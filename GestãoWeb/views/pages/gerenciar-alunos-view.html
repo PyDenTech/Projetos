@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Gerenciar Alunos</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+    <!-- Favicons -->
+    <link href="/img/favicon.png" rel="icon">
+    <link href="/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i" rel="stylesheet">
+    <!-- Vendor CSS Files -->
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="/vendor/simple-datatables/style.css" rel="stylesheet">
+    <!-- Template Main CSS File -->
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- ======= Header ======= -->
+    <header id="header" class="header fixed-top d-flex align-items-center">
+
+        <i class="bi bi-list toggle-sidebar-btn"></i>
+        <div class="d-flex align-items-center justify-content-between">
+            <a href="/dashboard-escolar" class="logo d-flex align-items-center">
+                <img src="/img/logo.png" alt="">
+            </a>
+        </div><!-- End Logo -->
+
+        <nav class="header-nav ms-auto">
+            <ul class="d-flex align-items-center">
+
+                <li class="nav-item dropdown pe-3">
+                    <a id="profile-link" class="nav-link nav-profile d-flex align-items-center pe-0" href="#"
+                        data-bs-toggle="dropdown">
+                        <img id="profile-image" src="/img/user.png" alt="Foto de Perfil" class="rounded-circle">
+                        <span id="usuarioNome" class="d-none d-md-block dropdown-toggle ps-2"></span>
+                    </a><!-- End Profile Image Icon -->
+
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="/users-profile">
+                                <i class="bi bi-person"></i>
+                                <span>Meu Perfil</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="/users-profile">
+                                <i class="bi bi-gear"></i>
+                                <span>Configurações de Conta</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="/faq">
+                                <i class="bi bi-question-circle"></i>
+                                <span>Ajuda</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="#" id="logout-link">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Sair</span>
+                            </a>
+                        </li>
+                    </ul><!-- End Profile Dropdown Items -->
+                </li><!-- End Profile Nav -->
+
+            </ul>
+        </nav><!-- End Icons Navigation -->
+
+    </header><!-- End Header -->
+
+    <!-- ======= Sidebar ======= -->
+    <aside id="sidebar" class="sidebar">
+
+        <ul class="sidebar-nav" id="sidebar-nav">
+            <li class="nav-heading">Transporte Escolar</li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="/dashboard-escolar">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Painel de Controle</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#escolas-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/escolas.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    <span>Escolas</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="escolas-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-escolas-form">
+                            <i class="bi bi-house-door"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-escolas-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-target="#aluno-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/aluno.svg" alt="Censo Escolar"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    <span>Alunos</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="aluno-nav" class="nav-content" data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-aluno-form">
+                            <i class="bi bi-person-plus"></i><span>Solicitar Cadastro</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-alunos-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/importar-aluno-form">
+                            <i class="bi bi-file-earmark-arrow-up"></i><span>Importar Dados</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/visualizar-alunos-map">
+                            <i class="bi bi-eye"></i><span>Vizualizar</span>
+                        </a>
+                    </li>
+                </ul>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#routs-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/rotas.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    </i><span>Rotas</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="routs-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-rotas-form">
+                            <i class="bi bi-plus-square"></i><span>Cadastrar Rota</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="/desenhar-rotas-map">
+                            <i class="bi bi-pencil"></i><span>Gerar Rotas</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/visualizar-rotas">
+                            <i class="bi bi-eye"></i><span>Vizualizar Rotas</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#driverbus-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/motoristas.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="driverbus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-motorista-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-motoristas-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerar-relatorio-view">
+                            <i class="bi bi-clipboard2-check"></i><span>Relatórios</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/check-list">
+                            <i class="bi bi-list-check"></i><span>Check List</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/monitor-icone-branco.png" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    </i><span>Monitores</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-monitores-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-monitores-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#fornecedores-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/fornecedores.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    </i><span>Fornecedor</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="fornecedores-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-fornecedores-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-fornecedores-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/vizualizar-fornecedores-map">
+                            <i class="bi bi-eye"></i><span>Vizualizar</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#bus-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/frotas.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    </i><span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="bus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-onibus-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-onibus-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/vizualizar-onibus-map">
+                            <i class="bi bi-eye"></i><span>Vizualizar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/solicitar-onibus-services">
+                            <i class="bi bi-file-earmark-text"></i><span>Ordem de Serviço</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="nav-heading">Administrativo</li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="/dashboard-adm">
+                    <i class="bi bi-speedometer"></i>
+                    <span>Painel de Controle</span>
+                </a>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#car-nav" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-car-front"></i><span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="car-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-carro-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-carros-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/localizar-carros-map">
+                            <i class="bi bi-geo-alt-fill"></i><span>Localizar</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#drivercar-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/motoristas.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="drivercar-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-motorista-carro-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-motorista-carro-form">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#tarefas-nav" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-list-check"></i><span>Tarefas</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="tarefas-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-demandas">
+                            <i class="bi bi-file-earmark-text"></i><span>Nova Tarefa</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/tasks">
+                            <i class="bi bi-person-plus"></i><span>Gerenciar Tarefas</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-heading">Controle Financeiro</li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#fuel-nav" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-droplet-half"></i><span>Abastecimento</span><i
+                        class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="fuel-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-abastecimento-view">
+                            <i class="bi bi-file-earmark-text"></i><span>Cadastrar Requisição</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-abastecimento-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+        </ul>
+
+    </aside><!-- End Sidebar-->
+
+    <main id="main" class="main">
+        <div class="pagetitle">
+            <h1>Gerenciar Alunos</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/dashboard-escolar"><i class="bi bi-house"></i></a></li>
+                    <li class="breadcrumb-item"><a href="/gerenciar-escolas-view">Escolas</a></li>
+                    <li class="breadcrumb-item active">Gerenciar Alunos</li>
+                </ol>
+            </nav>
+        </div><!-- End Page Title -->
+
+        <section class="section">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Filtrar Alunos</h5>
+                            <div class="mb-3">
+                                <label for="escolaSelect" class="form-label">Selecione a Escola</label>
+                                <select class="form-select" id="escolaSelect" name="id_escola" required>
+                                    <!-- Options dinâmicas -->
+                                </select>
+                            </div>
+                            <h5 class="card-title">Alunos</h5>
+                            <div class="table-responsive">
+                                <table class="table table-striped" id="alunosTable">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Nome <span class="bi bi-arrow-down-up"></span></th>
+                                            <th>Data de Nascimento <span class="bi bi-arrow-down-up"></span></th>
+                                            <th>Série <span class="bi bi-arrow-down-up"></span></th>
+                                            <th>Turma <span class="bi bi-arrow-down-up"></span></th>
+                                            <th>Endereço <span class="bi bi-arrow-down-up"></span></th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Dados dos alunos -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="statusMessage" class="mt-3"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main><!-- End #main -->
+
+    <!-- Modal de Edição de Aluno -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Editar Aluno</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm">
+                        <div class="mb-3">
+                            <label for="editNome" class="form-label">Nome</label>
+                            <input type="text" class="form-control" id="editNome" name="nome" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDtNascimento" class="form-label">Data de Nascimento</label>
+                            <input type="date" class="form-control" id="editDtNascimento" name="dt_nascimento" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editSituacao" class="form-label">Situação</label>
+                            <input type="text" class="form-control" id="editSituacao" name="situacao" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editSerie" class="form-label">Série</label>
+                            <input type="text" class="form-control" id="editSerie" name="serie" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editTurma" class="form-label">Turma</label>
+                            <input type="text" class="form-control" id="editTurma" name="turma" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editEndereco" class="form-label">Endereço</label>
+                            <input type="text" class="form-control" id="editEndereco" name="endereco" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editRotaTransporte" class="form-label">Rota Transporte</label>
+                            <input type="text" class="form-control" id="editRotaTransporte" name="rota_transporte">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editUsaTransporteEscolar" class="form-label">Usa Transporte Escolar</label>
+                            <select class="form-select" id="editUsaTransporteEscolar" name="usa_transporte_escolar"
+                                required>
+                                <option value="true">Sim</option>
+                                <option value="false">Não</option>
+                            </select>
+                        </div>
+                        <input type="hidden" id="editAlunoId">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" onclick="salvarEdicao()">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vendor JS Files -->
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/vendor/echarts/echarts.min.js"></script>
+    <script src="/vendor/quill/quill.min.js"></script>
+    <script src="/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="/vendor/tinymce/tinymce.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="/js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('/api/escolas')
+                .then(response => response.json())
+                .then(data => {
+                    const escolaSelect = document.getElementById('escolaSelect');
+                    data.forEach(escola => {
+                        const option = document.createElement('option');
+                        option.value = escola.id;
+                        option.textContent = escola.nome;
+                        escolaSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar escolas:', error));
+
+            document.getElementById('escolaSelect').addEventListener('change', function () {
+                const escolaId = this.value;
+                fetchAlunos(escolaId);
+            });
+
+            function fetchAlunos(escolaId) {
+                fetch(`/api/alunos?escolaId=${escolaId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const alunosTableBody = document.getElementById('alunosTable').querySelector('tbody');
+                        alunosTableBody.innerHTML = '';
+
+                        data.forEach((aluno, index) => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${aluno.nome}</td>
+                        <td>${aluno.dt_nascimento}</td>
+                        <td>${aluno.serie}</td>
+                        <td>${aluno.turma}</td>
+                        <td>${aluno.endereco}</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" onclick="editarAluno(${aluno.id})">Editar</button>
+                            <button class="btn btn-danger btn-sm" onclick="excluirAluno(${aluno.id})">Excluir</button>
+                        </td>
+                    `;
+                            alunosTableBody.appendChild(row);
+                        });
+
+                        const quantidadeAlunos = data.length;
+                        document.getElementById('statusMessage').textContent = `Total de alunos: ${quantidadeAlunos}`;
+                    })
+                    .catch(error => console.error('Erro ao carregar alunos:', error));
+            }
+        });
+
+        function editarAluno(alunoId) {
+            fetch(`/api/alunos/${alunoId}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('editAlunoId').value = data.id;
+                    document.getElementById('editNome').value = data.nome;
+                    document.getElementById('editDtNascimento').value = data.dt_nascimento;
+                    document.getElementById('editSituacao').value = data.situacao;
+                    document.getElementById('editSerie').value = data.serie;
+                    document.getElementById('editTurma').value = data.turma;
+                    document.getElementById('editEndereco').value = data.endereco;
+                    document.getElementById('editRotaTransporte').value = data.rota_transporte;
+                    document.getElementById('editUsaTransporteEscolar').value = data.usa_transporte_escolar.toString();
+
+                    const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+                    editModal.show();
+                })
+                .catch(error => console.error('Erro ao carregar dados do aluno:', error));
+        }
+
+        function salvarEdicao() {
+            const alunoId = document.getElementById('editAlunoId').value;
+            const formData = new FormData(document.getElementById('editForm'));
+
+            fetch(`/api/alunos/${alunoId}`, {
+                method: 'PUT',
+                body: JSON.stringify(Object.fromEntries(formData)),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Dados do aluno atualizados com sucesso.');
+                    const editModal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+                    editModal.hide();
+                    const escolaSelect = document.getElementById('escolaSelect');
+                    fetchAlunos(escolaSelect.value);
+                })
+                .catch(error => console.error('Erro ao salvar dados do aluno:', error));
+        }
+
+        function excluirAluno(alunoId) {
+            if (confirm('Tem certeza que deseja excluir este aluno?')) {
+                fetch(`/api/alunos/${alunoId}`, {
+                    method: 'DELETE'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert('Aluno excluído com sucesso.');
+                        const escolaSelect = document.getElementById('escolaSelect');
+                        fetchAlunos(escolaSelect.value);
+                    })
+                    .catch(error => console.error('Erro ao excluir aluno:', error));
+            }
+        }
+
+        function sortTableByColumn(table, column, asc = true) {
+            const dirModifier = asc ? 1 : -1;
+            const tBody = table.tBodies[0];
+            const rows = Array.from(tBody.querySelectorAll('tr'));
+
+            const sortedRows = rows.sort((a, b) => {
+                const aColText = a.querySelector(`td:nth-child(${column + 1})`).textContent.trim();
+                const bColText = b.querySelector(`td:nth-child(${column + 1})`).textContent.trim();
+
+                return aColText > bColText ? (1 * dirModifier) : (-1 * dirModifier);
+            });
+
+            while (tBody.firstChild) {
+                tBody.removeChild(tBody.firstChild);
+            }
+
+            tBody.append(...sortedRows);
+
+            table.querySelectorAll('th').forEach(th => th.classList.remove('th-sort-asc', 'th-sort-desc'));
+            table.querySelector(`th:nth-child(${column + 1})`).classList.toggle('th-sort-asc', asc);
+            table.querySelector(`th:nth-child(${column + 1})`).classList.toggle('th-sort-desc', !asc);
+        }
+
+        document.querySelectorAll('.table-sortable th').forEach(headerCell => {
+            headerCell.addEventListener('click', () => {
+                const tableElement = headerCell.parentElement.parentElement.parentElement;
+                const headerIndex = Array.prototype.indexOf.call(headerCell.parentElement.children, headerCell);
+                const currentIsAscending = headerCell.classList.contains('th-sort-asc');
+
+                sortTableByColumn(tableElement, headerIndex, !currentIsAscending);
+            });
+        });
+
+    </script>
+</body>
+
+</html>

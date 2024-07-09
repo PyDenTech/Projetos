@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>PyDenExpress</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="/img/favicon.png" rel="icon">
+  <link href="/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="/vendor/quill/quill.bubble.css" rel="stylesheet">
+  <link href="/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="/vendor/simple-datatables/style.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="/css/style.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+  <header id="header" class="header fixed-top d-flex align-items-center">
+
+    <i class="bi bi-list toggle-sidebar-btn"></i>
+    <div class="d-flex align-items-center justify-content-between">
+      <a href="/dashboard-escolar" class="logo d-flex align-items-center">
+        <img src="/img/logo.png" alt="">
+      </a>
+    </div><!-- End Logo -->
+
+    <nav class="header-nav ms-auto">
+      <ul class="d-flex align-items-center">
+
+        <li class="nav-item dropdown pe-3">
+          <a id="profile-link" class="nav-link nav-profile d-flex align-items-center pe-0" href="#"
+            data-bs-toggle="dropdown">
+            <img id="profile-image" src="/img/user.png" alt="Foto de Perfil" class="rounded-circle">
+            <span id="usuarioNome" class="d-none d-md-block dropdown-toggle ps-2"></span>
+          </a><!-- End Profile Image Icon -->
+
+          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="/users-profile">
+                <i class="bi bi-person"></i>
+                <span>Meu Perfil</span>
+              </a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="/users-profile">
+                <i class="bi bi-gear"></i>
+                <span>Configurações de Conta</span>
+              </a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="/faq">
+                <i class="bi bi-question-circle"></i>
+                <span>Ajuda</span>
+              </a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="#" id="logout-link">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Sair</span>
+              </a>
+            </li>
+          </ul><!-- End Profile Dropdown Items -->
+        </li><!-- End Profile Nav -->
+
+      </ul>
+    </nav><!-- End Icons Navigation -->
+
+  </header><!-- End Header -->
+
+  <!-- ======= Sidebar ======= -->
+  <aside id="sidebar" class="sidebar">
+
+    <ul class="sidebar-nav" id="sidebar-nav">
+      <li class="nav-heading">Transporte Escolar</li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="/dashboard-escolar">
+          <i class="bi bi-speedometer2"></i>
+          <span>Painel de Controle</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#escolas-nav" data-bs-toggle="collapse" href="#">
+          <img src="/img/icones/escolas.svg" alt="Escolas"
+            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+          <span>Escolas</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="escolas-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-escolas-form">
+              <i class="bi bi-house-door"></i><span>Cadastrar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-escolas-view">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#aluno-nav" data-bs-toggle="collapse" href="#">
+          <img src="/img/icones/aluno.svg" alt="Censo Escolar"
+            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+          <span>Alunos</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="aluno-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-aluno-form">
+              <i class="bi bi-person-plus"></i><span>Solicitar Cadastro</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-alunos-view">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/importar-aluno-form">
+              <i class="bi bi-file-earmark-arrow-up"></i><span>Importar Dados</span>
+            </a>
+          </li>
+          <li>
+            <a href="/visualizar-alunos-map">
+              <i class="bi bi-eye"></i><span>Vizualizar</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#routs-nav" data-bs-toggle="collapse" href="#">
+          <img src="/img/icones/rotas.svg" alt="Escolas"
+            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+          </i><span>Rotas</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="routs-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-rotas-form">
+              <i class="bi bi-plus-square"></i><span>Cadastrar Rota</span>
+            </a>
+          </li>
+          <li>
+            <a href="/desenhar-rotas-map">
+              <i class="bi bi-pencil"></i><span>Gerar Rotas</span>
+            </a>
+          </li>
+          <li>
+            <a href="/visualizar-rotas">
+              <i class="bi bi-eye"></i><span>Vizualizar Rotas</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#driverbus-nav" data-bs-toggle="collapse" href="#">
+          <img src="/img/icones/motoristas.svg" alt="Escolas"
+            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+          <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="driverbus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-motorista-form">
+              <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-motoristas-view">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerar-relatorio-view">
+              <i class="bi bi-clipboard2-check"></i><span>Relatórios</span>
+            </a>
+          </li>
+          <li>
+            <a href="/check-list">
+              <i class="bi bi-list-check"></i><span>Check List</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
+          <img src="/img/icones/monitor-icone-branco.png" alt="Escolas"
+            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+          </i><span>Monitores</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-monitores-form">
+              <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-monitores-view">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#fornecedores-nav" data-bs-toggle="collapse" href="#">
+          <img src="/img/icones/fornecedores.svg" alt="Escolas"
+            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+          </i><span>Fornecedor</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="fornecedores-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-fornecedores-form">
+              <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-fornecedores-view">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/vizualizar-fornecedores-map">
+              <i class="bi bi-eye"></i><span>Vizualizar</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#bus-nav" data-bs-toggle="collapse" href="#">
+          <img src="/img/icones/frotas.svg" alt="Escolas"
+            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+          </i><span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="bus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-onibus-form">
+              <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-onibus-view">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/vizualizar-onibus-map">
+              <i class="bi bi-eye"></i><span>Vizualizar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/solicitar-onibus-services">
+              <i class="bi bi-file-earmark-text"></i><span>Ordem de Serviço</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <li class="nav-heading">Administrativo</li>
+      <li class="nav-item">
+        <a class="nav-link" href="dashboard-adm.html">
+          <i class="bi bi-speedometer"></i>
+          <span>Painel de Controle</span>
+        </a>
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#car-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-car-front"></i><span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="car-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-carro-form">
+              <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-carros-view">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/localizar-carros-map">
+              <i class="bi bi-geo-alt-fill"></i><span>Localizar</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#drivercar-nav" data-bs-toggle="collapse" href="#">
+          <img src="/img/icones/motoristas.svg" alt="Escolas"
+            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+          <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="drivercar-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-motorista-carro-form">
+              <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-motorista-carro-form">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#tarefas-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-list-check"></i><span>Tarefas</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="tarefas-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-demandas">
+              <i class="bi bi-file-earmark-text"></i><span>Nova Tarefa</span>
+            </a>
+          </li>
+          <li>
+            <a href="/tasks">
+              <i class="bi bi-person-plus"></i><span>Gerenciar Tarefas</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <li class="nav-heading">Controle Financeiro</li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#fuel-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-droplet-half"></i><span>Abastecimento</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="fuel-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-abastecimento-view">
+              <i class="bi bi-file-earmark-text"></i><span>Cadastrar Requisição</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-abastecimento-view">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+    </ul>
+
+  </aside><!-- End Sidebar-->
+
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Controle Transprote Administrativo <i class="bi bi-car-front"></i></h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/dashboard-escolar"><i class="bi bi-house"></i></a></li>
+          <li class="breadcrumb-item active">Controle Transprote Administrativo</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section dashboard">
+      <div class="row">
+
+        <!-- Left side columns -->
+        <div class="col-lg-8">
+          <div class="row">
+
+
+            <!-- Solicitações Recentes -->
+            <div class="col-12">
+              <div class="card recent-sales overflow-auto">
+
+                <div class="card-body">
+                  <h5 class="card-title">Solicitações mais Recentes <button
+                      onclick="window.location.href='/cadastrar-demandas';"
+                      class="btn btn-primary btn-sm ms-2"><i class="bi bi-plus"></i> Nova Solicitação</button></h5>
+                      
+                      <table class="table table-borderless">
+                        <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Requerente</th>
+                        <th scope="col">Descrição da Solicitação</th>
+                        <th scope="col">Data</th>
+                        <th scope="col">Motorista</th>
+                        <th scope="col">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th scope="row"><a href="#">#2457</a></th>
+                        <td>Gabinete</td>
+                        <td scope="row">Viagem à Marabá</td>
+                        <td>01/01/2021</td>
+                        <td>Thalisson</td>
+                        <td><span class="badge bg-primary">Em andamento</span></td>
+                      </tr>
+                      <tr>
+                        <th scope="row"><a href="#">#2457</a></th>
+                        <td>Pedagógico</td>
+                        <td scope="row">Viagem à Marabá</td>
+                        <td>01/01/2021</td>
+                        <td>Diego</td>
+                        <td><span class="badge bg-success">Concluida</span></td>
+                      <tr>
+                        <th scope="row"><a href="#">#2147</a></th>
+                        <td>Pedagógico</td>
+                        <td scope="row">Solicitação de Transporte</td>
+                        <td>05/01/2021</td>
+                        <td>Ronaldo</td>
+                        <td><span class="badge bg-warning">Pendente</span></td>
+                      </tr>
+                      <tr>
+                        <th scope="row"><a href="#">#2049</a></th>
+                        <td>Escola Carlos Henrique</td>
+                        <td scope="row">Transporte de Material</td>
+                        <td>10/01/2021</td>
+                        <td> - </td>
+                        <td><span class="badge bg-danger">Rejeitada</span></td>
+                      </tr>
+                      <tr>
+                        <th scope="row"><a href="#">#2644</a></th>
+                        <td>Setor de Tecnologia</td>
+                        <td scope="row">Pedido de Transporte</td>
+                        <td>15/01/2021</td>
+                        <td>Gilcivaldo</td>
+                        <td><span class="badge bg-success">Concluida</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                </div>
+
+              </div>
+            </div><!-- Fim de Solicitações Recentes -->
+
+
+            <!-- Motoristas Mais Ativos -->
+            <div class="col-12">
+              <div class="card top-selling overflow-auto">
+
+                <div class="card-body pb-0">
+                  <h5 class="card-title">Motoristas Mais Ativos <span>| Este Mês</span></h5>
+
+                  <table class="table table-borderless">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Nome do Motorista</th>
+                        <th scope="col">Rotas Realizadas</th>
+                        <th scope="col">Km Percorridos</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th scope="row">1</th>
+                        <td>Carlos Silva</td>
+                        <td class="fw-bold">150</td>
+                        <td>1200 Km</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">2</th>
+                        <td>Maria Fernandes</td>
+                        <td class="fw-bold">145</td>
+                        <td>1150 Km</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">3</th>
+                        <td>João Pereira</td>
+                        <td class="fw-bold">140</td>
+                        <td>1100 Km</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">4</th>
+                        <td>Ana Júlia</td>
+                        <td class="fw-bold">135</td>
+                        <td>1050 Km</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">5</th>
+                        <td>Ricardo Gomes</td>
+                        <td class="fw-bold">130</td>
+                        <td>1000 Km</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">6</th>
+                        <td>Roberto Carlos</td>
+                        <td class="fw-bold">125</td>
+                        <td>950 Km</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">7</th>
+                        <td>Luciana Alves</td>
+                        <td class="fw-bold">120</td>
+                        <td>900 Km</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">8</th>
+                        <td>Felipe Neto</td>
+                        <td class="fw-bold">115</td>
+                        <td>870 Km</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">9</th>
+                        <td>Sandra Moraes</td>
+                        <td class="fw-bold">110</td>
+                        <td>850 Km</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">10</th>
+                        <td>Gustavo Lima</td>
+                        <td class="fw-bold">105</td>
+                        <td>820 Km</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">11</th>
+                        <td>Patrícia Rocha</td>
+                        <td class="fw-bold">100</td>
+                        <td>790 Km</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">12</th>
+                        <td>Fernando Dias</td>
+                        <td class="fw-bold">95</td>
+                        <td>760 Km</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">13</th>
+                        <td>Juliana Martins</td>
+                        <td class="fw-bold">90</td>
+                        <td>730 Km</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">14</th>
+                        <td>Antonio Banderas</td>
+                        <td class="fw-bold">85</td>
+                        <td>700 Km</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">15</th>
+                        <td>Marcia Andrade</td>
+                        <td class="fw-bold">80</td>
+                        <td>670 Km</td>
+                      </tr>
+                      <tr>
+                        <th scope="row">16</th>
+                        <td>Luiz Henrique</td>
+                        <td class="fw-bold">75</td>
+                        <td>640 Km</td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                </div>
+
+              </div>
+            </div><!-- Fim de Motoristas Mais Ativos -->
+
+
+          </div>
+        </div><!-- End Left side columns -->
+
+        <!-- Right side columns -->
+        <div class="col-lg-4">
+
+          <!-- Recent Activity -->
+          <!-- Atualizações Recentes de Rotas -->
+          <div class="card">
+            <div class="filter">
+              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                <li class="dropdown-header text-start">
+                  <h6>Filtrar por Motorista</h6>
+                </li>
+                <li><a class="dropdown-item" href="#">Carlos Silva</a></li>
+                <li><a class="dropdown-item" href="#">Ana Júlia</a></li>
+                <li><a class="dropdown-item" href="#">Ricardo Gomes</a></li>
+                <li><a class="dropdown-item" href="#">Márcia Andrade</a></li>
+                <li><a class="dropdown-item" href="#">Luiz Henrique</a></li>
+                <!-- Adicione mais motoristas conforme necessário -->
+              </ul>
+            </div>
+
+            <div class="card-body">
+              <h5 class="card-title">Atualizações de Rotas <span>| Hoje</span></h5>
+
+              <div class="activity">
+                <div class="activity-item d-flex">
+                  <div class="activite-label">10 min</div>
+                  <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
+                  <div class="activity-content">
+                    Rota completa por <a href="#" class="fw-bold text-dark">Carlos Silva</a> na Zona Urbana.
+                  </div>
+                </div><!-- Fim do item de atividade -->
+
+                <div class="activity-item d-flex">
+                  <div class="activite-label">30 min</div>
+                  <i class='bi bi-circle-fill activity-badge text-warning align-self-start'></i>
+                  <div class="activity-content">
+                    Atraso reportado por <a href="#" class="fw-bold text-dark">Ana Júlia</a> devido ao tráfego intenso.
+                  </div>
+                </div><!-- Fim do item de atividade -->
+
+                <div class="activity-item d-flex">
+                  <div class="activite-label">1 hora</div>
+                  <i class='bi bi-circle-fill activity-badge text-danger align-self-start'></i>
+                  <div class="activity-content">
+                    Manutenção urgente solicitada por <a href="#" class="fw-bold text-dark">Ricardo Gomes</a> no
+                    veículo.
+                  </div>
+                </div><!-- Fim do item de atividade -->
+
+                <div class="activity-item d-flex">
+                  <div class="activite-label">2 horas</div>
+                  <i class='bi bi-circle-fill activity-badge text-info align-self-start'></i>
+                  <div class="activity-content">
+                    Rota extra iniciada por <a href="#" class="fw-bold text-dark">Márcia Andrade</a> para atender
+                    demanda escolar.
+                  </div>
+                </div><!-- Fim do item de atividade -->
+
+                <div class="activity-item d-flex">
+                  <div class="activite-label">3 horas</div>
+                  <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
+                  <div class="activity-content">
+                    Rota concluída com sucesso por <a href="#" class="fw-bold text-dark">Luiz Henrique</a> na Zona
+                    Rural.
+                  </div>
+                </div><!-- Fim do item de atividade -->
+
+                <!-- Adicione mais itens de atividade conforme necessário -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Budget Report -->
+          <div class="card">
+            <div class="filter">
+              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                <li class="dropdown-header text-start">
+                  <h6>Filtrar</h6>
+                </li>
+
+                <li><a class="dropdown-item" href="#">Hoje</a></li>
+                <li><a class="dropdown-item" href="#">Este Mês</a></li>
+                <li><a class="dropdown-item" href="#">Este Ano</a></li>
+              </ul>
+            </div>
+
+            <div class="card-body pb-0">
+              <h5 class="card-title">Relatório de Orçamento <span>| Este Mês</span></h5>
+
+              <div id="budgetChart" style="min-height: 400px;" class="echart"></div>
+
+              <script>
+                document.addEventListener("DOMContentLoaded", () => {
+                  var budgetChart = echarts.init(document.querySelector("#budgetChart")).setOption({
+                    legend: {
+                      data: ['Orçamento Alocado', 'Gastos Reais']
+                    },
+                    radar: {
+                      indicator: [
+                        { name: 'Manutenção de Veículos', max: 50000 },
+                        { name: 'Combustível', max: 40000 },
+                        { name: 'Salários de Motoristas', max: 60000 },
+                        { name: 'Equipamentos', max: 30000 },
+                        { name: 'Administração', max: 25000 },
+                        { name: 'Marketing', max: 20000 }
+                      ]
+                    },
+                    series: [{
+                      name: 'Orçamento vs Gastos',
+                      type: 'radar',
+                      data: [
+                        { value: [45000, 32000, 48000, 25000, 20000, 15000], name: 'Orçamento Alocado' },
+                        { value: [40000, 35000, 50000, 20000, 18000, 12000], name: 'Gastos Reais' }
+                      ]
+                    }]
+                  });
+                });
+              </script>
+
+            </div>
+          </div><!-- End Budget Report -->
+
+        </div><!-- End Right side columns -->
+
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+
+  <!-- ======= Rodapé ======= -->
+  <footer id="footer" class="footer">
+    <div class="container">
+      <div class="row gy-4">
+
+
+        <div class="container mt-4">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="copyright">
+                &copy; Direitos Autorais <strong><span>PyDenExpress</span></strong>. Todos os Direitos Reservados
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="credits">
+                Desenvolvido por <a href="https://danilomorais.netlify.app/">Danilo de Morais</a>
+              </div>
+            </div>
+          </div>
+        </div>
+  </footer><!-- Fim do Rodapé -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+  <!-- Vendor JS Files -->
+  <script src="/vendor/apexcharts/apexcharts.min.js"></script>
+  <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/vendor/chart.js/chart.umd.js"></script>
+  <script src="/vendor/echarts/echarts.min.js"></script>
+  <script src="/vendor/quill/quill.min.js"></script>
+  <script src="/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="/vendor/tinymce/tinymce.min.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="/js/main.js"></script>
+  <script src="/js/users-profile.js"></script>
+</body>
+
+</html>

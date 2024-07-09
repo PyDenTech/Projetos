@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>PyDenExpress</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="/img/favicon.png" rel="icon">
+  <link href="/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="/vendor/quill/quill.bubble.css" rel="stylesheet">
+  <link href="/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="/vendor/simple-datatables/style.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="/css/style.css" rel="stylesheet">
+
+</head>
+
+<body>
+  
+ <!-- ======= Header ======= -->
+  <header id="header" class="header fixed-top d-flex align-items-center">
+
+    <i class="bi bi-list toggle-sidebar-btn"></i>
+    <div class="d-flex align-items-center justify-content-between">
+      <a href="/dashboard-escolar" class="logo d-flex align-items-center">
+        <img src="/img/logo.png" alt="">
+      </a>
+    </div><!-- End Logo -->
+
+    <nav class="header-nav ms-auto">
+      <ul class="d-flex align-items-center">
+
+        <li class="nav-item dropdown pe-3">
+          <a id="profile-link" class="nav-link nav-profile d-flex align-items-center pe-0" href="#"
+            data-bs-toggle="dropdown">
+            <img id="profile-image" src="/img/user.png" alt="Foto de Perfil" class="rounded-circle">
+            <span id="usuarioNome" class="d-none d-md-block dropdown-toggle ps-2"></span>
+          </a><!-- End Profile Image Icon -->
+
+          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="/users-profile">
+                <i class="bi bi-person"></i>
+                <span>Meu Perfil</span>
+              </a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="/users-profile">
+                <i class="bi bi-gear"></i>
+                <span>Configurações de Conta</span>
+              </a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="/faq">
+                <i class="bi bi-question-circle"></i>
+                <span>Ajuda</span>
+              </a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="#" id="logout-link">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Sair</span>
+              </a>
+            </li>
+          </ul><!-- End Profile Dropdown Items -->
+        </li><!-- End Profile Nav -->
+
+      </ul>
+    </nav><!-- End Icons Navigation -->
+
+  </header><!-- End Header -->
+
+  <!-- ======= Sidebar ======= -->
+  <aside id="sidebar" class="sidebar">
+
+    <ul class="sidebar-nav" id="sidebar-nav">
+      <li class="nav-heading">Transporte Escolar</li>
+      <li class="nav-item">
+        <a class="nav-link" href="/dashboard-escolar">
+          <i class="bi bi-speedometer2"></i>
+          <span>Painel de Controle</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#escolas-nav" data-bs-toggle="collapse" href="#">
+          <img src="/img/icones/escolas.svg" alt="Escolas"
+            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+          <span>Escolas</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="escolas-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-escolas-form">
+              <i class="bi bi-house-door"></i><span>Cadastrar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-escolas-view">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+
+        </ul>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#aluno-nav" data-bs-toggle="collapse" href="#">
+          <img src="/img/icones/aluno.svg" alt="Censo Escolar"
+            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+          <span>Alunos</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="aluno-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-aluno-form">
+              <i class="bi bi-person-plus"></i><span>Solicitar Cadastro</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-alunos-view">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/importar-aluno-form">
+              <i class="bi bi-file-earmark-arrow-up"></i><span>Importar Dados</span>
+            </a>
+          </li>
+          <li>
+            <a href="/visualizar-alunos-map">
+              <i class="bi bi-eye"></i><span>Vizualizar</span>
+            </a>
+          </li>
+        </ul>
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#routs-nav" data-bs-toggle="collapse" href="#">
+          <img src="/img/icones/rotas.svg" alt="Escolas"
+            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+          </i><span>Rotas</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="routs-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-rotas-form">
+              <i class="bi bi-plus-square"></i><span>Cadastrar Rota</span>
+            </a>
+          </li>
+
+          <li>
+            <a href="/desenhar-rotas-map">
+              <i class="bi bi-pencil"></i><span>Gerar Rotas</span>
+            </a>
+          </li>
+          <li>
+            <a href="/visualizar-rotas">
+              <i class="bi bi-eye"></i><span>Vizualizar Rotas</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#driverbus-nav" data-bs-toggle="collapse" href="#">
+          <img src="/img/icones/motoristas.svg" alt="Escolas"
+            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+          <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="driverbus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-motorista-form">
+              <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-motoristas-view">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerar-relatorio-view">
+              <i class="bi bi-clipboard2-check"></i><span>Relatórios</span>
+            </a>
+          </li>
+          <li>
+            <a href="/check-list">
+              <i class="bi bi-list-check"></i><span>Check List</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
+          <img src="/img/icones/monitor-icone-branco.png" alt="Escolas"
+            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+          </i><span>Monitores</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-monitores-form">
+              <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-monitores-view">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#fornecedores-nav" data-bs-toggle="collapse" href="#">
+          <img src="/img/icones/fornecedores.svg" alt="Escolas"
+            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+          </i><span>Fornecedor</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="fornecedores-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-fornecedores-form">
+              <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-fornecedores-view">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/vizualizar-fornecedores-map">
+              <i class="bi bi-eye"></i><span>Vizualizar</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#bus-nav" data-bs-toggle="collapse" href="#">
+          <img src="/img/icones/frotas.svg" alt="Escolas"
+            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+          </i><span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="bus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-onibus-form">
+              <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-onibus-view">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/vizualizar-onibus-map">
+              <i class="bi bi-eye"></i><span>Vizualizar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/solicitar-onibus-services">
+              <i class="bi bi-file-earmark-text"></i><span>Ordem de Serviço</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <li class="nav-heading">Administrativo</li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="/dashboard-adm">
+          <i class="bi bi-speedometer"></i>
+          <span>Painel de Controle</span>
+        </a>
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#car-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-car-front"></i><span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="car-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-carro-form">
+              <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-carros-view">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/localizar-carros-map">
+              <i class="bi bi-geo-alt-fill"></i><span>Localizar</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#drivercar-nav" data-bs-toggle="collapse" href="#">
+          <img src="/img/icones/motoristas.svg" alt="Escolas"
+            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+          <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="drivercar-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-motorista-carro-form">
+              <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-motorista-carro-form">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#tarefas-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-list-check"></i><span>Tarefas</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="tarefas-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-demandas">
+              <i class="bi bi-file-earmark-text"></i><span>Nova Tarefa</span>
+            </a>
+          </li>
+          <li>
+            <a href="/tasks">
+              <i class="bi bi-person-plus"></i><span>Gerenciar Tarefas</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li class="nav-heading">Controle Financeiro</li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#fuel-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-droplet-half"></i><span>Abastecimento</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="fuel-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-abastecimento-view">
+              <i class="bi bi-file-earmark-text"></i><span>Cadastrar Requisição</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-abastecimento-view">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+    </ul>
+
+  </aside><!-- End Sidebar-->
+
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Painel de Controle Escolar <i class="bi bi-bus-front"></i></h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/dashboard-escolar"><i class="bi bi-house"></i></a></li>
+          <li class="breadcrumb-item active">Painel de Controle Escolar</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section dashboard">
+      <div class="row">
+        <!-- Left side columns -->
+        <div class="col-lg-8">
+          <div class="row">
+
+            <!-- Alunos com rota -->
+            <div class="col-xxl-4 col-md-6">
+              <div class="card info-card">
+                <div class="card-body">
+                  <h5 class="card-title">Alunos Atendidos</h5>
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="bi bi-people"></i>
+                    </div>
+                    <div class="ps-3">
+                      <h6 id="alunosAtendidos">0</h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Escolas Atendidas por Rotas -->
+            <div class="col-xxl-4 col-md-6">
+              <div class="card info-card">
+                <div class="card-body">
+                  <h5 class="card-title">Escolas Atendidas</h5>
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="bi bi-house"></i>
+                    </div>
+                    <div class="ps-3">
+                      <h6 id="escolasAtendidas">0</h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quantidade de Rotas -->
+            <div class="col-xxl-4 col-md-6">
+              <div class="card info-card">
+                <div class="card-body">
+                  <h5 class="card-title">Quantidade de Rotas</h5>
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="bi bi-map"></i>
+                    </div>
+                    <div class="ps-3">
+                      <h6 id="quantidade-rotas">0</h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quilometragem Total -->
+            <div class="col-xxl-4 col-md-6">
+              <div class="card info-card">
+                <div class="card-body">
+                  <h5 class="card-title">Quilometragem Total</h5>
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="bi bi-speedometer2"></i>
+                    </div>
+                    <div class="ps-3">
+                      <h6 id="quilometragem-total">0</h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quilometragem Média das Rotas -->
+            <div class="col-xxl-4 col-md-6">
+              <div class="card info-card">
+                <div class="card-body">
+                  <h5 class="card-title">Quilometragem Média</h5>
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="bi bi-calculator"></i>
+                    </div>
+                    <div class="ps-3">
+                      <h6 id="quilometragem-media">0</h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Tempo Médio das Rotas -->
+            <div class="col-xxl-4 col-md-6">
+              <div class="card info-card">
+                <div class="card-body">
+                  <h5 class="card-title">Tempo Médio das Rotas</h5>
+                  <div class="d-flex align-items-center">
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+                      <i class="bi bi-clock"></i>
+                    </div>
+                    <div class="ps-3">
+                      <h6 id="tempo-medio">0</h6>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Reports -->
+            <!-- HTML -->
+            <div class="col-12">
+              <div class="card">
+                <div class="filter">
+                  <a class="icon" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                    <li class="dropdown-header text-start">
+                      <h6>Filtrar por Ano</h6>
+                    </li>
+                    <li><a class="dropdown-item" onclick="filterRoutes(2024)">2024</a></li>
+                    <li><a class="dropdown-item" onclick="filterRoutes(2023)">2023</a></li>
+                    <li><a class="dropdown-item" onclick="filterRoutes(2022)">2022</a></li>
+                    <!-- Adicione mais anos conforme necessário -->
+                  </ul>
+                </div>
+                <div class="card-body">
+                  <h5 class="card-title">Rotas Cadastradas Mensalmente</h5>
+                  <div id="reportsChart"></div>
+                </div>
+              </div>
+            </div><!-- End Reports -->
+
+            <!-- Atualizações e Comunicados -->
+            <div class="card">
+              <div class="filter">
+                <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                  <li class="dropdown-header text-start">
+                    <h6>Filtrar</h6>
+                  </li>
+
+                  <li><a class="dropdown-item" href="#">Hoje</a></li>
+                  <li><a class="dropdown-item" href="#">Este Mês</a></li>
+                  <li><a class="dropdown-item" href="#">Este Ano</a></li>
+                </ul>
+              </div>
+
+              <div class="card-body pb-0">
+                <h5 class="card-title">Atualizações e Comunicados <span>| Hoje</span></h5>
+
+                <div class="news">
+                  <div class="post-item clearfix">
+                    <h4><a href="#">Novas Rotas Escolares Implementadas</a></h4>
+                    <p>Informamos que novas rotas escolares foram implementadas para melhor atender a região norte da
+                      cidade...</p>
+                  </div>
+
+                  <div class="post-item clearfix">
+                    <h4><a href="#">Atualização na Política de Transporte</a></h4>
+                    <p>Uma atualização importante na política de transporte escolar entra em vigor a partir do próximo
+                      mês...</p>
+                  </div>
+
+                  <div class="post-item clearfix">
+                    <h4><a href="#">Manutenção Programada da Frota</a></h4>
+                    <p>Informamos que a manutenção programada da frota de veículos ocorrerá na próxima semana. Algumas
+                      rotas podem sofrer alterações temporárias...</p>
+                  </div>
+
+                  <div class="post-item clearfix">
+                    <h4><a href="#">Treinamento de Segurança para Motoristas</a></h4>
+                    <p>Estamos organizando um treinamento de segurança obrigatório para todos os nossos motoristas,
+                      visando melhorar ainda mais a segurança de nossos passageiros...</p>
+                  </div>
+
+                  <div class="post-item clearfix">
+                    <h4><a href="#">Integração com Novo Sistema de Monitoramento</a></h4>
+                    <p>Estamos felizes em anunciar a integração com um novo sistema de monitoramento de veículos, que
+                      permitirá um controle mais eficaz e seguro das rotas...</p>
+                  </div>
+
+                </div><!-- Fim das Atualizações e Comunicados -->
+
+              </div>
+            </div><!-- Fim de Atualizações e Comunicados -->
+          </div>
+        </div><!-- End Left side columns -->
+
+        <!-- Right side columns -->
+        <div class="col-lg-4">
+
+          <!-- Recent Activity -->
+          <!-- Atualizações Recentes de Rotas -->
+          <div class="card">
+            <div class="filter">
+              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                <li class="dropdown-header text-start">
+                  <h6>Filtrar por Motorista</h6>
+                </li>
+                <li><a class="dropdown-item" href="#">Carlos Silva</a></li>
+                <li><a class="dropdown-item" href="#">Ana Júlia</a></li>
+                <li><a class="dropdown-item" href="#">Ricardo Gomes</a></li>
+                <li><a class="dropdown-item" href="#">Márcia Andrade</a></li>
+                <li><a class="dropdown-item" href="#">Luiz Henrique</a></li>
+                <!-- Adicione mais motoristas conforme necessário -->
+              </ul>
+            </div>
+
+            <div class="card-body">
+              <h5 class="card-title">Atualizações de Rotas <span>| Hoje</span></h5>
+
+              <div class="activity">
+                <div class="activity-item d-flex">
+                  <div class="activite-label">10 min</div>
+                  <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
+                  <div class="activity-content">
+                    Rota completa por <a href="#" class="fw-bold text-dark">Carlos Silva</a> na Zona Urbana.
+                  </div>
+                </div><!-- Fim do item de atividade -->
+
+                <div class="activity-item d-flex">
+                  <div class="activite-label">30 min</div>
+                  <i class='bi bi-circle-fill activity-badge text-warning align-self-start'></i>
+                  <div class="activity-content">
+                    Atraso reportado por <a href="#" class="fw-bold text-dark">Ana Júlia</a> devido ao tráfego intenso.
+                  </div>
+                </div><!-- Fim do item de atividade -->
+
+                <div class="activity-item d-flex">
+                  <div class="activite-label">1 hora</div>
+                  <i class='bi bi-circle-fill activity-badge text-danger align-self-start'></i>
+                  <div class="activity-content">
+                    Manutenção urgente solicitada por <a href="#" class="fw-bold text-dark">Ricardo Gomes</a> no
+                    veículo.
+                  </div>
+                </div><!-- Fim do item de atividade -->
+
+                <div class="activity-item d-flex">
+                  <div class="activite-label">2 horas</div>
+                  <i class='bi bi-circle-fill activity-badge text-info align-self-start'></i>
+                  <div class="activity-content">
+                    Rota extra iniciada por <a href="#" class="fw-bold text-dark">Márcia Andrade</a> para atender
+                    demanda escolar.
+                  </div>
+                </div><!-- Fim do item de atividade -->
+
+                <div class="activity-item d-flex">
+                  <div class="activite-label">3 horas</div>
+                  <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
+                  <div class="activity-content">
+                    Rota concluída com sucesso por <a href="#" class="fw-bold text-dark">Luiz Henrique</a> na Zona
+                    Rural.
+                  </div>
+                </div><!-- Fim do item de atividade -->
+
+                <!-- Adicione mais itens de atividade conforme necessário -->
+              </div>
+            </div>
+          </div>
+
+
+          <!-- Budget Report -->
+          <div class="card">
+            <div class="filter">
+              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                <li class="dropdown-header text-start">
+                  <h6>Filtrar</h6>
+                </li>
+
+                <li><a class="dropdown-item" href="#">Hoje</a></li>
+                <li><a class="dropdown-item" href="#">Este Mês</a></li>
+                <li><a class="dropdown-item" href="#">Este Ano</a></li>
+              </ul>
+            </div>
+
+            <div class="card-body pb-0">
+              <h5 class="card-title">Relatório de Orçamento <span>| Este Mês</span></h5>
+
+              <div id="budgetChart" style="min-height: 400px;" class="echart"></div>
+
+              <script>
+                document.addEventListener("DOMContentLoaded", () => {
+                  var budgetChart = echarts.init(document.querySelector("#budgetChart")).setOption({
+                    legend: {
+                      data: ['Orçamento Alocado', 'Gastos Reais']
+                    },
+                    radar: {
+                      indicator: [
+                        { name: 'Manutenção', max: 50000 },
+                        { name: 'Combustível', max: 40000 },
+                        { name: 'Salários', max: 60000 },
+                        { name: 'Equipamentos', max: 30000 },
+                        { name: 'Administração', max: 25000 },
+                        { name: 'Marketing', max: 20000 }
+                      ]
+                    },
+                    series: [{
+                      name: 'Orçamento vs Gastos',
+                      type: 'radar',
+                      data: [
+                        { value: [45000, 32000, 48000, 25000, 20000, 15000], name: 'Orçamento Alocado' },
+                        { value: [40000, 35000, 50000, 20000, 18000, 12000], name: 'Gastos Reais' }
+                      ]
+                    }]
+                  });
+                });
+              </script>
+
+            </div>
+          </div><!-- End Budget Report -->
+
+          <!-- Website Traffic -->
+          <div class="card">
+            <div class="filter">
+              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                <li class="dropdown-header text-start">
+                  <h6>Filtrar</h6>
+                </li>
+
+                <li><a class="dropdown-item" href="#">Hoje</a></li>
+                <li><a class="dropdown-item" href="#">Este Mês</a></li>
+                <li><a class="dropdown-item" href="#">Este Ano</a></li>
+              </ul>
+            </div>
+
+        </div><!-- End Right side columns -->
+
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+
+  <!-- ======= Rodapé ======= -->
+  <footer id="footer" class="footer">
+    <div class="container">
+      <div class="row gy-4">
+
+
+        <div class="container mt-4">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="copyright">
+                &copy; Direitos Autorais <strong><span>PyDenExpress</span></strong>. Todos os Direitos Reservados
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="credits">
+                Desenvolvido por <a href="https://danilomorais.netlify.app/">Danilo de Morais</a>
+              </div>
+            </div>
+          </div>
+        </div>
+  </footer>
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="/vendor/apexcharts/apexcharts.min.js"></script>
+  <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/vendor/chart.js/chart.umd.js"></script>
+  <script src="/vendor/echarts/echarts.min.js"></script>
+  <script src="/vendor/quill/quill.min.js"></script>
+  <script src="/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="/vendor/tinymce/tinymce.min.js"></script>
+
+
+  <!-- Template Main JS File -->
+  <script src="/js/users-profile.js"></script>
+
+  <script>
+    let data; // Declare a variável data fora do bloco try para poder acessá-la dentro da função filterRoutes
+
+    document.addEventListener('DOMContentLoaded', async function () {
+      try {
+        const response = await fetch('/api/dashboard-data');
+        data = await response.json();
+
+        // Atualizando contagem de escolas
+        document.getElementById('escolasAtendidas').textContent = data.escolasCount;
+
+        // Atualizando contagem de alunos
+        document.getElementById('alunosAtendidos').textContent = data.alunosCount;
+
+        // Atualizando quantidade de rotas
+        document.getElementById('quantidade-rotas').innerText = data.rotasCount;
+
+        // Atualizando quilometragem total
+        document.getElementById('quilometragem-total').innerText = `${data.quilometragemTotal.toFixed(3)} km`;
+
+        // Atualizando dados das rotas mensais
+        updateChart(data.rotasMensais);
+
+      } catch (error) {
+        console.error('Erro ao buscar dados do dashboard:', error);
+      }
+    });
+
+    function updateChart(rotasMensais) {
+      const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      const totalData = [];
+      const urbanaData = [];
+      const ruralData = [];
+
+      months.forEach((month, index) => {
+        const key = `2024-${String(index + 1).padStart(2, '0')}`;
+        const entry = rotasMensais[key] || { total: 0, urbana: 0, rural: 0 };
+        totalData.push(entry.total);
+        urbanaData.push(entry.urbana);
+        ruralData.push(entry.rural);
+      });
+
+      new ApexCharts(document.querySelector("#reportsChart"), {
+        series: [{
+          name: 'Rotas Totais',
+          data: totalData,
+        }, {
+          name: 'Zona Urbana',
+          data: urbanaData
+        },
+        {
+          name: 'Zona Rural',
+          data: ruralData
+        },],
+        chart: {
+          height: 350,
+          type: 'area',
+          toolbar: {
+            show: false
+          },
+        },
+        markers: {
+          size: 4
+        },
+        colors: ['#4154f1', '#2eca6a', '#ff771d'],
+        fill: {
+          type: "gradient",
+          gradient: {
+            shadeIntensity: 1,
+            opacityFrom: 0.3,
+            opacityTo: 0.4,
+            stops: [0, 90, 100]
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        stroke: {
+          curve: 'smooth',
+          width: 2
+        },
+        xaxis: {
+          categories: months
+        },
+        tooltip: {
+          x: {
+            format: 'MMM'
+          },
+        }
+      }).render();
+    }
+
+    function filterRoutes(year) {
+      // Filtra os dados das rotas pelo ano selecionado
+      const filteredData = Object.keys(data.rotasMensais).reduce((acc, key) => {
+        if (key.startsWith(year)) {
+          acc[key] = data.rotasMensais[key];
+        }
+        return acc;
+      }, {});
+
+      // Atualiza o gráfico com os dados filtrados
+      updateChart(filteredData);
+    }
+  </script>
+
+
+</body>
+
+</html>

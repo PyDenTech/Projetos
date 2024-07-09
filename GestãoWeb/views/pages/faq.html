@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>PyDenExpress</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="/img/favicon.png" rel="icon">
+  <link href="/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="/vendor/quill/quill.bubble.css" rel="stylesheet">
+  <link href="/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="/vendor/simple-datatables/style.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="/css/style.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="header fixed-top d-flex align-items-center">
+
+    <i class="bi bi-list toggle-sidebar-btn"></i>
+    <div class="d-flex align-items-center justify-content-between">
+      <a href="/dashboard-escolar" class="logo d-flex align-items-center">
+        <img src="/img/logo.png" alt="">
+      </a>
+    </div><!-- End Logo -->
+
+    <nav class="header-nav ms-auto">
+      <ul class="d-flex align-items-center">
+
+        <li class="nav-item dropdown pe-3">
+          <a id="profile-link" class="nav-link nav-profile d-flex align-items-center pe-0" href="#"
+            data-bs-toggle="dropdown">
+            <img id="profile-image" src="/img/user.png" alt="Foto de Perfil" class="rounded-circle">
+            <span id="usuarioNome" class="d-none d-md-block dropdown-toggle ps-2"></span>
+          </a><!-- End Profile Image Icon -->
+
+          <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="/users-profile">
+                <i class="bi bi-person"></i>
+                <span>Meu Perfil</span>
+              </a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="/users-profile">
+                <i class="bi bi-gear"></i>
+                <span>Configurações de Conta</span>
+              </a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="/faq">
+                <i class="bi bi-question-circle"></i>
+                <span>Ajuda</span>
+              </a>
+            </li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="#" id="logout-link">
+                <i class="bi bi-box-arrow-right"></i>
+                <span>Sair</span>
+              </a>
+            </li>
+          </ul><!-- End Profile Dropdown Items -->
+        </li><!-- End Profile Nav -->
+
+      </ul>
+    </nav><!-- End Icons Navigation -->
+
+  </header><!-- End Header -->
+
+  <!-- ======= Sidebar ======= -->
+  <aside id="sidebar" class="sidebar">
+
+    <ul class="sidebar-nav" id="sidebar-nav">
+      <li class="nav-heading">Transporte Escolar</li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="/dashboard-escolar">
+          <i class="bi bi-speedometer2"></i>
+          <span>Painel de Controle</span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#escolas-nav" data-bs-toggle="collapse" href="#">
+          <img src="/img/icones/escolas.svg" alt="Escolas"
+            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+          <span>Escolas</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="escolas-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-escolas-form">
+              <i class="bi bi-house-door"></i><span>Cadastrar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-escolas-view">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+
+        </ul>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#aluno-nav" data-bs-toggle="collapse" href="#">
+          <img src="/img/icones/aluno.svg" alt="Censo Escolar"
+            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+          <span>Alunos</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="aluno-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-aluno-form">
+              <i class="bi bi-person-plus"></i><span>Solicitar Cadastro</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-alunos-view">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/importar-aluno-form">
+              <i class="bi bi-file-earmark-arrow-up"></i><span>Importar Dados</span>
+            </a>
+          </li>
+          <li>
+            <a href="/visualizar-alunos-map">
+              <i class="bi bi-eye"></i><span>Vizualizar</span>
+            </a>
+          </li>
+        </ul>
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#routs-nav" data-bs-toggle="collapse" href="#">
+          <img src="/img/icones/rotas.svg" alt="Escolas"
+            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+          </i><span>Rotas</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="routs-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-rotas-form">
+              <i class="bi bi-plus-square"></i><span>Cadastrar Rota</span>
+            </a>
+          </li>
+
+          <li>
+            <a href="/desenhar-rotas-map">
+              <i class="bi bi-pencil"></i><span>Gerar Rotas</span>
+            </a>
+          </li>
+          <li>
+            <a href="/visualizar-rotas">
+              <i class="bi bi-eye"></i><span>Vizualizar Rotas</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#driverbus-nav" data-bs-toggle="collapse" href="#">
+          <img src="/img/icones/motoristas.svg" alt="Escolas"
+            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+          <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="driverbus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-motorista-form">
+              <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-motoristas-view">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerar-relatorio-view">
+              <i class="bi bi-clipboard2-check"></i><span>Relatórios</span>
+            </a>
+          </li>
+          <li>
+            <a href="/check-list">
+              <i class="bi bi-list-check"></i><span>Check List</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
+          <img src="/img/icones/monitor-icone-branco.png" alt="Escolas"
+            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+          </i><span>Monitores</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-monitores-form">
+              <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-monitores-view">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#fornecedores-nav" data-bs-toggle="collapse" href="#">
+          <img src="/img/icones/fornecedores.svg" alt="Escolas"
+            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+          </i><span>Fornecedor</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="fornecedores-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-fornecedores-form">
+              <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-fornecedores-view">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/vizualizar-fornecedores-map">
+              <i class="bi bi-eye"></i><span>Vizualizar</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#bus-nav" data-bs-toggle="collapse" href="#">
+          <img src="/img/icones/frotas.svg" alt="Escolas"
+            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+          </i><span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="bus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-onibus-form">
+              <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-onibus-view">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/vizualizar-onibus-map">
+              <i class="bi bi-eye"></i><span>Vizualizar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/solicitar-onibus-services">
+              <i class="bi bi-file-earmark-text"></i><span>Ordem de Serviço</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <li class="nav-heading">Administrativo</li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="/dashboard-adm">
+          <i class="bi bi-speedometer"></i>
+          <span>Painel de Controle</span>
+        </a>
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#car-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-car-front"></i><span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="car-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-carro-form">
+              <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-carros-view">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/localizar-carros-map">
+              <i class="bi bi-geo-alt-fill"></i><span>Localizar</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#drivercar-nav" data-bs-toggle="collapse" href="#">
+          <img src="/img/icones/motoristas.svg" alt="Escolas"
+            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+          <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="drivercar-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-motorista-carro-form">
+              <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-motorista-carro-form">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#tarefas-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-list-check"></i><span>Tarefas</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="tarefas-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-demandas">
+              <i class="bi bi-file-earmark-text"></i><span>Nova Tarefa</span>
+            </a>
+          </li>
+          <li>
+            <a href="/tasks">
+              <i class="bi bi-person-plus"></i><span>Gerenciar Tarefas</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li class="nav-heading">Controle Financeiro</li>
+      <li class="nav-item">
+        <a class="nav-link collapsed" data-bs-target="#fuel-nav" data-bs-toggle="collapse" href="#">
+          <i class="bi bi-droplet-half"></i><span>Abastecimento</span><i class="bi bi-chevron-down ms-auto"></i>
+        </a>
+        <ul id="fuel-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+          <li>
+            <a href="/cadastrar-abastecimento-view">
+              <i class="bi bi-file-earmark-text"></i><span>Cadastrar Requisição</span>
+            </a>
+          </li>
+          <li>
+            <a href="/gerenciar-abastecimento-view">
+              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+    </ul>
+
+  </aside><!-- End Sidebar-->
+
+
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Frequently Asked Questions</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/dashboard-escolar"><i class="bi bi-house"></i></a></li>
+          <li class="breadcrumb-item active">FAQ</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section faq">
+      <div class="row">
+        <div class="col-lg-12">
+
+          <!-- F.A.Q Grupo 1 - PyDenExpress -->
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Perguntas Frequentes sobre o PyDenExpress</h5>
+
+              <div class="accordion accordion-flush" id="faq-group-1">
+
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" data-bs-target="#faqsOne-1" type="button"
+                      data-bs-toggle="collapse">
+                      Como são determinadas as rotas do transporte escolar?
+                    </button>
+                  </h2>
+                  <div id="faqsOne-1" class="accordion-collapse collapse" data-bs-parent="#faq-group-1">
+                    <div class="accordion-body">
+                      As rotas são planejadas com base na localização das escolas e residências dos estudantes,
+                      garantindo a máxima eficiência e segurança no trajeto.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" data-bs-target="#faqsOne-2" type="button"
+                      data-bs-toggle="collapse">
+                      Quais medidas de segurança são adotadas nos veículos?
+                    </button>
+                  </h2>
+                  <div id="faqsOne-2" class="accordion-collapse collapse" data-bs-parent="#faq-group-1">
+                    <div class="accordion-body">
+                      Todos os veículos são equipados com cintos de segurança, GPS e são regularmente inspecionados para
+                      garantir a segurança e conforto dos passageiros.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" data-bs-target="#faqsOne-3" type="button"
+                      data-bs-toggle="collapse">
+                      Como posso me inscrever ou alterar detalhes do transporte escolar?
+                    </button>
+                  </h2>
+                  <div id="faqsOne-3" class="accordion-collapse collapse" data-bs-parent="#faq-group-1">
+                    <div class="accordion-body">
+                      Inscrições e alterações podem ser feitas através do nosso portal online ou diretamente na
+                      administração escolar, sujeitas à disponibilidade e planejamento de rotas.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" data-bs-target="#faqsOne-4" type="button"
+                      data-bs-toggle="collapse">
+                      Existe um aplicativo para acompanhar o transporte em tempo real?
+                    </button>
+                  </h2>
+                  <div id="faqsOne-4" class="accordion-collapse collapse" data-bs-parent="#faq-group-1">
+                    <div class="accordion-body">
+                      Sim, nosso aplicativo permite que pais e responsáveis acompanhem o transporte escolar em tempo
+                      real, garantindo tranquilidade e segurança.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="accordion-item">
+                  <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" data-bs-target="#faqsOne-5" type="button"
+                      data-bs-toggle="collapse">
+                      Como são selecionados e treinados os motoristas?
+                    </button>
+                  </h2>
+                  <div id="faqsOne-5" class="accordion-collapse collapse" data-bs-parent="#faq-group-1">
+                    <div class="accordion-body">
+                      Nossos motoristas são rigorosamente selecionados e recebem treinamento contínuo para garantir a
+                      excelência no serviço e a segurança dos passageiros.
+                    </div>
+                  </div>
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button class="accordion-button collapsed" data-bs-target="#faqsTwo-1" type="button"
+                        data-bs-toggle="collapse">
+                        Como posso rastrear a localização do transporte escolar?
+                      </button>
+                    </h2>
+                    <div id="faqsTwo-1" class="accordion-collapse collapse" data-bs-parent="#faq-group-2">
+                      <div class="accordion-body">
+                        Oferecemos um sistema de rastreamento em tempo real, acessível através do nosso aplicativo ou
+                        website, permitindo que você acompanhe a localização exata do transporte escolar.
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- FAQ 2 -->
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button class="accordion-button collapsed" data-bs-target="#faqsTwo-2" type="button"
+                        data-bs-toggle="collapse">
+                        Em caso de atraso ou problema no transporte, como serei notificado?
+                      </button>
+                    </h2>
+                    <div id="faqsTwo-2" class="accordion-collapse collapse" data-bs-parent="#faq-group-2">
+                      <div class="accordion-body">
+                        Em caso de atrasos ou alterações, notificações são enviadas imediatamente através do aplicativo
+                        e por mensagens de texto ou e-mail, conforme cadastrado no sistema.
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- FAQ 3 -->
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button class="accordion-button collapsed" data-bs-target="#faqsTwo-3" type="button"
+                        data-bs-toggle="collapse">
+                        Qual é a política de cancelamento ou alteração de rotas?
+                      </button>
+                    </h2>
+                    <div id="faqsTwo-3" class="accordion-collapse collapse" data-bs-parent="#faq-group-2">
+                      <div class="accordion-body">
+                        Cancelamentos ou alterações podem ser feitos com antecedência mínima de 24 horas. Em casos
+                        urgentes, entre em contato diretamente com a nossa central de atendimento.
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- FAQ 4 -->
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button class="accordion-button collapsed" data-bs-target="#faqsTwo-4" type="button"
+                        data-bs-toggle="collapse">
+                        Existem serviços especiais para alunos com necessidades especiais?
+                      </button>
+                    </h2>
+                    <div id="faqsTwo-4" class="accordion-collapse collapse" data-bs-parent="#faq-group-2">
+                      <div class="accordion-body">
+                        Sim, oferecemos serviços adaptados para atender alunos com necessidades especiais, garantindo
+                        acessibilidade e conforto durante o transporte.
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- FAQ 5 -->
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button class="accordion-button collapsed" data-bs-target="#faqsTwo-5" type="button"
+                        data-bs-toggle="collapse">
+                        Os veículos estão equipados com primeiros socorros e equipamentos de segurança?
+                      </button>
+                    </h2>
+                    <div id="faqsTwo-5" class="accordion-collapse collapse" data-bs-parent="#faq-group-2">
+                      <div class="accordion-body">
+                        Todos os nossos veículos são equipados com kits de primeiros socorros e dispositivos de
+                        segurança essenciais, mantidos regularmente para garantir a segurança dos passageiros.
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- FAQ 6 -->
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button class="accordion-button collapsed" data-bs-target="#faqsTwo-6" type="button"
+                        data-bs-toggle="collapse">
+                        Como são feitas as comunicações de emergência?
+                      </button>
+                    </h2>
+                    <div id="faqsTwo-6" class="accordion-collapse collapse" data-bs-parent="#faq-group-2">
+                      <div class="accordion-body">
+                        Em casos de emergência, os motoristas são treinados para agir rapidamente e a central de
+                        atendimento é notificada imediatamente para providenciar assistência adicional e comunicação com
+                        os pais/responsáveis.
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- FAQ 7 -->
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button class="accordion-button collapsed" data-bs-target="#faqsTwo-7" type="button"
+                        data-bs-toggle="collapse">
+                        Como é feita a limpeza e higienização dos veículos?
+                      </button>
+                    </h2>
+                    <div id="faqsTwo-7" class="accordion-collapse collapse" data-bs-parent="#faq-group-2">
+                      <div class="accordion-body">
+                        Nossos veículos passam por um processo rigoroso de limpeza e higienização diariamente, seguindo
+                        todos os protocolos de saúde e segurança para garantir um ambiente limpo e seguro.
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- FAQ 8 -->
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button class="accordion-button collapsed" data-bs-target="#faqsTwo-8" type="button"
+                        data-bs-toggle="collapse">
+                        Os motoristas recebem treinamento em primeiros socorros?
+                      </button>
+                    </h2>
+                    <div id="faqsTwo-8" class="accordion-collapse collapse" data-bs-parent="#faq-group-2">
+                      <div class="accordion-body">
+                        Sim, todos os nossos motoristas passam por treinamento regular em primeiros socorros e
+                        procedimentos de emergência, além de atualizações periódicas de suas habilidades.
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- FAQ 9 -->
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button class="accordion-button collapsed" data-bs-target="#faqsTwo-9" type="button"
+                        data-bs-toggle="collapse">
+                        Como é garantida a pontualidade do transporte?
+                      </button>
+                    </h2>
+                    <div id="faqsTwo-9" class="accordion-collapse collapse" data-bs-parent="#faq-group-2">
+                      <div class="accordion-body">
+                        Utilizamos sistemas avançados de gerenciamento de rotas e monitoramento em tempo real para
+                        garantir a pontualidade e eficiência no transporte dos estudantes.
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- FAQ 10 -->
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button class="accordion-button collapsed" data-bs-target="#faqsTwo-10" type="button"
+                        data-bs-toggle="collapse">
+                        Como posso enviar feedback ou sugestões sobre o serviço?
+                      </button>
+                    </h2>
+                    <div id="faqsTwo-10" class="accordion-collapse collapse" data-bs-parent="#faq-group-2">
+                      <div class="accordion-body">
+                        Valorizamos muito o seu feedback. Você pode enviar sugestões ou comentários através do nosso
+                        aplicativo, website ou diretamente em nossa central de atendimento.
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+            </div><!-- Fim do F.A.Q Grupo 1 do PyDenExpress -->
+
+          </div>
+
+        </div>
+    </section>
+  </main><!-- End #main -->
+  <!-- ======= Rodapé ======= -->
+  <footer id="footer" class="footer">
+    <div class="container">
+      <div class="row gy-4">
+        <div class="container mt-4">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="copyright">
+                &copy; Direitos Autorais <strong><span>PyDenExpress</span></strong>. Todos os Direitos Reservados
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="credits">
+                Desenvolvido por <a href="https://danilomorais.netlify.app/">Danilo de Morais</a>
+              </div>
+            </div>
+          </div>
+        </div>
+  </footer><!-- Fim do Rodapé -->
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="/vendor/apexcharts/apexcharts.min.js"></script>
+  <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/vendor/chart.js/chart.umd.js"></script>
+  <script src="/vendor/echarts/echarts.min.js"></script>
+  <script src="/vendor/quill/quill.min.js"></script>
+  <script src="/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="/vendor/tinymce/tinymce.min.js"></script>
+
+
+  <!-- Template Main JS File -->
+  <script src="/js/users-profile.js"></script>
+
+</body>
+
+</html>

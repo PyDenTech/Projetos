@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Solicitação de Cadastro</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="/img/favicon.png" rel="icon">
+    <link href="/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i"
+        rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="/vendor/simple-datatables/style.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- ======= Header ======= -->
+    <header id="header" class="header fixed-top d-flex align-items-center">
+
+        <i class="bi bi-list toggle-sidebar-btn"></i>
+        <div class="d-flex align-items-center justify-content-between">
+            <a href="/dashboard-escolar" class="logo d-flex align-items-center">
+                <img src="/img/logo.png" alt="">
+            </a>
+        </div><!-- End Logo -->
+
+        <nav class="header-nav ms-auto">
+            <ul class="d-flex align-items-center">
+
+                <li class="nav-item dropdown pe-3">
+                    <a id="profile-link" class="nav-link nav-profile d-flex align-items-center pe-0" href="#"
+                        data-bs-toggle="dropdown">
+                        <img id="profile-image" src="/img/user.png" alt="Foto de Perfil" class="rounded-circle">
+                        <span id="usuarioNome" class="d-none d-md-block dropdown-toggle ps-2"></span>
+                    </a><!-- End Profile Image Icon -->
+
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="/users-profile">
+                                <i class="bi bi-person"></i>
+                                <span>Meu Perfil</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="/users-profile">
+                                <i class="bi bi-gear"></i>
+                                <span>Configurações de Conta</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="/faq">
+                                <i class="bi bi-question-circle"></i>
+                                <span>Ajuda</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="#" id="logout-link">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Sair</span>
+                            </a>
+                        </li>
+                    </ul><!-- End Profile Dropdown Items -->
+                </li><!-- End Profile Nav -->
+
+            </ul>
+        </nav><!-- End Icons Navigation -->
+
+    </header><!-- End Header -->
+
+    <!-- ======= Sidebar ======= -->
+    <aside id="sidebar" class="sidebar">
+
+        <ul class="sidebar-nav" id="sidebar-nav">
+            <li class="nav-heading">Transporte Escolar</li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="/dashboard-escolar">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Painel de Controle</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#escolas-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/escolas.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    <span>Escolas</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="escolas-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-escolas-form">
+                            <i class="bi bi-house-door"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-escolas-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-target="#aluno-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/aluno.svg" alt="Censo Escolar"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    <span>Alunos</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="aluno-nav" class="nav-content" data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-aluno-form">
+                            <i class="bi bi-person-plus"></i><span>Solicitar Cadastro</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-alunos-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/importar-aluno-form">
+                            <i class="bi bi-file-earmark-arrow-up"></i><span>Importar Dados</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/visualizar-alunos-map">
+                            <i class="bi bi-eye"></i><span>Vizualizar</span>
+                        </a>
+                    </li>
+                </ul>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#routs-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/rotas.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    </i><span>Rotas</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="routs-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-rotas-form">
+                            <i class="bi bi-plus-square"></i><span>Cadastrar Rota</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="/desenhar-rotas-map">
+                            <i class="bi bi-pencil"></i><span>Gerar Rotas</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/visualizar-rotas">
+                            <i class="bi bi-eye"></i><span>Vizualizar Rotas</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#driverbus-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/motoristas.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="driverbus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-motorista-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-motoristas-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerar-relatorio-view">
+                            <i class="bi bi-clipboard2-check"></i><span>Relatórios</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/check-list">
+                            <i class="bi bi-list-check"></i><span>Check List</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/monitor-icone-branco.png" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    </i><span>Monitores</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-monitores-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-monitores-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#fornecedores-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/fornecedores.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    </i><span>Fornecedor</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="fornecedores-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-fornecedores-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-fornecedores-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/vizualizar-fornecedores-map">
+                            <i class="bi bi-eye"></i><span>Vizualizar</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#bus-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/frotas.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    </i><span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="bus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-onibus-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-onibus-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/vizualizar-onibus-map">
+                            <i class="bi bi-eye"></i><span>Vizualizar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/solicitar-onibus-services">
+                            <i class="bi bi-file-earmark-text"></i><span>Ordem de Serviço</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="nav-heading">Administrativo</li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="/dashboard-adm">
+                    <i class="bi bi-speedometer"></i>
+                    <span>Painel de Controle</span>
+                </a>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#car-nav" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-car-front"></i><span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="car-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-carro-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-carros-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/localizar-carros-map">
+                            <i class="bi bi-geo-alt-fill"></i><span>Localizar</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#drivercar-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/motoristas.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="drivercar-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-motorista-carro-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-motorista-carro-form">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#tarefas-nav" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-list-check"></i><span>Tarefas</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="tarefas-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-demandas">
+                            <i class="bi bi-file-earmark-text"></i><span>Nova Tarefa</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/tasks">
+                            <i class="bi bi-person-plus"></i><span>Gerenciar Tarefas</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-heading">Controle Financeiro</li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#fuel-nav" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-droplet-half"></i><span>Abastecimento</span><i
+                        class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="fuel-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-abastecimento-view">
+                            <i class="bi bi-file-earmark-text"></i><span>Cadastrar Requisição</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-abastecimento-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+        </ul>
+
+    </aside><!-- End Sidebar-->
+
+    <main id="main" class="main">
+        <div class="pagetitle">
+            <h1>Solicitação de Cadastro</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/dashboard-escolar"><i class="bi bi-house"></i></a></li>
+                    <li class="breadcrumb-item active">Solicitação de Cadastro</li>
+                </ol>
+            </nav>
+        </div><!-- End Page Title -->
+
+        <section class="section">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Buscar Aluno</h5>
+                            <form id="buscarAlunoForm" class="mb-3">
+                                <div class="input-group">
+                                    <input type="text" id="idMatricula" class="form-control"
+                                        placeholder="ID de Matrícula">
+                                    <button class="btn btn-primary" type="submit">Buscar</button>
+                                </div>
+                            </form>
+                            <div id="alunoInfo" style="display: none;">
+                                <h5 class="card-title">Informações do Aluno</h5>
+                                <div class="row mb-3">
+                                    <label class="col-md-4 col-lg-3 col-form-label">Nome:</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <p id="nomeAluno" class="form-control-plaintext"></p>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-md-4 col-lg-3 col-form-label">CPF:</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <p id="cpfAluno" class="form-control-plaintext"></p>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-md-4 col-lg-3 col-form-label">Data de Nascimento:</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <p id="dataNascimentoAluno" class="form-control-plaintext"></p>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-md-4 col-lg-3 col-form-label">Filiação 1:</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <p id="filiacao1Aluno" class="form-control-plaintext"></p>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-md-4 col-lg-3 col-form-label">Certidão de Nascimento:</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <p id="certidaoNascimentoAluno" class="form-control-plaintext"></p>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-md-4 col-lg-3 col-form-label">NIS:</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <p id="nisAluno" class="form-control-plaintext"></p>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-md-4 col-lg-3 col-form-label">RG:</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <p id="rgAluno" class="form-control-plaintext"></p>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-md-4 col-lg-3 col-form-label">Endereço:</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <p id="enderecoAluno" class="form-control-plaintext"></p>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-md-4 col-lg-3 col-form-label">ID Censo:</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <p id="idCensoAluno" class="form-control-plaintext"></p>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-md-4 col-lg-3 col-form-label">Filiação 2:</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <p id="filiacao2Aluno" class="form-control-plaintext"></p>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-md-4 col-lg-3 col-form-label">E-mail:</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <p id="emailAluno" class="form-control-plaintext"></p>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-md-4 col-lg-3 col-form-label">Celular:</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <p id="celularAluno" class="form-control-plaintext"></p>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-md-4 col-lg-3 col-form-label">Matrícula do Aluno:</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <p id="matriculaAluno" class="form-control-plaintext"></p>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-md-4 col-lg-3 col-form-label">ID Enturmação:</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <p id="idEnturmacaoAluno" class="form-control-plaintext"></p>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-md-4 col-lg-3 col-form-label">Ano:</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <p id="anoAluno" class="form-control-plaintext"></p>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-md-4 col-lg-3 col-form-label">Situação:</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <p id="situacaoAluno" class="form-control-plaintext"></p>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-md-4 col-lg-3 col-form-label">Data de Matrícula |
+                                        Enturmação:</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <p id="dataMatriculaEnturmacaoAluno" class="form-control-plaintext"></p>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-md-4 col-lg-3 col-form-label">Série:</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <p id="serieAluno" class="form-control-plaintext"></p>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-md-4 col-lg-3 col-form-label">Turma:</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <p id="turmaAluno" class="form-control-plaintext"></p>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-md-4 col-lg-3 col-form-label">Pessoa que Matrículou:</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <p id="pessoaMatriculouAluno" class="form-control-plaintext"></p>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label class="col-md-4 col-lg-3 col-form-label">Hora da Matrícula:</label>
+                                    <div class="col-md-8 col-lg-9">
+                                        <p id="horaMatriculaAluno" class="form-control-plaintext"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="noResultMessage" style="display: none;" class="alert alert-warning">Nenhum aluno
+                                encontrado com este ID de matrícula.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main><!-- End #main -->
+
+    <!-- ======= Rodapé ======= -->
+    <footer id="footer" class="footer">
+        <div class="container">
+            <div class="row gy-4">
+                <div class="container mt-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="copyright">
+                                &copy; Direitos Autorais <strong><span>PyDenExpress</span></strong>. Todos os Direitos
+                                Reservados
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="credits">
+                                Desenvolvido por <a href="https://danilomorais.netlify.app/">Danilo de Morais</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    </footer><!-- Fim do Rodapé -->
+
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+            class="bi bi-arrow-up-short"></i></a>
+
+    <!-- Vendor JS Files -->
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/vendor/quill/quill.min.js"></script>
+    <script src="/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="/vendor/tinymce/tinymce.min.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="/js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const buscarAlunoForm = document.getElementById('buscarAlunoForm');
+            const alunoInfo = document.getElementById('alunoInfo');
+            const noResultMessage = document.getElementById('noResultMessage');
+
+            buscarAlunoForm.addEventListener('submit', async function (event) {
+                event.preventDefault();
+                const idMatricula = document.getElementById('idMatricula').value.trim();
+                if (!idMatricula) {
+                    alert('Por favor, insira um ID de matrícula.');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/api/alunos/${idMatricula}`);
+                    if (response.ok) {
+                        const aluno = await response.json();
+                        document.getElementById('nomeAluno').textContent = aluno.nome || '';
+                        document.getElementById('cpfAluno').textContent = aluno.cpf || '';
+                        document.getElementById('dataNascimentoAluno').textContent = aluno.data_nascimento || '';
+                        document.getElementById('filiacao1Aluno').textContent = aluno.filiacao1 || '';
+                        document.getElementById('certidaoNascimentoAluno').textContent = aluno.certidao_nascimento || '';
+                        document.getElementById('nisAluno').textContent = aluno.nis || '';
+                        document.getElementById('rgAluno').textContent = aluno.rg || '';
+                        document.getElementById('enderecoAluno').textContent = aluno.endereco || '';
+                        document.getElementById('idCensoAluno').textContent = aluno.id_censo || '';
+                        document.getElementById('filiacao2Aluno').textContent = aluno.filiacao2 || '';
+                        document.getElementById('emailAluno').textContent = aluno.email || '';
+                        document.getElementById('celularAluno').textContent = aluno.celular || '';
+                        document.getElementById('matriculaAluno').textContent = aluno.matricula || '';
+                        document.getElementById('idEnturmacaoAluno').textContent = aluno.id_enturmacao || '';
+                        document.getElementById('anoAluno').textContent = aluno.ano || '';
+                        document.getElementById('situacaoAluno').textContent = aluno.situacao || '';
+                        document.getElementById('dataMatriculaEnturmacaoAluno').textContent = aluno.data_matricula_enturmacao || '';
+                        document.getElementById('serieAluno').textContent = aluno.serie || '';
+                        document.getElementById('turmaAluno').textContent = aluno.turma || '';
+                        document.getElementById('pessoaMatriculouAluno').textContent = aluno.pessoa_matriculou || '';
+                        document.getElementById('horaMatriculaAluno').textContent = aluno.hora_matricula || '';
+
+                        alunoInfo.style.display = 'block';
+                        noResultMessage.style.display = 'none';
+                    } else {
+                        alunoInfo.style.display = 'none';
+                        noResultMessage.style.display = 'block';
+                    }
+                } catch (error) {
+                    console.error('Erro ao buscar aluno:', error);
+                    alunoInfo.style.display = 'none';
+                    noResultMessage.style.display = 'block';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

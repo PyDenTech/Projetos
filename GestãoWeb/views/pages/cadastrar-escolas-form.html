@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>PyDenExpress</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="/img/favicon.png" rel="icon">
+  <link href="/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+    rel="stylesheet">
+  <style>
+    .dual-listbox {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .dual-listbox select {
+      width: 300px;
+      height: 300px;
+    }
+
+    .dual-listbox button {
+      margin: 5px 0;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-label {
+      margin-bottom: 5px;
+    }
+
+    .form-control {
+      margin-bottom: 10px;
+    }
+  </style>
+  <!-- Vendor CSS Files -->
+  <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="/vendor/quill/quill.snow.css" rel="stylesheet">
+  <link href="/vendor/quill/quill.bubble.css" rel="stylesheet">
+  <link href="/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="/vendor/simple-datatables/style.css" rel="stylesheet">
+
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+
+  <!-- Template Main CSS File -->
+  <link href="/css/style.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+ <!-- ======= Header ======= -->
+ <header id="header" class="header fixed-top d-flex align-items-center">
+
+  <i class="bi bi-list toggle-sidebar-btn"></i>
+  <div class="d-flex align-items-center justify-content-between">
+    <a href="/dashboard-escolar" class="logo d-flex align-items-center">
+      <img src="/img/logo.png" alt="">
+    </a>
+  </div><!-- End Logo -->
+
+  <nav class="header-nav ms-auto">
+    <ul class="d-flex align-items-center">
+
+      <li class="nav-item dropdown pe-3">
+        <a id="profile-link" class="nav-link nav-profile d-flex align-items-center pe-0" href="#"
+          data-bs-toggle="dropdown">
+          <img id="profile-image" src="/img/user.png" alt="Foto de Perfil" class="rounded-circle">
+          <span id="usuarioNome" class="d-none d-md-block dropdown-toggle ps-2"></span>
+        </a><!-- End Profile Image Icon -->
+
+        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+          <li>
+            <a class="dropdown-item d-flex align-items-center" href="/users-profile">
+              <i class="bi bi-person"></i>
+              <span>Meu Perfil</span>
+            </a>
+          </li>
+          <li>
+            <hr class="dropdown-divider">
+          </li>
+
+          <li>
+            <a class="dropdown-item d-flex align-items-center" href="/users-profile">
+              <i class="bi bi-gear"></i>
+              <span>Configurações de Conta</span>
+            </a>
+          </li>
+          <li>
+            <hr class="dropdown-divider">
+          </li>
+
+          <li>
+            <a class="dropdown-item d-flex align-items-center" href="/faq">
+              <i class="bi bi-question-circle"></i>
+              <span>Ajuda</span>
+            </a>
+          </li>
+          <li>
+            <hr class="dropdown-divider">
+          </li>
+
+          <li>
+            <a class="dropdown-item d-flex align-items-center" href="#" id="logout-link">
+              <i class="bi bi-box-arrow-right"></i>
+              <span>Sair</span>
+            </a>
+          </li>
+        </ul><!-- End Profile Dropdown Items -->
+      </li><!-- End Profile Nav -->
+
+    </ul>
+  </nav><!-- End Icons Navigation -->
+
+</header><!-- End Header -->
+
+<!-- ======= Sidebar ======= -->
+<aside id="sidebar" class="sidebar">
+
+  <ul class="sidebar-nav" id="sidebar-nav">
+    <li class="nav-heading">Transporte Escolar</li>
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/dashboard-escolar">
+        <i class="bi bi-speedometer2"></i>
+        <span>Painel de Controle</span>
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link" data-bs-target="#escolas-nav" data-bs-toggle="collapse" href="#">
+        <img src="/img/icones/escolas.svg" alt="Escolas"
+          style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+        <span>Escolas</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="escolas-nav" class="nav-content" data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="/cadastrar-escolas-form">
+            <i class="bi bi-house-door"></i><span>Cadastrar</span>
+          </a>
+        </li>
+        <li>
+          <a href="/gerenciar-escolas-view">
+            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+          </a>
+        </li>
+
+      </ul>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#aluno-nav" data-bs-toggle="collapse" href="#">
+        <img src="/img/icones/aluno.svg" alt="Censo Escolar"
+          style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+        <span>Alunos</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="aluno-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="/cadastrar-aluno-form">
+            <i class="bi bi-person-plus"></i><span>Solicitar Cadastro</span>
+          </a>
+        </li>
+        <li>
+          <a href="/gerenciar-alunos-view">
+            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+          </a>
+        </li>
+        <li>
+          <a href="/importar-aluno-form">
+            <i class="bi bi-file-earmark-arrow-up"></i><span>Importar Dados</span>
+          </a>
+        </li>
+        <li>
+          <a href="/visualizar-alunos-map">
+            <i class="bi bi-eye"></i><span>Vizualizar</span>
+          </a>
+        </li>
+      </ul>
+    <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#routs-nav" data-bs-toggle="collapse" href="#">
+        <img src="/img/icones/rotas.svg" alt="Escolas"
+          style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+        </i><span>Rotas</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="routs-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="/cadastrar-rotas-form">
+            <i class="bi bi-plus-square"></i><span>Cadastrar Rota</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/desenhar-rotas-map">
+            <i class="bi bi-pencil"></i><span>Gerar Rotas</span>
+          </a>
+        </li>
+        <li>
+          <a href="/visualizar-rotas">
+            <i class="bi bi-eye"></i><span>Vizualizar Rotas</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#driverbus-nav" data-bs-toggle="collapse" href="#">
+        <img src="/img/icones/motoristas.svg" alt="Escolas"
+          style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+        <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="driverbus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="/cadastrar-motorista-form">
+            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+          </a>
+        </li>
+        <li>
+          <a href="/gerenciar-motoristas-view">
+            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+          </a>
+        </li>
+        <li>
+          <a href="/gerar-relatorio-view">
+            <i class="bi bi-clipboard2-check"></i><span>Relatórios</span>
+          </a>
+        </li>
+        <li>
+          <a href="/check-list">
+            <i class="bi bi-list-check"></i><span>Check List</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
+        <img src="/img/icones/monitor-icone-branco.png" alt="Escolas"
+          style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+        </i><span>Monitores</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="/cadastrar-monitores-form">
+            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+          </a>
+        </li>
+        <li>
+          <a href="/gerenciar-monitores-view">
+            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#fornecedores-nav" data-bs-toggle="collapse" href="#">
+        <img src="/img/icones/fornecedores.svg" alt="Escolas"
+          style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+        </i><span>Fornecedor</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="fornecedores-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="/cadastrar-fornecedores-form">
+            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+          </a>
+        </li>
+        <li>
+          <a href="/gerenciar-fornecedores-view">
+            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+          </a>
+        </li>
+        <li>
+          <a href="/vizualizar-fornecedores-map">
+            <i class="bi bi-eye"></i><span>Vizualizar</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#bus-nav" data-bs-toggle="collapse" href="#">
+        <img src="/img/icones/frotas.svg" alt="Escolas"
+          style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+        </i><span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="bus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="/cadastrar-onibus-form">
+            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+          </a>
+        </li>
+        <li>
+          <a href="/gerenciar-onibus-view">
+            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+          </a>
+        </li>
+        <li>
+          <a href="/vizualizar-onibus-map">
+            <i class="bi bi-eye"></i><span>Vizualizar</span>
+          </a>
+        </li>
+        <li>
+          <a href="/solicitar-onibus-services">
+            <i class="bi bi-file-earmark-text"></i><span>Ordem de Serviço</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+
+    <li class="nav-heading">Administrativo</li>
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/dashboard-adm">
+        <i class="bi bi-speedometer"></i>
+        <span>Painel de Controle</span>
+      </a>
+    <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#car-nav" data-bs-toggle="collapse" href="#">
+        <i class="bi bi-car-front"></i><span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="car-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="/cadastrar-carro-form">
+            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+          </a>
+        </li>
+        <li>
+          <a href="/gerenciar-carros-view">
+            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+          </a>
+        </li>
+        <li>
+          <a href="/localizar-carros-map">
+            <i class="bi bi-geo-alt-fill"></i><span>Localizar</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#drivercar-nav" data-bs-toggle="collapse" href="#">
+        <img src="/img/icones/motoristas.svg" alt="Escolas"
+          style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+        <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="drivercar-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="/cadastrar-motorista-carro-form">
+            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+          </a>
+        </li>
+        <li>
+          <a href="/gerenciar-motorista-carro-form">
+            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#tarefas-nav" data-bs-toggle="collapse" href="#">
+        <i class="bi bi-list-check"></i><span>Tarefas</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="tarefas-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="/cadastrar-demandas">
+            <i class="bi bi-file-earmark-text"></i><span>Nova Tarefa</span>
+          </a>
+        </li>
+        <li>
+          <a href="/tasks">
+            <i class="bi bi-person-plus"></i><span>Gerenciar Tarefas</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+    <li class="nav-heading">Controle Financeiro</li>
+    <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#fuel-nav" data-bs-toggle="collapse" href="#">
+        <i class="bi bi-droplet-half"></i><span>Abastecimento</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="fuel-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="/cadastrar-abastecimento-view">
+            <i class="bi bi-file-earmark-text"></i><span>Cadastrar Requisição</span>
+          </a>
+        </li>
+        <li>
+          <a href="/gerenciar-abastecimento-view">
+            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+
+  </ul>
+
+</aside><!-- End Sidebar-->
+
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Cadastrar Escola</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/dashboard-escolar"><i class="bi bi-house"></i></a></li>
+          <li class="breadcrumb-item"><a href="/cadastrar-escolas-form">Escolas</a></li>
+          <li class="breadcrumb-item active">Cadastrar</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Informações da Escola</h5>
+              <form id="escolaForm">
+                <!-- Outros campos do formulário -->
+
+                <div class="col-12 obr">
+                  <label class="control-label"><b>Localização da escola (clique no mapa)</b></label>
+                  <div class="row">
+
+                    <div id="map" style="width: 98%; height: 450px; margin:10px;"></div>
+                  </div>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <div class="row justify-content-center">
+                        <div class="col-6 ">
+                          <div class="row">
+                            <label class="col-4 control-label latlon-label"><b>Latitude</b></label>
+                            <div class="col-5">
+                              <input class="form-control" type="text" id="reglatEscola" name="reglatEscola"
+                                placeholder="Latitude:" />
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-6">
+                          <div class="row">
+                            <label class="col-4 control-label latlon-label"><b>Longitude</b></label>
+                            <div class="col-5">
+                              <input class="form-control" type="text" id="reglonEscola" name="reglonEscola"
+                                placeholder="Longitude:" />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Restante do formulário -->
+                <h5 class="card-title">Endereço</h5>
+                <div class="col-12">
+                  <div class="form-group obr">
+                    <div class="row">
+                      <div class="col-6">
+                        <label class="control-label"><b>A escola está localizada em:</b>
+                          <star>*</star>
+                        </label>
+                      </div>
+                      <div class="form-check form-check-radio">
+                        <label class="form-check-label">
+                          <input class="form-check-input" type="radio" id="areaUrbanaEscola" name="areaUrbanaEscola"
+                            value="1"> Área Urbana
+                        </label>
+                      </div>
+                      <div class="form-check form-check-radio">
+                        <label class="form-check-label">
+                          <input class="form-check-input" type="radio" id="areaUrbanaEscola" name="areaUrbanaEscola"
+                            value="2"> Área Rural
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div><br>
+                <!-- Restante dos campos de endereço -->
+                <div class="row mb-3">
+                  <div class="col-md-4">
+                    <b><label for="inputAddressEscola" class="form-label">Logradouro</label></b>
+                    <input type="text" class="form-control" name="inputAddressEscola" id="inputAddressEscola"
+                      placeholder="Rua, Avenida, Vicinal etc.">
+                  </div>
+                  <div class="col-md-4">
+                    <b><label for="inputNumberEscola" class="form-label">Número</label></b>
+                    <input type="text" class="form-control" name="inputNumberEscola" id="inputNumberEscola"
+                      placeholder="Número">
+                  </div>
+                  <div class="col-md-4">
+                    <b> <label for="inputComplementEscola" class="form-label">Complemento</label></b>
+                    <input type="text" class="form-control" name="inputComplementEscola" id="inputComplementEscola"
+                      placeholder="Ponto de Referência">
+                  </div>
+                </div>
+                <!-- Outros campos do formulário -->
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <b><label for="inputNeighborhoodEscola" class="form-label">Bairro</label></b>
+                    <input type="text" class="form-control" name="inputNeighborhoodEscola" id="inputNeighborhoodEscola"
+                      placeholder="Bairro">
+                  </div>
+                  <div class="col-md-6">
+                    <b> <label for="inputZipEscola" class="form-label">CEP</label></b>
+                    <input type="text" class="form-control" name="inputZipEscola" id="inputZipEscola" placeholder="CEP">
+                  </div>
+                </div>
+                <!-- Restante do formulário -->
+                <div class="col-12">
+                  <div class="row mb-3">
+                    <div class="col-md-6">
+                      <label for="schoolName" class="form-label"><b>Nome da Escola</b></label>
+                      <input type="text" class="form-control" name="schoolName" id="schoolName"
+                        placeholder="Informe o nome da escola">
+                    </div>
+                    <div class="col-md-6">
+                      <label for="schoolINEP" class="form-label"><b>Código INEP</b></label>
+                      <input type="text" class="form-control" name="schoolINEP" id="schoolINEP"
+                        placeholder="Informe o INEP da escola">
+                      <h6><a
+                          href="https://inepdata.inep.gov.br/analytics/saw.dll?Dashboard&NQUser=inepdata&NQPassword=Inep2014&PortalPath=%2Fshared%2FCenso%20da%20Educa%C3%A7%C3%A3o%20B%C3%A1sica%2F_portal%2FCat%C3%A1logo%20de%20Escolas&Page=Pr%C3%A9-Lista%20das%20Escolas"
+                          target="_blank">Clique aqui para saber o código INEP</a></h6>
+                    </div>
+                  </div>
+                  <h5 class="card-title">Tipo de Ensino da Escola</h5>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label class="mb-3 control-label"><b>Em relação ao regime, a escola oferta ensino:</b></label>
+                      <div class="row">
+                        <div class="col-10">
+                          <div class="form-check form-check-inline">
+                            <label class="form-check-label">
+                              <input id="regular" name="regular" value="1" type="checkbox" class="form-check-input">
+                              <span class="form-check-sign"></span>
+                              Regular
+                            </label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <label class="form-check-label from-check-inline">
+                              <input id="eja" name="eja" value="1" type="checkbox" class="form-check-input">
+                              <span class="form-check-sign"></span>
+                              EJA
+                            </label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <label class="form-check-label from-check-inline">
+                              <input id="profissionalizante" name="profissionalizante" value="1" type="checkbox"
+                                class="form-check-input">
+                              <span class="form-check-sign"></span>
+                              Profissionalizante
+                            </label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <label class="form-check-label from-check-inline">
+                              <input id="especial" name="especial" value="1" type="checkbox" class="form-check-input">
+                              <span class="form-check-sign"></span>
+                              Especial
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div><br>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label class="mb-3 control-label"><b>Em relação ao nível, a escola oferta ensino:</b></label>
+                      <div class="row">
+                        <div class="col-10">
+                          <div class="form-check form-check-inline">
+                            <label class="form-check-label">
+                              <input id="infantil" name="infantil" value="1" type="checkbox" class="form-check-input">
+                              <span class="form-check-sign"></span>
+                              Infantil
+                            </label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <label class="form-check-label from-check-inline">
+                              <input id="fundamental" name="fundamental" value="1" type="checkbox"
+                                class="form-check-input">
+                              <span class="form-check-sign"></span>
+                              Fundamental
+                            </label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <label class="form-check-label from-check-inline">
+                              <input id="medio" name="medio" value="1" type="checkbox" class="form-check-input">
+                              <span class="form-check-sign"></span>
+                              Médio
+                            </label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <label class="form-check-label from-check-inline">
+                              <input id="superior" name="superior" value="1" type="checkbox" class="form-check-input">
+                              <span class="form-check-sign"></span>
+                              Superior
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div><br>
+                  <div class="col-12">
+                    <div class="form-group">
+                      <label class="mb-3 control-label"><b>Em relação ao horário de funcionamento, a escola
+                          funciona:</b></label>
+                      <div class="row">
+                        <div class="col-10">
+                          <div class="form-check form-check-inline">
+                            <label class="form-check-label">
+                              <input id="manha" name="manha" value="1" type="checkbox" class="form-check-input">
+                              <span class="form-check-sign"></span>
+                              Manhã
+                            </label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <label class="form-check-label from-check-inline">
+                              <input id="tarde" name="tarde" value="1" type="checkbox" class="form-check-input">
+                              <span class="form-check-sign"></span>
+                              Tarde
+                            </label>
+                          </div>
+                          <div class="form-check form-check-inline">
+                            <label class="form-check-label from-check-inline">
+                              <input id="noite" name="noite" value="1" type="checkbox" class="form-check-input">
+                              <span class="form-check-sign"></span>
+                              Noite
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div><br>
+                  <div class="form-group row dual-listbox">
+                    <div class="col">
+                      <h5>Lista de Bairros</h5>
+                      <input type="text" class="form-control mb-2" placeholder="Filtro" id="filterBairros">
+                      <select class="form-control" id="listaBairros" multiple>
+                        <!-- Opções carregadas dinamicamente -->
+                      </select>
+                    </div>
+                    <div class="col d-flex flex-column justify-content-center">
+                      <button type="button" class="btn btn-primary mb-2" id="adicionarBtn">Adicionar →</button>
+                      <button type="button" class="btn btn-danger" id="removerBtn">← Remover</button>
+                    </div>
+                    <div class="col">
+                      <h5>Bairros Atendidos pela Escola <span id="contadorBairros" class="badge bg-success">0</span>
+                      </h5>
+                      <input type="text" class="form-control mb-2" placeholder="Filtro" id="filterAtendidos">
+                      <select class="form-control" id="bairrosAtendidos" multiple>
+                        <!-- Opções carregadas dinamicamente -->
+                      </select>
+                    </div>
+                  </div>
+                  <br>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-sm-10">
+          <button type="button" class="btn btn-primary" id="concluirCadastroEscola">Cadastrar Escola</button>
+        </div>
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+  <!-- ======= Rodapé ======= -->
+  <footer id="footer" class="footer">
+    <div class="container">
+      <div class="row gy-4">
+
+
+        <div class="container mt-4">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="copyright">
+                &copy; Direitos Autorais <strong><span>PyDenExpress</span></strong>. Todos os Direitos Reservados
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="credits">
+                Desenvolvido por <a href="https://danilomorais.netlify.app/">Danilo de Morais</a>
+              </div>
+            </div>
+          </div>
+        </div>
+  </footer><!-- Fim do Rodapé -->
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+  <!-- Vendor JS Files -->
+  <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/vendor/echarts/echarts.min.js"></script>
+  <script src="/vendor/quill/quill.min.js"></script>
+  <script src="/vendor/simple-datatables/simple-datatables.js"></script>
+  <script src="/vendor/tinymce/tinymce.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+  <!-- Template Main JS File -->
+  <script src="/js/users-profile.js"></script>
+  <script src="/js/escolaCadastrarMap.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Gerenciar Motoristas</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+    <!-- Favicons -->
+    <link href="/img/favicon.png" rel="icon">
+    <link href="/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i" rel="stylesheet">
+    <!-- Vendor CSS Files -->
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="/vendor/simple-datatables/style.css" rel="stylesheet">
+    <!-- Template Main CSS File -->
+    <link href="/css/style.css" rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+</head>
+
+<body>
+
+    <!-- ======= Header ======= -->
+    <header id="header" class="header fixed-top d-flex align-items-center">
+
+        <i class="bi bi-list toggle-sidebar-btn"></i>
+        <div class="d-flex align-items-center justify-content-between">
+            <a href="/dashboard-escolar" class="logo d-flex align-items-center">
+                <img src="/img/logo.png" alt="">
+            </a>
+        </div><!-- End Logo -->
+
+        <nav class="header-nav ms-auto">
+            <ul class="d-flex align-items-center">
+
+                <li class="nav-item dropdown pe-3">
+                    <a id="profile-link" class="nav-link nav-profile d-flex align-items-center pe-0" href="#"
+                        data-bs-toggle="dropdown">
+                        <img id="profile-image" src="/img/user.png" alt="Foto de Perfil" class="rounded-circle">
+                        <span id="usuarioNome" class="d-none d-md-block dropdown-toggle ps-2"></span>
+                    </a><!-- End Profile Image Icon -->
+
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="/users-profile">
+                                <i class="bi bi-person"></i>
+                                <span>Meu Perfil</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="/users-profile">
+                                <i class="bi bi-gear"></i>
+                                <span>Configurações de Conta</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="/faq">
+                                <i class="bi bi-question-circle"></i>
+                                <span>Ajuda</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="#" id="logout-link">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Sair</span>
+                            </a>
+                        </li>
+                    </ul><!-- End Profile Dropdown Items -->
+                </li><!-- End Profile Nav -->
+
+            </ul>
+        </nav><!-- End Icons Navigation -->
+
+    </header><!-- End Header -->
+
+    <!-- ======= Sidebar ======= -->
+    <aside id="sidebar" class="sidebar">
+
+        <ul class="sidebar-nav" id="sidebar-nav">
+            <li class="nav-heading">Transporte Escolar</li>
+            <li class="nav-item">
+                <a class="nav-link" href="/dashboard-escolar">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Painel de Controle</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#escolas-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/escolas.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    <span>Escolas</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="escolas-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-escolas-form">
+                            <i class="bi bi-house-door"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-escolas-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#aluno-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/aluno.svg" alt="Censo Escolar"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    <span>Alunos</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="aluno-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-aluno-form">
+                            <i class="bi bi-person-plus"></i><span>Solicitar Cadastro</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-alunos-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/importar-aluno-form">
+                            <i class="bi bi-file-earmark-arrow-up"></i><span>Importar Dados</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/visualizar-alunos-map">
+                            <i class="bi bi-eye"></i><span>Vizualizar</span>
+                        </a>
+                    </li>
+                </ul>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#routs-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/rotas.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    </i><span>Rotas</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="routs-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-rotas-form">
+                            <i class="bi bi-plus-square"></i><span>Cadastrar Rota</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="/desenhar-rotas-map">
+                            <i class="bi bi-pencil"></i><span>Gerar Rotas</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/visualizar-rotas">
+                            <i class="bi bi-eye"></i><span>Vizualizar Rotas</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#driverbus-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/motoristas.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="driverbus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-motorista-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-motoristas-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerar-relatorio-view">
+                            <i class="bi bi-clipboard2-check"></i><span>Relatórios</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/check-list">
+                            <i class="bi bi-list-check"></i><span>Check List</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/monitor-icone-branco.png" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    </i><span>Monitores</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-monitores-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-monitores-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#fornecedores-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/fornecedores.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    </i><span>Fornecedor</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="fornecedores-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-fornecedores-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-fornecedores-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/vizualizar-fornecedores-map">
+                            <i class="bi bi-eye"></i><span>Vizualizar</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#bus-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/frotas.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    </i><span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="bus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-onibus-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-onibus-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/vizualizar-onibus-map">
+                            <i class="bi bi-eye"></i><span>Vizualizar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/solicitar-onibus-services">
+                            <i class="bi bi-file-earmark-text"></i><span>Ordem de Serviço</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="nav-heading">Administrativo</li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="/dashboard-adm">
+                    <i class="bi bi-speedometer"></i>
+                    <span>Painel de Controle</span>
+                </a>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#car-nav" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-car-front"></i><span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="car-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-carro-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-carros-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/localizar-carros-map">
+                            <i class="bi bi-geo-alt-fill"></i><span>Localizar</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#drivercar-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/motoristas.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="drivercar-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-motorista-carro-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-motorista-carro-form">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#tarefas-nav" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-list-check"></i><span>Tarefas</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="tarefas-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-demandas">
+                            <i class="bi bi-file-earmark-text"></i><span>Nova Tarefa</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/tasks">
+                            <i class="bi bi-person-plus"></i><span>Gerenciar Tarefas</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-heading">Controle Financeiro</li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#fuel-nav" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-droplet-half"></i><span>Abastecimento</span><i
+                        class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="fuel-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-abastecimento-view">
+                            <i class="bi bi-file-earmark-text"></i><span>Cadastrar Requisição</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-abastecimento-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+        </ul>
+
+    </aside><!-- End Sidebar-->
+
+    <main id="main" class="main">
+        <div class="pagetitle">
+            <h1>Gerenciar Motoristas</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/dashboard-escolar"><i class="bi bi-house"></i></a></li>
+                    <li class="breadcrumb-item"><a href="/gerenciar-motoristas-view">Motoristas</a></li>
+                    <li class="breadcrumb-item active">Gerenciar Motoristas</li>
+                </ol>
+            </nav>
+        </div><!-- End Page Title -->
+
+        <section class="section">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Motoristas</h5>
+                            <button class="btn btn-warning mb-3" onclick="abrirModalAvisoGeral()">
+                                <i class="bi bi-megaphone"></i> Aviso Geral
+                            </button>
+                            <div class="table-responsive">
+                                <table class="table table-striped" id="motoristasTable">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Nome <span class="bi bi-arrow-down-up"></span></th>
+                                            <th>CPF <span class="bi bi-arrow-down-up"></span></th>
+                                            <th>CNH <span class="bi bi-arrow-down-up"></span></th>
+                                            <th>Status <span class="bi bi-arrow-down-up"></span></th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Dados dos motoristas -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="statusMessage" class="mt-3"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main><!-- End #main -->
+
+    <!-- Modal para Aviso Específico -->
+    <div class="modal fade" id="modalAvisoEspecifico" tabindex="-1" aria-labelledby="modalAvisoEspecificoLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalAvisoEspecificoLabel">Enviar Aviso Específico</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formAvisoEspecifico">
+                        <div class="mb-3">
+                            <label for="tituloAvisoEspecifico" class="form-label">Título</label>
+                            <input type="text" class="form-control" id="tituloAvisoEspecifico" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="mensagemAvisoEspecifico" class="form-label">Mensagem</label>
+                            <textarea class="form-control" id="mensagemAvisoEspecifico" rows="3" required></textarea>
+                        </div>
+                        <input type="hidden" id="destinatarioAvisoEspecifico">
+                        <button type="submit" class="btn btn-primary">Enviar Aviso</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Aviso Geral -->
+    <div class="modal fade" id="modalAvisoGeral" tabindex="-1" aria-labelledby="modalAvisoGeralLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalAvisoGeralLabel">Enviar Aviso Geral</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formAvisoGeral">
+                        <div class="mb-3">
+                            <label for="tituloAvisoGeral" class="form-label">Título</label>
+                            <input type="text" class="form-control" id="tituloAvisoGeral" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="mensagemAvisoGeral" class="form-label">Mensagem</label>
+                            <textarea class="form-control" id="mensagemAvisoGeral" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Enviar Aviso</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vendor JS Files -->
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/vendor/echarts/echarts.min.js"></script>
+    <script src="/vendor/quill/quill.min.js"></script>
+    <script src="/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="/vendor/tinymce/tinymce.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="/js/users-profile.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchMotoristas();
+
+            function fetchMotoristas() {
+                fetch('/api/motoristas')
+                    .then(response => response.json())
+                    .then(data => {
+                        const motoristasTableBody = document.getElementById('motoristasTable').querySelector('tbody');
+                        motoristasTableBody.innerHTML = '';
+
+                        data.forEach((motorista, index) => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${index + 1}</td>
+                                <td>${motorista.nome}</td>
+                                <td>${motorista.cpf}</td>
+                                <td>${motorista.cnh}</td>
+                                <td>${motorista.status}</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" onclick="localizarMotorista(${motorista.id})">
+                                        <i class="bi bi-geo-alt"></i> Localizar
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="excluirMotorista(${motorista.id})">Excluir</button>
+                                    <button class="btn btn-warning btn-sm" onclick="abrirModalAvisoEspecifico(${motorista.id})">
+                                        <i class="bi bi-megaphone"></i> Aviso
+                                    </button>
+                                </td>
+                            `;
+                            motoristasTableBody.appendChild(row);
+                        });
+
+                        const quantidadeMotoristas = data.length;
+                        document.getElementById('statusMessage').textContent = `Total de motoristas: ${quantidadeMotoristas}`;
+                    })
+                    .catch(error => console.error('Erro ao carregar motoristas:', error));
+            }
+
+            window.localizarMotorista = function (motoristaId) {
+                fetch(`/api/motoristas/${motoristaId}/localizacao`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.latitude && data.longitude) {
+                            const map = L.map('map').setView([data.latitude, data.longitude], 13);
+                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                attribution: '&copy; OpenStreetMap contributors'
+                            }).addTo(map);
+                            L.marker([data.latitude, data.longitude]).addTo(map)
+                                .bindPopup('Localização do Motorista')
+                                .openPopup();
+                            const modal = new bootstrap.Modal(document.getElementById('localizacaoModal'));
+                            modal.show();
+                        } else {
+                            alert('Localização não disponível.');
+                        }
+                    })
+                    .catch(error => console.error('Erro ao localizar motorista:', error));
+            };
+
+            window.excluirMotorista = function (motoristaId) {
+                if (confirm('Tem certeza que deseja excluir este motorista?')) {
+                    fetch(`/api/motoristas/${motoristaId}`, {
+                        method: 'DELETE'
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Erro ao excluir motorista.');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            alert(data.message);
+                            fetchMotoristas();
+                        })
+                        .catch(error => console.error('Erro ao excluir motorista:', error));
+                }
+            };
+
+            window.abrirModalAvisoEspecifico = function (id) {
+                document.getElementById('destinatarioAvisoEspecifico').value = id;
+                const modal = new bootstrap.Modal(document.getElementById('modalAvisoEspecifico'));
+                modal.show();
+            };
+
+            window.abrirModalAvisoGeral = function () {
+                const modal = new bootstrap.Modal(document.getElementById('modalAvisoGeral'));
+                modal.show();
+            };
+
+            document.getElementById('formAvisoEspecifico').addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const titulo = document.getElementById('tituloAvisoEspecifico').value;
+                const mensagem = document.getElementById('mensagemAvisoEspecifico').value;
+                const destinatario = document.getElementById('destinatarioAvisoEspecifico').value;
+
+                fetch('/api/avisos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ titulo, mensagem, destinatario })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.message);
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalAvisoEspecifico'));
+                        modal.hide();
+                    })
+                    .catch(error => console.error('Erro ao enviar aviso:', error));
+            });
+
+            document.getElementById('formAvisoGeral').addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const titulo = document.getElementById('tituloAvisoGeral').value;
+                const mensagem = document.getElementById('mensagemAvisoGeral').value;
+
+                fetch('/api/avisos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ titulo, mensagem, destinatario: 'geral' })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.message);
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalAvisoGeral'));
+                        modal.hide();
+                    })
+                    .catch(error => console.error('Erro ao enviar aviso:', error));
+            });
+
+            function sortTableByColumn(table, column, asc = true) {
+                const dirModifier = asc ? 1 : -1;
+                const tBody = table.tBodies[0];
+                const rows = Array.from(tBody.querySelectorAll('tr'));
+
+                const sortedRows = rows.sort((a, b) => {
+                    const aColText = a.querySelector(`td:nth-child(${column + 1})`).textContent.trim();
+                    const bColText = b.querySelector(`td:nth-child(${column + 1})`).textContent.trim();
+
+                    return aColText > bColText ? (1 * dirModifier) : (-1 * dirModifier);
+                });
+
+                while (tBody.firstChild) {
+                    tBody.removeChild(tBody.firstChild);
+                }
+
+                tBody.append(...sortedRows);
+
+                table.querySelectorAll('th').forEach(th => th.classList.remove('th-sort-asc', 'th-sort-desc'));
+                table.querySelector(`th:nth-child(${column + 1})`).classList.toggle('th-sort-asc', asc);
+                table.querySelector(`th:nth-child(${column + 1})`).classList.toggle('th-sort-desc', !asc);
+            }
+
+            document.querySelectorAll('.table-sortable th').forEach(headerCell => {
+                headerCell.addEventListener('click', () => {
+                    const tableElement = headerCell.parentElement.parentElement.parentElement;
+                    const headerIndex = Array.prototype.indexOf.call(headerCell.parentElement.children, headerCell);
+                    const currentIsAscending = headerCell.classList.contains('th-sort-asc');
+
+                    sortTableByColumn(tableElement, headerIndex, !currentIsAscending);
+                });
+            });
+        });
+    </script>
+
+    <!-- Modal para exibir o mapa -->
+    <div class="modal fade" id="localizacaoModal" tabindex="-1" aria-labelledby="localizacaoModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="localizacaoModalLabel">Localização do Motorista</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="map" style="height: 400px;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

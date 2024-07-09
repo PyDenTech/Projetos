@@ -1,0 +1,112 @@
+:root {
+    --bg-color: #f4f4f4;
+    --nav-bg: #008374;
+    --nav-text: #ffffff;
+    --nav-active-bg: #006f5c;
+    --nav-active-text: #ffffff;
+    --table-head-bg: #008374;
+    --table-head-text: #ffffff;
+    --table-row-hover: #e0e0e0;
+    --card-bg: #ffffff;
+    --card-border: #e0e0e0;
+    --btn-bg: #008374;
+    --btn-hover-bg: #006f5c;
+    --btn-text: #ffffff;
+    --form-label: #333;
+    --form-input-bg: #e0e0e0;
+    --form-input-border: #ccc;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+}
+
+.container {
+    background-color: #ffffff;
+    padding: 20px 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h2, h3 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.nav-tabs .nav-link {
+    color: var(--nav-text);
+    background-color: var(--nav-bg);
+    border: none;
+    border-radius: 0;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--nav-active-text);
+    background-color: var(--nav-active-bg);
+}
+
+.table {
+    margin-top: 20px;
+}
+
+.table thead th {
+    background-color: var(--table-head-bg);
+    color: var(--table-head-text);
+}
+
+.table tbody tr:hover {
+    background-color: var(--table-row-hover);
+}
+
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    margin-top: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    color: var(--form-label);
+}
+
+.form-control {
+    background-color: var(--form-input-bg);
+    border: 1px solid var(--form-input-border);
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 1rem;
+    color: #333;
+}
+
+.btn-primary {
+    background-color: var(--btn-bg);
+    border: none;
+    color: var(--btn-text);
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: var(--btn-hover-bg);
+}
+
+.modal-header, .modal-footer {
+    border: none;
+}
