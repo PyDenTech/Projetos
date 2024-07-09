@@ -15,7 +15,7 @@ class LoginPage extends StatelessWidget {
 
   Future<void> _login(BuildContext context) async {
     const String apiUrl =
-        'http://localhost:3000/api/loginMotoristasAdministrativos';
+        'http://18.231.172.222:3000/api/loginMotoristasAdministrativos';
 
     final response = await http.post(
       Uri.parse(apiUrl),

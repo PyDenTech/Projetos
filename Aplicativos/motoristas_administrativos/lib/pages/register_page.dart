@@ -24,7 +24,7 @@ class RegisterPageState extends State<RegisterPage> {
 
   Future<void> _register() async {
     const String apiUrl =
-        'http://18.231.15.35:3000/api/registroMotoristasAdministrativos';
+        'http://18.231.172.222:3000/api/registroMotoristasAdministrativos';
 
     final response = await http.post(
       Uri.parse(apiUrl),

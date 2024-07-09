@@ -32,7 +32,7 @@ class PerfilPageState extends State<PerfilPage> {
   }
 
   Future<void> _fetchMotoristaData() async {
-    const String apiUrl = 'http://localhost:3000/api/getMotorista';
+    const String apiUrl = 'http://18.231.172.222:3000/api/getMotorista';
 
     final response = await http.post(
       Uri.parse(apiUrl),
@@ -71,7 +71,7 @@ class PerfilPageState extends State<PerfilPage> {
   }
 
   Future<void> _fetchAvisos() async {
-    const String apiUrl = 'http://localhost:3000/api/avisosMotorista';
+    const String apiUrl = 'http://18.231.172.222:3000/api/avisosMotorista';
 
     final response = await http.post(
       Uri.parse(apiUrl),
@@ -101,7 +101,7 @@ class PerfilPageState extends State<PerfilPage> {
   }
 
   Future<void> _marcarAvisoComoRecebido(int avisoId) async {
-    const String apiUrl = 'http://localhost:3000/api/marcarAvisoComoRecebido';
+    const String apiUrl = 'http://18.231.172.222:3000/api/marcarAvisoComoRecebido';
 
     final response = await http.post(
       Uri.parse(apiUrl),

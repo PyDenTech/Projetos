@@ -45,7 +45,7 @@ class HomePageState extends State<HomePage> {
   }
 
   Future<void> _fetchMotoristaData() async {
-    const String apiUrl = 'http://localhost:3000/api/getMotorista';
+    const String apiUrl = 'http://18.231.172.222:3000/api/getMotorista';
 
     final response = await http.post(
       Uri.parse(apiUrl),
@@ -191,7 +191,7 @@ class HomePageState extends State<HomePage> {
 
   Future<void> _updateLocation(
       double latitude, double longitude, String status) async {
-    const String apiUrl = 'http://localhost:3000/api/atualizarLocalizacao';
+    const String apiUrl = 'http://18.231.172.222:3000/api/atualizarLocalizacao';
 
     final response = await http.post(
       Uri.parse(apiUrl),
@@ -219,7 +219,7 @@ class HomePageState extends State<HomePage> {
   }
 
   Future<void> _registerWorkShift(int workSeconds, int lunchSeconds) async {
-    const String apiUrl = 'http://localhost:3000/api/registrarExpediente';
+    const String apiUrl = 'http://18.231.172.222:3000/api/registrarExpediente';
 
     final requestBody = jsonEncode(<String, dynamic>{
       'motorista_id': _motoristaId,
