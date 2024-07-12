@@ -520,26 +520,39 @@
                     .catch(error => console.error('Erro ao carregar motoristas:', error));
             }
 
-            window.localizarMotorista = function (motoristaId) {
+            let map, marker, motoristaId;
+
+            window.localizarMotorista = function (id) {
+                motoristaId = id;
+                fetchLocalizacao();
+                const modal = new bootstrap.Modal(document.getElementById('localizacaoModal'));
+                modal.show();
+                setInterval(fetchLocalizacao, 10000);
+            };
+
+            function fetchLocalizacao() {
                 fetch(`/api/motoristas/${motoristaId}/localizacao`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.latitude && data.longitude) {
-                            const map = L.map('map').setView([data.latitude, data.longitude], 13);
-                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                                attribution: '&copy; OpenStreetMap contributors'
-                            }).addTo(map);
-                            L.marker([data.latitude, data.longitude]).addTo(map)
-                                .bindPopup('Localização do Motorista')
-                                .openPopup();
-                            const modal = new bootstrap.Modal(document.getElementById('localizacaoModal'));
-                            modal.show();
+                            if (!map) {
+                                map = L.map('map').setView([data.latitude, data.longitude], 13);
+                                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                    attribution: '&copy; OpenStreetMap contributors'
+                                }).addTo(map);
+                                marker = L.marker([data.latitude, data.longitude]).addTo(map)
+                                    .bindPopup('Localização do Motorista')
+                                    .openPopup();
+                            } else {
+                                map.setView([data.latitude, data.longitude], 13);
+                                marker.setLatLng([data.latitude, data.longitude]);
+                            }
                         } else {
                             alert('Localização não disponível.');
                         }
                     })
                     .catch(error => console.error('Erro ao localizar motorista:', error));
-            };
+            }
 
             window.excluirMotorista = function (motoristaId) {
                 if (confirm('Tem certeza que deseja excluir este motorista?')) {
