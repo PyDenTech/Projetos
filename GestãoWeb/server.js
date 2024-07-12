@@ -1562,6 +1562,23 @@ app.post('/api/marcarAvisoComoRecebido', async (req, res) => {
     }
 });
 
+app.get('/api/motoristas/:id/localizacao', async (req, res) => {
+    const motoristaId = req.params.id;
+
+    try {
+        const result = await pool.query('SELECT latitude, longitude FROM motoristas_administrativos WHERE id = $1', [motoristaId]);
+
+        if (result.rows.length > 0) {
+            res.json(result.rows[0]);
+        } else {
+            res.status(404).json({ error: 'Motorista não encontrado' });
+        }
+    } catch (error) {
+        console.error('Erro ao buscar localização do motorista:', error);
+        res.status(500).json({ error: 'Erro ao buscar localização do motorista' });
+    }
+});
+
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
 });
