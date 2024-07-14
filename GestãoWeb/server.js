@@ -371,7 +371,7 @@ app.delete('/api/usuarios/:userId', isAdmin, async (req, res) => {
         await client.query('BEGIN');
 
         // Excluir de motoristasescolares primeiro se existir
-        await client.query('DELETE FROM motoristasescolares WHERE usuario_id = $1', [userId]);
+        await client.query('DELETE FROM motoristasescolares WHERE id = $1', [userId]);
 
         // Excluir de usuarios
         const result = await client.query('DELETE FROM usuarios WHERE id = $1 RETURNING *', [userId]);
@@ -391,6 +391,7 @@ app.delete('/api/usuarios/:userId', isAdmin, async (req, res) => {
         client.release();
     }
 });
+
 
 
 app.post('/api/usuarios/:userId/cargo', isAdmin, async (req, res) => {
@@ -917,7 +918,7 @@ app.get('/api/motorista/rotas/:usuarioId', async (req, res) => {
     const { usuarioId } = req.params;
 
     try {
-        const motoristaResult = await pool.query('SELECT rota_id FROM motoristasescolares WHERE usuario_id = $1', [usuarioId]);
+        const motoristaResult = await pool.query('SELECT rota_id FROM motoristasescolares WHERE id = $1', [usuarioId]);
 
         if (motoristaResult.rows.length > 0) {
             const rotaIds = motoristaResult.rows.map(row => row.rota_id);
@@ -933,11 +934,10 @@ app.get('/api/motorista/rotas/:usuarioId', async (req, res) => {
     }
 });
 
-
 app.get('/api/motoristasescolares', async (req, res) => {
     try {
         const result = await pool.query(`
-            SELECT m.id, m.nome, m.cpf, m.cnh, m.empresa, r.nome_rota as rota_nome
+            SELECT m.id, m.nome_completo, m.cpf, m.cnh, m.empresa, r.nome AS rota_nome
             FROM motoristasescolares m
             LEFT JOIN rotas r ON m.rota_id = r.id
         `);
@@ -947,6 +947,7 @@ app.get('/api/motoristasescolares', async (req, res) => {
         res.status(500).json({ error: 'Erro ao obter motoristas' });
     }
 });
+
 
 app.get('/api/motoristasescolares/:id', async (req, res) => {
     const { id } = req.params;
@@ -1049,11 +1050,11 @@ app.delete('/api/motoristasescolares/:id', async (req, res) => {
     try {
         await client.query('BEGIN');
 
-        const motoristaResult = await client.query('DELETE FROM motoristasescolares WHERE id = $1 RETURNING usuario_id', [id]);
+        const motoristaResult = await client.query('DELETE FROM motoristasescolares WHERE id = $1 RETURNING id', [id]);
 
         if (motoristaResult.rows.length > 0) {
-            const usuarioId = motoristaResult.rows[0].usuario_id;
-            await client.query('DELETE FROM usuarios WHERE id = $1', [usuarioId]);
+            const motoristaId = motoristaResult.rows[0].id;
+            await client.query('DELETE FROM usuarios WHERE id = $1', [motoristaId]);
 
             await client.query('COMMIT');
             res.json({ message: 'Motorista e usuário excluídos com sucesso.' });
@@ -1070,20 +1071,21 @@ app.delete('/api/motoristasescolares/:id', async (req, res) => {
     }
 });
 
+
 app.post('/api/registerMotoristasEscolares', async (req, res) => {
     const { nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha } = req.body;
-  
+
     try {
-      const result = await pool.query(
-        'INSERT INTO motoristasescolares (nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-        [nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha]
-      );
-      res.status(201).json(result.rows[0]);
+        const result = await pool.query(
+            'INSERT INTO motoristasescolares (nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+            [nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha]
+        );
+        res.status(201).json(result.rows[0]);
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Internal Server Error' });
+        console.error(err);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
-  });
+});
 
 // Endpoint para obter todos os pontos de parada
 app.get('/api/stop-points', async (req, res) => {
