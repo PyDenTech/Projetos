@@ -1596,6 +1596,31 @@ app.get('/api/motoristas/:id/localizacao', async (req, res) => {
     }
 });
 
+app.post('/api/loginMotoristasEscolares', async (req, res) => {
+    const { email, senha } = req.body;
+  
+    try {
+      const result = await pool.query('SELECT * FROM motoristasescolares WHERE email = $1', [email]);
+  
+      if (result.rows.length > 0) {
+        const user = result.rows[0];
+        const match = await bcrypt.compare(senha, user.senha);
+  
+        if (match) {
+          res.status(200).json({ message: 'Login bem-sucedido', userId: user.id });
+        } else {
+          res.status(401).json({ message: 'Senha incorreta' });
+        }
+      } else {
+        res.status(404).json({ message: 'Usuário não encontrado' });
+      }
+    } catch (error) {
+      console.error('Erro ao fazer login:', error);
+      res.status(500).json({ message: 'Erro ao processar a solicitação' });
+    }
+  });
+
+
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
 });
