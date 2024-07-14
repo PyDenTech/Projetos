@@ -1070,6 +1070,21 @@ app.delete('/api/motoristasescolares/:id', async (req, res) => {
     }
 });
 
+app.post('/api/registerMotoristasEscolares', async (req, res) => {
+    const { nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha, longitude, latitude } = req.body;
+  
+    try {
+      const result = await pool.query(
+        'INSERT INTO motoristasescolares (nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha, longitude, latitude) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *',
+        [nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha, longitude, latitude]
+      );
+      res.status(201).json(result.rows[0]);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+
 // Endpoint para obter todos os pontos de parada
 app.get('/api/stop-points', async (req, res) => {
     try {
