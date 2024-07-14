@@ -1076,14 +1076,16 @@ app.post('/api/registerMotoristasEscolares', async (req, res) => {
     const { nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha } = req.body;
 
     try {
+        const hashedPassword = await bcrypt.hash(senha, saltRounds);
+
         const result = await pool.query(
             'INSERT INTO motoristasescolares (nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-            [nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha]
+            [nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, hashedPassword]
         );
         res.status(201).json(result.rows[0]);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({ error: 'Erro ao registrar usuário' });
     }
 });
 
