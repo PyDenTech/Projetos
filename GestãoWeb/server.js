@@ -1071,6 +1071,20 @@ app.delete('/api/motoristasescolares/:id', async (req, res) => {
     }
 });
 
+app.post('/api/registerMotoristasEscolares', async (req, res) => {
+    const { nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha, longitude, latitude } = req.body;
+
+    try {
+        const result = await pool.query(
+            'INSERT INTO motoristasescolares (nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha, longitude, latitude) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *',
+            [nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha, longitude, latitude]
+        );
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 app.post('/api/registerMotoristasEscolares', async (req, res) => {
     const { nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha } = req.body;
@@ -1609,7 +1623,12 @@ app.post('/api/loginMotoristasEscolares', async (req, res) => {
             const match = await bcrypt.compare(senha, user.senha);
 
             if (match) {
-                res.status(200).json({ message: 'Login bem-sucedido', userId: user.id });
+                res.status(200).json({
+                    message: 'Login bem-sucedido',
+                    userId: user.id,
+                    nome: user.nome_completo,
+                    empresa: user.empresa
+                });
             } else {
                 res.status(401).json({ message: 'Senha incorreta' });
             }
@@ -1621,6 +1640,7 @@ app.post('/api/loginMotoristasEscolares', async (req, res) => {
         res.status(500).json({ message: 'Erro ao processar a solicitação' });
     }
 });
+
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
