@@ -253,46 +253,55 @@ app.get('/api/sessao-usuario', (req, res) => {
     }
 });
 
-app.post('/login', async (req, res) => {
-    const { email, senha, origem } = req.body;
+// Rota unificada de login
+app.post('/api/login', async (req, res) => {
+    const { email, senha, tipo } = req.body;
 
     try {
-        const userQuery = await pool.query('SELECT * FROM usuarios WHERE email = $1', [email]);
+        let query;
+        switch (tipo) {
+            case 'admin':
+                query = 'SELECT * FROM usuarios WHERE email = $1 AND role = $2';
+                break;
+            case 'motorista_administrativo':
+                query = 'SELECT * FROM motoristas_administrativos WHERE email = $1';
+                break;
+            case 'motorista_escolar':
+                query = 'SELECT * FROM motoristasescolares WHERE email = $1';
+                break;
+            default:
+                return res.status(400).send('Tipo de usuário inválido.');
+        }
+
+        const userQuery = await pool.query(query, [email]);
         if (userQuery.rows.length === 0) {
             return res.status(404).send('Usuário não encontrado.');
         }
 
         const user = userQuery.rows[0];
+        const isValidPassword = await bcrypt.compare(senha, user.password || user.senha);
 
-        if (!user.init) {
-            return res.status(403).send('Usuário não ativado. Por favor, contate o administrador.');
-        }
-
-        const isValidPassword = await bcrypt.compare(senha, user.password);
         if (!isValidPassword) {
             return res.status(401).send('Senha incorreta.');
         }
 
-        // Verificar a origem da tentativa de login
-        if (origem === 'app') {
-            if (user.role !== 'motorista_escolar') {
-                return res.status(403).send('Acesso negado. Usuário não é um motorista escolar.');
-            }
-            res.json({ message: "Login successful", redirectUrl: '/dashboard-escolar-app' });
-        } else {
-            req.session.user = {
-                id: user.id,
-                nome: user.nome,
-                email: user.email
-            };
-            res.json({ message: "Login successful", redirectUrl: '/dashboard-escolar' });
+        if (tipo === 'admin' && !user.init) {
+            return res.status(403).send('Usuário não ativado. Por favor, contate o administrador.');
         }
+
+        req.session.user = {
+            id: user.id,
+            nome: user.nome || user.nome_completo,
+            email: user.email,
+            role: tipo
+        };
+
+        res.json({ message: "Login successful", redirectUrl: tipo === 'admin' ? '/admin/dashboard' : `/dashboard-${tipo}` });
     } catch (error) {
         console.error('Erro no login:', error);
         res.status(500).send('Erro ao processar o login');
     }
 });
-
 
 
 app.get('/api/usuario-logado', async (req, res) => {
@@ -320,32 +329,6 @@ app.post('/logout', (req, res) => {
         }
         res.redirect('/');
     });
-});
-
-app.post('/admin/login', async (req, res) => {
-    const { email, senha } = req.body;
-    try {
-        const queryResult = await pool.query('SELECT * FROM usuarios WHERE email = $1 AND role = $2', [email, 'admin']);
-        if (queryResult.rows.length > 0) {
-            const user = queryResult.rows[0];
-            if (await bcrypt.compare(senha, user.password)) {
-                req.session.admin = {
-                    id: user.id,
-                    nome: user.nome,
-                    email: user.email,
-                    role: user.role
-                };
-                res.redirect('/admin/dashboard');
-            } else {
-                res.status(401).send('Senha incorreta');
-            }
-        } else {
-            res.status(404).send('Conta administrativa não encontrada');
-        }
-    } catch (error) {
-        console.error('Erro de login', error);
-        res.status(500).send('Erro ao processar o login');
-    }
 });
 
 app.post('/api/usuarios/:userId/status', isAdmin, async (req, res) => {
@@ -435,11 +418,12 @@ app.post('/api/change-password', ensureLoggedIn, async (req, res) => {
     }
 });
 
-app.post('/cadastrar-usuario', async (req, res) => {
-    const { nome_completo, cpf, telefone, email_institucional, senha, cnh, empresa } = req.body;
+// Rota unificada de cadastro
+app.post('/api/cadastrar-usuario', async (req, res) => {
+    const { nome_completo, cpf, telefone, email, senha, cnh, empresa, tipo_veiculo, modelo, placa, tipo } = req.body;
 
     try {
-        const emailJaExiste = await emailExiste(email_institucional);
+        const emailJaExiste = await emailExiste(email);
         const cpfJaExiste = await cpfExiste(cpf);
 
         if (emailJaExiste) {
@@ -451,19 +435,35 @@ app.post('/cadastrar-usuario', async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(senha, saltRounds);
-        const novoUsuario = await pool.query(
-            'INSERT INTO usuarios (nome, cpf, telefone, email, password, role) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-            [nome_completo, cpf, telefone, email_institucional, hashedPassword, 'motorista_escolar']
-        );
+        let usuarioId;
 
-        const usuarioId = novoUsuario.rows[0].id;
+        switch (tipo) {
+            case 'admin':
+                const novoAdmin = await pool.query(
+                    'INSERT INTO usuarios (nome, cpf, telefone, email, password, role) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+                    [nome_completo, cpf, telefone, email, hashedPassword, 'admin']
+                );
+                usuarioId = novoAdmin.rows[0].id;
+                break;
+            case 'motorista_escolar':
+                const novoMotoristaEscolar = await pool.query(
+                    'INSERT INTO motoristasescolares (nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+                    [nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, hashedPassword]
+                );
+                usuarioId = novoMotoristaEscolar.rows[0].id;
+                break;
+            case 'motorista_administrativo':
+                const novoMotoristaAdministrativo = await pool.query(
+                    'INSERT INTO motoristas_administrativos (nome_completo, cpf, cnh, empresa, tipo_veiculo, modelo, placa, email, senha) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
+                    [nome_completo, cpf, cnh, empresa, tipo_veiculo, modelo, placa, email, hashedPassword]
+                );
+                usuarioId = novoMotoristaAdministrativo.rows[0].id;
+                break;
+            default:
+                return res.status(400).json({ error: 'Tipo de usuário inválido.' });
+        }
 
-        await pool.query(
-            'INSERT INTO motoristasescolares (nome, cpf, cnh, empresa, usuario_id) VALUES ($1, $2, $3, $4, $5)',
-            [nome_completo, cpf, cnh, empresa, usuarioId]
-        );
-
-        res.json(novoUsuario.rows[0]);
+        res.status(201).json({ message: 'Usuário cadastrado com sucesso.', usuarioId });
     } catch (error) {
         console.error('Erro ao inserir novo usuário:', error);
         res.status(500).json({ error: error.message });
@@ -1043,8 +1043,7 @@ app.post('/api/salvar-rota-gerada', async (req, res) => {
     }
 
     try {
-        const client = await pool
-            .connect();
+        const client = await pool.connect();
         try {
             await client.query('BEGIN');
 
@@ -1262,53 +1261,6 @@ app.post('/api/informarAtraso', async (req, res) => {
 });
 
 
-// Endpoint para registrar motoristas
-app.post('/api/registroMotoristasAdministrativos', async (req, res) => {
-    const {
-        nome_completo,
-        cpf,
-        cnh,
-        empresa,
-        tipo_veiculo,
-        modelo,
-        placa,
-        email,
-        senha
-    } = req.body;
-
-    try {
-        const result = await pool.query(
-            `INSERT INTO motoristas_administrativos (nome_completo, cpf, cnh, empresa, tipo_veiculo, modelo, placa, email, senha)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
-            [nome_completo, cpf, cnh, empresa, tipo_veiculo, modelo, placa, email, senha]
-        );
-        res.status(201).json(result.rows[0]);
-    } catch (error) {
-        console.error('Erro ao registrar motorista:', error);
-        res.status(500).json({ error: 'Erro ao registrar motorista' });
-    }
-});
-
-app.post('/api/loginMotoristasAdministrativos', async (req, res) => {
-    const { email, senha } = req.body;
-
-    try {
-        const result = await pool.query(
-            'SELECT * FROM motoristas_administrativos WHERE email = $1 AND senha = $2',
-            [email, senha]
-        );
-
-        if (result.rows.length > 0) {
-            res.status(200).json(result.rows[0]);
-        } else {
-            res.status(401).json({ error: 'Credenciais inválidas' });
-        }
-    } catch (error) {
-        console.error('Erro ao fazer login:', error);
-        res.status(500).json({ error: 'Erro ao fazer login' });
-    }
-});
-
 app.post('/api/getMotorista', async (req, res) => {
     const { email } = req.body;
 
@@ -1433,36 +1385,6 @@ app.post('/api/marcarAvisoComoRecebido', async (req, res) => {
     }
 });
 
-
-app.post('/api/loginMotoristasEscolares', async (req, res) => {
-    const { email, senha } = req.body;
-
-    try {
-        const result = await pool.query('SELECT * FROM motoristasescolares WHERE email = $1', [email]);
-
-        if (result.rows.length > 0) {
-            const user = result.rows[0];
-            const match = await bcrypt.compare(senha, user.senha);
-
-            if (match) {
-                res.status(200).json({
-                    message: 'Login bem-sucedido',
-                    userId: user.id,
-                    nome: user.nome_completo,
-                    empresa: user.empresa
-                });
-            } else {
-                res.status(401).json({ message: 'Senha incorreta' });
-            }
-        } else {
-            res.status(404).json({ message: 'Usuário não encontrado' });
-        }
-    } catch (error) {
-        console.error('Erro ao fazer login:', error);
-        res.status(500).json({ message: 'Erro ao processar a solicitação' });
-    }
-});
-
 app.delete('/api/usuarios/:userId', isAdmin, async (req, res) => {
     const { userId } = req.params;
     const client = await pool.connect();
@@ -1520,23 +1442,6 @@ app.get('/api/motoristasescolares/:id', async (req, res) => {
     } catch (error) {
         console.error('Erro ao buscar dados do motorista:', error);
         res.status(500).json({ message: 'Erro ao processar a solicitação' });
-    }
-});
-
-app.post('/api/registerMotoristasEscolares', async (req, res) => {
-    const { nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha } = req.body;
-
-    try {
-        const hashedPassword = await bcrypt.hash(senha, saltRounds);
-
-        const result = await pool.query(
-            'INSERT INTO motoristasescolares (nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-            [nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, hashedPassword]
-        );
-        res.status(201).json(result.rows[0]);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Erro ao registrar usuário' });
     }
 });
 
