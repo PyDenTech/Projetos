@@ -34,10 +34,19 @@
             <input type="password" name="senha" autocomplete="password" placeholder="Senha" id="id_password" required>
             <i class="far fa-eye" id="togglePassword" style="cursor: pointer;"></i>
           </div>
+          <div class="input-field">
+            <i class="fas fa-user-tag"></i>
+            <select name="tipo" required>
+              <option value="">Selecione o tipo de usuário</option>
+              <option value="admin">Administrador</option>
+              <option value="motorista_administrativo">Motorista Administrativo</option>
+              <option value="motorista_escolar">Motorista Escolar</option>
+            </select>
+          </div>
           <a class="pass" href="#">Esqueceu sua senha?</a>
           <input type="submit" value="Entrar" class="btn solid">
         </form>
-        <form id="singUpForm" action="cadastrar-usuario" method="post" class="sign-up-form">
+        <form id="singUpForm" action="/api/cadastrar-usuario" method="post" class="sign-up-form">
           <img src="/img/logo.png" alt="logo" class="form-logo">
           <h2 class="title">Cadastre-se</h2>
           <div class="input-field">
@@ -54,12 +63,21 @@
           </div>
           <div class="input-field">
             <i class="fas fa-envelope"></i>
-            <input type="email" name="email_institucional" placeholder="Endereço de e-mail" required>
+            <input type="email" name="email" placeholder="Endereço de e-mail" required>
           </div>
           <div class="input-field">
             <i class="fas fa-lock"></i>
             <input type="password" name="senha" autocomplete="password" placeholder="Senha" id="id_password2" required>
             <i class="far fa-eye" id="togglePassword2" style="cursor: pointer;"></i>
+          </div>
+          <div class="input-field">
+            <i class="fas fa-user-tag"></i>
+            <select name="tipo" required>
+              <option value="">Selecione o tipo de usuário</option>
+              <option value="admin">Administrador</option>
+              <option value="motorista_administrativo">Motorista Administrativo</option>
+              <option value="motorista_escolar">Motorista Escolar</option>
+            </select>
           </div>
           <input type="submit" value="Solicitar Cadastro" class="btn solid" style="width: 250px;">
         </form>
@@ -151,11 +169,12 @@
           nome_completo: formData.get('nome_completo'),
           cpf: formData.get('cpf'),
           telefone: formData.get('telefone'),
-          email_institucional: formData.get('email_institucional'),
-          senha: formData.get('senha')
+          email: formData.get('email'),
+          senha: formData.get('senha'),
+          tipo: formData.get('tipo')
         };
 
-        fetch('/cadastrar-usuario', {
+        fetch('/api/cadastrar-usuario', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
@@ -178,13 +197,14 @@
         const formData = new FormData(loginForm);
         const email = formData.get('email');
         const senha = formData.get('senha');
+        const tipo = formData.get('tipo');
 
         fetch('/api/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ email: email, senha: senha, origem: 'web' }) // Adicionar origem como 'web'
+          body: JSON.stringify({ email: email, senha: senha, tipo: tipo })
         })
           .then(response => {
             if (!response.ok) {
