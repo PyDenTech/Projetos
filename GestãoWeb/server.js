@@ -315,7 +315,7 @@ app.post('/api/login', async (req, res) => {
                 redirectUrl = '/dashboard-motorista_escolar';
                 break;
             case 'web':
-                redirectUrl = '/dashboard-web';
+                redirectUrl = '/dashboard-escolar';
                 break;
             default:
                 redirectUrl = '/';
