@@ -260,24 +260,30 @@ app.post('/api/login', async (req, res) => {
 
     try {
         let query;
+        let params;
+
         switch (tipo) {
             case 'admin':
                 query = 'SELECT * FROM usuarios WHERE email = $1 AND role = $2';
+                params = [email, 'admin'];
                 break;
             case 'motorista_administrativo':
                 query = 'SELECT * FROM motoristas_administrativos WHERE email = $1';
+                params = [email];
                 break;
             case 'motorista_escolar':
                 query = 'SELECT * FROM motoristasescolares WHERE email = $1';
+                params = [email];
                 break;
             case 'web':
                 query = 'SELECT * FROM usuarios WHERE email = $1';
+                params = [email];
                 break;
             default:
                 return res.status(400).send('Tipo de usuário inválido.');
         }
 
-        const userQuery = await pool.query(query, tipo === 'admin' ? [email, 'admin'] : [email]);
+        const userQuery = await pool.query(query, params);
         if (userQuery.rows.length === 0) {
             return res.status(404).send('Usuário não encontrado.');
         }
@@ -297,32 +303,14 @@ app.post('/api/login', async (req, res) => {
             return res.status(403).send('Usuário não autorizado a usar o sistema. Por favor, contate o administrador.');
         }
 
-        req.session.user = {
-            id: user.id,
+        let responseData = {
+            userId: user.id,
             nome: user.nome || user.nome_completo,
             email: user.email,
-            role: tipo
+            empresa: tipo === 'motorista_escolar' || tipo === 'motorista_administrativo' ? user.empresa : null
         };
 
-        let redirectUrl;
-        switch (tipo) {
-            case 'admin':
-                redirectUrl = '/admin-dashboard';
-                break;
-            case 'motorista_administrativo':
-                redirectUrl = '/dashboard-motorista_administrativo';
-                break;
-            case 'motorista_escolar':
-                redirectUrl = '/dashboard-motorista_escolar';
-                break;
-            case 'web':
-                redirectUrl = '/dashboard-escolar';
-                break;
-            default:
-                redirectUrl = '/';
-        }
-
-        res.json({ message: "Login successful", redirectUrl });
+        res.json(responseData);
     } catch (error) {
         console.error('Erro no login:', error);
         res.status(500).send('Erro ao processar o login');
