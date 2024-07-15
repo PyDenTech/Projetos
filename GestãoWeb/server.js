@@ -310,7 +310,19 @@ app.post('/api/login', async (req, res) => {
             empresa: tipo === 'motorista_escolar' || tipo === 'motorista_administrativo' ? user.empresa : null
         };
 
-        res.json(responseData);
+        let redirectUrl;
+        switch (tipo) {
+            case 'admin':
+                redirectUrl = '/admin-dashboard';
+                break;
+            case 'web':
+                redirectUrl = '/dashboard-escolar';
+                break;
+            default:
+                redirectUrl = '/';
+        }
+
+        res.json({ ...responseData, redirectUrl });
     } catch (error) {
         console.error('Erro no login:', error);
         res.status(500).send('Erro ao processar o login');
