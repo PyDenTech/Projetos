@@ -802,21 +802,20 @@ app.get('/api/rota-gerada/:rotaId', async (req, res) => {
 
         if (result.rows.length > 0) {
             const coordenadas = result.rows[0].coordenadas;
-
-            // Verificar se coordenadas é um array
             if (Array.isArray(coordenadas)) {
-                res.json(coordenadas);
+                res.json({ coordenadas });
             } else {
-                res.status(500).json({ message: 'Coordenadas não estão em um formato de array.' });
+                throw new Error('Formato de coordenadas inválido.');
             }
         } else {
             res.status(404).json({ message: 'Rota não encontrada.' });
         }
     } catch (error) {
-        console.error('Erro ao buscar coordenadas da rota:', error);
-        res.status(500).json({ message: 'Erro ao processar a solicitação' });
+        console.error('Erro ao buscar rota gerada:', error);
+        res.status(500).json({ message: 'Erro ao processar a solicitação.' });
     }
 });
+
 
 
 app.post('/api/cadastrar-aluno', async (req, res) => {
