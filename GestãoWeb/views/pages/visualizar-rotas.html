@@ -8,8 +8,13 @@
     <meta content="" name="description">
     <meta content="" name="keywords">
 
-    <!-- Google Maps API -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDw_MBqX5A0JFo9Ic0qawBNV7tb5XrfeQ8&callback=initMap" async defer></script>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <!-- Leaflet Routing Machine -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
 
     <!-- Vendor CSS Files -->
     <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -95,21 +100,16 @@
             </div>
     </footer>
 
-    <!-- Google Maps JS -->
+    <!-- Leaflet JS -->
     <script>
-        let map;
-        let directionsService;
-        let directionsRenderer;
+        document.addEventListener('DOMContentLoaded', function () {
+            var map = L.map('map').setView([-6.530379, -49.851744], 13);
 
-        function initMap() {
-            map = new google.maps.Map(document.getElementById("map"), {
-                center: { lat: -6.530379, lng: -49.851744 },
-                zoom: 13,
-            });
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
 
-            directionsService = new google.maps.DirectionsService();
-            directionsRenderer = new google.maps.DirectionsRenderer();
-            directionsRenderer.setMap(map);
+            var routingControl;
 
             // Carregar opções do select
             fetch('/api/rotas')
@@ -137,50 +137,39 @@
                                 throw new Error('Resposta não é um array');
                             }
 
-                            const waypoints = data.map(coord => ({
-                                location: new google.maps.LatLng(coord.lat, coord.lng),
-                                stopover: false,
-                            }));
+                            const waypoints = data.map(coord => L.latLng(coord.lat, coord.lng));
 
-                            if (waypoints.length > 0) {
-                                const origin = waypoints.shift().location;
-                                const destination = waypoints.pop().location;
-
-                                directionsService.route(
-                                    {
-                                        origin: origin,
-                                        destination: destination,
-                                        waypoints: waypoints,
-                                        travelMode: google.maps.TravelMode.DRIVING,
-                                    },
-                                    (response, status) => {
-                                        if (status === google.maps.DirectionsStatus.OK) {
-                                            directionsRenderer.setDirections(response);
-
-                                            const detalhesRotaDiv = document.getElementById('detalhesRota');
-                                            detalhesRotaDiv.innerHTML = `
-                                                <p><strong>Nome da Rota:</strong> ${rotaId}</p>
-                                                <p><strong>Total de Pontos:</strong> ${data.length}</p>
-                                                <p><strong>Pontos:</strong></p>
-                                                <ul>
-                                                    ${data.map((ponto, index) => `<li>Ponto ${index + 1}: ${ponto.lat.toFixed(5)}, ${ponto.lng.toFixed(5)}</li>`).join('')}
-                                                </ul>
-                                            `;
-                                        } else {
-                                            console.error('Erro ao traçar rota:', status);
-                                        }
-                                    }
-                                );
+                            if (routingControl) {
+                                map.removeControl(routingControl);
                             }
+
+                            routingControl = L.Routing.control({
+                                waypoints: waypoints,
+                                createMarker: function () { return null; },
+                                routeWhileDragging: false,
+                                addWaypoints: false,
+                                draggableWaypoints: false
+                            }).addTo(map);
+
+                            // Exibir detalhes da rota
+                            const detalhesRotaDiv = document.getElementById('detalhesRota');
+                            detalhesRotaDiv.innerHTML = `
+                                <p><strong>Nome da Rota:</strong> ${rotaId}</p>
+                                <p><strong>Total de Pontos:</strong> ${data.length}</p>
+                                <p><strong>Pontos:</strong></p>
+                                <ul>
+                                    ${data.map((ponto, index) => `<li>Ponto ${index + 1}: ${ponto.lat.toFixed(5)}, ${ponto.lng.toFixed(5)}</li>`).join('')}
+                                </ul>
+                            `;
                         })
                         .catch(error => console.error('Erro ao visualizar rota:', error));
                 } else {
-                    directionsRenderer.set('directions', null);
+                    if (routingControl) {
+                        map.removeControl(routingControl);
+                    }
                 }
             });
-        }
-
-        window.initMap = initMap;
+        });
     </script>
 
 </body>
