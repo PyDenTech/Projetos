@@ -486,39 +486,39 @@
                     });
                 })
                 .catch(error => console.error('Erro ao carregar rotas:', error));
-
+    
             fetchMotoristas();
-
+    
             function fetchMotoristas() {
                 fetch('/api/motoristasescolares')
                     .then(response => response.json())
                     .then(data => {
                         const motoristasTableBody = document.getElementById('motoristasTable').querySelector('tbody');
                         motoristasTableBody.innerHTML = '';
-
+    
                         data.forEach((motorista, index) => {
                             const row = document.createElement('tr');
                             row.innerHTML = `
-                        <td>${index + 1}</td>
-                        <td>${motorista.nome}</td>
-                        <td>${motorista.cpf}</td>
-                        <td>${motorista.cnh}</td>
-                        <td>${motorista.empresa}</td>
-                        <td>${motorista.rota_nome}</td>
-                        <td>
-                            <button class="btn btn-primary btn-sm" onclick="editarMotorista(${motorista.id})">Editar</button>
-                            <button class="btn btn-danger btn-sm" onclick="excluirMotorista(${motorista.id})">Excluir</button>
-                        </td>
-                    `;
+                                <td>${index + 1}</td>
+                                <td>${motorista.nome_completo}</td>
+                                <td>${motorista.cpf}</td>
+                                <td>${motorista.cnh}</td>
+                                <td>${motorista.empresa}</td>
+                                <td>${motorista.rota_nome}</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" onclick="editarMotorista(${motorista.id})">Editar</button>
+                                    <button class="btn btn-danger btn-sm" onclick="excluirMotorista(${motorista.id})">Excluir</button>
+                                </td>
+                            `;
                             motoristasTableBody.appendChild(row);
                         });
-
+    
                         const quantidadeMotoristas = data.length;
                         document.getElementById('statusMessage').textContent = `Total de motoristas: ${quantidadeMotoristas}`;
                     })
                     .catch(error => console.error('Erro ao carregar motoristas:', error));
             }
-
+    
             window.editarMotorista = function (motoristaId) {
                 fetch(`/api/motoristasescolares/${motoristaId}`)
                     .then(response => {
@@ -529,23 +529,22 @@
                     })
                     .then(data => {
                         document.getElementById('editMotoristaId').value = data.id;
-                        document.getElementById('editNome').value = data.nome;
+                        document.getElementById('editNome').value = data.nome_completo;
                         document.getElementById('editCpf').value = data.cpf;
                         document.getElementById('editCnh').value = data.cnh;
                         document.getElementById('editEmpresa').value = data.empresa;
                         document.getElementById('editRota').value = data.rota_id;
-
+    
                         const editModal = new bootstrap.Modal(document.getElementById('editModal'));
                         editModal.show();
                     })
                     .catch(error => console.error('Erro ao carregar dados do motorista:', error));
             };
-
-
+    
             window.salvarEdicao = function () {
                 const motoristaId = document.getElementById('editMotoristaId').value;
                 const formData = new FormData(document.getElementById('editForm'));
-
+    
                 fetch(`/api/motoristasescolares/${motoristaId}`, {
                     method: 'PUT',
                     body: JSON.stringify(Object.fromEntries(formData)),
@@ -562,7 +561,7 @@
                     })
                     .catch(error => console.error('Erro ao salvar dados do motorista:', error));
             };
-
+    
             window.excluirMotorista = function (motoristaId) {
                 if (confirm('Tem certeza que deseja excluir este motorista?')) {
                     fetch(`/api/motoristasescolares/${motoristaId}`, {
@@ -581,42 +580,42 @@
                         .catch(error => console.error('Erro ao excluir motorista:', error));
                 }
             };
-
+    
             function sortTableByColumn(table, column, asc = true) {
                 const dirModifier = asc ? 1 : -1;
                 const tBody = table.tBodies[0];
                 const rows = Array.from(tBody.querySelectorAll('tr'));
-
+    
                 const sortedRows = rows.sort((a, b) => {
                     const aColText = a.querySelector(`td:nth-child(${column + 1})`).textContent.trim();
                     const bColText = b.querySelector(`td:nth-child(${column + 1})`).textContent.trim();
-
+    
                     return aColText > bColText ? (1 * dirModifier) : (-1 * dirModifier);
                 });
-
+    
                 while (tBody.firstChild) {
                     tBody.removeChild(tBody.firstChild);
                 }
-
+    
                 tBody.append(...sortedRows);
-
+    
                 table.querySelectorAll('th').forEach(th => th.classList.remove('th-sort-asc', 'th-sort-desc'));
                 table.querySelector(`th:nth-child(${column + 1})`).classList.toggle('th-sort-asc', asc);
                 table.querySelector(`th:nth-child(${column + 1})`).classList.toggle('th-sort-desc', !asc);
             }
-
+    
             document.querySelectorAll('.table-sortable th').forEach(headerCell => {
                 headerCell.addEventListener('click', () => {
                     const tableElement = headerCell.parentElement.parentElement.parentElement;
                     const headerIndex = Array.prototype.indexOf.call(headerCell.parentElement.children, headerCell);
                     const currentIsAscending = headerCell.classList.contains('th-sort-asc');
-
+    
                     sortTableByColumn(tableElement, headerIndex, !currentIsAscending);
                 });
             });
         });
-
     </script>
+    
 </body>
 
 </html>
