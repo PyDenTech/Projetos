@@ -936,31 +936,31 @@ app.get('/api/motorista/rotas/:usuarioId', async (req, res) => {
 
 app.get('/api/motoristasescolares', async (req, res) => {
     try {
-      const result = await pool.query('SELECT * FROM motoristasescolares');
-      res.status(200).json(result.rows);
+        const result = await pool.query('SELECT * FROM motoristasescolares');
+        res.status(200).json(result.rows);
     } catch (error) {
-      console.error('Erro ao buscar motoristas:', error);
-      res.status(500).json({ error: 'Erro ao processar a solicitação' });
+        console.error('Erro ao buscar motoristas:', error);
+        res.status(500).json({ error: 'Erro ao processar a solicitação' });
     }
-  });
-  
+});
+
 // Endpoint para obter um motorista escolar por ID
 app.get('/api/motoristasescolares/:id', async (req, res) => {
     const { id } = req.params;
-  
+
     try {
-      const result = await pool.query('SELECT * FROM motoristasescolares WHERE id = $1', [id]);
-  
-      if (result.rows.length > 0) {
-        res.status(200).json(result.rows[0]);
-      } else {
-        res.status(404).json({ message: 'Motorista não encontrado' });
-      }
+        const result = await pool.query('SELECT * FROM motoristasescolares WHERE id = $1', [id]);
+
+        if (result.rows.length > 0) {
+            res.status(200).json(result.rows[0]);
+        } else {
+            res.status(404).json({ message: 'Motorista não encontrado' });
+        }
     } catch (error) {
-      console.error('Erro ao buscar dados do motorista:', error);
-      res.status(500).json({ message: 'Erro ao processar a solicitação' });
+        console.error('Erro ao buscar dados do motorista:', error);
+        res.status(500).json({ message: 'Erro ao processar a solicitação' });
     }
-  });
+});
 
 
 app.get('/api/dashboard-data', async (req, res) => {
@@ -1021,30 +1021,30 @@ app.get('/api/dashboard-data', async (req, res) => {
 app.put('/api/motoristasescolares/:id', async (req, res) => {
     const { id } = req.params;
     const { nome_completo, cpf, cnh, empresa, rota_id } = req.body;
-  
-    try {
-      const result = await pool.query(
-        'UPDATE motoristasescolares SET nome_completo = $1, cpf = $2, cnh = $3, empresa = $4, rota_id = $5 WHERE id = $6 RETURNING *',
-        [nome_completo, cpf, cnh, empresa, rota_id, id]
-      );
-      res.status(200).json(result.rows[0]);
-    } catch (error) {
-      console.error('Erro ao atualizar motorista:', error);
-      res.status(500).json({ error: 'Erro ao processar a solicitação' });
-    }
-  });
 
-  app.delete('/api/motoristasescolares/:id', async (req, res) => {
-    const { id } = req.params;
-  
     try {
-      await pool.query('DELETE FROM motoristasescolares WHERE id = $1', [id]);
-      res.status(200).json({ message: 'Motorista excluído com sucesso' });
+        const result = await pool.query(
+            'UPDATE motoristasescolares SET nome_completo = $1, cpf = $2, cnh = $3, empresa = $4, rota_id = $5 WHERE id = $6 RETURNING *',
+            [nome_completo, cpf, cnh, empresa, rota_id, id]
+        );
+        res.status(200).json(result.rows[0]);
     } catch (error) {
-      console.error('Erro ao excluir motorista:', error);
-      res.status(500).json({ error: 'Erro ao processar a solicitação' });
+        console.error('Erro ao atualizar motorista:', error);
+        res.status(500).json({ error: 'Erro ao processar a solicitação' });
     }
-  });
+});
+
+app.delete('/api/motoristasescolares/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        await pool.query('DELETE FROM motoristasescolares WHERE id = $1', [id]);
+        res.status(200).json({ message: 'Motorista excluído com sucesso' });
+    } catch (error) {
+        console.error('Erro ao excluir motorista:', error);
+        res.status(500).json({ error: 'Erro ao processar a solicitação' });
+    }
+});
 
 app.post('/api/registerMotoristasEscolares', async (req, res) => {
     const { nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha, longitude, latitude } = req.body;
