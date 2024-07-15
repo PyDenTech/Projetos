@@ -297,19 +297,38 @@ app.post('/api/login', async (req, res) => {
             return res.status(403).send('Usuário não autorizado a usar o sistema. Por favor, contate o administrador.');
         }
 
-        const responseData = {
-            userId: user.id,
+        req.session.user = {
+            id: user.id,
             nome: user.nome || user.nome_completo,
             email: user.email,
-            empresa: user.empresa || null, // Adicionar a empresa se existir
+            role: tipo
         };
 
-        res.json(responseData);
+        let redirectUrl;
+        switch (tipo) {
+            case 'admin':
+                redirectUrl = '/admin-dashboard';
+                break;
+            case 'motorista_administrativo':
+                redirectUrl = '/dashboard-motorista_administrativo';
+                break;
+            case 'motorista_escolar':
+                redirectUrl = '/dashboard-motorista_escolar';
+                break;
+            case 'web':
+                redirectUrl = '/dashboard-escolar';
+                break;
+            default:
+                redirectUrl = '/';
+        }
+
+        res.json({ message: "Login successful", redirectUrl });
     } catch (error) {
         console.error('Erro no login:', error);
         res.status(500).send('Erro ao processar o login');
     }
 });
+
 
 app.get('/api/usuario-logado', async (req, res) => {
     if (!req.session.user) {
