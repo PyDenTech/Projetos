@@ -818,6 +818,7 @@ app.get('/api/rota-gerada/:rotaId', async (req, res) => {
     }
 });
 
+
 app.post('/api/cadastrar-aluno', async (req, res) => {
     const {
         latitude,
