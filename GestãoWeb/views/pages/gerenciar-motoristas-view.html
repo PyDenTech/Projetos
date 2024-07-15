@@ -115,7 +115,8 @@
                                             <th>CPF <span class="bi bi-arrow-down-up"></span></th>
                                             <th>CNH <span class="bi bi-arrow-down-up"></span></th>
                                             <th>Empresa <span class="bi bi-arrow-down-up"></span></th>
-                                            <th>Rota <span class="bi bi-arrow-down-up"></span></th>
+                                            <th>Id da Rota <span class="bi bi-arrow-down-up"></span></th>
+                                            <th>Nome da Rota <span class="bi bi-arrow-down-up"></span></th>
                                             <th>Ações</th>
                                         </tr>
                                     </thead>
@@ -225,7 +226,8 @@
                                 <td>${motorista.cpf}</td>
                                 <td>${motorista.cnh}</td>
                                 <td>${motorista.empresa}</td>
-                                <td>${motorista.rota_nome}</td>
+                                <td>${motorista.rota_id}</td>
+                                <td>${motorista.rota_nome || 'N/A'}</td>
                                 <td>
                                     <button class="btn btn-primary btn-sm" onclick="editarMotorista(${motorista.id})">Editar</button>
                                     <button class="btn btn-danger btn-sm" onclick="excluirMotorista(${motorista.id})">Excluir</button>

@@ -769,13 +769,13 @@ app.post('/api/cadastrar-rota', async (req, res) => {
 
 app.get('/api/rotas', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM rotas');
-        res.json(result.rows);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Server error');
+      const result = await pool.query('SELECT * FROM rotas');
+      res.status(200).json(result.rows);
+    } catch (error) {
+      console.error('Erro ao buscar rotas:', error);
+      res.status(500).json({ error: 'Erro ao processar a solicitação' });
     }
-});
+  });
 
 app.post('/api/cadastrar-aluno', async (req, res) => {
     const {
@@ -936,7 +936,11 @@ app.get('/api/motorista/rotas/:usuarioId', async (req, res) => {
 
 app.get('/api/motoristasescolares', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM motoristasescolares');
+        const result = await pool.query(`
+        SELECT m.*, r.id AS rota_id, r.nome_rota AS rota_nome
+        FROM motoristasescolares m
+        LEFT JOIN rotas r ON m.rota_id = r.id
+      `);
         res.status(200).json(result.rows);
     } catch (error) {
         console.error('Erro ao buscar motoristas:', error);
@@ -1036,15 +1040,15 @@ app.put('/api/motoristasescolares/:id', async (req, res) => {
 
 app.delete('/api/motoristasescolares/:id', async (req, res) => {
     const { id } = req.params;
-
+  
     try {
-        await pool.query('DELETE FROM motoristasescolares WHERE id = $1', [id]);
-        res.status(200).json({ message: 'Motorista excluído com sucesso' });
+      await pool.query('DELETE FROM motoristasescolares WHERE id = $1', [id]);
+      res.status(200).json({ message: 'Motorista excluído com sucesso' });
     } catch (error) {
-        console.error('Erro ao excluir motorista:', error);
-        res.status(500).json({ error: 'Erro ao processar a solicitação' });
+      console.error('Erro ao excluir motorista:', error);
+      res.status(500).json({ error: 'Erro ao processar a solicitação' });
     }
-});
+  });
 
 app.post('/api/registerMotoristasEscolares', async (req, res) => {
     const { nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha, longitude, latitude } = req.body;
