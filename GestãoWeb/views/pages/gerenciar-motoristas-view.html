@@ -493,6 +493,10 @@
                 fetch('/api/motoristasescolares')
                     .then(response => response.json())
                     .then(data => {
+                        console.log('Motoristas recebidos:', data); // Adicione este log
+                        if (!Array.isArray(data)) {
+                            throw new Error('Resposta não é um array');
+                        }
                         const motoristasTableBody = document.getElementById('motoristasTable').querySelector('tbody');
                         motoristasTableBody.innerHTML = '';
     
@@ -615,6 +619,7 @@
             });
         });
     </script>
+    
     
 </body>
 

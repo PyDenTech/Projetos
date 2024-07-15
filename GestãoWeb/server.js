@@ -934,7 +934,6 @@ app.get('/api/motorista/rotas/:usuarioId', async (req, res) => {
     }
 });
 
-// Endpoint para obter todos os motoristas escolares
 app.get('/api/motoristasescolares', async (req, res) => {
     try {
       const result = await pool.query(`
@@ -942,14 +941,14 @@ app.get('/api/motoristasescolares', async (req, res) => {
         FROM motoristasescolares m
         LEFT JOIN rotas r ON m.rota_id = r.id
       `);
+      console.log('Query result:', result.rows);
       res.status(200).json(result.rows);
     } catch (error) {
-      console.error(error);
+      console.error('Erro ao obter motoristas:', error);
       res.status(500).json({ error: 'Erro ao obter motoristas' });
     }
   });
-
-
+  
 // Endpoint para obter um motorista escolar por ID
 app.get('/api/motoristasescolares/:id', async (req, res) => {
     const { id } = req.params;
