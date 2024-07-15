@@ -798,7 +798,7 @@ app.get('/api/rota-gerada/:rotaId', async (req, res) => {
     const { rotaId } = req.params;
 
     try {
-        const result = await pool.query('SELECT coordenadas FROM rotas WHERE id = $1', [rotaId]);
+        const result = await pool.query('SELECT coordenadas FROM rotas_geradas WHERE rota_id = $1', [rotaId]);
 
         if (result.rows.length > 0) {
             const coordenadas = result.rows[0].coordenadas;
@@ -817,6 +817,7 @@ app.get('/api/rota-gerada/:rotaId', async (req, res) => {
         res.status(500).json({ message: 'Erro ao processar a solicitação' });
     }
 });
+
 
 
 app.post('/api/cadastrar-aluno', async (req, res) => {
