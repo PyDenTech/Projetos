@@ -479,6 +479,10 @@
                     fetch(`/api/rota-gerada/${rotaId}`)
                         .then(response => response.json())
                         .then(data => {
+                            if (!Array.isArray(data)) {
+                                throw new Error('Resposta não é um array');
+                            }
+
                             if (routingControl) {
                                 map.removeControl(routingControl);
                             }
@@ -495,12 +499,12 @@
                             // Exibir detalhes da rota
                             const detalhesRotaDiv = document.getElementById('detalhesRota');
                             detalhesRotaDiv.innerHTML = `
-                      <p><strong>Nome da Rota:</strong> ${rotaId}</p>
-                      <p><strong>Total de Pontos:</strong> ${waypoints.length}</p>
-                      <p><strong>Pontos:</strong></p>
-                      <ul>
-                        ${waypoints.map((ponto, index) => `<li>Ponto ${index + 1}: ${ponto.lat.toFixed(5)}, ${ponto.lng.toFixed(5)}</li>`).join('')}
-                      </ul>
+                        <p><strong>Nome da Rota:</strong> ${rotaId}</p>
+                        <p><strong>Total de Pontos:</strong> ${waypoints.length}</p>
+                        <p><strong>Pontos:</strong></p>
+                        <ul>
+                            ${waypoints.map((ponto, index) => `<li>Ponto ${index + 1}: ${ponto.lat.toFixed(5)}, ${ponto.lng.toFixed(5)}</li>`).join('')}
+                        </ul>
                     `;
                         })
                         .catch(error => console.error('Erro ao visualizar rota:', error));

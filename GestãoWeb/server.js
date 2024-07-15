@@ -796,12 +796,18 @@ app.get('/api/rotas/motorista/:motoristaId', async (req, res) => {
 
 app.get('/api/rota-gerada/:rotaId', async (req, res) => {
     const { rotaId } = req.params;
+
     try {
-        const result = await pool.query('SELECT coordenadas FROM rota_gerada WHERE rota_id = $1', [rotaId]);
-        res.status(200).json(result.rows[0].coordenadas);
+        const result = await pool.query('SELECT coordenadas FROM rotas WHERE id = $1', [rotaId]);
+        
+        if (result.rows.length > 0) {
+            res.json(result.rows[0].coordenadas);
+        } else {
+            res.status(404).json({ message: 'Rota não encontrada.' });
+        }
     } catch (error) {
         console.error('Erro ao buscar coordenadas da rota:', error);
-        res.status(500).json({ error: 'Erro ao processar a solicitação' });
+        res.status(500).json({ message: 'Erro ao processar a solicitação' });
     }
 });
 
