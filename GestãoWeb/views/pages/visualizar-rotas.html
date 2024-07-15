@@ -380,7 +380,6 @@
         </ul>
 
     </aside><!-- End Sidebar-->
-
     <main id="main" class="main">
         <div class="pagetitle">
             <h1>Visualizar Rotas</h1>
@@ -496,13 +495,13 @@
                             // Exibir detalhes da rota
                             const detalhesRotaDiv = document.getElementById('detalhesRota');
                             detalhesRotaDiv.innerHTML = `
-                                <p><strong>Nome da Rota:</strong> ${rotaId}</p>
-                                <p><strong>Total de Pontos:</strong> ${waypoints.length}</p>
-                                <p><strong>Pontos:</strong></p>
-                                <ul>
-                                    ${waypoints.map((ponto, index) => `<li>Ponto ${index + 1}: ${ponto.lat.toFixed(5)}, ${ponto.lng.toFixed(5)}</li>`).join('')}
-                                </ul>
-                            `;
+                      <p><strong>Nome da Rota:</strong> ${rotaId}</p>
+                      <p><strong>Total de Pontos:</strong> ${waypoints.length}</p>
+                      <p><strong>Pontos:</strong></p>
+                      <ul>
+                        ${waypoints.map((ponto, index) => `<li>Ponto ${index + 1}: ${ponto.lat.toFixed(5)}, ${ponto.lng.toFixed(5)}</li>`).join('')}
+                      </ul>
+                    `;
                         })
                         .catch(error => console.error('Erro ao visualizar rota:', error));
                 } else {
@@ -512,8 +511,23 @@
                 }
             });
         });
-
     </script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
+    <!-- Vendor JS Files -->
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/vendor/echarts/echarts.min.js"></script>
+    <script src="/vendor/quill/quill.min.js"></script>
+    <script src="/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="/vendor/tinymce/tinymce.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="/js/users-profile.js"></script>
+    <script src="/js/main.js"></script>
+
 </body>
 
 </html>
