@@ -123,6 +123,7 @@ app.post('/api/upload-foto-perfil', ensureLoggedIn, upload.single('foto_perfil')
 
 const pages = [
     'cadastrar-aluno-form',
+    'admin-dashboard',
     'importar-aluno-form',
     'gerenciar-alunos-view',
     'cadastrar-escolas-form',
