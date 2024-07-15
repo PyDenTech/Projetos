@@ -179,7 +179,7 @@
         const email = formData.get('email');
         const senha = formData.get('senha');
 
-        fetch('/login', {
+        fetch('/api/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
