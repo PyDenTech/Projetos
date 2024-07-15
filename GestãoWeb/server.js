@@ -934,37 +934,39 @@ app.get('/api/motorista/rotas/:usuarioId', async (req, res) => {
     }
 });
 
+// Endpoint para obter todos os motoristas escolares
 app.get('/api/motoristasescolares', async (req, res) => {
     try {
-        const result = await pool.query(`
-            SELECT m.id, m.nome_completo, m.cpf, m.cnh, m.empresa, r.nome AS rota_nome
-            FROM motoristasescolares m
-            LEFT JOIN rotas r ON m.rota_id = r.id
-        `);
-        res.status(200).json(result.rows);
+      const result = await pool.query(`
+        SELECT m.id, m.nome_completo, m.cpf, m.cnh, m.empresa, r.nome_rota as rota_nome
+        FROM motoristasescolares m
+        LEFT JOIN rotas r ON m.rota_id = r.id
+      `);
+      res.status(200).json(result.rows);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Erro ao obter motoristas' });
+      console.error(error);
+      res.status(500).json({ error: 'Erro ao obter motoristas' });
     }
-});
+  });
 
 
+// Endpoint para obter um motorista escolar por ID
 app.get('/api/motoristasescolares/:id', async (req, res) => {
     const { id } = req.params;
-
+  
     try {
-        const result = await pool.query('SELECT * FROM motoristasescolares WHERE id = $1', [id]);
-
-        if (result.rows.length > 0) {
-            res.json(result.rows[0]);
-        } else {
-            res.status(404).json({ message: 'Motorista não encontrado.' });
-        }
+      const result = await pool.query('SELECT * FROM motoristasescolares WHERE id = $1', [id]);
+  
+      if (result.rows.length > 0) {
+        res.status(200).json(result.rows[0]);
+      } else {
+        res.status(404).json({ message: 'Motorista não encontrado' });
+      }
     } catch (error) {
-        console.error('Erro ao buscar dados do motorista:', error);
-        res.status(500).json({ message: 'Erro ao processar a solicitação.' });
+      console.error('Erro ao buscar dados do motorista:', error);
+      res.status(500).json({ message: 'Erro ao processar a solicitação' });
     }
-});
+  });
 
 
 app.get('/api/dashboard-data', async (req, res) => {
@@ -1022,54 +1024,45 @@ app.get('/api/dashboard-data', async (req, res) => {
     }
 });
 
+// Endpoint para atualizar um motorista escolar
 app.put('/api/motoristasescolares/:id', async (req, res) => {
     const { id } = req.params;
-    const { nome, cpf, cnh, empresa, rota_id } = req.body;
-
+    const { nome_completo, cpf, cnh, empresa, rota_id } = req.body;
+  
     try {
-        const result = await pool.query(
-            'UPDATE motoristasescolares SET nome = $1, cpf = $2, cnh = $3, empresa = $4, rota_id = $5 WHERE id = $6 RETURNING *',
-            [nome, cpf, cnh, empresa, rota_id, id]
-        );
-
-        if (result.rows.length > 0) {
-            res.json({ message: 'Dados do motorista atualizados com sucesso.', data: result.rows[0] });
-        } else {
-            res.status(404).json({ message: 'Motorista não encontrado.' });
-        }
+      const result = await pool.query(
+        'UPDATE motoristasescolares SET nome_completo = $1, cpf = $2, cnh = $3, empresa = $4, rota_id = $5 WHERE id = $6 RETURNING *',
+        [nome_completo, cpf, cnh, empresa, rota_id, id]
+      );
+  
+      if (result.rows.length > 0) {
+        res.status(200).json(result.rows[0]);
+      } else {
+        res.status(404).json({ message: 'Motorista não encontrado' });
+      }
     } catch (error) {
-        console.error('Erro ao atualizar dados do motorista:', error);
-        res.status(500).json({ message: 'Erro ao processar a solicitação.' });
+      console.error('Erro ao atualizar dados do motorista:', error);
+      res.status(500).json({ message: 'Erro ao processar a solicitação' });
     }
-});
+  });
 
+// Endpoint para excluir um motorista escolar
 app.delete('/api/motoristasescolares/:id', async (req, res) => {
     const { id } = req.params;
-    const client = await pool.connect();
-
+  
     try {
-        await client.query('BEGIN');
-
-        const motoristaResult = await client.query('DELETE FROM motoristasescolares WHERE id = $1 RETURNING id', [id]);
-
-        if (motoristaResult.rows.length > 0) {
-            const motoristaId = motoristaResult.rows[0].id;
-            await client.query('DELETE FROM usuarios WHERE id = $1', [motoristaId]);
-
-            await client.query('COMMIT');
-            res.json({ message: 'Motorista e usuário excluídos com sucesso.' });
-        } else {
-            await client.query('ROLLBACK');
-            res.status(404).json({ message: 'Motorista não encontrado.' });
-        }
+      const result = await pool.query('DELETE FROM motoristasescolares WHERE id = $1 RETURNING *', [id]);
+  
+      if (result.rows.length > 0) {
+        res.status(200).json({ message: 'Motorista excluído com sucesso' });
+      } else {
+        res.status(404).json({ message: 'Motorista não encontrado' });
+      }
     } catch (error) {
-        await client.query('ROLLBACK');
-        console.error('Erro ao excluir motorista:', error);
-        res.status(500).json({ message: 'Erro ao processar a solicitação.' });
-    } finally {
-        client.release();
+      console.error('Erro ao excluir motorista:', error);
+      res.status(500).json({ message: 'Erro ao processar a solicitação' });
     }
-});
+  });
 
 app.post('/api/registerMotoristasEscolares', async (req, res) => {
     const { nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha, longitude, latitude } = req.body;
