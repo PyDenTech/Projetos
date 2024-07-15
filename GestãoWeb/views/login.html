@@ -34,6 +34,7 @@
             <input type="password" name="senha" autocomplete="password" placeholder="Senha" id="id_password" required>
             <i class="far fa-eye" id="togglePassword" style="cursor: pointer;"></i>
           </div>
+          <input type="hidden" name="tipo" value="web"> <!-- Campo oculto para o tipo de login -->
           <a class="pass" href="#">Esqueceu sua senha?</a>
           <input type="submit" value="Entrar" class="btn solid">
         </form>
@@ -178,13 +179,14 @@
         const formData = new FormData(loginForm);
         const email = formData.get('email');
         const senha = formData.get('senha');
+        const tipo = formData.get('tipo');
 
         fetch('/api/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ email: email, senha: senha, origem: 'web' }) // Adicionar origem como 'web'
+          body: JSON.stringify({ email: email, senha: senha, tipo: tipo })
         })
           .then(response => {
             if (!response.ok) {
