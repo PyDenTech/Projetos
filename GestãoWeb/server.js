@@ -306,7 +306,7 @@ app.post('/api/login', async (req, res) => {
         let redirectUrl;
         switch (tipo) {
             case 'admin':
-                redirectUrl = '/admin/dashboard';
+                redirectUrl = '/admin/admin-dashboard';
                 break;
             case 'motorista_administrativo':
                 redirectUrl = '/dashboard-motorista_administrativo';
