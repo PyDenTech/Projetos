@@ -799,9 +799,16 @@ app.get('/api/rota-gerada/:rotaId', async (req, res) => {
 
     try {
         const result = await pool.query('SELECT coordenadas FROM rotas WHERE id = $1', [rotaId]);
-        
+
         if (result.rows.length > 0) {
-            res.json(result.rows[0].coordenadas);
+            const coordenadas = result.rows[0].coordenadas;
+
+            // Verificar se coordenadas é um array
+            if (Array.isArray(coordenadas)) {
+                res.json(coordenadas);
+            } else {
+                res.status(500).json({ message: 'Coordenadas não estão em um formato de array.' });
+            }
         } else {
             res.status(404).json({ message: 'Rota não encontrada.' });
         }
@@ -810,6 +817,7 @@ app.get('/api/rota-gerada/:rotaId', async (req, res) => {
         res.status(500).json({ message: 'Erro ao processar a solicitação' });
     }
 });
+
 
 app.post('/api/cadastrar-aluno', async (req, res) => {
     const {
