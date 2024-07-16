@@ -1528,6 +1528,7 @@ app.get('/api/motoristasescolares/:id', async (req, res) => {
 app.get('/api/rotas/motorista/:motorista_id', async (req, res) => {
     const { motorista_id } = req.params;
     try {
+        console.log(`Buscando rotas para o motorista com ID: ${motorista_id}`);
         const result = await pool.query(
             `SELECT r.id, r.nome_rota
              FROM rotas r
@@ -1537,8 +1538,10 @@ app.get('/api/rotas/motorista/:motorista_id', async (req, res) => {
         );
 
         if (result.rows.length > 0) {
+            console.log(`Rotas encontradas: ${JSON.stringify(result.rows)}`);
             res.json(result.rows);
         } else {
+            console.log('Nenhuma rota encontrada para o motorista.');
             res.status(404).json({ message: 'Nenhuma rota encontrada para o motorista.' });
         }
     } catch (error) {
@@ -1546,6 +1549,7 @@ app.get('/api/rotas/motorista/:motorista_id', async (req, res) => {
         res.status(500).json({ error: 'Erro ao buscar rotas do motorista' });
     }
 });
+
 
 app.get('/api/rota-gerada/:id', async (req, res) => {
     const { id } = req.params;
