@@ -31,13 +31,11 @@
         #map {
             height: 600px;
             display: none;
-            /* Ocultar o mapa inicialmente */
         }
 
         #detalhesRota {
             margin-top: 20px;
             display: none;
-            /* Ocultar os detalhes da rota inicialmente */
         }
     </style>
 </head>
@@ -401,9 +399,6 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Rotas</h5>
-                            <button class="btn btn-warning mb-3" onclick="abrirModalAvisoGeral()">
-                                <i class="bi bi-megaphone"></i> Aviso Geral
-                            </button>
                             <div class="table-responsive">
                                 <table class="table table-striped" id="rotasTable">
                                     <thead>
@@ -584,33 +579,6 @@
                         .catch(error => console.error('Erro ao excluir rota:', error));
                 }
             };
-
-            window.abrirModalAvisoGeral = function () {
-                const modal = new bootstrap.Modal(document.getElementById('modalAvisoGeral'));
-                modal.show();
-            };
-
-            document.getElementById('formAvisoGeral').addEventListener('submit', function (e) {
-                e.preventDefault();
-
-                const titulo = document.getElementById('tituloAvisoGeral').value;
-                const mensagem = document.getElementById('mensagemAvisoGeral').value;
-
-                fetch('/api/avisos', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ titulo, mensagem, destinatario: 'geral' })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert(data.message);
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalAvisoGeral'));
-                        modal.hide();
-                    })
-                    .catch(error => console.error('Erro ao enviar aviso:', error));
-            });
 
         });
     </script>
