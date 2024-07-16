@@ -879,18 +879,27 @@ app.delete('/api/rotas/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
-        const result = await pool.query('DELETE FROM rotas WHERE id = $1 RETURNING *', [id]);
+        // Começar uma transação
+        await pool.query('BEGIN');
 
-        if (result.rows.length === 0) {
-            return res.status(404).json({ error: 'Rota não encontrada' });
-        }
+        // Excluir rotas geradas associadas à rota
+        await pool.query('DELETE FROM rotas_geradas WHERE rota_id = $1', [id]);
 
-        res.status(200).json({ message: 'Rota excluída com sucesso' });
-    } catch (error) {
-        console.error('Erro ao excluir rota:', error);
-        res.status(500).json({ error: 'Erro ao excluir rota' });
+        // Excluir a rota
+        await pool.query('DELETE FROM rotas WHERE id = $1', [id]);
+
+        // Commit da transação
+        await pool.query('COMMIT');
+
+        res.json({ message: 'Rota excluída com sucesso.' });
+    } catch (err) {
+        // Rollback da transação em caso de erro
+        await pool.query('ROLLBACK');
+        console.error(err);
+        res.status(500).send('Erro ao excluir a rota');
     }
 });
+
 
 
 app.post('/api/cadastrar-aluno', async (req, res) => {
