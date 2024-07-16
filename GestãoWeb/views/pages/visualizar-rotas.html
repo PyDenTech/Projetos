@@ -391,7 +391,39 @@
                 </ol>
             </nav>
         </div>
-
+        <section class="section">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Rotas</h5>
+                            <button class="btn btn-warning mb-3" onclick="abrirModalAvisoGeral()">
+                                <i class="bi bi-megaphone"></i> Aviso Geral
+                            </button>
+                            <div class="table-responsive">
+                                <table class="table table-striped" id="rotasTable">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Nome da Rota <span class="bi bi-arrow-down-up"></span></th>
+                                            <th>Horários de Funcionamento <span class="bi bi-arrow-down-up"></span></th>
+                                            <th>Escolas Atendidas <span class="bi bi-arrow-down-up"></span></th>
+                                            <th>Distância <span class="bi bi-arrow-down-up"></span></th>
+                                            <th>Tempo <span class="bi bi-arrow-down-up"></span></th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Dados das rotas -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="statusMessage" class="mt-3"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
         <section class="section">
             <div class="row">
                 <div class="col-lg-12">
@@ -512,6 +544,94 @@
             });
         });
 
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchRotas();
+
+            function fetchRotas() {
+                fetch('/api/rotas')
+                    .then(response => response.json())
+                    .then(data => {
+                        const rotasTableBody = document.getElementById('rotasTable').querySelector('tbody');
+                        rotasTableBody.innerHTML = '';
+
+                        data.forEach((rota, index) => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                    <td>${index + 1}</td>
+                                    <td>${rota.nome_rota}</td>
+                                    <td>${rota.horarios_funcionamento.join(', ')}</td>
+                                    <td>${rota.escolas_atendidas.join(', ')}</td>
+                                    <td>${rota.distancia} km</td>
+                                    <td>${rota.tempo} min</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-sm" onclick="editarRota(${rota.id})">
+                                            <i class="bi bi-pencil"></i> Editar
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" onclick="excluirRota(${rota.id})">Excluir</button>
+                                    </td>
+                                `;
+                            rotasTableBody.appendChild(row);
+                        });
+
+                        const quantidadeRotas = data.length;
+                        document.getElementById('statusMessage').textContent = `Total de rotas: ${quantidadeRotas}`;
+                    })
+                    .catch(error => console.error('Erro ao carregar rotas:', error));
+            }
+
+            window.editarRota = function (id) {
+                // Implementar função de editar rota
+            };
+
+            window.excluirRota = function (id) {
+                if (confirm('Tem certeza que deseja excluir esta rota?')) {
+                    fetch(`/api/rotas/${id}`, {
+                        method: 'DELETE'
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Erro ao excluir rota.');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            alert(data.message);
+                            fetchRotas();
+                        })
+                        .catch(error => console.error('Erro ao excluir rota:', error));
+                }
+            };
+
+            window.abrirModalAvisoGeral = function () {
+                const modal = new bootstrap.Modal(document.getElementById('modalAvisoGeral'));
+                modal.show();
+            };
+
+            document.getElementById('formAvisoGeral').addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const titulo = document.getElementById('tituloAvisoGeral').value;
+                const mensagem = document.getElementById('mensagemAvisoGeral').value;
+
+                fetch('/api/avisos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ titulo, mensagem, destinatario: 'geral' })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data.message);
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalAvisoGeral'));
+                        modal.hide();
+                    })
+                    .catch(error => console.error('Erro ao enviar aviso:', error));
+            });
+
+        });
     </script>
 </body>
 

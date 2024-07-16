@@ -821,12 +821,77 @@ app.post('/api/cadastrar-rota', async (req, res) => {
 app.get('/api/rotas', async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM rotas');
-        res.json(result.rows);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Server error');
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'Nenhuma rota encontrada' });
+        }
+
+        res.status(200).json(result.rows);
+    } catch (error) {
+        console.error('Erro ao buscar rotas:', error);
+        res.status(500).json({ error: 'Erro ao buscar rotas' });
     }
 });
+
+// Endpoint para buscar informações de uma rota por ID
+app.get('/api/rotas/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await pool.query('SELECT * FROM rotas WHERE id = $1', [id]);
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Rota não encontrada' });
+        }
+        res.status(200).json(result.rows[0]);
+    } catch (error) {
+        console.error('Erro ao buscar rota:', error);
+        res.status(500).json({ error: 'Erro ao buscar rota' });
+    }
+});
+
+// Endpoint para editar uma rota
+app.put('/api/rotas/:id', async (req, res) => {
+    const { id } = req.params;
+    const { tipo_rota, nome_rota, horarios_funcionamento, dificuldades_acesso, escolas_atendidas, alunos_atendidos, area_urbana } = req.body;
+
+    try {
+        const result = await pool.query(
+            `UPDATE rotas
+             SET tipo_rota = $1, nome_rota = $2, horarios_funcionamento = $3, dificuldades_acesso = $4,
+                 escolas_atendidas = $5, alunos_atendidos = $6, area_urbana = $7
+             WHERE id = $8
+             RETURNING *`,
+            [tipo_rota, nome_rota, horarios_funcionamento, dificuldades_acesso, escolas_atendidas, alunos_atendidos, area_urbana, id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Rota não encontrada' });
+        }
+
+        res.status(200).json(result.rows[0]);
+    } catch (error) {
+        console.error('Erro ao editar rota:', error);
+        res.status(500).json({ error: 'Erro ao editar rota' });
+    }
+});
+
+// Endpoint para excluir uma rota
+app.delete('/api/rotas/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const result = await pool.query('DELETE FROM rotas WHERE id = $1 RETURNING *', [id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Rota não encontrada' });
+        }
+
+        res.status(200).json({ message: 'Rota excluída com sucesso' });
+    } catch (error) {
+        console.error('Erro ao excluir rota:', error);
+        res.status(500).json({ error: 'Erro ao excluir rota' });
+    }
+});
+
 
 app.post('/api/cadastrar-aluno', async (req, res) => {
     const {
