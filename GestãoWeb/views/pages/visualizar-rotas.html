@@ -30,10 +30,14 @@
     <style>
         #map {
             height: 600px;
+            display: none;
+            /* Ocultar o mapa inicialmente */
         }
 
         #detalhesRota {
             margin-top: 20px;
+            display: none;
+            /* Ocultar os detalhes da rota inicialmente */
         }
     </style>
 </head>
@@ -429,11 +433,7 @@
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Selecionar Rota</h5>
-                            <select id="selectRota" class="form-select mb-3">
-                                <option value="">Selecione uma rota</option>
-                                <!-- Opções serão preenchidas dinamicamente -->
-                            </select>
+                            <h5 class="card-title">Mapa da Rota</h5>
                             <div id="map"></div>
                             <div id="detalhesRota"></div>
                         </div>
@@ -489,64 +489,7 @@
 
             var routingControl;
 
-            // Carregar opções do select
-            fetch('/api/rotas')
-                .then(response => response.json())
-                .then(data => {
-                    const selectRota = document.getElementById('selectRota');
-                    data.forEach(rota => {
-                        const option = document.createElement('option');
-                        option.value = rota.id;
-                        option.textContent = rota.nome_rota;
-                        selectRota.appendChild(option);
-                    });
-                })
-                .catch(error => console.error('Erro ao carregar rotas:', error));
-
-            // Adicionar evento ao select
-            document.getElementById('selectRota').addEventListener('change', function () {
-                const rotaId = this.value;
-
-                if (rotaId) {
-                    fetch(`/api/rota-gerada/${rotaId}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (routingControl) {
-                                map.removeControl(routingControl);
-                            }
-
-                            const waypoints = data.map(coord => L.latLng(coord.lat, coord.lng));
-                            routingControl = L.Routing.control({
-                                waypoints: waypoints,
-                                createMarker: function () { return null; },
-                                routeWhileDragging: false,
-                                addWaypoints: false,
-                                draggableWaypoints: false
-                            }).addTo(map);
-
-                            // Exibir detalhes da rota
-                            const detalhesRotaDiv = document.getElementById('detalhesRota');
-                            detalhesRotaDiv.innerHTML = `
-                                <p><strong>Nome da Rota:</strong> ${rotaId}</p>
-                                <p><strong>Total de Pontos:</strong> ${waypoints.length}</p>
-                                <p><strong>Pontos:</strong></p>
-                                <ul>
-                                    ${waypoints.map((ponto, index) => `<li>Ponto ${index + 1}: ${ponto.lat.toFixed(5)}, ${ponto.lng.toFixed(5)}</li>`).join('')}
-                                </ul>
-                            `;
-                        })
-                        .catch(error => console.error('Erro ao visualizar rota:', error));
-                } else {
-                    if (routingControl) {
-                        map.removeControl(routingControl);
-                    }
-                }
-            });
-        });
-
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
+            // Carregar rotas na tabela
             fetchRotas();
 
             function fetchRotas() {
@@ -559,19 +502,22 @@
                         data.forEach((rota, index) => {
                             const row = document.createElement('tr');
                             row.innerHTML = `
-                                    <td>${index + 1}</td>
-                                    <td>${rota.nome_rota}</td>
-                                    <td>${rota.horarios_funcionamento.join(', ')}</td>
-                                    <td>${rota.escolas_atendidas.join(', ')}</td>
-                                    <td>${rota.distancia} km</td>
-                                    <td>${rota.tempo} min</td>
-                                    <td>
-                                        <button class="btn btn-primary btn-sm" onclick="editarRota(${rota.id})">
-                                            <i class="bi bi-pencil"></i> Editar
-                                        </button>
-                                        <button class="btn btn-danger btn-sm" onclick="excluirRota(${rota.id})">Excluir</button>
-                                    </td>
-                                `;
+                                <td>${index + 1}</td>
+                                <td>${rota.nome_rota}</td>
+                                <td>${rota.horarios_funcionamento.join(', ')}</td>
+                                <td>${rota.escolas_atendidas.join(', ')}</td>
+                                <td>${rota.distancia} km</td>
+                                <td>${rota.tempo} min</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" onclick="visualizarRota(${rota.id})">
+                                        <i class="bi bi-eye"></i> Visualizar
+                                    </button>
+                                    <button class="btn btn-primary btn-sm" onclick="editarRota(${rota.id})">
+                                        <i class="bi bi-pencil"></i> Editar
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="excluirRota(${rota.id})">Excluir</button>
+                                </td>
+                            `;
                             rotasTableBody.appendChild(row);
                         });
 
@@ -580,6 +526,41 @@
                     })
                     .catch(error => console.error('Erro ao carregar rotas:', error));
             }
+
+            window.visualizarRota = function (rotaId) {
+                fetch(`/api/rota-gerada/${rotaId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (routingControl) {
+                            map.removeControl(routingControl);
+                        }
+
+                        const waypoints = data.map(coord => L.latLng(coord.lat, coord.lng));
+                        routingControl = L.Routing.control({
+                            waypoints: waypoints,
+                            createMarker: function () { return null; },
+                            routeWhileDragging: false,
+                            addWaypoints: false,
+                            draggableWaypoints: false
+                        }).addTo(map);
+
+                        // Exibir detalhes da rota
+                        const detalhesRotaDiv = document.getElementById('detalhesRota');
+                        detalhesRotaDiv.innerHTML = `
+                            <p><strong>Nome da Rota:</strong> ${rotaId}</p>
+                            <p><strong>Total de Pontos:</strong> ${waypoints.length}</p>
+                            <p><strong>Pontos:</strong></p>
+                            <ul>
+                                ${waypoints.map((ponto, index) => `<li>Ponto ${index + 1}: ${ponto.lat.toFixed(5)}, ${ponto.lng.toFixed(5)}</li>`).join('')}
+                            </ul>
+                        `;
+                        detalhesRotaDiv.style.display = 'block';
+                        map.invalidateSize();
+                        map.setView(waypoints[0], 13); // Ajustar o foco do mapa
+                        document.getElementById('map').style.display = 'block'; // Mostrar o mapa
+                    })
+                    .catch(error => console.error('Erro ao visualizar rota:', error));
+            };
 
             window.editarRota = function (id) {
                 // Implementar função de editar rota
