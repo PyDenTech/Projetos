@@ -189,7 +189,7 @@
                     </li>
                     <li>
                         <a href="/visualizar-rotas">
-                            <i class="bi bi-eye"></i><span>Vizualizar Rotas</span>
+                            <i class="bi bi-eye"></i><span>Visualizar Rotas</span>
                         </a>
                     </li>
                 </ul>
@@ -261,8 +261,8 @@
                         </a>
                     </li>
                     <li>
-                        <a href="/vizualizar-fornecedores-map">
-                            <i class="bi bi-eye"></i><span>Vizualizar</span>
+                        <a href="/visualizar-fornecedores-map">
+                            <i class="bi bi-eye"></i><span>Visualizar</span>
                         </a>
                     </li>
                 </ul>
@@ -285,8 +285,8 @@
                         </a>
                     </li>
                     <li>
-                        <a href="/vizualizar-onibus-map">
-                            <i class="bi bi-eye"></i><span>Vizualizar</span>
+                        <a href="/visualizar-onibus-map">
+                            <i class="bi bi-eye"></i><span>Visualizar</span>
                         </a>
                     </li>
                     <li>
@@ -492,18 +492,19 @@
             function fetchRotas() {
                 fetch('/api/rotas')
                     .then(response => response.json())
-                    .then(data => {
+                    .then(async data => {
                         const rotasTableBody = document.getElementById('rotasTable').querySelector('tbody');
                         rotasTableBody.innerHTML = '';
 
-                        data.forEach((rota, index) => {
+                        for (const rota of data) {
+                            const escolasNomes = await getEscolasNomes(rota.escolas_atendidas);
                             const row = document.createElement('tr');
                             row.innerHTML = `
-                                <td>${index + 1}</td>
+                                <td>${rota.id}</td>
                                 <td>${rota.nome_rota}</td>
                                 <td>${rota.horarios_funcionamento.join(', ')}</td>
-                                <td>${rota.escolas_atendidas.join(', ')}</td>
-                                <td>${rota.distancia} km</td>
+                                <td>${escolasNomes.join(', ')}</td>
+                                <td>${rota.distancia?.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} km</td>
                                 <td>${rota.tempo} min</td>
                                 <td>
                                     <button class="btn btn-primary btn-sm" onclick="visualizarRota(${rota.id})">
@@ -516,12 +517,32 @@
                                 </td>
                             `;
                             rotasTableBody.appendChild(row);
-                        });
+                        }
 
                         const quantidadeRotas = data.length;
                         document.getElementById('statusMessage').textContent = `Total de rotas: ${quantidadeRotas}`;
                     })
                     .catch(error => console.error('Erro ao carregar rotas:', error));
+            }
+
+            async function getEscolasNomes(ids) {
+                try {
+                    const response = await fetch(`/api/escolas-nomes`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ ids })
+                    });
+                    if (!response.ok) {
+                        throw new Error('Erro ao buscar nomes das escolas');
+                    }
+                    const data = await response.json();
+                    return data.map(escola => escola.nome);
+                } catch (error) {
+                    console.error(error);
+                    return ids; // Retorna os ids caso ocorra algum erro
+                }
             }
 
             window.visualizarRota = function (rotaId) {
