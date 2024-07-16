@@ -37,6 +37,23 @@
             margin-top: 20px;
             display: none;
         }
+
+        .table thead th {
+            background-color: #f8f9fa;
+            text-align: center;
+        }
+
+        .table tbody td {
+            vertical-align: middle;
+        }
+
+        .table-actions {
+            text-align: center;
+        }
+
+        .table-actions button {
+            margin: 0 2px;
+        }
     </style>
 </head>
 
@@ -385,21 +402,14 @@
                         <div class="card-body">
                             <h5 class="card-title">Rotas</h5>
                             <div class="table-responsive">
-                                <table class="table table-striped" id="rotasTable">
-                                    <thead>
+                                <table class="table table-striped table-bordered">
+                                    <thead class="table-dark">
                                         <tr>
                                             <th>#</th>
-                                            <th>
-                                                <h5>Nome da Rota</h5> <span class="bi bi-arrow-down-up"></span>
-                                            </th>
-                                            <th>
-                                                <h5>Horários de Funcionamento</h5> <span
-                                                    class="bi bi-arrow-down-up"></span>
-                                            </th>
-                                            <th>
-                                                <h5>Escolas Atendidas</h5> <span class="bi bi-arrow-down-up"></span>
-                                            </th>
-                                            <th>Ações</th>
+                                            <th>Nome da Rota <span class="bi bi-arrow-down-up"></span></th>
+                                            <th>Horários de Funcionamento <span class="bi bi-arrow-down-up"></span></th>
+                                            <th>Escolas Atendidas <span class="bi bi-arrow-down-up"></span></th>
+                                            <th class="text-center">Ações</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -504,7 +514,7 @@
                                     escolasMap[escola.id] = escola.nome;
                                 });
 
-                                const rotasTableBody = document.getElementById('rotasTable').querySelector('tbody');
+                                const rotasTableBody = document.querySelector('#rotasTable tbody');
                                 rotasTableBody.innerHTML = '';
 
                                 data.forEach((rota, index) => {
@@ -512,18 +522,18 @@
 
                                     const row = document.createElement('tr');
                                     row.innerHTML = `
-                                        <td>${index + 1}</td>
+                                        <td class="text-center">${index + 1}</td>
                                         <td>${rota.nome_rota}</td>
                                         <td>${rota.horarios_funcionamento.join(', ')}</td>
                                         <td>${escolasNomes}</td>
-                                        <td>
-                                            <button class="btn btn-primary btn-sm" onclick="visualizarRota(${rota.id})">
+                                        <td class="table-actions">
+                                            <button class="btn btn-outline-primary btn-sm" onclick="visualizarRota(${rota.id})">
                                                 <i class="bi bi-eye"></i>
                                             </button>
-                                            <button class="btn btn-primary btn-sm" onclick="editarRota(${rota.id})">
+                                            <button class="btn btn-outline-warning btn-sm" onclick="editarRota(${rota.id})">
                                                 <i class="bi bi-pencil"></i>
                                             </button>
-                                            <button class="btn btn-danger btn-sm" onclick="excluirRota(${rota.id})">
+                                            <button class="btn btn-outline-danger btn-sm" onclick="excluirRota(${rota.id})">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </td>
