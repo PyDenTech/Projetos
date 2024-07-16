@@ -834,19 +834,39 @@ app.get('/api/rotas', async (req, res) => {
 });
 
 // Endpoint para buscar informações de uma rota por ID
-app.get('/api/rotas/:id', async (req, res) => {
-    const { id } = req.params;
+app.get('/api/rotas', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM rotas WHERE id = $1', [id]);
-        if (result.rows.length === 0) {
-            return res.status(404).json({ error: 'Rota não encontrada' });
-        }
-        res.status(200).json(result.rows[0]);
-    } catch (error) {
-        console.error('Erro ao buscar rota:', error);
-        res.status(500).json({ error: 'Erro ao buscar rota' });
+        const result = await pool.query(`
+            SELECT 
+                r.id, 
+                r.nome_rota, 
+                r.horarios_funcionamento, 
+                r.escolas_atendidas, 
+                r.area_urbana, 
+                r.dificuldades_acesso, 
+                r.alunos_atendidos, 
+                r.data_cadastro, 
+                rg.detalhes, 
+                rg.distancia, 
+                rg.tempo 
+            FROM rotas r 
+            LEFT JOIN rotas_geradas rg ON r.id = rg.rota_id
+        `);
+        const rotas = result.rows.map(rota => ({
+            ...rota,
+            horarios_funcionamento: JSON.parse(rota.horarios_funcionamento),
+            escolas_atendidas: JSON.parse(rota.escolas_atendidas),
+            alunos_atendidos: rota.alunos_atendidos ? JSON.parse(rota.alunos_atendidos) : null,
+            distancia: rota.distancia ? rota.distancia.toString().replace('.', ',') : 'undefined',
+            tempo: rota.tempo ? rota.tempo.toString().replace('.', ',') : 'undefined'
+        }));
+        res.json(rotas);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
     }
 });
+
 
 // Endpoint para editar uma rota
 app.put('/api/rotas/:id', async (req, res) => {
