@@ -31,13 +31,11 @@
         #map {
             height: 600px;
             display: none;
-            /* Ocultar o mapa inicialmente */
         }
 
         #detalhesRota {
             margin-top: 20px;
             display: none;
-            /* Ocultar os detalhes da rota inicialmente */
         }
     </style>
 </head>
@@ -46,7 +44,6 @@
 
     <!-- ======= Header ======= -->
     <header id="header" class="header fixed-top d-flex align-items-center">
-
         <i class="bi bi-list toggle-sidebar-btn"></i>
         <div class="d-flex align-items-center justify-content-between">
             <a href="/dashboard-escolar" class="logo d-flex align-items-center">
@@ -56,7 +53,6 @@
 
         <nav class="header-nav ms-auto">
             <ul class="d-flex align-items-center">
-
                 <li class="nav-item dropdown pe-3">
                     <a id="profile-link" class="nav-link nav-profile d-flex align-items-center pe-0" href="#"
                         data-bs-toggle="dropdown">
@@ -74,7 +70,6 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-
                         <li>
                             <a class="dropdown-item d-flex align-items-center" href="/users-profile">
                                 <i class="bi bi-gear"></i>
@@ -84,7 +79,6 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-
                         <li>
                             <a class="dropdown-item d-flex align-items-center" href="/faq">
                                 <i class="bi bi-question-circle"></i>
@@ -94,7 +88,6 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-
                         <li>
                             <a class="dropdown-item d-flex align-items-center" href="#" id="logout-link">
                                 <i class="bi bi-box-arrow-right"></i>
@@ -103,15 +96,12 @@
                         </li>
                     </ul><!-- End Profile Dropdown Items -->
                 </li><!-- End Profile Nav -->
-
             </ul>
         </nav><!-- End Icons Navigation -->
-
     </header><!-- End Header -->
 
     <!-- ======= Sidebar ======= -->
     <aside id="sidebar" class="sidebar">
-
         <ul class="sidebar-nav" id="sidebar-nav">
             <li class="nav-heading">Transporte Escolar</li>
             <li class="nav-item">
@@ -120,14 +110,13 @@
                     <span>Painel de Controle</span>
                 </a>
             </li>
-
             <li class="nav-item">
                 <a class="nav-link collapsed" data-bs-target="#escolas-nav" data-bs-toggle="collapse" href="#">
                     <img src="/img/icones/escolas.svg" alt="Escolas"
                         style="width: 20px; height: 20px; margin-right: 5px; color: white;">
                     <span>Escolas</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
-                <ul id="escolas-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                <ul id="escolas-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
                     <li>
                         <a href="/cadastrar-escolas-form">
                             <i class="bi bi-house-door"></i><span>Cadastrar</span>
@@ -138,7 +127,6 @@
                             <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
                         </a>
                     </li>
-
                 </ul>
             </li>
             <li class="nav-item">
@@ -147,7 +135,7 @@
                         style="width: 20px; height: 20px; margin-right: 5px; color: white;">
                     <span>Alunos</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
-                <ul id="aluno-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                <ul id="aluno-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
                     <li>
                         <a href="/cadastrar-aluno-form">
                             <i class="bi bi-person-plus"></i><span>Solicitar Cadastro</span>
@@ -181,7 +169,6 @@
                             <i class="bi bi-plus-square"></i><span>Cadastrar Rota</span>
                         </a>
                     </li>
-
                     <li>
                         <a href="/desenhar-rotas-map">
                             <i class="bi bi-pencil"></i><span>Gerar Rotas</span>
@@ -189,7 +176,7 @@
                     </li>
                     <li>
                         <a href="/visualizar-rotas">
-                            <i class="bi bi-eye"></i><span>Visualizar Rotas</span>
+                            <i class="bi bi-eye"></i><span>Vizualizar Rotas</span>
                         </a>
                     </li>
                 </ul>
@@ -200,7 +187,7 @@
                         style="width: 20px; height: 20px; margin-right: 5px; color: white;">
                     <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
-                <ul id="driverbus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                <ul id="driverbus-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
                     <li>
                         <a href="/cadastrar-motorista-form">
                             <i class="bi bi-person-plus"></i><span>Cadastrar</span>
@@ -229,7 +216,7 @@
                         style="width: 20px; height: 20px; margin-right: 5px; color: white;">
                     </i><span>Monitores</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
-                <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                <ul id="charts-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
                     <li>
                         <a href="/cadastrar-monitores-form">
                             <i class="bi bi-person-plus"></i><span>Cadastrar</span>
@@ -242,14 +229,13 @@
                     </li>
                 </ul>
             </li>
-
             <li class="nav-item">
                 <a class="nav-link collapsed" data-bs-target="#fornecedores-nav" data-bs-toggle="collapse" href="#">
                     <img src="/img/icones/fornecedores.svg" alt="Escolas"
                         style="width: 20px; height: 20px; margin-right: 5px; color: white;">
                     </i><span>Fornecedor</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
-                <ul id="fornecedores-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                <ul id="fornecedores-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
                     <li>
                         <a href="/cadastrar-fornecedores-form">
                             <i class="bi bi-person-plus"></i><span>Cadastrar</span>
@@ -262,7 +248,7 @@
                     </li>
                     <li>
                         <a href="/vizualizar-fornecedores-map">
-                            <i class="bi bi-eye"></i><span>Visualizar</span>
+                            <i class="bi bi-eye"></i><span>Vizualizar</span>
                         </a>
                     </li>
                 </ul>
@@ -273,7 +259,7 @@
                         style="width: 20px; height: 20px; margin-right: 5px; color: white;">
                     </i><span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
-                <ul id="bus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                <ul id="bus-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
                     <li>
                         <a href="/cadastrar-onibus-form">
                             <i class="bi bi-person-plus"></i><span>Cadastrar</span>
@@ -286,7 +272,7 @@
                     </li>
                     <li>
                         <a href="/vizualizar-onibus-map">
-                            <i class="bi bi-eye"></i><span>Visualizar</span>
+                            <i class="bi bi-eye"></i><span>Vizualizar</span>
                         </a>
                     </li>
                     <li>
@@ -296,7 +282,6 @@
                     </li>
                 </ul>
             </li>
-
             <li class="nav-heading">Administrativo</li>
             <li class="nav-item">
                 <a class="nav-link collapsed" href="/dashboard-adm">
@@ -307,7 +292,7 @@
                 <a class="nav-link collapsed" data-bs-target="#car-nav" data-bs-toggle="collapse" href="#">
                     <i class="bi bi-car-front"></i><span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
-                <ul id="car-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                <ul id="car-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
                     <li>
                         <a href="/cadastrar-carro-form">
                             <i class="bi bi-person-plus"></i><span>Cadastrar</span>
@@ -331,7 +316,7 @@
                         style="width: 20px; height: 20px; margin-right: 5px; color: white;">
                     <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
-                <ul id="drivercar-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                <ul id="drivercar-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
                     <li>
                         <a href="/cadastrar-motorista-carro-form">
                             <i class="bi bi-person-plus"></i><span>Cadastrar</span>
@@ -348,7 +333,7 @@
                 <a class="nav-link collapsed" data-bs-target="#tarefas-nav" data-bs-toggle="collapse" href="#">
                     <i class="bi bi-list-check"></i><span>Tarefas</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
-                <ul id="tarefas-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                <ul id="tarefas-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
                     <li>
                         <a href="/cadastrar-demandas">
                             <i class="bi bi-file-earmark-text"></i><span>Nova Tarefa</span>
@@ -367,7 +352,7 @@
                     <i class="bi bi-droplet-half"></i><span>Abastecimento</span><i
                         class="bi bi-chevron-down ms-auto"></i>
                 </a>
-                <ul id="fuel-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                <ul id="fuel-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
                     <li>
                         <a href="/cadastrar-abastecimento-view">
                             <i class="bi bi-file-earmark-text"></i><span>Cadastrar Requisição</span>
@@ -380,9 +365,7 @@
                     </li>
                 </ul>
             </li>
-
         </ul>
-
     </aside><!-- End Sidebar-->
 
     <main id="main" class="main">
@@ -492,46 +475,63 @@
             function fetchRotas() {
                 fetch('/api/rotas')
                     .then(response => response.json())
-                    .then(async data => {
-                        const rotasTableBody = document.getElementById('rotasTable').querySelector('tbody');
-                        rotasTableBody.innerHTML = '';
+                    .then(data => {
+                        const escolaIds = [];
+                        data.forEach(rota => {
+                            rota.escolas_atendidas.forEach(id => {
+                                if (!escolaIds.includes(id)) {
+                                    escolaIds.push(id);
+                                }
+                            });
+                        });
 
-                        for (const rota of data) {
-                            const row = document.createElement('tr');
-                            const escolasAtendidas = await fetchEscolas(rota.escolas_atendidas);
-                            row.innerHTML = `
-                                <td>${rota.id}</td>
-                                <td>${rota.nome_rota}</td>
-                                <td>${rota.horarios_funcionamento.join(', ')}</td>
-                                <td>${escolasAtendidas.join(', ')}</td>
-                                <td>${rota.distancia.toString().replace('.', ',')} km</td>
-                                <td>${rota.tempo} min</td>
-                                <td>
-                                    <button class="btn btn-primary btn-sm" onclick="visualizarRota(${rota.id})">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
-                                    <button class="btn btn-primary btn-sm" onclick="editarRota(${rota.id})">
-                                        <i class="bi bi-pencil"></i> Editar
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" onclick="excluirRota(${rota.id})">Excluir</button>
-                                </td>
-                            `;
-                            rotasTableBody.appendChild(row);
-                        }
+                        fetch('/api/escolas-nomes', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ ids: escolaIds })
+                        })
+                            .then(response => response.json())
+                            .then(escolasData => {
+                                const escolasMap = {};
+                                escolasData.forEach(escola => {
+                                    escolasMap[escola.id] = escola.nome;
+                                });
 
-                        const quantidadeRotas = data.length;
-                        document.getElementById('statusMessage').textContent = `Total de rotas: ${quantidadeRotas}`;
+                                const rotasTableBody = document.getElementById('rotasTable').querySelector('tbody');
+                                rotasTableBody.innerHTML = '';
+
+                                data.forEach((rota, index) => {
+                                    const escolasNomes = rota.escolas_atendidas.map(id => escolasMap[id]).join(', ');
+
+                                    const row = document.createElement('tr');
+                                    row.innerHTML = `
+                                        <td>${index + 1}</td>
+                                        <td>${rota.nome_rota}</td>
+                                        <td>${rota.horarios_funcionamento.join(', ')}</td>
+                                        <td>${escolasNomes}</td>
+                                        <td>${rota.distancia ? rota.distancia.toString().replace('.', ',') + ' km' : 'N/A'}</td>
+                                        <td>${rota.tempo ? rota.tempo.toString().replace('.', ',') + ' min' : 'N/A'}</td>
+                                        <td>
+                                            <button class="btn btn-primary btn-sm" onclick="visualizarRota(${rota.id})">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <button class="btn btn-primary btn-sm" onclick="editarRota(${rota.id})">
+                                                <i class="bi bi-pencil"></i> Editar
+                                            </button>
+                                            <button class="btn btn-danger btn-sm" onclick="excluirRota(${rota.id})">Excluir</button>
+                                        </td>
+                                    `;
+                                    rotasTableBody.appendChild(row);
+                                });
+
+                                const quantidadeRotas = data.length;
+                                document.getElementById('statusMessage').textContent = `Total de rotas: ${quantidadeRotas}`;
+                            })
+                            .catch(error => console.error('Erro ao carregar nomes das escolas:', error));
                     })
                     .catch(error => console.error('Erro ao carregar rotas:', error));
-            }
-
-            async function fetchEscolas(ids) {
-                const nomesEscolas = await Promise.all(ids.map(async id => {
-                    const response = await fetch(`/api/escolas/${id}`);
-                    const data = await response.json();
-                    return data.nome;
-                }));
-                return nomesEscolas;
             }
 
             window.visualizarRota = function (rotaId) {
@@ -551,7 +551,6 @@
                             draggableWaypoints: false
                         }).addTo(map);
 
-                        // Exibir detalhes da rota
                         const detalhesRotaDiv = document.getElementById('detalhesRota');
                         detalhesRotaDiv.innerHTML = `
                             <p><strong>Nome da Rota:</strong> ${rotaId}</p>
@@ -563,8 +562,8 @@
                         `;
                         detalhesRotaDiv.style.display = 'block';
                         map.invalidateSize();
-                        map.setView(waypoints[0], 13); // Ajustar o foco do mapa
-                        document.getElementById('map').style.display = 'block'; // Mostrar o mapa
+                        map.setView(waypoints[0], 13);
+                        document.getElementById('map').style.display = 'block';
                     })
                     .catch(error => console.error('Erro ao visualizar rota:', error));
             };
@@ -591,7 +590,6 @@
                         .catch(error => console.error('Erro ao excluir rota:', error));
                 }
             };
-
         });
     </script>
 </body>
