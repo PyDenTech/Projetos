@@ -254,75 +254,129 @@ app.get('/api/sessao-usuario', (req, res) => {
     }
 });
 
-// Rota unificada de login
-app.post('/api/login', async (req, res) => {
-    const { email, senha, tipo } = req.body;
+app.post('/admin/login', async (req, res) => {
+    const { email, senha } = req.body;
 
     try {
-        let query;
-        let params;
-
-        switch (tipo) {
-            case 'admin':
-                query = 'SELECT * FROM usuarios WHERE email = $1 AND role = $2';
-                params = [email, 'admin'];
-                break;
-            case 'motorista_administrativo':
-                query = 'SELECT * FROM motoristas_administrativos WHERE email = $1';
-                params = [email];
-                break;
-            case 'motorista_escolar':
-                query = 'SELECT * FROM motoristasescolares WHERE email = $1';
-                params = [email];
-                break;
-            case 'web':
-                query = 'SELECT * FROM usuarios WHERE email = $1';
-                params = [email];
-                break;
-            default:
-                return res.status(400).send('Tipo de usuário inválido.');
-        }
-
-        const userQuery = await pool.query(query, params);
+        const userQuery = await pool.query('SELECT * FROM usuarios WHERE email = $1 AND role = $2', [email, 'admin']);
         if (userQuery.rows.length === 0) {
             return res.status(404).send('Usuário não encontrado.');
         }
 
         const user = userQuery.rows[0];
-        const isValidPassword = await bcrypt.compare(senha, user.password || user.senha);
+        const isValidPassword = await bcrypt.compare(senha, user.password);
 
         if (!isValidPassword) {
             return res.status(401).send('Senha incorreta.');
         }
 
-        if (tipo === 'admin' && !user.init) {
+        if (!user.init) {
             return res.status(403).send('Usuário não ativado. Por favor, contate o administrador.');
         }
 
-        if (tipo === 'web' && !user.init) {
+        req.session.user = {
+            id: user.id,
+            nome: user.nome,
+            email: user.email,
+            role: 'admin'
+        };
+
+        res.json({ message: "Login successful", redirectUrl: '/admin-dashboard' });
+    } catch (error) {
+        console.error('Erro no login:', error);
+        res.status(500).send('Erro ao processar o login');
+    }
+});
+
+app.post('/api/loginMotoristasAdministrativos', async (req, res) => {
+    const { email, senha } = req.body;
+
+    try {
+        const userQuery = await pool.query('SELECT * FROM motoristas_administrativos WHERE email = $1', [email]);
+        if (userQuery.rows.length === 0) {
+            return res.status(404).send('Usuário não encontrado.');
+        }
+
+        const user = userQuery.rows[0];
+        const isValidPassword = await bcrypt.compare(senha, user.senha);
+
+        if (!isValidPassword) {
+            return res.status(401).send('Senha incorreta.');
+        }
+
+        req.session.user = {
+            id: user.id,
+            nome: user.nome_completo,
+            email: user.email,
+            role: 'motorista_administrativo'
+        };
+
+        res.json({ userId: user.id, nome: user.nome_completo, empresa: user.empresa });
+    } catch (error) {
+        console.error('Erro no login:', error);
+        res.status(500).send('Erro ao processar o login');
+    }
+});
+
+
+app.post('/api/loginMotoristasEscolares', async (req, res) => {
+    const { email, senha } = req.body;
+
+    try {
+        const userQuery = await pool.query('SELECT * FROM motoristasescolares WHERE email = $1', [email]);
+        if (userQuery.rows.length === 0) {
+            return res.status(404).send('Usuário não encontrado.');
+        }
+
+        const user = userQuery.rows[0];
+        const isValidPassword = await bcrypt.compare(senha, user.senha);
+
+        if (!isValidPassword) {
+            return res.status(401).send('Senha incorreta.');
+        }
+
+        req.session.user = {
+            id: user.id,
+            nome: user.nome_completo,
+            email: user.email,
+            role: 'motorista_escolar'
+        };
+
+        res.json({ userId: user.id, nome: user.nome_completo, empresa: user.empresa });
+    } catch (error) {
+        console.error('Erro no login:', error);
+        res.status(500).send('Erro ao processar o login');
+    }
+});
+
+app.post('/api/loginWeb', async (req, res) => {
+    const { email, senha } = req.body;
+
+    try {
+        const userQuery = await pool.query('SELECT * FROM usuarios WHERE email = $1', [email]);
+        if (userQuery.rows.length === 0) {
+            return res.status(404).send('Usuário não encontrado.');
+        }
+
+        const user = userQuery.rows[0];
+        const isValidPassword = await bcrypt.compare(senha, user.password);
+
+        if (!isValidPassword) {
+            return res.status(401).send('Senha incorreta.');
+        }
+
+        if (!user.init) {
             return res.status(403).send('Usuário não autorizado a usar o sistema. Por favor, contate o administrador.');
         }
 
-        let responseData = {
-            userId: user.id,
-            nome: user.nome || user.nome_completo,
+        req.session.user = {
+            id: user.id,
+            nome: user.nome,
             email: user.email,
-            empresa: tipo === 'motorista_escolar' || tipo === 'motorista_administrativo' ? user.empresa : null
+            role: 'web'
         };
 
-        let redirectUrl;
-        switch (tipo) {
-            case 'admin':
-                redirectUrl = '/admin-dashboard';
-                break;
-            case 'web':
-                redirectUrl = '/dashboard-escolar';
-                break;
-            default:
-                redirectUrl = '/';
-        }
-
-        res.json({ ...responseData, redirectUrl });
+        res.json({ message: "Login successful", redirectUrl: '/dashboard-escolar' });
     } catch (error) {
         console.error('Erro no login:', error);
         res.status(500).send('Erro ao processar o login');
