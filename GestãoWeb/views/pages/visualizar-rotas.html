@@ -392,8 +392,6 @@
                                             <th>Nome da Rota <span class="bi bi-arrow-down-up"></span></th>
                                             <th>Horários de Funcionamento <span class="bi bi-arrow-down-up"></span></th>
                                             <th>Escolas Atendidas <span class="bi bi-arrow-down-up"></span></th>
-                                            <th>Distância <span class="bi bi-arrow-down-up"></span></th>
-                                            <th>Tempo <span class="bi bi-arrow-down-up"></span></th>
                                             <th>Ações</th>
                                         </tr>
                                     </thead>
@@ -511,8 +509,6 @@
                                         <td>${rota.nome_rota}</td>
                                         <td>${rota.horarios_funcionamento.join(', ')}</td>
                                         <td>${escolasNomes}</td>
-                                        <td>${rota.distancia ? rota.distancia.toString().replace('.', ',') + ' km' : 'N/A'}</td>
-                                        <td>${rota.tempo ? rota.tempo.toString().replace('.', ',') + ' min' : 'N/A'}</td>
                                         <td>
                                             <button class="btn btn-primary btn-sm" onclick="visualizarRota(${rota.id})">
                                                 <i class="bi bi-eye"></i>
