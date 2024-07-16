@@ -950,7 +950,7 @@ app.delete('/api/alunos/:id', async (req, res) => {
 
 // Endpoint para obter uma rota gerada específica
 
-app.get('/api/rota-gerada/:id', async (req, res) => {
+/* app.get('/api/rota-gerada/:id', async (req, res) => {
     const { id } = req.params;
     try {
         const result = await pool.query('SELECT coordenadas FROM rotas_geradas WHERE rota_id = $1', [id]);
@@ -963,7 +963,7 @@ app.get('/api/rota-gerada/:id', async (req, res) => {
         console.error('Erro ao buscar rota gerada:', error);
         res.status(500).json({ message: 'Erro ao buscar rota gerada' });
     }
-});
+}); */
 
 
 app.get('/api/dashboard-data', async (req, res) => {
@@ -1524,6 +1524,44 @@ app.get('/api/motoristasescolares/:id', async (req, res) => {
         res.status(500).json({ message: 'Erro ao processar a solicitação' });
     }
 });
+
+app.get('/api/rotas/motorista/:motorista_id', async (req, res) => {
+    const { motorista_id } = req.params;
+    try {
+        const result = await pool.query(
+            `SELECT r.id, r.nome_rota
+             FROM rotas r
+             JOIN motoristasescolares m ON r.id = m.rota_id
+             WHERE m.usuario_id = $1`,
+            [motorista_id]
+        );
+
+        if (result.rows.length > 0) {
+            res.json(result.rows);
+        } else {
+            res.status(404).json({ message: 'Nenhuma rota encontrada para o motorista.' });
+        }
+    } catch (error) {
+        console.error('Erro ao buscar rotas do motorista:', error);
+        res.status(500).json({ error: 'Erro ao buscar rotas do motorista' });
+    }
+});
+
+app.get('/api/rota-gerada/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await pool.query('SELECT coordenadas FROM rotas_geradas WHERE rota_id = $1', [id]);
+        if (result.rows.length > 0) {
+            res.json(JSON.parse(result.rows[0].coordenadas));
+        } else {
+            res.status(404).json({ message: 'Rota gerada não encontrada' });
+        }
+    } catch (error) {
+        console.error('Erro ao buscar rota gerada:', error);
+        res.status(500).json({ message: 'Erro ao buscar rota gerada' });
+    }
+});
+
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
