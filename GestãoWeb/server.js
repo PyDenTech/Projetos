@@ -867,6 +867,21 @@ app.get('/api/rotas', async (req, res) => {
     }
 });
 
+// Endpoint para obter os nomes das escolas pelos IDs
+app.post('/api/escolas-nomes', async (req, res) => {
+    const { ids } = req.body;
+    try {
+        const result = await pool.query(
+            'SELECT id, nome FROM escolas WHERE id = ANY($1)',
+            [ids]
+        );
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
+    }
+});
+
 
 // Endpoint para editar uma rota
 app.put('/api/rotas/:id', async (req, res) => {
