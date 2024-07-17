@@ -27,10 +27,129 @@
 
   <!-- Template Main CSS File -->
   <link href="/css/style.css" rel="stylesheet">
+
+  <!-- Custom CSS for Loading Spinner -->
+  <style>
+    .three-body {
+      --uib-size: 35px;
+      --uib-speed: 0.8s;
+      --uib-color: #5D3FD3;
+      position: relative;
+      display: inline-block;
+      height: var(--uib-size);
+      width: var(--uib-size);
+      animation: spin78236 calc(var(--uib-speed) * 2.5) infinite linear;
+    }
+
+    .three-body__dot {
+      position: absolute;
+      height: 100%;
+      width: 30%;
+    }
+
+    .three-body__dot:after {
+      content: '';
+      position: absolute;
+      height: 0%;
+      width: 100%;
+      padding-bottom: 100%;
+      background-color: var(--uib-color);
+      border-radius: 50%;
+    }
+
+    .three-body__dot:nth-child(1) {
+      bottom: 5%;
+      left: 0;
+      transform: rotate(60deg);
+      transform-origin: 50% 85%;
+    }
+
+    .three-body__dot:nth-child(1)::after {
+      bottom: 0;
+      left: 0;
+      animation: wobble1 var(--uib-speed) infinite ease-in-out;
+      animation-delay: calc(var(--uib-speed) * -0.3);
+    }
+
+    .three-body__dot:nth-child(2) {
+      bottom: 5%;
+      right: 0;
+      transform: rotate(-60deg);
+      transform-origin: 50% 85%;
+    }
+
+    .three-body__dot:nth-child(2)::after {
+      bottom: 0;
+      left: 0;
+      animation: wobble1 var(--uib-speed) infinite calc(var(--uib-speed) * -0.15) ease-in-out;
+    }
+
+    .three-body__dot:nth-child(3) {
+      bottom: -5%;
+      left: 0;
+      transform: translateX(116.666%);
+    }
+
+    .three-body__dot:nth-child(3)::after {
+      top: 0;
+      left: 0;
+      animation: wobble2 var(--uib-speed) infinite ease-in-out;
+    }
+
+    @keyframes spin78236 {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes wobble1 {
+
+      0%,
+      100% {
+        transform: translateY(0%) scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: translateY(-66%) scale(0.65);
+        opacity: 0.8;
+      }
+    }
+
+    @keyframes wobble2 {
+
+      0%,
+      100% {
+        transform: translateY(0%) scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: translateY(66%) scale(0.65);
+        opacity: 0.8;
+      }
+    }
+
+    #loadingSpinner {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.8);
+      z-index: 1000;
+    }
+  </style>
 </head>
 
 <body>
-
   <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
 
@@ -98,277 +217,7 @@
 
   <!-- ======= Sidebar ======= -->
   <aside id="sidebar" class="sidebar">
-
-    <ul class="sidebar-nav" id="sidebar-nav">
-      <li class="nav-heading">Transporte Escolar</li>
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="/dashboard-escolar">
-          <i class="bi bi-speedometer2"></i>
-          <span>Painel de Controle</span>
-        </a>
-      </li>
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#escolas-nav" data-bs-toggle="collapse" href="#">
-          <img src="/img/icones/escolas.svg" alt="Escolas"
-            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
-          <span>Escolas</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="escolas-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="/cadastrar-escolas-form">
-              <i class="bi bi-house-door"></i><span>Cadastrar</span>
-            </a>
-          </li>
-          <li>
-            <a href="/gerenciar-escolas-view">
-              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-            </a>
-          </li>
-
-        </ul>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-bs-target="#aluno-nav" data-bs-toggle="collapse" href="#">
-          <img src="/img/icones/aluno.svg" alt="Censo Escolar"
-            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
-          <span>Alunos</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="aluno-nav" class="nav-content" data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="/cadastrar-aluno-form">
-              <i class="bi bi-person-plus"></i><span>Solicitar Cadastro</span>
-            </a>
-          </li>
-          <li>
-            <a href="/gerenciar-alunos-view">
-              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-            </a>
-          </li>
-          <li>
-            <a href="/importar-aluno-form">
-              <i class="bi bi-file-earmark-arrow-up"></i><span>Importar Dados</span>
-            </a>
-          </li>
-          <li>
-            <a href="/visualizar-alunos-map">
-              <i class="bi bi-eye"></i><span>Vizualizar</span>
-            </a>
-          </li>
-        </ul>
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#routs-nav" data-bs-toggle="collapse" href="#">
-          <img src="/img/icones/rotas.svg" alt="Escolas"
-            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
-          </i><span>Rotas</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="routs-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="/cadastrar-rotas-form">
-              <i class="bi bi-plus-square"></i><span>Cadastrar Rota</span>
-            </a>
-          </li>
-
-          <li>
-            <a href="/desenhar-rotas-map">
-              <i class="bi bi-pencil"></i><span>Gerar Rotas</span>
-            </a>
-          </li>
-          <li>
-            <a href="/visualizar-rotas">
-              <i class="bi bi-eye"></i><span>Vizualizar Rotas</span>
-            </a>
-          </li>
-        </ul>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#driverbus-nav" data-bs-toggle="collapse" href="#">
-          <img src="/img/icones/motoristas.svg" alt="Escolas"
-            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
-          <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="driverbus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="/cadastrar-motorista-form">
-              <i class="bi bi-person-plus"></i><span>Cadastrar</span>
-            </a>
-          </li>
-          <li>
-            <a href="/gerenciar-motoristas-view">
-              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-            </a>
-          </li>
-          <li>
-            <a href="/gerar-relatorio-view">
-              <i class="bi bi-clipboard2-check"></i><span>Relatórios</span>
-            </a>
-          </li>
-          <li>
-            <a href="/check-list">
-              <i class="bi bi-list-check"></i><span>Check List</span>
-            </a>
-          </li>
-        </ul>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
-          <img src="/img/icones/monitor-icone-branco.png" alt="Escolas"
-            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
-          </i><span>Monitores</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="/cadastrar-monitores-form">
-              <i class="bi bi-person-plus"></i><span>Cadastrar</span>
-            </a>
-          </li>
-          <li>
-            <a href="/gerenciar-monitores-view">
-              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-            </a>
-          </li>
-        </ul>
-      </li>
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#fornecedores-nav" data-bs-toggle="collapse" href="#">
-          <img src="/img/icones/fornecedores.svg" alt="Escolas"
-            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
-          </i><span>Fornecedor</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="fornecedores-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="/cadastrar-fornecedores-form">
-              <i class="bi bi-person-plus"></i><span>Cadastrar</span>
-            </a>
-          </li>
-          <li>
-            <a href="/gerenciar-fornecedores-view">
-              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-            </a>
-          </li>
-          <li>
-            <a href="/vizualizar-fornecedores-map">
-              <i class="bi bi-eye"></i><span>Vizualizar</span>
-            </a>
-          </li>
-        </ul>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#bus-nav" data-bs-toggle="collapse" href="#">
-          <img src="/img/icones/frotas.svg" alt="Escolas"
-            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
-          </i><span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="bus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="/cadastrar-onibus-form">
-              <i class="bi bi-person-plus"></i><span>Cadastrar</span>
-            </a>
-          </li>
-          <li>
-            <a href="/gerenciar-onibus-view">
-              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-            </a>
-          </li>
-          <li>
-            <a href="/vizualizar-onibus-map">
-              <i class="bi bi-eye"></i><span>Vizualizar</span>
-            </a>
-          </li>
-          <li>
-            <a href="/solicitar-onibus-services">
-              <i class="bi bi-file-earmark-text"></i><span>Ordem de Serviço</span>
-            </a>
-          </li>
-        </ul>
-      </li>
-
-      <li class="nav-heading">Administrativo</li>
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="/dashboard-adm">
-          <i class="bi bi-speedometer"></i>
-          <span>Painel de Controle</span>
-        </a>
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#car-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-car-front"></i><span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="car-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="/cadastrar-carro-form">
-              <i class="bi bi-person-plus"></i><span>Cadastrar</span>
-            </a>
-          </li>
-          <li>
-            <a href="/gerenciar-carros-view">
-              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-            </a>
-          </li>
-          <li>
-            <a href="/localizar-carros-map">
-              <i class="bi bi-geo-alt-fill"></i><span>Localizar</span>
-            </a>
-          </li>
-        </ul>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#drivercar-nav" data-bs-toggle="collapse" href="#">
-          <img src="/img/icones/motoristas.svg" alt="Escolas"
-            style="width: 20px; height: 20px; margin-right: 5px; color: white;">
-          <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="drivercar-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="/cadastrar-motorista-carro-form">
-              <i class="bi bi-person-plus"></i><span>Cadastrar</span>
-            </a>
-          </li>
-          <li>
-            <a href="/gerenciar-motorista-carro-form">
-              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-            </a>
-          </li>
-        </ul>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#tarefas-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-list-check"></i><span>Tarefas</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="tarefas-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="/cadastrar-demandas">
-              <i class="bi bi-file-earmark-text"></i><span>Nova Tarefa</span>
-            </a>
-          </li>
-          <li>
-            <a href="/tasks">
-              <i class="bi bi-person-plus"></i><span>Gerenciar Tarefas</span>
-            </a>
-          </li>
-        </ul>
-      </li>
-      <li class="nav-heading">Controle Financeiro</li>
-      <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#fuel-nav" data-bs-toggle="collapse" href="#">
-          <i class="bi bi-droplet-half"></i><span>Abastecimento</span><i class="bi bi-chevron-down ms-auto"></i>
-        </a>
-        <ul id="fuel-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-          <li>
-            <a href="/cadastrar-abastecimento-view">
-              <i class="bi bi-file-earmark-text"></i><span>Cadastrar Requisição</span>
-            </a>
-          </li>
-          <li>
-            <a href="/gerenciar-abastecimento-view">
-              <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-            </a>
-          </li>
-        </ul>
-      </li>
-
-    </ul>
-
+    <!-- Sidebar content -->
   </aside><!-- End Sidebar-->
 
   <main id="main" class="main">
@@ -412,38 +261,27 @@
     </section>
   </main>
 
-  <footer id="footer" class="footer">
-    <div class="container">
-      <div class="row gy-4">
-        <div class="container mt-4">
-          <div class="row">
-            <div class="col-md-6">
-              <div class="copyright">
-                &copy; Direitos Autorais <strong><span>PyDenExpress</span></strong>. Todos os Direitos
-                Reservados
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="credits">
-                Desenvolvido por <a href="https://danilomorais.netlify.app/">Danilo de Morais</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-  </footer>
+  <div id="loadingSpinner">
+    <div class="three-body">
+      <div class="three-body__dot"></div>
+      <div class="three-body__dot"></div>
+      <div class="three-body__dot"></div>
+    </div>
+  </div>
 
   <!-- Vendor JS Files -->
+  <script src="/vendor/apexcharts/apexcharts.min.js"></script>
   <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/vendor/chart.js/chart.umd.js"></script>
   <script src="/vendor/echarts/echarts.min.js"></script>
   <script src="/vendor/quill/quill.min.js"></script>
   <script src="/vendor/simple-datatables/simple-datatables.js"></script>
   <script src="/vendor/tinymce/tinymce.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="/vendor/php-email-form/validate.js"></script>
 
   <!-- Template Main JS File -->
-  <script src="/js/users-profile.js"></script>
   <script src="/js/main.js"></script>
+
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       fetch('/api/escolas')
@@ -464,16 +302,21 @@
         const formData = new FormData();
         const fileInput = document.getElementById('fileInput');
         const escolaSelect = document.getElementById('escolaSelect');
+        const loadingSpinner = document.getElementById('loadingSpinner');
 
         if (fileInput.files.length > 0) {
           formData.append('file', fileInput.files[0]);
           formData.append('id_escola', escolaSelect.value);
+
+          loadingSpinner.style.display = 'flex'; // Mostrar o spinner de carregamento
 
           try {
             const response = await fetch('/upload-planilha', {
               method: 'POST',
               body: formData
             });
+
+            loadingSpinner.style.display = 'none'; // Ocultar o spinner de carregamento
 
             if (response.ok) {
               const data = await response.text();
@@ -483,6 +326,7 @@
               document.getElementById('statusMessage').textContent = `Erro: ${errorData}`;
             }
           } catch (error) {
+            loadingSpinner.style.display = 'none'; // Ocultar o spinner de carregamento
             console.error('Erro ao enviar dados:', error);
             document.getElementById('statusMessage').textContent = 'Erro ao importar dados. Tente novamente mais tarde.';
           }
@@ -492,6 +336,7 @@
       });
     });
   </script>
+
 </body>
 
 </html>

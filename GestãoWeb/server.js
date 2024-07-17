@@ -154,35 +154,16 @@ app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'pages', 'admin.html'));
 });
 
-// Função para converter data no formato DD/MM/YYYY para YYYY-MM-DD
-function converterData(data) {
-    if (typeof data === 'number') {
-        const excelDate = new Date((data - (25567 + 1)) * 86400 * 1000);
-        return excelDate.toISOString().split('T')[0];
-    } else if (typeof data === 'string') {
-        const [dia, mes, ano] = data.split('/');
-        return `${ano}-${mes}-${dia}`;
-    } else {
-        throw new Error('Data deve ser uma string ou número');
-    }
-}
-
-// Função para normalizar strings
-function normalizeString(str) {
-    return str.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
-}
-// Rota para upload de arquivo Excel
 app.post('/upload-planilha', upload.single('file'), async (req, res) => {
     const filePath = req.file.path;
+    const escolaId = req.body.id_escola;
 
     try {
-        // Ler o arquivo Excel
         const workbook = xlsx.readFile(filePath);
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
         const data = xlsx.utils.sheet_to_json(sheet);
 
-        // Inserir dados no banco de dados
         for (const row of data) {
             const {
                 Unidade,
@@ -201,22 +182,27 @@ app.post('/upload-planilha', upload.single('file'), async (req, res) => {
 
             const formattedNascimento = dt_nascimento ? converterData(dt_nascimento) : null;
 
-            // Normalizar o nome da escola
-            const normalizedUnidade = normalizeString(Unidade);
+            // Se Unidade não estiver definida, usar a escola selecionada no select
+            const unidade = Unidade || escolaId;
 
-            // Encontrar a escola correspondente
-            const escolaResult = await pool.query('SELECT id FROM escolas WHERE LOWER(TRIM(nome)) = $1', [normalizedUnidade]);
-            const id_escola = escolaResult.rows[0]?.id;
+            // Se unidade for uma string, procurar pelo nome da escola; se for um número, usar como ID da escola
+            let id_escola;
+            if (isNaN(unidade)) {
+                const escolaResult = await pool.query('SELECT id FROM escolas WHERE LOWER(TRIM(nome)) = $1', [normalizeString(unidade)]);
+                id_escola = escolaResult.rows[0]?.id;
+            } else {
+                id_escola = unidade;
+            }
 
             if (id_escola) {
                 await pool.query(
                     `INSERT INTO alunos (
                         unidade, id_escola, id_matricula, cod_censo, ano, nome, dt_nascimento, situacao, serie, turma, endereco, rota_transporte, usa_transporte_escolar
                     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
-                    [Unidade, id_escola, id_matricula, cod_censo, ano, nome, formattedNascimento, situacao, serie, turma, endereco, rota_transporte, usa_transporte_escolar === 'SIM']
+                    [unidade, id_escola, id_matricula, cod_censo, ano, nome, formattedNascimento, situacao, serie, turma, endereco, rota_transporte, usa_transporte_escolar === 'SIM']
                 );
             } else {
-                console.error(`Escola não encontrada: ${Unidade}`);
+                console.error(`Escola não encontrada: ${unidade}`);
             }
         }
 
@@ -226,6 +212,25 @@ app.post('/upload-planilha', upload.single('file'), async (req, res) => {
         res.status(500).send('Erro ao importar dados');
     }
 });
+
+function normalizeString(str) {
+    if (!str) return '';
+    return str.toLowerCase().trim();
+}
+
+function converterData(data) {
+    if (!data) return null;
+    if (typeof data === 'string') {
+        const partes = data.split('/');
+        if (partes.length === 3) {
+            return `${partes[2]}-${partes[1]}-${partes[0]}`;
+        }
+    } else if (typeof data === 'number') {
+        const excelDate = new Date((data - (25567 + 2)) * 86400 * 1000);
+        return excelDate.toISOString().split('T')[0];
+    }
+    return null;
+}
 
 app.get('/admin/dashboard', (req, res) => {
     if (req.session.admin) {
