@@ -169,9 +169,8 @@ function converterData(data) {
 
 // Função para normalizar strings
 function normalizeString(str) {
-    return str.trim().toLowerCase();
+    return str.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
 }
-
 // Rota para upload de arquivo Excel
 app.post('/upload-planilha', upload.single('file'), async (req, res) => {
     const filePath = req.file.path;
@@ -227,7 +226,6 @@ app.post('/upload-planilha', upload.single('file'), async (req, res) => {
         res.status(500).send('Erro ao importar dados');
     }
 });
-
 
 app.get('/admin/dashboard', (req, res) => {
     if (req.session.admin) {
