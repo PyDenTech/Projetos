@@ -993,15 +993,24 @@ app.post('/api/cadastrar-aluno', async (req, res) => {
 
 // Endpoint para buscar alunos por escola
 app.get('/api/alunos', async (req, res) => {
-    const { escolaIds } = req.query;
+    const escolaId = req.query.escolaId;
+
     try {
-        const result = await pool.query('SELECT * FROM alunos WHERE id_escola = ANY($1::int[])', [escolaIds.split(',').map(id => parseInt(id, 10))]);
-        res.json(result.rows);
+        const result = await pool.query('SELECT * FROM alunos WHERE id_escola = $1', [escolaId]);
+        const alunos = result.rows;
+
+        // Corrigir possível erro de dados undefined
+        alunos.forEach(aluno => {
+            aluno.dt_nascimento = aluno.dt_nascimento ? aluno.dt_nascimento.toISOString().split('T')[0] : null;
+        });
+
+        res.json(alunos);
     } catch (error) {
         console.error('Erro ao buscar alunos:', error);
-        res.status(500).send('Erro ao buscar alunos');
+        res.status(500).json({ error: 'Erro ao buscar alunos' });
     }
 });
+
 
 // Endpoint para buscar um aluno específico por ID
 app.get('/api/alunos/:id', async (req, res) => {
