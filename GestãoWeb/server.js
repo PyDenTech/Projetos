@@ -430,7 +430,6 @@ app.post('/api/usuarios/:userId/status', isAdmin, async (req, res) => {
     }
 });
 
-
 app.post('/api/usuarios/:userId/cargo', isAdmin, async (req, res) => {
     const { userId } = req.params;
     const { role } = req.body;
