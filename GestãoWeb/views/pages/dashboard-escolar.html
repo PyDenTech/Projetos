@@ -15,7 +15,7 @@
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
   <link
-    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i"
     rel="stylesheet">
 
   <!-- Vendor CSS Files -->
@@ -33,8 +33,8 @@
 </head>
 
 <body>
-  
- <!-- ======= Header ======= -->
+
+  <!-- ======= Header ======= -->
   <header id="header" class="header fixed-top d-flex align-items-center">
 
     <i class="bi bi-list toggle-sidebar-btn"></i>
@@ -175,7 +175,7 @@
           </li>
           <li>
             <a href="/visualizar-rotas">
-              <i class="bi bi-eye"></i><span>Vizualizar Rotas</span>
+              <i class="bi bi-eye"></i><span>Visualizar Rotas</span>
             </a>
           </li>
         </ul>
@@ -257,7 +257,7 @@
         <a class="nav-link collapsed" data-bs-target="#bus-nav" data-bs-toggle="collapse" href="#">
           <img src="/img/icones/frotas.svg" alt="Escolas"
             style="width: 20px; height: 20px; margin-right: 5px; color: white;">
-          </i><span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
+          <span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
         <ul id="bus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
           <li>
@@ -708,9 +708,9 @@
               </ul>
             </div>
 
-        </div><!-- End Right side columns -->
+          </div><!-- End Right side columns -->
 
-      </div>
+        </div>
     </section>
 
   </main><!-- End #main -->
@@ -772,7 +772,7 @@
         document.getElementById('quantidade-rotas').innerText = data.rotasCount;
 
         // Atualizando quilometragem total
-        document.getElementById('quilometragem-total').innerText = `${data.quilometragemTotal.toFixed(3)} km`;
+        document.getElementById('quilometragem-total').innerText = formatNumber(data.quilometragemTotal) + ' km';
 
         // Atualizando dados das rotas mensais
         updateChart(data.rotasMensais);
@@ -781,6 +781,10 @@
         console.error('Erro ao buscar dados do dashboard:', error);
       }
     });
+
+    function formatNumber(number) {
+      return number.toFixed(3).replace('.', ',');
+    }
 
     function updateChart(rotasMensais) {
       const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
@@ -859,7 +863,6 @@
       updateChart(filteredData);
     }
   </script>
-
 
 </body>
 
