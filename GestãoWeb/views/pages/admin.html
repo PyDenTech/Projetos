@@ -1,16 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <title>Login Administrativo</title>
     <link rel="stylesheet" href="/css/admin-login.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 </head>
-
 <body>
     <div class="container">
-        <form id="adminLoginForm" method="post">
+        <form id="adminLoginForm" action="/admin/login" method="post">
             <h2>Login Administrativo</h2>
             <div class="input-field">
                 <label for="adminEmail">E-mail:</label>
@@ -21,58 +19,9 @@
                 <input type="password" id="adminPassword" name="senha" required>
                 <i class="fas fa-eye" id="toggleAdminPassword" style="cursor: pointer;"></i>
             </div>
-            <input type="hidden" name="tipo" value="admin"> <!-- Campo oculto para o tipo de login -->
             <button type="submit">Entrar</button>
         </form>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const adminLoginForm = document.getElementById('adminLoginForm');
-
-            adminLoginForm.addEventListener('submit', function (e) {
-                e.preventDefault(); // Prevent default form submission behavior
-                const formData = new FormData(adminLoginForm);
-                const email = formData.get('email');
-                const senha = formData.get('senha');
-                const tipo = formData.get('tipo');
-
-                fetch('/admin/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email: email, senha: senha, tipo: tipo })
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Failed to log in.');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.redirectUrl) {
-                            window.location.href = data.redirectUrl; // Redirect to the protected dashboard
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error during login:', error);
-                        alert('Login falhou! Verifique suas credenciais.'); // Display a generic error message
-                    });
-            });
-
-            // Toggle password visibility
-            const togglePassword = document.getElementById('toggleAdminPassword');
-            const passwordField = document.getElementById('adminPassword');
-
-            togglePassword.addEventListener('click', function () {
-                const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordField.setAttribute('type', type);
-                this.classList.toggle('fa-eye');
-                this.classList.toggle('fa-eye-slash');
-            });
-        });
-    </script>
+    <script src="/js/admin-login.js"></script>
 </body>
-
 </html>

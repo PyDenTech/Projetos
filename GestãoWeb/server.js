@@ -259,37 +259,30 @@ app.get('/api/sessao-usuario', (req, res) => {
 
 app.post('/admin/login', async (req, res) => {
     const { email, senha } = req.body;
-
     try {
-        const userQuery = await pool.query('SELECT * FROM usuarios WHERE email = $1 AND role = $2', [email, 'admin']);
-        if (userQuery.rows.length === 0) {
-            return res.status(404).send('Usuário não encontrado.');
+        const queryResult = await pool.query('SELECT * FROM usuarios WHERE email = $1 AND role = $2', [email, 'admin']);
+        if (queryResult.rows.length > 0) {
+            const user = queryResult.rows[0];
+            if (await bcrypt.compare(senha, user.password)) {
+                req.session.admin = {
+                    id: user.id,
+                    nome: user.nome,
+                    email: user.email,
+                    role: user.role
+                };
+                res.redirect('/admin/dashboard');
+            } else {
+                res.status(401).send('Senha incorreta');
+            }
+        } else {
+            res.status(404).send('Conta administrativa não encontrada');
         }
-
-        const user = userQuery.rows[0];
-        const isValidPassword = await bcrypt.compare(senha, user.password);
-
-        if (!isValidPassword) {
-            return res.status(401).send('Senha incorreta.');
-        }
-
-        if (!user.init) {
-            return res.status(403).send('Usuário não ativado. Por favor, contate o administrador.');
-        }
-
-        req.session.user = {
-            id: user.id,
-            nome: user.nome,
-            email: user.email,
-            role: 'admin'
-        };
-
-        res.json({ message: "Login successful", redirectUrl: '/admin-dashboard' });
     } catch (error) {
-        console.error('Erro no login:', error);
+        console.error('Erro de login', error);
         res.status(500).send('Erro ao processar o login');
     }
 });
+
 
 app.post('/api/loginMotoristasAdministrativos', async (req, res) => {
     const { email, senha } = req.body;
@@ -429,6 +422,7 @@ app.post('/api/usuarios/:userId/status', isAdmin, async (req, res) => {
         res.status(500).json({ message: 'Erro ao processar a solicitação.' });
     }
 });
+
 
 app.post('/api/usuarios/:userId/cargo', isAdmin, async (req, res) => {
     const { userId } = req.params;
