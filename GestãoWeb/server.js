@@ -501,12 +501,11 @@ app.post('/api/change-password', ensureLoggedIn, async (req, res) => {
     }
 });
 
-// Rota unificada de cadastro
-app.post('/api/cadastrar-usuario', async (req, res) => {
-    const { nome_completo, cpf, telefone, email, senha, cnh, empresa, tipo_veiculo, modelo, placa, tipo } = req.body;
+app.post('/cadastrar-usuario', async (req, res) => {
+    const { nome_completo, cpf, telefone, email_institucional, senha, cnh, empresa } = req.body;
 
     try {
-        const emailJaExiste = await emailExiste(email);
+        const emailJaExiste = await emailExiste(email_institucional);
         const cpfJaExiste = await cpfExiste(cpf);
 
         if (emailJaExiste) {
@@ -518,35 +517,19 @@ app.post('/api/cadastrar-usuario', async (req, res) => {
         }
 
         const hashedPassword = await bcrypt.hash(senha, saltRounds);
-        let usuarioId;
+        const novoUsuario = await pool.query(
+            'INSERT INTO usuarios (nome, cpf, telefone, email, password, role) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+            [nome_completo, cpf, telefone, email_institucional, hashedPassword, 'motorista_escolar']
+        );
 
-        switch (tipo) {
-            case 'admin':
-                const novoAdmin = await pool.query(
-                    'INSERT INTO usuarios (nome, cpf, telefone, email, password, role) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-                    [nome_completo, cpf, telefone, email, hashedPassword, 'admin']
-                );
-                usuarioId = novoAdmin.rows[0].id;
-                break;
-            case 'motorista_escolar':
-                const novoMotoristaEscolar = await pool.query(
-                    'INSERT INTO motoristasescolares (nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-                    [nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, hashedPassword]
-                );
-                usuarioId = novoMotoristaEscolar.rows[0].id;
-                break;
-            case 'motorista_administrativo':
-                const novoMotoristaAdministrativo = await pool.query(
-                    'INSERT INTO motoristas_administrativos (nome_completo, cpf, cnh, empresa, tipo_veiculo, modelo, placa, email, senha) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
-                    [nome_completo, cpf, cnh, empresa, tipo_veiculo, modelo, placa, email, hashedPassword]
-                );
-                usuarioId = novoMotoristaAdministrativo.rows[0].id;
-                break;
-            default:
-                return res.status(400).json({ error: 'Tipo de usuário inválido.' });
-        }
+        const usuarioId = novoUsuario.rows[0].id;
 
-        res.status(201).json({ message: 'Usuário cadastrado com sucesso.', usuarioId });
+        await pool.query(
+            'INSERT INTO motoristasescolares (nome, cpf, cnh, empresa, usuario_id) VALUES ($1, $2, $3, $4, $5)',
+            [nome_completo, cpf, cnh, empresa, usuarioId]
+        );
+
+        res.json(novoUsuario.rows[0]);
     } catch (error) {
         console.error('Erro ao inserir novo usuário:', error);
         res.status(500).json({ error: error.message });
