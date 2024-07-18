@@ -1265,7 +1265,7 @@ app.post('/api/salvar-rota-gerada', async (req, res) => {
 
             const result = await client.query(insertQuery, [
                 rotaId,
-                coordenadas,
+                JSON.stringify(coordenadas),
                 detalhes,
                 distancia,
                 tempo,
@@ -1287,6 +1287,7 @@ app.post('/api/salvar-rota-gerada', async (req, res) => {
         res.status(500).json({ error: 'Erro de conexão com o banco de dados' });
     }
 });
+
 
 app.get('/api/motoristas', async (req, res) => {
     try {

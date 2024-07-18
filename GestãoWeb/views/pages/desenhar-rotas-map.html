@@ -626,7 +626,7 @@
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ rotaId, coordenadas, detalhes, distancia, tempo, pontos_parada: coordenadas })
+                        body: JSON.stringify({ rotaId, coordenadas: JSON.stringify(coordenadas), detalhes, distancia, tempo, pontos_parada: JSON.stringify(coordenadas) })
                     });
 
                     if (response.ok) {
