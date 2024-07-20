@@ -1,17 +1,17 @@
 require('dotenv').config();
+const cors = require('cors');
 const express = require('express');
 const multer = require('multer');
-const fs = require('fs');
-const { Pool } = require('pg');
-const https = require('https');
-const path = require('path');
-const cors = require('cors');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
+const { Pool } = require('pg');
+const path = require('path');
+const xlsx = require('xlsx');
 const jwt = require('jsonwebtoken');
 const NodeCache = require('node-cache');
-
+const app = express();
+const port = process.env.PORT || 3000;
 
 app.use(cors());
 const SECRET_KEY = 'DeD-140619';
@@ -97,32 +97,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Configuração do HTTPS
-const options = {
-    key: fs.readFileSync('/etc/letsencrypt/live/semedcanaadoscarajas.pydenexpress.com/privkey.pem'),
-    cert: fs.readFileSync('/etc/letsencrypt/live/semedcanaadoscarajas.pydenexpress.com/fullchain.pem')
-};
-
-// Rota de upload e armazenamento de arquivos GPX
-app.post('/upload', upload.single('gpxfile'), async (req, res) => {
-    try {
-        const filePath = req.file.path;
-
-        // Ler o conteúdo do arquivo
-        const fileContent = fs.readFileSync(filePath, 'utf8');
-
-        // Inserir o conteúdo no banco de dados
-        const client = await pool.connect();
-        await client.query('INSERT INTO gpx_files (file_name, file_content) VALUES ($1, $2)', [req.file.filename, fileContent]);
-        client.release();
-
-        res.status(200).send('Arquivo GPX armazenado com sucesso.');
-    } catch (error) {
-        console.error('Erro ao armazenar arquivo GPX:', error);
-        res.status(500).send('Erro ao armazenar arquivo GPX.');
-    }
-});
-
 app.post('/api/upload-foto-perfil', ensureLoggedIn, upload.single('foto_perfil'), async (req, res) => {
     if (!req.file) {
         return res.status(400).send('Nenhum arquivo foi enviado.');
@@ -168,7 +142,7 @@ const pages = [
     'faq',
     'users-profile',
     'gerenciar-motoristas-view',
-    'teste-rotas'
+    'teste-rotas.html'
 ];
 
 pages.forEach(page => {
@@ -1713,7 +1687,6 @@ app.post('/upload', upload.single('gpxfile'), async (req, res) => {
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
 });
-
 
 app.listen(port, () => {
     console.log(`Servidor rodando em http://localhost:${port}`);
