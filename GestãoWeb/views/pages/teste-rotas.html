@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rastrear Localização e Gerar GPX</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
 
 <body>
@@ -12,10 +14,13 @@
     <button id="startTracking">Iniciar Rastreamento</button>
     <button id="stopTracking" disabled>Parar Rastreamento</button>
     <a id="downloadLink" href="#" download="track.gpx" style="display:none;">Baixar GPX</a>
+    <div id="map" style="height: 500px;"></div>
 
     <script>
         let watchId;
         let trackingData = [];
+        let map;
+        let polyline;
 
         document.getElementById('startTracking').addEventListener('click', startTracking);
         document.getElementById('stopTracking').addEventListener('click', stopTracking);
@@ -31,6 +36,17 @@
                 document.getElementById('stopTracking').disabled = false;
             } else {
                 alert('Geolocation não é suportada por este navegador.');
+            }
+
+            // Inicializar o mapa
+            if (!map) {
+                map = L.map('map').setView([0, 0], 13); // Centraliza o mapa em uma localização padrão
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                }).addTo(map);
+
+                polyline = L.polyline([], { color: 'blue' }).addTo(map);
             }
         }
 
@@ -52,6 +68,11 @@
                 alt: altitude || 0,
                 time: new Date(timestamp).toISOString()
             });
+
+            // Adicionar ponto à polilinha e ajustar a visualização do mapa
+            const latLng = [latitude, longitude];
+            polyline.addLatLng(latLng);
+            map.setView(latLng);
         }
 
         function onError(error) {
