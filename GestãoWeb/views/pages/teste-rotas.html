@@ -44,7 +44,8 @@
         }
 
         function onSuccess(position) {
-            const { latitude, longitude, altitude, timestamp } = position.coords;
+            const { latitude, longitude, altitude } = position.coords;
+            const timestamp = position.timestamp;
             trackingData.push({
                 lat: latitude,
                 lon: longitude,
@@ -78,7 +79,7 @@
             const formData = new FormData();
             formData.append('gpxfile', file);
 
-            fetch('http://localhost:3000/upload', {
+            fetch('http://18.231.172.222:3000/upload', {
                 method: 'POST',
                 body: formData
             })
@@ -96,7 +97,6 @@
             downloadLink.href = url;
             downloadLink.style.display = 'block';
         }
-
     </script>
 </body>
 
