@@ -1714,11 +1714,7 @@ app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
 });
 
-https.createServer(options, app).listen(port, () => {
-    console.log(`Servidor HTTPS rodando na porta ${port}`);
-});
 
-/* app.listen(port, () => {
+app.listen(port, () => {
     console.log(`Servidor rodando em http://localhost:${port}`);
 });
- */
