@@ -141,8 +141,7 @@ const pages = [
     'gerenciar-motorista-carro-form',
     'faq',
     'users-profile',
-    'gerenciar-motoristas-view',
-    'teste-rotas.html'
+    'gerenciar-motoristas-view'
 ];
 
 pages.forEach(page => {
@@ -1665,24 +1664,6 @@ app.get('/api/rota-gerada/:id', async (req, res) => {
     }
 });
 
-app.post('/upload', upload.single('gpxfile'), async (req, res) => {
-    try {
-        const filePath = req.file.path;
-
-        // Ler o conteúdo do arquivo
-        const fileContent = fs.readFileSync(filePath, 'utf8');
-
-        // Inserir o conteúdo no banco de dados
-        const client = await pool.connect();
-        await client.query('INSERT INTO gpx_files (file_name, file_content) VALUES ($1, $2)', [req.file.filename, fileContent]);
-        client.release();
-
-        res.status(200).send('Arquivo GPX armazenado com sucesso.');
-    } catch (error) {
-        console.error('Erro ao armazenar arquivo GPX:', error);
-        res.status(500).send('Erro ao armazenar arquivo GPX.');
-    }
-});
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
