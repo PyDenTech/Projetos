@@ -100,7 +100,7 @@
             const formData = new FormData();
             formData.append('gpxfile', file);
 
-            fetch('https://18.231.172.222:3000/upload', {
+            fetch('https://18.231.172.222:3000/upload', { // Use HTTPS
                 method: 'POST',
                 body: formData
             })
