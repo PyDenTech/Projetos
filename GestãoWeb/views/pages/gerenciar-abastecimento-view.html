@@ -385,31 +385,33 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Filtros</h5>
-                            <form id="filtrosForm">
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <label for="filtroCombustivel" class="form-label">Tipo de Combustível</label>
-                                        <select class="form-select" id="filtroCombustivel">
-                                            <option value="">Todos</option>
-                                            <option value="Gasolina Comum">Gasolina Comum</option>
-                                            <option value="Diesel S10">Diesel S10</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label for="filtroMotorista" class="form-label">Motorista</label>
-                                        <select class="form-select" id="filtroMotorista">
-                                            <option value="">Todos</option>
-                                            <!-- Options dinâmicas dos motoristas -->
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label for="filtroMes" class="form-label">Mês</label>
-                                        <input type="month" class="form-control" id="filtroMes">
-                                    </div>
-                                    <div class="col-md-3 d-flex align-items-end">
-                                        <button type="button" class="btn btn-primary w-100"
-                                            onclick="aplicarFiltros()">Aplicar Filtros</button>
-                                    </div>
+                            <form id="filtrosForm" class="d-flex flex-wrap gap-3 align-items-end">
+                                <div class="flex-fill">
+                                    <label for="filtroCombustivel" class="form-label">Tipo de Combustível</label>
+                                    <select class="form-select" id="filtroCombustivel">
+                                        <option value="">Todos</option>
+                                        <option value="Gasolina Comum">Gasolina Comum</option>
+                                        <option value="Diesel S10">Diesel S10</option>
+                                    </select>
+                                </div>
+                                <div class="flex-fill">
+                                    <label for="filtroMotorista" class="form-label">Motorista</label>
+                                    <select class="form-select" id="filtroMotorista">
+                                        <option value="">Todos</option>
+                                        <!-- Options dinâmicas dos motoristas -->
+                                    </select>
+                                </div>
+                                <div class="flex-fill">
+                                    <label for="filtroMes" class="form-label">Mês</label>
+                                    <input type="month" class="form-control" id="filtroMes">
+                                </div>
+                                <div class="flex-fill">
+                                    <label for="filtroRequisicao" class="form-label">ID de Requisição</label>
+                                    <input type="text" class="form-control" id="filtroRequisicao">
+                                </div>
+                                <div class="flex-fill">
+                                    <button type="button" class="btn btn-primary w-100"
+                                        onclick="aplicarFiltros()">Aplicar Filtros</button>
                                 </div>
                             </form>
                             <h5 class="card-title mt-4">Abastecimentos</h5>
@@ -453,6 +455,7 @@
             </div>
         </section>
     </main><!-- End #main -->
+
     <!-- ======= Rodapé ======= -->
     <footer id="footer" class="footer">
         <div class="container">
@@ -568,6 +571,7 @@
             const filtroCombustivel = document.getElementById('filtroCombustivel').value;
             const filtroMotorista = document.getElementById('filtroMotorista').value;
             const filtroMes = document.getElementById('filtroMes').value;
+            const filtroRequisicao = document.getElementById('filtroRequisicao').value;
 
             const filtros = {};
             if (filtroCombustivel) {
@@ -578,6 +582,9 @@
             }
             if (filtroMes) {
                 filtros.mes = filtroMes;
+            }
+            if (filtroRequisicao) {
+                filtros.requisicao = filtroRequisicao;
             }
 
             fetchAbastecimentos(filtros);

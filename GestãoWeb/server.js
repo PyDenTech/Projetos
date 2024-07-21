@@ -143,7 +143,8 @@ const pages = [
     'users-profile',
     'gerenciar-motoristas-view',
     'cadastrar-abastecimento-view',
-    'gerenciar-abastecimento-view'
+    'gerenciar-abastecimento-view',
+    'cadastrar-monitores-form'
 ];
 
 pages.forEach(page => {
@@ -1758,7 +1759,7 @@ app.post('/api/cadastrar-abastecimento-administrativos', async (req, res) => {
 
 // Endpoint para buscar abastecimentos com filtros
 app.get('/api/abastecimentos', async (req, res) => {
-    const { combustivel, motorista, mes } = req.query;
+    const { combustivel, motorista, mes, requisicao } = req.query;
 
     let query = `
         SELECT a.id, a.req_id, a.carro, a.placa, a.quilometragem, a.tipo_combustivel, a.quantidade_litros, a.valor_total, a.data_abastecimento,
@@ -1785,6 +1786,10 @@ app.get('/api/abastecimentos', async (req, res) => {
     if (mes) {
         queryParams.push(mes + '-01', mes + '-31');
         query += ` AND a.data_abastecimento BETWEEN $${queryParams.length - 1} AND $${queryParams.length}`;
+    }
+    if (requisicao) {
+        queryParams.push(requisicao);
+        query += ` AND a.req_id = $${queryParams.length}`;
     }
 
     query += ' ORDER BY a.data_abastecimento DESC';
