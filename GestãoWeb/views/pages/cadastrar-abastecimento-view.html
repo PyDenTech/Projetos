@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Gerenciar Motoristas</title>
+    <title>Cadastrar Abastecimento</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
     <!-- Favicons -->
@@ -26,7 +26,7 @@
 </head>
 
 <body>
-    <!-- ======= Header ======= -->
+
     <header id="header" class="header fixed-top d-flex align-items-center">
 
         <i class="bi bi-list toggle-sidebar-btn"></i>
@@ -120,9 +120,9 @@
                             <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
                         </a>
                     </li>
-
                 </ul>
             </li>
+
             <li class="nav-item">
                 <a class="nav-link collapsed" data-bs-target="#aluno-nav" data-bs-toggle="collapse" href="#">
                     <img src="/img/icones/aluno.svg" alt="Censo Escolar"
@@ -147,19 +147,20 @@
                     </li>
 
                 </ul>
+            </li>
+
             <li class="nav-item">
-                <a class="nav-link" data-bs-target="#routs-nav" data-bs-toggle="collapse" href="#">
+                <a class="nav-link collapsed" data-bs-target="#routs-nav" data-bs-toggle="collapse" href="#">
                     <img src="/img/icones/rotas.svg" alt="Escolas"
                         style="width: 20px; height: 20px; margin-right: 5px; color: white;">
                     </i><span>Rotas</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
-                <ul id="routs-nav" class="nav-content" data-bs-parent="#sidebar-nav">
+                <ul id="routs-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
                     <li>
                         <a href="/cadastrar-rotas-form">
                             <i class="bi bi-plus-square"></i><span>Cadastrar Rota</span>
                         </a>
                     </li>
-
                     <li>
                         <a href="/desenhar-rotas-map">
                             <i class="bi bi-pencil"></i><span>Gerar Rotas</span>
@@ -172,6 +173,7 @@
                     </li>
                 </ul>
             </li>
+
             <li class="nav-item">
                 <a class="nav-link collapsed" data-bs-target="#driverbus-nav" data-bs-toggle="collapse" href="#">
                     <img src="/img/icones/motoristas.svg" alt="Escolas"
@@ -201,6 +203,7 @@
                     </li>
                 </ul>
             </li>
+
             <li class="nav-item">
                 <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
                     <img src="/img/icones/monitor-icone-branco.png" alt="Escolas"
@@ -245,6 +248,7 @@
                     </li>
                 </ul>
             </li>
+
             <li class="nav-item">
                 <a class="nav-link collapsed" data-bs-target="#bus-nav" data-bs-toggle="collapse" href="#">
                     <img src="/img/icones/frotas.svg" alt="Escolas"
@@ -277,7 +281,7 @@
 
             <li class="nav-heading">Administrativo</li>
             <li class="nav-item">
-                <a class="nav-link collapsed" href="/dashboard-adm">
+                <a class="nav-link collapsed" href="dashboard-adm.html">
                     <i class="bi bi-speedometer"></i>
                     <span>Painel de Controle</span>
                 </a>
@@ -303,6 +307,7 @@
                     </li>
                 </ul>
             </li>
+
             <li class="nav-item">
                 <a class="nav-link collapsed" data-bs-target="#drivercar-nav" data-bs-toggle="collapse" href="#">
                     <img src="/img/icones/motoristas.svg" alt="Escolas"
@@ -322,13 +327,14 @@
                     </li>
                 </ul>
             </li>
+
             <li class="nav-item">
                 <a class="nav-link collapsed" data-bs-target="#tarefas-nav" data-bs-toggle="collapse" href="#">
                     <i class="bi bi-list-check"></i><span>Tarefas</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
                 <ul id="tarefas-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
                     <li>
-                        <a href="/cadastrar-demandas">
+                        <a href="/new-tasks">
                             <i class="bi bi-file-earmark-text"></i><span>Nova Tarefa</span>
                         </a>
                     </li>
@@ -339,13 +345,14 @@
                     </li>
                 </ul>
             </li>
+
             <li class="nav-heading">Controle Financeiro</li>
             <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#fuel-nav" data-bs-toggle="collapse" href="#">
+                <a class="nav-link" data-bs-target="#fuel-nav" data-bs-toggle="collapse" href="#">
                     <i class="bi bi-droplet-half"></i><span>Abastecimento</span><i
                         class="bi bi-chevron-down ms-auto"></i>
                 </a>
-                <ul id="fuel-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                <ul id="fuel-nav" class="nav-content" data-bs-parent="#sidebar-nav">
                     <li>
                         <a href="/cadastrar-abastecimento-view">
                             <i class="bi bi-file-earmark-text"></i><span>Cadastrar Requisição</span>
@@ -365,40 +372,132 @@
 
     <main id="main" class="main">
         <div class="pagetitle">
-            <h1>Gerenciar Motoristas</h1>
+            <h1>Cadastrar Abastecimento</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/dashboard-escolar"><i class="bi bi-house"></i></a></li>
-                    <li class="breadcrumb-item"><a href="/gerenciar-motoristas-view">Motoristas</a></li>
-                    <li class="breadcrumb-item active">Gerenciar Motoristas</li>
+                    <li class="breadcrumb-item"><a href="/gerenciar-abastecimento-view">Abastecimento</a></li>
+                    <li class="breadcrumb-item active">Cadastrar Abastecimento</li>
                 </ol>
             </nav>
-        </div>
+        </div><!-- End Page Title -->
 
         <section class="section">
             <div class="row">
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Motoristas</h5>
-                            <div class="table-responsive">
-                                <table class="table table-striped" id="motoristasTable">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Nome <span class="bi bi-arrow-down-up"></span></th>
-                                            <th>CPF <span class="bi bi-arrow-down-up"></span></th>
-                                            <th>CNH <span class="bi bi-arrow-down-up"></span></th>
-                                            <th>Empresa <span class="bi bi-arrow-down-up"></span></th>
-                                            <th>Id da Rota <span class="bi bi-arrow-down-up"></span></th>
-                                            <th>Nome da Rota <span class="bi bi-arrow-down-up"></span></th>
-                                            <th>Ações</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- Dados dos motoristas -->
-                                    </tbody>
-                                </table>
+                            <h5 class="card-title">Cadastrar Abastecimento</h5>
+
+                            <!-- Tabs for different motoristas -->
+                            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="escolares-tab" data-bs-toggle="tab"
+                                        data-bs-target="#escolares" type="button" role="tab" aria-controls="escolares"
+                                        aria-selected="true">Motoristas Escolares</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="administrativos-tab" data-bs-toggle="tab"
+                                        data-bs-target="#administrativos" type="button" role="tab"
+                                        aria-controls="administrativos" aria-selected="false">Motoristas
+                                        Administrativos</button>
+                                </li>
+                            </ul>
+                            <div class="tab-content" id="myTabContent">
+                                <div class="tab-pane fade show active" id="escolares" role="tabpanel"
+                                    aria-labelledby="escolares-tab">
+                                    <form id="abastecimentoFormEscolares">
+                                        <div class="mb-3">
+                                            <label for="reqIdEscolares" class="form-label">ID de Requisição</label>
+                                            <input type="text" class="form-control" id="reqIdEscolares" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="carroEscolares" class="form-label">Carro</label>
+                                            <input type="text" class="form-control" id="carroEscolares" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="placaEscolares" class="form-label">Placa</label>
+                                            <input type="text" class="form-control" id="placaEscolares" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="odometroEscolares" class="form-label">KM do Odômetro</label>
+                                            <input type="number" class="form-control" id="odometroEscolares" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="combustivelEscolares" class="form-label">Tipo de
+                                                Combustível</label>
+                                            <select class="form-select" id="combustivelEscolares" required>
+                                                <option value="Gasolina Comum">Gasolina Comum</option>
+                                                <option value="Diesel S10">Diesel S10</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="litrosEscolares" class="form-label">Quantidade de Litros</label>
+                                            <input type="number" step="0.01" class="form-control" id="litrosEscolares"
+                                                required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="totalEscolares" class="form-label">Valor Total</label>
+                                            <input type="text" class="form-control" id="totalEscolares" readonly>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="motoristaEscolares" class="form-label">Motorista</label>
+                                            <select class="form-select" id="motoristaEscolares" required>
+                                                <!-- Options dinâmicas dos motoristas -->
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Cadastrar</button>
+                                    </form>
+                                </div>
+                                <div class="tab-pane fade" id="administrativos" role="tabpanel"
+                                    aria-labelledby="administrativos-tab">
+                                    <form id="abastecimentoFormAdministrativos">
+                                        <div class="mb-3">
+                                            <label for="reqIdAdministrativos" class="form-label">ID de
+                                                Requisição</label>
+                                            <input type="text" class="form-control" id="reqIdAdministrativos" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="carroAdministrativos" class="form-label">Carro</label>
+                                            <input type="text" class="form-control" id="carroAdministrativos" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="placaAdministrativos" class="form-label">Placa</label>
+                                            <input type="text" class="form-control" id="placaAdministrativos" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="odometroAdministrativos" class="form-label">KM do
+                                                Odômetro</label>
+                                            <input type="number" class="form-control" id="odometroAdministrativos"
+                                                required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="combustivelAdministrativos" class="form-label">Tipo de
+                                                Combustível</label>
+                                            <select class="form-select" id="combustivelAdministrativos" required>
+                                                <option value="Gasolina Comum">Gasolina Comum</option>
+                                                <option value="Diesel S10">Diesel S10</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="litrosAdministrativos" class="form-label">Quantidade de
+                                                Litros</label>
+                                            <input type="number" step="0.01" class="form-control"
+                                                id="litrosAdministrativos" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="totalAdministrativos" class="form-label">Valor Total</label>
+                                            <input type="text" class="form-control" id="totalAdministrativos" readonly>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="motoristaAdministrativos" class="form-label">Motorista</label>
+                                            <select class="form-select" id="motoristaAdministrativos" required>
+                                                <!-- Options dinâmicas dos motoristas -->
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Cadastrar</button>
+                                    </form>
+                                </div>
                             </div>
                             <div id="statusMessage" class="mt-3"></div>
                         </div>
@@ -406,213 +505,141 @@
                 </div>
             </div>
         </section>
-        <!-- Modal de Edição de Motorista -->
-        <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editModalLabel">Editar Motorista</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="editForm">
-                            <div class="mb-3">
-                                <label for="editNome" class="form-label">Nome</label>
-                                <input type="text" class="form-control" id="editNome" name="nome_completo" required>
+    </main><!-- End #main -->
+    <!-- ======= Rodapé ======= -->
+    <footer id="footer" class="footer">
+        <div class="container">
+            <div class="row gy-4">
+
+
+                <div class="container mt-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="copyright">
+                                &copy; Direitos Autorais <strong><span>PyDenExpress</span></strong>. Todos os Direitos
+                                Reservados
                             </div>
-                            <div class="mb-3">
-                                <label for="editCpf" class="form-label">CPF</label>
-                                <input type="text" class="form-control" id="editCpf" name="cpf" required>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="credits">
+                                Desenvolvido por <a href="https://danilomorais.netlify.app/">Danilo de Morais</a>
                             </div>
-                            <div class="mb-3">
-                                <label for="editCnh" class="form-label">CNH</label>
-                                <input type="text" class="form-control" id="editCnh" name="cnh" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="editEmpresa" class="form-label">Empresa</label>
-                                <select class="form-select" id="editEmpresa" name="empresa" required>
-                                    <option value="SEMED">SEMED</option>
-                                    <option value="TALISMÃ">TALISMÃ</option>
-                                    <option value="LOCAN">LOCAN</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="editRota" class="form-label">Rota</label>
-                                <select class="form-select" id="editRota" name="rota_id" required>
-                                    <!-- Options dinâmicas -->
-                                </select>
-                            </div>
-                            <input type="hidden" id="editMotoristaId" name="id">
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                        <button type="button" class="btn btn-primary" onclick="salvarEdicao()">Salvar</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </main>
+    </footer>
+
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+            class="bi bi-arrow-up-short"></i></a>
 
     <!-- Vendor JS Files -->
+    <script src="/vendor/apexcharts/apexcharts.min.js"></script>
     <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/vendor/chart.js/chart.umd.js"></script>
     <script src="/vendor/echarts/echarts.min.js"></script>
     <script src="/vendor/quill/quill.min.js"></script>
     <script src="/vendor/simple-datatables/simple-datatables.js"></script>
     <script src="/vendor/tinymce/tinymce.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
 
     <!-- Template Main JS File -->
     <script src="/js/users-profile.js"></script>
     <script src="/js/main.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            fetch('/api/rotas')
-                .then(response => response.json())
-                .then(data => {
-                    const rotaSelect = document.getElementById('editRota');
-                    data.forEach(rota => {
-                        const option = document.createElement('option');
-                        option.value = rota.id;
-                        option.textContent = rota.nome_rota;
-                        rotaSelect.appendChild(option);
-                    });
-                })
-                .catch(error => console.error('Erro ao carregar rotas:', error));
+            fetchMotoristas('motoristas_escolares', 'motoristaEscolares');
+            fetchMotoristas('motoristas_administrativos', 'motoristaAdministrativos');
 
-            fetchMotoristas();
+            document.getElementById('litrosEscolares').addEventListener('input', calcularValorTotalEscolares);
+            document.getElementById('combustivelEscolares').addEventListener('change', calcularValorTotalEscolares);
+            document.getElementById('litrosAdministrativos').addEventListener('input', calcularValorTotalAdministrativos);
+            document.getElementById('combustivelAdministrativos').addEventListener('change', calcularValorTotalAdministrativos);
 
-            function fetchMotoristas() {
-                fetch('/api/motoristas_escolares')
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Motoristas recebidos:', data); // Adicione este log
-                        if (!Array.isArray(data)) {
-                            throw new Error('Resposta não é um array');
-                        }
-                        const motoristasTableBody = document.getElementById('motoristasTable').querySelector('tbody');
-                        motoristasTableBody.innerHTML = '';
+            document.getElementById('abastecimentoFormEscolares').addEventListener('submit', function (event) {
+                event.preventDefault();
+                cadastrarAbastecimento('escolares');
+            });
 
-                        data.forEach((motorista, index) => {
-                            const row = document.createElement('tr');
-                            row.innerHTML = `
-                                <td>${index + 1}</td>
-                                <td>${motorista.nome_completo}</td>
-                                <td>${motorista.cpf}</td>
-                                <td>${motorista.cnh}</td>
-                                <td>${motorista.empresa}</td>
-                                <td>${motorista.rota_id}</td>
-                                <td>${motorista.rota_nome || 'N/A'}</td>
-                                <td>
-                                    <button class="btn btn-primary btn-sm" onclick="editarMotorista(${motorista.id})">Editar</button>
-                                    <button class="btn btn-danger btn-sm" onclick="excluirMotorista(${motorista.id})">Excluir</button>
-                                </td>
-                            `;
-                            motoristasTableBody.appendChild(row);
-                        });
-
-                        const quantidadeMotoristas = data.length;
-                        document.getElementById('statusMessage').textContent = `Total de motoristas: ${quantidadeMotoristas}`;
-                    })
-                    .catch(error => console.error('Erro ao carregar motoristas:', error));
-            }
-
-            window.editarMotorista = function (motoristaId) {
-                fetch(`/api/motoristas_escolares/${motoristaId}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Motorista não encontrado.');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        document.getElementById('editMotoristaId').value = data.id;
-                        document.getElementById('editNome').value = data.nome_completo;
-                        document.getElementById('editCpf').value = data.cpf;
-                        document.getElementById('editCnh').value = data.cnh;
-                        document.getElementById('editEmpresa').value = data.empresa;
-                        document.getElementById('editRota').value = data.rota_id;
-
-                        const editModal = new bootstrap.Modal(document.getElementById('editModal'));
-                        editModal.show();
-                    })
-                    .catch(error => console.error('Erro ao carregar dados do motorista:', error));
-            };
-
-            window.salvarEdicao = function () {
-                const motoristaId = document.getElementById('editMotoristaId').value;
-                const formData = new FormData(document.getElementById('editForm'));
-
-                fetch(`/api/motoristas_escolares/${motoristaId}`, {
-                    method: 'PUT',
-                    body: JSON.stringify(Object.fromEntries(formData)),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert('Dados do motorista atualizados com sucesso.');
-                        const editModal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
-                        editModal.hide();
-                        fetchMotoristas();
-                    })
-                    .catch(error => console.error('Erro ao salvar dados do motorista:', error));
-            };
-
-            window.excluirMotorista = function (motoristaId) {
-                if (confirm('Tem certeza que deseja excluir este motorista?')) {
-                    fetch(`/api/motoristas_escolares/${motoristaId}`, {
-                        method: 'DELETE'
-                    })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Erro ao excluir motorista.');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            alert(data.message);
-                            fetchMotoristas();
-                        })
-                        .catch(error => console.error('Erro ao excluir motorista:', error));
-                }
-            };
-
-            function sortTableByColumn(table, column, asc = true) {
-                const dirModifier = asc ? 1 : -1;
-                const tBody = table.tBodies[0];
-                const rows = Array.from(tBody.querySelectorAll('tr'));
-
-                const sortedRows = rows.sort((a, b) => {
-                    const aColText = a.querySelector(`td:nth-child(${column + 1})`).textContent.trim();
-                    const bColText = b.querySelector(`td:nth-child(${column + 1})`).textContent.trim();
-
-                    return aColText > bColText ? (1 * dirModifier) : (-1 * dirModifier);
-                });
-
-                while (tBody.firstChild) {
-                    tBody.removeChild(tBody.firstChild);
-                }
-
-                tBody.append(...sortedRows);
-
-                table.querySelectorAll('th').forEach(th => th.classList.remove('th-sort-asc', 'th-sort-desc'));
-                table.querySelector(`th:nth-child(${column + 1})`).classList.toggle('th-sort-asc', asc);
-                table.querySelector(`th:nth-child(${column + 1})`).classList.toggle('th-sort-desc', !asc);
-            }
-
-            document.querySelectorAll('.table-sortable th').forEach(headerCell => {
-                headerCell.addEventListener('click', () => {
-                    const tableElement = headerCell.parentElement.parentElement.parentElement;
-                    const headerIndex = Array.prototype.indexOf.call(headerCell.parentElement.children, headerCell);
-                    const currentIsAscending = headerCell.classList.contains('th-sort-asc');
-
-                    sortTableByColumn(tableElement, headerIndex, !currentIsAscending);
-                });
+            document.getElementById('abastecimentoFormAdministrativos').addEventListener('submit', function (event) {
+                event.preventDefault();
+                cadastrarAbastecimento('administrativos');
             });
         });
+
+        function fetchMotoristas(tipoMotorista, selectId) {
+            fetch(`/api/motoristas-abastecimento?tipo=${tipoMotorista}`)
+                .then(response => response.json())
+                .then(data => {
+                    const motoristaSelect = document.getElementById(selectId);
+                    data.forEach(motorista => {
+                        const option = document.createElement('option');
+                        option.value = motorista.id;
+                        option.textContent = motorista.nome_completo;
+                        motoristaSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar motoristas:', error));
+        }
+
+        function calcularValorTotalEscolares() {
+            calcularValorTotal('litrosEscolares', 'combustivelEscolares', 'totalEscolares');
+        }
+
+        function calcularValorTotalAdministrativos() {
+            calcularValorTotal('litrosAdministrativos', 'combustivelAdministrativos', 'totalAdministrativos');
+        }
+
+        function calcularValorTotal(litrosId, combustivelId, totalId) {
+            const litros = parseFloat(document.getElementById(litrosId).value);
+            const combustivel = document.getElementById(combustivelId).value;
+            let valorUnitario = 0;
+
+            if (combustivel === 'Gasolina Comum') {
+                valorUnitario = 5.8;
+            } else if (combustivel === 'Diesel S10') {
+                valorUnitario = 6.9;
+            }
+
+            const valorTotal = (litros * valorUnitario).toFixed(2);
+            document.getElementById(totalId).value = isNaN(valorTotal) ? '' : `R$ ${valorTotal}`;
+        }
+
+        function cadastrarAbastecimento(tipoMotorista) {
+            const reqId = document.getElementById(`reqId${tipoMotorista.charAt(0).toUpperCase() + tipoMotorista.slice(1)}`).value;
+            const carro = document.getElementById(`carro${tipoMotorista.charAt(0).toUpperCase() + tipoMotorista.slice(1)}`).value;
+            const placa = document.getElementById(`placa${tipoMotorista.charAt(0).toUpperCase() + tipoMotorista.slice(1)}`).value;
+            const odometro = document.getElementById(`odometro${tipoMotorista.charAt(0).toUpperCase() + tipoMotorista.slice(1)}`).value;
+            const combustivel = document.getElementById(`combustivel${tipoMotorista.charAt(0).toUpperCase() + tipoMotorista.slice(1)}`).value;
+            const litros = document.getElementById(`litros${tipoMotorista.charAt(0).toUpperCase() + tipoMotorista.slice(1)}`).value;
+            const motoristaId = document.getElementById(`motorista${tipoMotorista.charAt(0).toUpperCase() + tipoMotorista.slice(1)}`).value;
+
+            const data = {
+                reqId,
+                carro,
+                placa,
+                odometro,
+                combustivel,
+                litros,
+                motoristaId
+            };
+
+            fetch(`/api/cadastrar-abastecimento-${tipoMotorista}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('statusMessage').textContent = `Abastecimento cadastrado com sucesso para motoristas ${tipoMotorista}!`;
+                    document.getElementById(`abastecimentoForm${tipoMotorista.charAt(0).toUpperCase() + tipoMotorista.slice(1)}`).reset();
+                    document.getElementById(`total${tipoMotorista.charAt(0).toUpperCase() + tipoMotorista.slice(1)}`).value = '';
+                })
+                .catch(error => console.error('Erro ao cadastrar abastecimento:', error));
+        }
     </script>
+
 </body>
 
 </html>

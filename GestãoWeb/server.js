@@ -141,7 +141,9 @@ const pages = [
     'gerenciar-motorista-carro-form',
     'faq',
     'users-profile',
-    'gerenciar-motoristas-view'
+    'gerenciar-motoristas-view',
+    'cadastrar-abastecimento-view',
+    'gerenciar-abastecimento-view'
 ];
 
 pages.forEach(page => {
@@ -315,11 +317,11 @@ app.post('/api/loginMotoristasAdministrativos', async (req, res) => {
 });
 
 
-app.post('/api/loginMotoristasEscolares', async (req, res) => {
+app.post('/api/loginmotoristas_escolares', async (req, res) => {
     const { email, senha } = req.body;
 
     try {
-        const userQuery = await pool.query('SELECT * FROM motoristasescolares WHERE email = $1', [email]);
+        const userQuery = await pool.query('SELECT * FROM motoristas_escolares WHERE email = $1', [email]);
         if (userQuery.rows.length === 0) {
             return res.status(404).send('Usuário não encontrado.');
         }
@@ -518,7 +520,7 @@ app.post('/cadastrar-usuario', async (req, res) => {
         const usuarioId = novoUsuario.rows[0].id;
 
         await pool.query(
-            'INSERT INTO motoristasescolares (nome, cpf, cnh, empresa, usuario_id) VALUES ($1, $2, $3, $4, $5)',
+            'INSERT INTO motoristas_escolares (nome, cpf, cnh, empresa, usuario_id) VALUES ($1, $2, $3, $4, $5)',
             [nome_completo, cpf, cnh, empresa, usuarioId]
         );
 
@@ -1569,8 +1571,8 @@ app.delete('/api/usuarios/:userId', isAdmin, async (req, res) => {
     try {
         await client.query('BEGIN');
 
-        // Excluir de motoristasescolares primeiro se existir
-        await client.query('DELETE FROM motoristasescolares WHERE id = $1', [userId]);
+        // Excluir de motoristas_escolares primeiro se existir
+        await client.query('DELETE FROM motoristas_escolares WHERE id = $1', [userId]);
 
         // Excluir de usuarios
         const result = await client.query('DELETE FROM usuarios WHERE id = $1 RETURNING *', [userId]);
@@ -1591,11 +1593,11 @@ app.delete('/api/usuarios/:userId', isAdmin, async (req, res) => {
     }
 });
 
-app.get('/api/motoristasescolares', async (req, res) => {
+app.get('/api/motoristas_escolares', async (req, res) => {
     try {
         const result = await pool.query(`
         SELECT m.*, r.id AS rota_id, r.nome_rota AS rota_nome
-        FROM motoristasescolares m
+        FROM motoristas_escolares m
         LEFT JOIN rotas r ON m.rota_id = r.id
       `);
         res.status(200).json(result.rows);
@@ -1606,11 +1608,11 @@ app.get('/api/motoristasescolares', async (req, res) => {
 });
 
 // Endpoint para obter um motorista escolar por ID
-app.get('/api/motoristasescolares/:id', async (req, res) => {
+app.get('/api/motoristas_escolares/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
-        const result = await pool.query('SELECT * FROM motoristasescolares WHERE id = $1', [id]);
+        const result = await pool.query('SELECT * FROM motoristas_escolares WHERE id = $1', [id]);
 
         if (result.rows.length > 0) {
             res.status(200).json(result.rows[0]);
@@ -1630,7 +1632,7 @@ app.get('/api/rotas/motorista/:motorista_id', async (req, res) => {
         const result = await pool.query(
             `SELECT r.id, r.nome_rota
              FROM rotas r
-             JOIN motoristasescolares m ON r.id = m.rota_id
+             JOIN motoristas_escolares m ON r.id = m.rota_id
              WHERE m.usuario_id = $1`,
             [motorista_id]
         );
@@ -1664,6 +1666,154 @@ app.get('/api/rota-gerada/:id', async (req, res) => {
     }
 });
 
+// Endpoint para buscar motoristas
+app.get('/api/motoristas-abastecimento', async (req, res) => {
+    const tipo = req.query.tipo;
+
+    let query = 'SELECT id, nome_completo FROM ';
+    if (tipo === 'motoristas_escolares') {
+        query += 'motoristas_escolares';
+    } else if (tipo === 'motoristas_administrativos') {
+        query += 'motoristas_administrativos';
+    } else {
+        return res.status(400).json({ error: 'Tipo de motorista inválido' });
+    }
+
+    try {
+        const result = await pool.query(query);
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Erro ao buscar motoristas:', err);
+        res.status(500).json({ error: 'Erro ao buscar motoristas' });
+    }
+});
+
+// Endpoint para cadastrar abastecimento para motoristas escolares
+app.post('/api/cadastrar-abastecimento-escolares', async (req, res) => {
+    const {
+        reqId,
+        carro,
+        placa,
+        odometro,
+        combustivel,
+        litros,
+        motoristaId
+    } = req.body;
+
+    let valorUnitario = 0;
+
+    if (combustivel === 'Gasolina Comum') {
+        valorUnitario = 5.8;
+    } else if (combustivel === 'Diesel S10') {
+        valorUnitario = 6.9;
+    }
+
+    const valorTotal = (litros * valorUnitario).toFixed(2);
+
+    try {
+        const result = await pool.query(
+            'INSERT INTO abastecimentos (req_id, carro, placa, quilometragem, tipo_combustivel, quantidade_litros, valor_total, motorista_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+            [reqId, carro, placa, odometro, combustivel, litros, valorTotal, motoristaId]
+        );
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        console.error('Erro ao cadastrar abastecimento:', err);
+        res.status(500).json({ error: 'Erro ao cadastrar abastecimento' });
+    }
+});
+
+// Endpoint para cadastrar abastecimento para motoristas administrativos
+app.post('/api/cadastrar-abastecimento-administrativos', async (req, res) => {
+    const {
+        reqId,
+        carro,
+        placa,
+        odometro,
+        combustivel,
+        litros,
+        motoristaId
+    } = req.body;
+
+    let valorUnitario = 0;
+
+    if (combustivel === 'Gasolina Comum') {
+        valorUnitario = 5.8;
+    } else if (combustivel === 'Diesel S10') {
+        valorUnitario = 6.9;
+    }
+
+    const valorTotal = (litros * valorUnitario).toFixed(2);
+
+    try {
+        const result = await pool.query(
+            'INSERT INTO abastecimentos (req_id, carro, placa, quilometragem, tipo_combustivel, quantidade_litros, valor_total, motorista_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+            [reqId, carro, placa, odometro, combustivel, litros, valorTotal, motoristaId]
+        );
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        console.error('Erro ao cadastrar abastecimento:', err);
+        res.status(500).json({ error: 'Erro ao cadastrar abastecimento' });
+    }
+});
+
+// Endpoint para buscar abastecimentos com filtros
+app.get('/api/abastecimentos', async (req, res) => {
+    const { combustivel, motorista, mes } = req.query;
+
+    let query = `
+        SELECT a.id, a.req_id, a.carro, a.placa, a.quilometragem, a.tipo_combustivel, a.quantidade_litros, a.valor_total, a.data_abastecimento,
+               CASE
+                   WHEN m.id IS NOT NULL THEN m.nome_completo
+                   WHEN ma.id IS NOT NULL THEN ma.nome_completo
+                   ELSE 'Desconhecido'
+               END AS nome_motorista
+        FROM abastecimentos a
+        LEFT JOIN motoristas_escolares m ON a.motorista_id = m.id
+        LEFT JOIN motoristas_administrativos ma ON a.motorista_id = ma.id
+        WHERE 1=1
+    `;
+
+    const queryParams = [];
+    if (combustivel) {
+        queryParams.push(combustivel);
+        query += ` AND a.tipo_combustivel = $${queryParams.length}`;
+    }
+    if (motorista) {
+        queryParams.push(motorista);
+        query += ` AND a.motorista_id = $${queryParams.length}`;
+    }
+    if (mes) {
+        queryParams.push(mes + '-01', mes + '-31');
+        query += ` AND a.data_abastecimento BETWEEN $${queryParams.length - 1} AND $${queryParams.length}`;
+    }
+
+    query += ' ORDER BY a.data_abastecimento DESC';
+
+    try {
+        const result = await pool.query(query, queryParams);
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Erro ao buscar abastecimentos:', err);
+        res.status(500).json({ error: 'Erro ao buscar abastecimentos' });
+    }
+});
+
+// Endpoint para buscar motoristas
+app.get('/api/motoristas-gerenciar-abastecimento', async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT id, nome_completo 
+            FROM motoristas_escolares
+            UNION
+            SELECT id, nome_completo
+            FROM motoristas_administrativos
+        `);
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Erro ao buscar motoristas:', err);
+        res.status(500).json({ error: 'Erro ao buscar motoristas' });
+    }
+});
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));

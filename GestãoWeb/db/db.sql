@@ -1,4 +1,4 @@
-CREATE TABLE usuarios (
+CREATE TABLE IF NOT EXISTS usuarios (
     id SERIAL PRIMARY KEY,
     nome VARCHAR NOT NULL,
     cpf VARCHAR,
@@ -10,8 +10,7 @@ CREATE TABLE usuarios (
     role VARCHAR
 );
 
-
-CREATE TABLE escolas (
+CREATE TABLE IF NOT EXISTS escolas (
     id SERIAL PRIMARY KEY,
     latitude DECIMAL(9, 6) NOT NULL,
     longitude DECIMAL(9, 6) NOT NULL,
@@ -38,8 +37,7 @@ CREATE TABLE escolas (
     bairro_id INT REFERENCES bairros(id)
 );
 
-
-CREATE TABLE bairros (
+CREATE TABLE IF NOT EXISTS bairros (
     id SERIAL PRIMARY KEY,
     nome VARCHAR(255) NOT NULL
 );
@@ -56,7 +54,7 @@ CREATE TABLE IF NOT EXISTS rotas (
     area_urbana BOOLEAN
 );
 
-CREATE TABLE alunos (
+CREATE TABLE IF NOT EXISTS alunos (
     id SERIAL PRIMARY KEY,
     unidade VARCHAR(255),
     id_escola INT REFERENCES escolas(id),
@@ -82,24 +80,28 @@ CREATE TABLE IF NOT EXISTS rotas_geradas (
     tempo FLOAT
 );
 
-CREATE TABLE IF NOT EXISTS motoristasescolares (
+CREATE TABLE IF NOT EXISTS motoristas_escolares (
     id SERIAL PRIMARY KEY,
-    nome VARCHAR NOT NULL,
-    cpf VARCHAR NOT NULL,
-    cnh VARCHAR NOT NULL,
-    empresa VARCHAR NOT NULL,
-    usuario_id INTEGER NOT NULL REFERENCES usuarios(id),
-    rota_id INTEGER REFERENCES rotas(id)
+    nome_completo VARCHAR(255) NOT NULL,
+    cpf VARCHAR(11) NOT NULL UNIQUE,
+    cnh VARCHAR(20) NOT NULL UNIQUE,
+    tipo_veiculo VARCHAR(50) NOT NULL,
+    placa VARCHAR(10) NOT NULL UNIQUE,
+    empresa VARCHAR(50) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    senha VARCHAR(255) NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'fora de serviço',
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE stop_points (
+CREATE TABLE IF NOT EXISTS stop_points (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100),
     latitude DECIMAL(9, 6),
     longitude DECIMAL(9, 6)
 );
 
-CREATE TABLE fornecedores (
+CREATE TABLE IF NOT EXISTS fornecedores (
     id SERIAL PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     tipo_contrato VARCHAR(255),
@@ -110,10 +112,36 @@ CREATE TABLE fornecedores (
     longitude DECIMAL(9, 6)
 );
 
-CREATE TABLE expediente (
+CREATE TABLE IF NOT EXISTS expediente (
     id SERIAL PRIMARY KEY,
     motorista_id INTEGER REFERENCES motoristas_administrativos(id),
     horas_trabalhadas INTERVAL,
     horas_almoco INTERVAL,
     data DATE DEFAULT CURRENT_DATE
+);
+
+CREATE TABLE IF NOT EXISTS abastecimentos (
+    id SERIAL PRIMARY KEY,
+    modelo VARCHAR(255) NOT NULL,
+    placa VARCHAR(10) NOT NULL,
+    quilometragem INTEGER NOT NULL,
+    tipo_combustivel VARCHAR(50) NOT NULL,
+    quantidade_litros DECIMAL(10, 2) NOT NULL,
+    motorista_id INTEGER NOT NULL,
+    FOREIGN KEY (motorista_id) REFERENCES motoristas_escolares(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS motoristas_administrativos (
+    id SERIAL PRIMARY KEY,
+    nome_completo VARCHAR(255) NOT NULL,
+    cpf VARCHAR(11) NOT NULL UNIQUE,
+    cnh VARCHAR(20) NOT NULL UNIQUE,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    senha VARCHAR(255) NOT NULL,
+    empresa VARCHAR(50) NOT NULL,
+    tipo_veiculo VARCHAR(50) NOT NULL,
+    modelo VARCHAR(100) NOT NULL,
+    placa VARCHAR(10) NOT NULL UNIQUE,
+    status VARCHAR(50) NOT NULL DEFAULT 'fora de serviço',
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
