@@ -136,7 +136,7 @@ app.post('/api/upload-foto-perfil', ensureLoggedIn, upload.single('foto_perfil')
     }
 });
 
-async function sendMail(to, subject, htmlContent) {
+async function sendMail(to, subject, text) {
     try {
         const mailOptions = {
             from: `PyDen™Tech <${process.env.EMAIL_USER}>`,
@@ -316,25 +316,32 @@ app.post('/solicitar-redefinir-senha', async (req, res) => {
         await client.query('UPDATE usuarios SET reset_password_token = $1, reset_password_expires = $2 WHERE email = $3',
             [token, resetPasswordExpires, email]);
 
-        const resetUrl = `https://semedcanaadoscarajas.pydenexpress.com/redefinir-senha/${token}`;
+        const resetUrl = `http://${req.headers.host}/redefinir-senha/${token}`;
         console.log(`URL de redefinição: ${resetUrl}`);
 
         const emailSubject = 'Redefinição de senha';
-        const emailText = `
-Olá,
-
-Você está recebendo este e-mail porque você (ou alguém) solicitou a redefinição da senha para sua conta.
-
-Para redefinir sua senha, clique no link abaixo ou copie e cole no seu navegador:
-${resetUrl}
-
-Se você não solicitou isso, por favor, ignore este e-mail e sua senha permanecerá inalterada.
-
-Obrigado,
-Equipe de Suporte
+        const emailHtml = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
+                <h2 style="color: #333; text-align: center;">Redefinição de Senha</h2>
+                <p style="font-size: 16px; color: #555;">Olá,</p>
+                <p style="font-size: 16px; color: #555;">
+                    Você está recebendo este e-mail porque você (ou alguém) solicitou a redefinição da senha para sua conta.
+                </p>
+                <p style="text-align: center;">
+                    <a href="${resetUrl}" style="display: inline-block; padding: 15px 25px; font-size: 16px; color: #ffffff; background-color: #007bff; border-radius: 5px; text-decoration: none;">Redefinir Senha</a>
+                </p>
+                <p style="font-size: 16px; color: #555;">
+                    Se você não solicitou isso, por favor, ignore este e-mail e sua senha permanecerá inalterada.
+                </p>
+                <p style="font-size: 16px; color: #555;">
+                    Obrigado,
+                    <br>
+                    Equipe de Suporte
+                </p>
+            </div>
         `;
 
-        await sendMail(email, emailSubject, emailText);
+        await sendMail(email, emailSubject, emailHtml);
         console.log(`E-mail de redefinição de senha enviado para: ${email}`);
 
         client.release();
@@ -344,6 +351,7 @@ Equipe de Suporte
         res.status(500).json({ message: 'Erro interno do servidor' });
     }
 });
+
 
 app.post('/admin/login', async (req, res) => {
     const { email, senha } = req.body;
