@@ -107,7 +107,6 @@ app.get('/termos', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'termos.html'));
 });
 
-
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, 'public/uploads/');
