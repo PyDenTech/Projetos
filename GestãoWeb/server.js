@@ -81,6 +81,10 @@ app.get('/dashboard-escolar', ensureLoggedIn, (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'pages', 'dashboard-escolar.html'));
 });
 
+app.get('/redefinir-senha/:token', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'redefinir-senha.html'));
+});
+
 app.get('/dashboard-adm', ensureLoggedIn, (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'pages', 'dashboard-adm.html'));
 });
