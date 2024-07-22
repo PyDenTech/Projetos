@@ -147,7 +147,8 @@ const pages = [
     'cadastrar-abastecimento-view',
     'gerenciar-abastecimento-view',
     'cadastrar-monitores-form',
-    'gerenciar-monitores-view'
+    'gerenciar-monitores-view',
+    'gerenciar-fornecedores-view'
 ];
 
 pages.forEach(page => {

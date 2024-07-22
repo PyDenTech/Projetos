@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>PyDenExpress - Gerenciar Fornecedores</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="/img/favicon.png" rel="icon">
+    <link href="/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i"
+        rel="stylesheet">
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
+    <!-- Vendor CSS Files -->
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="/vendor/simple-datatables/style.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- ======= Header ======= -->
+    <header id="header" class="header fixed-top d-flex align-items-center">
+
+        <i class="bi bi-list toggle-sidebar-btn"></i>
+        <div class="d-flex align-items-center justify-content-between">
+            <a href="/dashboard-escolar" class="logo d-flex align-items-center">
+                <img src="/img/logo.png" alt="">
+            </a>
+        </div><!-- End Logo -->
+
+        <nav class="header-nav ms-auto">
+            <ul class="d-flex align-items-center">
+
+                <li class="nav-item dropdown pe-3">
+                    <a id="profile-link" class="nav-link nav-profile d-flex align-items-center pe-0" href="#"
+                        data-bs-toggle="dropdown">
+                        <img id="profile-image" src="/img/user.png" alt="Foto de Perfil" class="rounded-circle">
+                        <span id="usuarioNome" class="d-none d-md-block dropdown-toggle ps-2"></span>
+                    </a><!-- End Profile Image Icon -->
+
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="/users-profile">
+                                <i class="bi bi-person"></i>
+                                <span>Meu Perfil</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="/users-profile">
+                                <i class="bi bi-gear"></i>
+                                <span>Configurações de Conta</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="/faq">
+                                <i class="bi bi-question-circle"></i>
+                                <span>Ajuda</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="#" id="logout-link">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Sair</span>
+                            </a>
+                        </li>
+                    </ul><!-- End Profile Dropdown Items -->
+                </li><!-- End Profile Nav -->
+
+            </ul>
+        </nav><!-- End Icons Navigation -->
+
+    </header><!-- End Header -->
+
+    <!-- ======= Sidebar ======= -->
+    <aside id="sidebar" class="sidebar">
+
+        <ul class="sidebar-nav" id="sidebar-nav">
+            <li class="nav-heading">Transporte Escolar</li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="/dashboard-escolar">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Painel de Controle</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" data-bs-target="#escolas-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/escolas.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    <span>Escolas</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="escolas-nav" class="nav-content" data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-escolas-form">
+                            <i class="bi bi-house-door"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-escolas-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#aluno-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/aluno.svg" alt="Censo Escolar"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    <span>Alunos</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="aluno-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-aluno-form">
+                            <i class="bi bi-person-plus"></i><span>Solicitar Cadastro</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-alunos-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/importar-aluno-form">
+                            <i class="bi bi-file-earmark-arrow-up"></i><span>Importar Dados</span>
+                        </a>
+                    </li>
+
+                </ul>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#routs-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/rotas.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    </i><span>Rotas</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="routs-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-rotas-form">
+                            <i class="bi bi-plus-square"></i><span>Cadastrar Rota</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="/desenhar-rotas-map">
+                            <i class="bi bi-pencil"></i><span>Gerar Rotas</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/visualizar-rotas">
+                            <i class="bi bi-eye"></i><span>Vizualizar Rotas</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#driverbus-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/motoristas.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="driverbus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-motorista-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-motoristas-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerar-relatorio-view">
+                            <i class="bi bi-clipboard2-check"></i><span>Relatórios</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/monitor-icone-branco.png" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    </i><span>Monitores</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-monitores-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-monitores-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" data-bs-target="#fornecedores-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/fornecedores.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    </i><span>Fornecedor</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="fornecedores-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-fornecedores-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-fornecedores-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#bus-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/frotas.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    </i><span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="bus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-onibus-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-onibus-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/vizualizar-onibus-map">
+                            <i class="bi bi-eye"></i><span>Vizualizar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/solicitar-onibus-services">
+                            <i class="bi bi-file-earmark-text"></i><span>Ordem de Serviço</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="nav-heading">Administrativo</li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="/dashboard-adm">
+                    <i class="bi bi-speedometer"></i>
+                    <span>Painel de Controle</span>
+                </a>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#car-nav" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-car-front"></i><span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="car-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-carro-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-carros-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/localizar-carros-map">
+                            <i class="bi bi-geo-alt-fill"></i><span>Localizar</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#drivercar-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/motoristas.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="drivercar-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-motorista-carro-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-motorista-carro-form">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#tarefas-nav" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-list-check"></i><span>Tarefas</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="tarefas-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-demandas">
+                            <i class="bi bi-file-earmark-text"></i><span>Nova Tarefa</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/tasks">
+                            <i class="bi bi-person-plus"></i><span>Gerenciar Tarefas</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-heading">Controle Financeiro</li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#fuel-nav" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-droplet-half"></i><span>Abastecimento</span><i
+                        class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="fuel-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-abastecimento-view">
+                            <i class="bi bi-file-earmark-text"></i><span>Cadastrar Requisição</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-abastecimento-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+        </ul>
+
+    </aside><!-- End Sidebar-->
+
+    <main id="main" class="main">
+        <div class="pagetitle">
+            <h1>Gerenciar Fornecedores</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/dashboard-escolar"><i class="bi bi-house"></i></a></li>
+                    <li class="breadcrumb-item"><a href="/gerenciar-fornecedores-view">Fornecedores</a></li>
+                    <li class="breadcrumb-item active">Gerenciar</li>
+                </ol>
+            </nav>
+        </div><!-- End Page Title -->
+
+        <section class="section">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Lista de Fornecedores</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Nome</th>
+                                            <th>Tipo de Contrato</th>
+                                            <th>CNPJ</th>
+                                            <th>Contato</th>
+                                            <th>Latitude</th>
+                                            <th>Longitude</th>
+                                            <th>Endereço</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="fornecedoresTableBody">
+                                        <!-- Conteúdo dinâmico -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Modal para Editar Fornecedor -->
+        <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Editar Fornecedor</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editFornecedorForm">
+                            <!-- Campos de edição -->
+                            <input type="hidden" id="editFornecedorId">
+                            <div class="form-group">
+                                <label for="editFornecedorNome">Nome:</label>
+                                <input type="text" class="form-control" id="editFornecedorNome" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editFornecedorTipoContrato">Tipo de Contrato:</label>
+                                <input type="text" class="form-control" id="editFornecedorTipoContrato" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editFornecedorCNPJ">CNPJ:</label>
+                                <input type="text" class="form-control" id="editFornecedorCNPJ" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editFornecedorContato">Contato:</label>
+                                <input type="text" class="form-control" id="editFornecedorContato" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editFornecedorLatitude">Latitude:</label>
+                                <input type="text" class="form-control" id="editFornecedorLatitude" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editFornecedorLongitude">Longitude:</label>
+                                <input type="text" class="form-control" id="editFornecedorLongitude" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editFornecedorEndereco">Endereço:</label>
+                                <input type="text" class="form-control" id="editFornecedorEndereco" required>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="salvarEdicaoBtn">Salvar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="section">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Mapa dos Fornecedores</h5>
+                            <div id="map" style="width: 100%; height: 450px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main><!-- End #main -->
+
+    <!-- ======= Rodapé ======= -->
+    <footer id="footer" class="footer">
+        <div class="container">
+            <div class="row gy-4">
+                <div class="container mt-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="copyright">
+                                &copy; Direitos Autorais <strong><span>PyDenExpress</span></strong>. Todos os Direitos
+                                Reservados
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="credits">
+                                Desenvolvido por <a href="https://danilomorais.netlify.app/">Danilo de Morais</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    </footer><!-- Fim do Rodapé -->
+
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+            class="bi bi-arrow-up-short"></i></a>
+
+    <!-- Vendor JS Files -->
+    <script src="/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/vendor/chart.js/chart.umd.js"></script>
+    <script src="/vendor/echarts/echarts.min.js"></script>
+    <script src="/vendor/quill/quill.min.js"></script>
+    <script src="/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="/vendor/tinymce/tinymce.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="/js/users-profile.js"></script>
+    <script src="/js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Inicializar o mapa Leaflet
+            var map = L.map('map').setView([-6.52974, -49.851845], 13); // Coordenadas de exemplo
+
+            // Camadas de mapa
+            var satelliteLayer = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+                maxZoom: 22,
+                id: 'mapbox/satellite-v9',
+                accessToken: 'pk.eyJ1IjoiZGFuaWxvbW9yYWlzIiwiYSI6ImNsdzZocmJ5eDFqenoyanFzenBoMTc4c28ifQ._RiYYX1oIBe7_MBpTyYWxQ' // Substitua pelo seu token de acesso do Mapbox
+            });
+
+            var streetsLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+            });
+
+            // Adicionar camada de mapa de ruas por padrão
+            streetsLayer.addTo(map);
+
+            // Adicionar botões para alternar entre as camadas
+            var mapControl = L.control.layers({
+                "Ruas": streetsLayer,
+                "Satélite": satelliteLayer
+            }).addTo(map);
+
+            // Função para criar um ícone personalizado
+            function createCustomIcon(iconUrl) {
+                return L.icon({
+                    iconUrl: iconUrl,
+                    iconSize: [32, 32], // Tamanho do ícone
+                    iconAnchor: [16, 32], // Ponto de ancoragem do ícone (centro inferior)
+                    popupAnchor: [0, -32] // Ponto de ancoragem do popup (acima do ícone)
+                });
+            }
+
+            // URL do ícone personalizado (substitua pelo caminho correto do seu ícone)
+            var fornecedorIconUrl = '/img/icones/fornecedor-marcador.png';
+
+            // Ícone personalizado
+            var fornecedorIcon = createCustomIcon(fornecedorIconUrl);
+
+            // Carregar fornecedores e adicionar marcadores no mapa
+            function carregarFornecedores() {
+                fetch('/api/fornecedores')
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(fornecedor => {
+                            // Adicionar marcador no mapa com ícone personalizado
+                            if (fornecedor.latitude && fornecedor.longitude) {
+                                L.marker([fornecedor.latitude, fornecedor.longitude], { icon: fornecedorIcon }).addTo(map)
+                                    .bindPopup(`<b>${fornecedor.nome_fornecedor}</b><br>${fornecedor.endereco}`);
+                            }
+                        });
+                    })
+                    .catch(error => console.error('Erro ao carregar fornecedores:', error));
+            }
+
+            carregarFornecedores();
+
+            // Carregar lista de fornecedores na tabela
+            function carregarTabelaFornecedores() {
+                fetch('/api/fornecedores')
+                    .then(response => response.json())
+                    .then(data => {
+                        const tableBody = document.getElementById('fornecedoresTableBody');
+                        tableBody.innerHTML = '';
+                        data.forEach(fornecedor => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${fornecedor.id}</td>
+                                <td>${fornecedor.nome_fornecedor}</td>
+                                <td>${fornecedor.tipo_contrato}</td>
+                                <td>${fornecedor.cnpj}</td>
+                                <td>${fornecedor.contato}</td>
+                                <td>${fornecedor.latitude}</td>
+                                <td>${fornecedor.longitude}</td>
+                                <td>${fornecedor.endereco}</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm btn-edit" data-id="${fornecedor.id}">Editar</button>
+                                    <button class="btn btn-danger btn-sm btn-delete" data-id="${fornecedor.id}">Excluir</button>
+                                </td>
+                            `;
+                            tableBody.appendChild(row);
+                        });
+
+                        // Adicionar eventos aos botões de edição e exclusão
+                        document.querySelectorAll('.btn-edit').forEach(button => {
+                            button.addEventListener('click', function () {
+                                const fornecedorId = this.getAttribute('data-id');
+                                editarFornecedor(fornecedorId);
+                            });
+                        });
+
+                        document.querySelectorAll('.btn-delete').forEach(button => {
+                            button.addEventListener('click', function () {
+                                const fornecedorId = this.getAttribute('data-id');
+                                excluirFornecedor(fornecedorId);
+                            });
+                        });
+                    })
+                    .catch(error => console.error('Erro ao carregar tabela de fornecedores:', error));
+            }
+
+            function editarFornecedor(id) {
+                fetch(`/api/fornecedores/${id}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('editFornecedorId').value = data.id;
+                        document.getElementById('editFornecedorNome').value = data.nome_fornecedor;
+                        document.getElementById('editFornecedorTipoContrato').value = data.tipo_contrato;
+                        document.getElementById('editFornecedorCNPJ').value = data.cnpj;
+                        document.getElementById('editFornecedorContato').value = data.contato;
+                        document.getElementById('editFornecedorLatitude').value = data.latitude;
+                        document.getElementById('editFornecedorLongitude').value = data.longitude;
+                        document.getElementById('editFornecedorEndereco').value = data.endereco;
+
+                        $('#editModal').modal('show');
+                    })
+                    .catch(error => console.error('Erro ao buscar dados do fornecedor:', error));
+            }
+
+            document.getElementById('salvarEdicaoBtn').addEventListener('click', function () {
+                const id = document.getElementById('editFornecedorId').value;
+                const nome_fornecedor = document.getElementById('editFornecedorNome').value;
+                const tipo_contrato = document.getElementById('editFornecedorTipoContrato').value;
+                const cnpj = document.getElementById('editFornecedorCNPJ').value;
+                const contato = document.getElementById('editFornecedorContato').value;
+                const latitude = document.getElementById('editFornecedorLatitude').value;
+                const longitude = document.getElementById('editFornecedorLongitude').value;
+                const endereco = document.getElementById('editFornecedorEndereco').value;
+
+                const data = {
+                    nome_fornecedor,
+                    tipo_contrato,
+                    cnpj,
+                    contato,
+                    latitude,
+                    longitude,
+                    endereco
+                };
+
+                fetch(`/api/fornecedores/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            $('#editModal').modal('hide');
+                            carregarTabelaFornecedores();
+                        } else {
+                            console.error('Erro ao salvar edição do fornecedor');
+                        }
+                    })
+                    .catch(error => console.error('Erro ao salvar edição do fornecedor:', error));
+            });
+
+            function excluirFornecedor(id) {
+                if (confirm('Tem certeza de que deseja excluir este fornecedor?')) {
+                    fetch(`/api/fornecedores/${id}`, {
+                        method: 'DELETE'
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                carregarTabelaFornecedores();
+                            } else {
+                                console.error('Erro ao excluir fornecedor');
+                            }
+                        })
+                        .catch(error => console.error('Erro ao excluir fornecedor:', error));
+                }
+            }
+
+            carregarTabelaFornecedores();
+        });
+    </script>
+</body>
+
+</html>
