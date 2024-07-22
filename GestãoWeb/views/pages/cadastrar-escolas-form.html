@@ -46,6 +46,11 @@
     .form-control {
       margin-bottom: 10px;
     }
+
+    #map {
+      height: 400px;
+      width: 100%;
+    }
   </style>
   <!-- Vendor CSS Files -->
   <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -56,10 +61,8 @@
   <link href="/vendor/remixicon/remixicon.css" rel="stylesheet">
   <link href="/vendor/simple-datatables/style.css" rel="stylesheet">
 
-
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-
 
   <!-- Template Main CSS File -->
   <link href="/css/style.css" rel="stylesheet">
@@ -693,7 +696,7 @@
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
       class="bi bi-arrow-up-short"></i></a>
-      
+
   <!-- Vendor JS Files -->
   <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="/vendor/echarts/echarts.min.js"></script>
@@ -712,6 +715,106 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+  <!-- Leaflet JS -->
+  <script>
+    var map = L.map('map').setView([-6.52989, -49.851665], 15);
+
+    var baseMaps = {
+      "Mapa": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map),
+      "Satélite": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: 'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        maxZoom: 18,
+        tileSize: 512,
+        zoomOffset: -1,
+        accessToken: 'your.mapbox.access.token'
+      })
+    };
+
+    L.control.layers(baseMaps).addTo(map);
+
+    var marker;
+
+    var escolaIcon = L.icon({
+      iconUrl: '/img/icones/escola-marcador.png',
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+      popupAnchor: [0, -32]
+    });
+
+    map.on('click', function (e) {
+      var lat = e.latlng.lat;
+      var lon = e.latlng.lng;
+
+      if (marker) {
+        map.removeLayer(marker);
+      }
+
+      marker = L.marker([lat, lon], { icon: escolaIcon }).addTo(map);
+
+      document.getElementById('reglatEscola').value = lat;
+      document.getElementById('reglonEscola').value = lon;
+
+      // Fetch address
+      fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('inputAddressEscola').value = data.display_name;
+        });
+    });
+
+    document.getElementById('concluirCadastroEscola').addEventListener('click', function () {
+      var nomeEscola = document.getElementById('schoolName').value;
+      var codigoINEP = document.getElementById('schoolINEP').value;
+      var latitude = document.getElementById('reglatEscola').value;
+      var longitude = document.getElementById('reglonEscola').value;
+      var endereco = document.getElementById('inputAddressEscola').value;
+
+      fetch('/api/escolas', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          nomeEscola: nomeEscola,
+          codigoINEP: codigoINEP,
+          latitude: latitude,
+          longitude: longitude,
+          endereco: endereco
+        })
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            alert('Erro: ' + data.error);
+          } else {
+            alert('Escola cadastrada com sucesso!');
+            // Limpar formulário
+            document.getElementById('escolaForm').reset();
+            // Adicionar marcador no mapa
+            L.marker([latitude, longitude], { icon: escolaIcon }).addTo(map)
+              .bindPopup(`<b>${nomeEscola}</b><br>${endereco}`).openPopup();
+          }
+        })
+        .catch(error => {
+          console.error('Erro:', error);
+        });
+    });
+
+    // Fetch and display existing escolas
+    fetch('/api/escolas')
+      .then(response => response.json())
+      .then(escolas => {
+        escolas.forEach(escola => {
+          L.marker([escola.latitude, escola.longitude], { icon: escolaIcon }).addTo(map)
+            .bindPopup(`<b>${escola.nome_escola}</b><br>${escola.endereco}`);
+        });
+      })
+      .catch(error => {
+        console.error('Erro ao buscar escolas:', error);
+      });
+  </script>
 
 </body>
 
