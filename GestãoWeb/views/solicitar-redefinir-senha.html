@@ -4,114 +4,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitar Redefinição de Senha</title>
+    <link rel="stylesheet" href="/css/reset-password.css">
+    <link rel="shortcut icon" href="/img/favicon.png" type="image/x-icon">
     <style>
-        /* Estilo geral */
         body {
             font-family: 'Poppins', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f0f2f5;
+            background-color: #f6f5f7;
             margin: 0;
         }
 
         .container {
             background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 40px;
-            width: 400px;
+            border-radius: 10px;
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+            padding: 20px;
+            width: 300px;
             text-align: center;
         }
 
-        h2 {
+        .form-logo {
+            width: 100px;
             margin-bottom: 20px;
+        }
+
+        .title {
+            margin: 10px 0 20px;
+            font-size: 24px;
             color: #333;
         }
 
         .input-field {
-            margin-bottom: 20px;
             position: relative;
+            margin-bottom: 20px;
         }
 
-        .input-field label {
-            display: block;
-            text-align: left;
-            margin-bottom: 5px;
-            color: #333;
+        .input-field i {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #999;
         }
 
         .input-field input {
             width: 100%;
-            padding: 10px 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
+            padding: 10px 10px 10px 30px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
             outline: none;
-            transition: border-color 0.2s;
         }
 
-        .input-field input:focus {
-            border-color: #007bff;
-        }
-
-        button {
-            background: #007bff;
-            color: #fff;
+        .btn {
+            background-color: #4CAF50;
             border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.2s;
-        }
-
-        button:hover {
-            background: #0056b3;
-        }
-
-        a {
-            color: #007bff;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
             text-decoration: none;
-            display: block;
-            margin-top: 15px;
+            display: inline-block;
+            font-size: 16px;
+            margin-top: 20px;
+            border-radius: 5px;
+            cursor: pointer;
         }
 
-        a:hover {
-            text-decoration: underline;
+        .btn:hover {
+            background-color: #45a049;
         }
     </style>
+    <title>Solicitar Redefinição de Senha</title>
 </head>
 
 <body>
     <div class="container">
-        <h2>Solicitar Redefinição de Senha</h2>
-        <form id="requestResetForm">
+        <form id="resetRequestForm" class="reset-request-form">
+            <img src="/img/logo.png" alt="logo" class="form-logo">
+            <h2 class="title">Solicitar Redefinição de Senha</h2>
             <div class="input-field">
-                <label for="email">E-mail:</label>
-                <input type="email" id="email" name="email" required>
+                <i class="fas fa-envelope"></i>
+                <input type="email" name="email" autocomplete="email" placeholder="Digite seu e-mail" required>
             </div>
-            <button type="submit">Enviar</button>
+            <input type="submit" value="Enviar" class="btn solid">
         </form>
     </div>
+
     <script>
-        document.getElementById('requestResetForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
+        document.getElementById('resetRequestForm').addEventListener('submit', function (e) {
+            e.preventDefault(); // Prevent default form submission behavior
+            const formData = new FormData(this);
+            const email = formData.get('email');
 
             fetch('/solicitar-redefinir-senha', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify({ email: email })
-            }).then(response => response.json())
-                .then(data => {
-                    alert(data.message);
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro ao enviar solicitação.');
+                    }
+                    alert('Solicitação enviada! Verifique seu e-mail.');
                 })
                 .catch(error => {
-                    console.error('Erro:', error);
-                    alert('Erro ao solicitar redefinição de senha.');
+                    console.error('Erro ao solicitar redefinição de senha:', error);
+                    alert('Erro ao enviar solicitação: ' + error.message);
                 });
         });
     </script>

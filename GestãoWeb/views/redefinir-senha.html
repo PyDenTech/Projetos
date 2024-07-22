@@ -4,125 +4,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redefinir Senha</title>
+    <link rel="stylesheet" href="/css/reset-password.css">
+    <link rel="shortcut icon" href="/img/favicon.png" type="image/x-icon">
     <style>
-        /* Estilo geral */
         body {
             font-family: 'Poppins', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f0f2f5;
+            background-color: #f6f5f7;
             margin: 0;
         }
 
         .container {
             background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 40px;
-            width: 400px;
+            border-radius: 10px;
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+            padding: 20px;
+            width: 300px;
             text-align: center;
         }
 
-        h2 {
+        .form-logo {
+            width: 100px;
             margin-bottom: 20px;
+        }
+
+        .title {
+            margin: 10px 0 20px;
+            font-size: 24px;
             color: #333;
         }
 
         .input-field {
-            margin-bottom: 20px;
             position: relative;
+            margin-bottom: 20px;
         }
 
-        .input-field label {
-            display: block;
-            text-align: left;
-            margin-bottom: 5px;
-            color: #333;
+        .input-field i {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #999;
         }
 
         .input-field input {
             width: 100%;
-            padding: 10px 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
+            padding: 10px 10px 10px 30px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
             outline: none;
-            transition: border-color 0.2s;
         }
 
-        .input-field input:focus {
-            border-color: #007bff;
-        }
-
-        button {
-            background: #007bff;
-            color: #fff;
+        .btn {
+            background-color: #4CAF50;
             border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.2s;
-        }
-
-        button:hover {
-            background: #0056b3;
-        }
-
-        a {
-            color: #007bff;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
             text-decoration: none;
-            display: block;
-            margin-top: 15px;
+            display: inline-block;
+            font-size: 16px;
+            margin-top: 20px;
+            border-radius: 5px;
+            cursor: pointer;
         }
 
-        a:hover {
-            text-decoration: underline;
+        .btn:hover {
+            background-color: #45a049;
         }
     </style>
+    <title>Redefinir Senha</title>
 </head>
 
 <body>
     <div class="container">
-        <h2>Redefinir Senha</h2>
-        <form id="resetPasswordForm">
+        <form id="resetPasswordForm" class="reset-password-form">
+            <img src="/img/logo.png" alt="logo" class="form-logo">
+            <h2 class="title">Redefinir Senha</h2>
             <div class="input-field">
-                <label for="password">Nova Senha:</label>
-                <input type="password" id="password" name="password" required>
+                <i class="fas fa-lock"></i>
+                <input type="password" name="senha" autocomplete="new-password" placeholder="Digite a nova senha"
+                    required>
             </div>
             <div class="input-field">
-                <label for="confirmPassword">Confirmar Senha:</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" required>
+                <i class="fas fa-lock"></i>
+                <input type="password" name="confirm_senha" autocomplete="new-password"
+                    placeholder="Confirme a nova senha" required>
             </div>
-            <button type="submit">Redefinir Senha</button>
+            <input type="submit" value="Redefinir Senha" class="btn solid">
         </form>
     </div>
+
     <script>
         document.getElementById('resetPasswordForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const token = window.location.pathname.split('/').pop();
+            e.preventDefault(); // Prevent default form submission behavior
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            const formData = new FormData(this);
+            const senha = formData.get('senha');
+            const confirmSenha = formData.get('confirm_senha');
 
-            if (password !== confirmPassword) {
+            if (senha !== confirmSenha) {
                 alert('As senhas não coincidem.');
                 return;
             }
 
             fetch(`/redefinir-senha/${token}`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password: password })
-            }).then(response => response.json())
-                .then(data => {
-                    alert(data.message);
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ senha: senha })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro ao redefinir senha.');
+                    }
+                    alert('Senha redefinida com sucesso! Faça login com sua nova senha.');
+                    window.location.href = '/';
                 })
                 .catch(error => {
-                    console.error('Erro:', error);
-                    alert('Erro ao redefinir senha.');
+                    console.error('Erro ao redefinir senha:', error);
+                    alert('Erro ao redefinir senha: ' + error.message);
                 });
         });
     </script>

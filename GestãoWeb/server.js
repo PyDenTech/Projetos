@@ -150,6 +150,12 @@ const oAuth2Client = new google.auth.OAuth2(
 
 oAuth2Client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN });
 
+// Log para verificar as variáveis de ambiente
+console.log('CLIENT_ID:', process.env.CLIENT_ID);
+console.log('CLIENT_SECRET:', process.env.CLIENT_SECRET);
+console.log('REDIRECT_URI:', process.env.REDIRECT_URI);
+console.log('REFRESH_TOKEN:', process.env.REFRESH_TOKEN);
+
 const pages = [
     'cadastrar-aluno-form',
     'admin-dashboard',
@@ -362,6 +368,7 @@ app.post('/solicitar-redefinir-senha', async (req, res) => {
         res.status(500).json({ message: 'Erro interno do servidor' });
     }
 });
+
 
 app.post('/admin/login', async (req, res) => {
     const { email, senha } = req.body;
