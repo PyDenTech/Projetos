@@ -1,14 +1,54 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
+
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redefinir Senha</title>
+    <link rel="stylesheet" href="/css/login.css">
 </head>
+
 <body>
-    <h2>Redefinir Senha</h2>
-    <form action="/reset-password/<%= token %>" method="POST">
-        <label for="newPassword">Nova Senha:</label>
-        <input type="password" id="newPassword" name="newPassword" required>
-        <button type="submit">Redefinir Senha</button>
-    </form>
+    <div class="container">
+        <h2>Redefinir Senha</h2>
+        <form id="resetPasswordForm">
+            <div class="input-field">
+                <label for="password">Nova Senha:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="input-field">
+                <label for="confirmPassword">Confirmar Senha:</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required>
+            </div>
+            <button type="submit">Redefinir Senha</button>
+        </form>
+    </div>
+    <script>
+        document.getElementById('resetPasswordForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const token = window.location.pathname.split('/').pop();
+
+            if (password !== confirmPassword) {
+                alert('As senhas não coincidem.');
+                return;
+            }
+
+            fetch(`/redefinir-senha/${token}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: password })
+            }).then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Erro ao redefinir senha.');
+                });
+        });
+    </script>
 </body>
+
 </html>

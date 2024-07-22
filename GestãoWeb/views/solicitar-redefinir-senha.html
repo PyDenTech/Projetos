@@ -1,14 +1,40 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-    <title>Redefinir Senha</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitar Redefinição de Senha</title>
+    <link rel="stylesheet" href="/css/login.css">
 </head>
 <body>
-    <h2>Solicitar Redefinição de Senha</h2>
-    <form action="/request-password-reset" method="POST">
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-        <button type="submit">Enviar</button>
-    </form>
+    <div class="container">
+        <h2>Solicitar Redefinição de Senha</h2>
+        <form id="requestResetForm">
+            <div class="input-field">
+                <label for="email">E-mail:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
+    <script>
+        document.getElementById('requestResetForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+
+            fetch('/solicitar-redefinir-senha', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email })
+            }).then(response => response.json())
+              .then(data => {
+                  alert(data.message);
+              })
+              .catch(error => {
+                  console.error('Erro:', error);
+                  alert('Erro ao solicitar redefinição de senha.');
+              });
+        });
+    </script>
 </body>
 </html>

@@ -7,7 +7,9 @@ CREATE TABLE IF NOT EXISTS usuarios (
     password VARCHAR NOT NULL,
     foto_perfil VARCHAR,
     init BOOLEAN DEFAULT FALSE,
-    role VARCHAR
+    role VARCHAR,
+    reset_password_token VARCHAR,
+    reset_password_expires BIGINT;
 );
 
 CREATE TABLE IF NOT EXISTS escolas (

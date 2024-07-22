@@ -10,6 +10,8 @@ const path = require('path');
 const xlsx = require('xlsx');
 const jwt = require('jsonwebtoken');
 const NodeCache = require('node-cache');
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -121,6 +123,15 @@ app.post('/api/upload-foto-perfil', ensureLoggedIn, upload.single('foto_perfil')
         console.error('Erro ao atualizar foto de perfil:', error);
         res.status(500).json({ error: error.message });
     }
+});
+
+// Configuração do Nodemailer para enviar e-mails
+const transporter = nodemailer.createTransport({
+    service: 'Gmail', // ou outro serviço de e-mail que você estiver usando
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+    },
 });
 
 const pages = [
@@ -263,6 +274,97 @@ app.get('/api/sessao-usuario', (req, res) => {
         res.status(401).send('Usuário não autenticado');
     }
 });
+
+app.post('/solicitar-redefinir-senha', async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const client = await pool.connect();
+        const result = await client.query('SELECT * FROM usuarios WHERE email = $1', [email]);
+        const user = result.rows[0];
+
+        if (!user) {
+            return res.status(404).json({ message: 'Usuário não encontrado' });
+        }
+
+        // Gerar token de redefinição de senha
+        const token = crypto.randomBytes(20).toString('hex');
+        const resetPasswordExpires = Date.now() + 3600000; // 1 hora
+
+        // Salvar o token no banco de dados
+        await client.query('UPDATE usuarios SET reset_password_token = $1, reset_password_expires = $2 WHERE email = $3',
+            [token, resetPasswordExpires, email]);
+
+        // Enviar e-mail com link de redefinição de senha
+        const resetUrl = `http://${req.headers.host}/redefinir-senha/${token}`;
+        const mailOptions = {
+            to: email,
+            from: process.env.EMAIL_USER,
+            subject: 'Redefinição de senha',
+            text: `Você está recebendo este e-mail porque você (ou alguém) solicitou a redefinição da senha para sua conta.\n\n` +
+                `Clique no link a seguir ou cole no seu navegador para completar o processo:\n\n` +
+                `${resetUrl}\n\n` +
+                `Se você não solicitou isso, por favor, ignore este e-mail e sua senha permanecerá inalterada.\n`
+        };
+
+        await transporter.sendMail(mailOptions);
+        client.release();
+
+        res.status(200).json({ message: 'E-mail de redefinição de senha enviado com sucesso' });
+    } catch (error) {
+        console.error('Erro ao solicitar redefinição de senha:', error);
+        res.status(500).json({ message: 'Erro interno do servidor' });
+    }
+});
+
+app.get('/redefinir-senha/:token', async (req, res) => {
+    const { token } = req.params;
+
+    try {
+        const client = await pool.connect();
+        const result = await client.query('SELECT * FROM usuarios WHERE reset_password_token = $1 AND reset_password_expires > $2',
+            [token, Date.now()]);
+        const user = result.rows[0];
+        client.release();
+
+        if (!user) {
+            return res.status(400).send('Token inválido ou expirado.');
+        }
+
+        res.sendFile(path.join(__dirname, 'views', 'redefinir-senha.html'));
+    } catch (error) {
+        console.error('Erro ao validar token:', error);
+        res.status(500).send('Erro interno do servidor');
+    }
+});
+
+app.post('/redefinir-senha/:token', async (req, res) => {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    try {
+        const client = await pool.connect();
+        const result = await client.query('SELECT * FROM usuarios WHERE reset_password_token = $1 AND reset_password_expires > $2',
+            [token, Date.now()]);
+        const user = result.rows[0];
+
+        if (!user) {
+            return res.status(400).json({ message: 'Token inválido ou expirado.' });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await client.query('UPDATE usuarios SET password = $1, reset_password_token = $2, reset_password_expires = $3 WHERE id = $4',
+            [hashedPassword, null, null, user.id]);
+
+        client.release();
+
+        res.status(200).json({ message: 'Senha redefinida com sucesso.' });
+    } catch (error) {
+        console.error('Erro ao redefinir senha:', error);
+        res.status(500).json({ message: 'Erro interno do servidor' });
+    }
+});
+
 
 app.post('/admin/login', async (req, res) => {
     const { email, senha } = req.body;
