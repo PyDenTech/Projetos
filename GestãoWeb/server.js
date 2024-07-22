@@ -317,22 +317,22 @@ app.post('/solicitar-redefinir-senha', async (req, res) => {
         await client.query('UPDATE usuarios SET reset_password_token = $1, reset_password_expires = $2 WHERE email = $3',
             [token, resetPasswordExpires, email]);
 
-        const resetUrl = `http://${req.headers.host}/redefinir-senha/${token}`;
+        const resetUrl = `https://semedcanaadoscarajas.pydenexpress.com/redefinir-senha/${token}`;
         console.log(`URL de redefinição: ${resetUrl}`);
 
         const emailSubject = 'Redefinição de senha';
         const emailText = `
-        Olá,
+Olá,
 
-        Você está recebendo este e-mail porque você (ou alguém) solicitou a redefinição da senha para sua conta.
+Você está recebendo este e-mail porque você (ou alguém) solicitou a redefinição da senha para sua conta.
 
-        Para redefinir sua senha, clique no link abaixo ou copie e cole no seu navegador:
-        ${resetUrl}
+Para redefinir sua senha, clique no link abaixo ou copie e cole no seu navegador:
+${resetUrl}
 
-        Se você não solicitou isso, por favor, ignore este e-mail e sua senha permanecerá inalterada.
+Se você não solicitou isso, por favor, ignore este e-mail e sua senha permanecerá inalterada.
 
-        Obrigado,
-        Equipe de Suporte
+Obrigado,
+Equipe de Suporte
         `;
 
         await sendMail(email, emailSubject, emailText);
