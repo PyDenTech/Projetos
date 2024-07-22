@@ -142,7 +142,6 @@ async function sendMail(to, subject, htmlContent) {
             from: `PyDen™Tech <${process.env.EMAIL_USER}>`,
             to: to,
             subject: subject,
-            html: htmlContent,
             text: text,
         };
 
