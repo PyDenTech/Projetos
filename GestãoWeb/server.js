@@ -349,6 +349,34 @@ Equipe de Suporte
     }
 });
 
+app.post('/redefinir-senha/:token', async (req, res) => {
+    const { token } = req.params;
+    const { senha } = req.body;
+
+    try {
+        const client = await pool.connect();
+        console.log('Conectado ao banco de dados');
+
+        const result = await client.query('SELECT * FROM usuarios WHERE reset_password_token = $1 AND reset_password_expires > NOW()', [token]);
+        const user = result.rows[0];
+
+        if (!user) {
+            console.log(`Token inválido ou expirado: ${token}`);
+            return res.status(400).json({ message: 'Token inválido ou expirado' });
+        }
+
+        const hashedPassword = await bcrypt.hash(senha, 10);
+        await client.query('UPDATE usuarios SET password = $1, reset_password_token = NULL, reset_password_expires = NULL WHERE id = $2',
+            [hashedPassword, user.id]);
+
+        client.release();
+        res.status(200).json({ message: 'Senha redefinida com sucesso' });
+    } catch (error) {
+        console.error('Erro ao redefinir senha:', error);
+        res.status(500).json({ message: 'Erro interno do servidor' });
+    }
+});
+
 app.post('/admin/login', async (req, res) => {
     const { email, senha } = req.body;
     try {
