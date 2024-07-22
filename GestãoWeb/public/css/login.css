@@ -155,7 +155,7 @@ form.sign-up-form {
   font-weight: 400;
 }
 
-.input-field select + i {
+.input-field select+i {
   display: block;
   position: relative;
   width: 15%;
@@ -167,8 +167,8 @@ form.sign-up-form {
   cursor: pointer;
 }
 
-.input-field input + i,
-.input-field select + i {
+.input-field input+i,
+.input-field select+i {
   display: none;
 }
 
@@ -529,3 +529,41 @@ header {
   padding: 10px 20px;
 }
 
+/* Rodapé */
+.footer {
+  background-color: var(--bg-color);
+  color: var(--title);
+  padding: 20px 0;
+  text-align: center;
+  font-size: 0.9rem;
+  border-top: 1px solid var(--bg-round-a);
+}
+
+.footer .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.footer .container .row {
+  width: 100%;
+}
+
+.footer .container .credits {
+  margin-top: 10px;
+}
+
+.footer .container .links {
+  margin-top: 10px;
+}
+
+.footer .container .links a {
+  color: var(--title);
+  text-decoration: none;
+  margin: 0 10px;
+}
+
+.footer .container .links a:hover {
+  text-decoration: underline;
+}

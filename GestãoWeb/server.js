@@ -12,6 +12,7 @@ const jwt = require('jsonwebtoken');
 const NodeCache = require('node-cache');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const { google } = require('googleapis');
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -98,6 +99,14 @@ app.get('/redefinir-senha/:token', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'redefinir-senha.html'));
 });
 
+app.get('/politicaprivacidade', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'politica.html'));
+});
+
+app.get('/termos', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'termos.html'));
+});
+
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -134,14 +143,13 @@ app.post('/api/upload-foto-perfil', ensureLoggedIn, upload.single('foto_perfil')
     }
 });
 
-// Configuração do Nodemailer para enviar e-mails
-const transporter = nodemailer.createTransport({
-    service: 'Gmail',
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
-});
+const oAuth2Client = new google.auth.OAuth2(
+    process.env.CLIENT_ID,
+    process.env.CLIENT_SECRET,
+    process.env.REDIRECT_URI
+);
+
+oAuth2Client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN });
 
 const pages = [
     'cadastrar-aluno-form',
@@ -284,6 +292,36 @@ app.get('/api/sessao-usuario', (req, res) => {
     }
 });
 
+async function sendMail(to, subject, text) {
+    try {
+        const accessToken = await oAuth2Client.getAccessToken();
+
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                type: 'OAuth2',
+                user: process.env.EMAIL_USER,
+                clientId: process.env.CLIENT_ID,
+                clientSecret: process.env.CLIENT_SECRET,
+                refreshToken: process.env.REFRESH_TOKEN,
+                accessToken: accessToken.token,
+            },
+        });
+
+        const mailOptions = {
+            from: `Seu Nome <${process.env.EMAIL_USER}>`,
+            to: to,
+            subject: subject,
+            text: text,
+        };
+
+        const result = await transporter.sendMail(mailOptions);
+        return result;
+    } catch (error) {
+        console.error('Erro ao enviar e-mail:', error);
+    }
+}
+
 app.post('/solicitar-redefinir-senha', async (req, res) => {
     const { email } = req.body;
 
@@ -309,17 +347,13 @@ app.post('/solicitar-redefinir-senha', async (req, res) => {
         const resetUrl = `http://${req.headers.host}/redefinir-senha/${token}`;
         console.log(`URL de redefinição: ${resetUrl}`);
 
-        const mailOptions = {
-            to: email,
-            from: process.env.EMAIL_USER,
-            subject: 'Redefinição de senha',
-            text: `Você está recebendo este e-mail porque você (ou alguém) solicitou a redefinição da senha para sua conta.\n\n` +
-                `Clique no link a seguir ou cole no seu navegador para completar o processo:\n\n` +
-                `${resetUrl}\n\n` +
-                `Se você não solicitou isso, por favor, ignore este e-mail e sua senha permanecerá inalterada.\n`
-        };
+        const emailSubject = 'Redefinição de senha';
+        const emailText = `Você está recebendo este e-mail porque você (ou alguém) solicitou a redefinição da senha para sua conta.\n\n` +
+            `Clique no link a seguir ou cole no seu navegador para completar o processo:\n\n` +
+            `${resetUrl}\n\n` +
+            `Se você não solicitou isso, por favor, ignore este e-mail e sua senha permanecerá inalterada.\n`;
 
-        await transporter.sendMail(mailOptions);
+        await sendMail(email, emailSubject, emailText);
         console.log(`E-mail de redefinição de senha enviado para: ${email}`);
 
         client.release();
@@ -329,56 +363,6 @@ app.post('/solicitar-redefinir-senha', async (req, res) => {
         res.status(500).json({ message: 'Erro interno do servidor' });
     }
 });
-
-
-app.get('/redefinir-senha/:token', async (req, res) => {
-    const { token } = req.params;
-
-    try {
-        const client = await pool.connect();
-        const result = await client.query('SELECT * FROM usuarios WHERE reset_password_token = $1 AND reset_password_expires > $2',
-            [token, Date.now()]);
-        const user = result.rows[0];
-        client.release();
-
-        if (!user) {
-            return res.status(400).send('Token inválido ou expirado.');
-        }
-
-        res.sendFile(path.join(__dirname, 'views', 'redefinir-senha.html'));
-    } catch (error) {
-        console.error('Erro ao validar token:', error);
-        res.status(500).send('Erro interno do servidor');
-    }
-});
-
-app.post('/redefinir-senha/:token', async (req, res) => {
-    const { token } = req.params;
-    const { password } = req.body;
-
-    try {
-        const client = await pool.connect();
-        const result = await client.query('SELECT * FROM usuarios WHERE reset_password_token = $1 AND reset_password_expires > $2',
-            [token, Date.now()]);
-        const user = result.rows[0];
-
-        if (!user) {
-            return res.status(400).json({ message: 'Token inválido ou expirado.' });
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-        await client.query('UPDATE usuarios SET password = $1, reset_password_token = $2, reset_password_expires = $3 WHERE id = $4',
-            [hashedPassword, null, null, user.id]);
-
-        client.release();
-
-        res.status(200).json({ message: 'Senha redefinida com sucesso.' });
-    } catch (error) {
-        console.error('Erro ao redefinir senha:', error);
-        res.status(500).json({ message: 'Erro interno do servidor' });
-    }
-});
-
 
 app.post('/admin/login', async (req, res) => {
     const { email, senha } = req.body;
