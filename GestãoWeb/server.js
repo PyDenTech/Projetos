@@ -1806,6 +1806,82 @@ app.get('/api/abastecimentos', async (req, res) => {
     }
 });
 
+// Endpoint para buscar um abastecimento específico pelo ID
+app.get('/api/abastecimentos/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await pool.query('SELECT * FROM abastecimentos WHERE id = $1', [id]);
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Abastecimento não encontrado' });
+        }
+        res.json(result.rows[0]);
+    } catch (error) {
+        console.error('Erro ao buscar abastecimento:', error);
+        res.status(500).json({ error: 'Erro ao buscar abastecimento' });
+    }
+});
+
+// Endpoint para atualizar um abastecimento
+app.put('/api/abastecimentos/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const {
+            req_id,
+            carro,
+            placa,
+            quilometragem,
+            tipo_combustivel,
+            quantidade_litros,
+            valor_total,
+            data_abastecimento,
+            motorista_id,
+        } = req.body;
+
+        const result = await pool.query(
+            `UPDATE abastecimentos 
+             SET req_id = $1, carro = $2, placa = $3, quilometragem = $4, tipo_combustivel = $5, quantidade_litros = $6, valor_total = $7, data_abastecimento = $8, motorista_id = $9 
+             WHERE id = $10 
+             RETURNING *`,
+            [req_id, carro, placa, quilometragem, tipo_combustivel, quantidade_litros, valor_total, data_abastecimento, motorista_id, id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Abastecimento não encontrado' });
+        }
+        res.json(result.rows[0]);
+    } catch (error) {
+        console.error('Erro ao atualizar abastecimento:', error);
+        res.status(500).json({ error: 'Erro ao atualizar abastecimento' });
+    }
+});
+
+// Endpoint para excluir um abastecimento
+app.delete('/api/abastecimentos/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const result = await pool.query('DELETE FROM abastecimentos WHERE id = $1 RETURNING *', [id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Abastecimento não encontrado' });
+        }
+        res.json({ message: 'Abastecimento excluído com sucesso' });
+    } catch (error) {
+        console.error('Erro ao excluir abastecimento:', error);
+        res.status(500).json({ error: 'Erro ao excluir abastecimento' });
+    }
+});
+
+app.get('/api/motoristas-editar-abastecimento', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT id, nome_completo FROM motoristas');
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Erro ao buscar motoristas:', error);
+        res.status(500).json({ error: 'Erro ao buscar motoristas' });
+    }
+});
+
 // Endpoint para buscar motoristas
 app.get('/api/motoristas-gerenciar-abastecimento', async (req, res) => {
     try {

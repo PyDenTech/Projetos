@@ -25,10 +25,6 @@
     <link href="/css/style.css" rel="stylesheet">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- DataTables CSS and JS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
-    <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/plug-ins/1.11.3/i18n/pt-BR.json"></script>
 </head>
 
 <body>
@@ -45,13 +41,14 @@
 
         <nav class="header-nav ms-auto">
             <ul class="d-flex align-items-center">
-                <!-- Profile Navigation -->
+
                 <li class="nav-item dropdown pe-3">
                     <a id="profile-link" class="nav-link nav-profile d-flex align-items-center pe-0" href="#"
                         data-bs-toggle="dropdown">
                         <img id="profile-image" src="/img/user.png" alt="Foto de Perfil" class="rounded-circle">
                         <span id="usuarioNome" class="d-none d-md-block dropdown-toggle ps-2"></span>
-                    </a>
+                    </a><!-- End Profile Image Icon -->
+
                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                         <li>
                             <a class="dropdown-item d-flex align-items-center" href="/users-profile">
@@ -62,6 +59,7 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
+
                         <li>
                             <a class="dropdown-item d-flex align-items-center" href="/users-profile">
                                 <i class="bi bi-gear"></i>
@@ -71,6 +69,7 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
+
                         <li>
                             <a class="dropdown-item d-flex align-items-center" href="/faq">
                                 <i class="bi bi-question-circle"></i>
@@ -80,24 +79,287 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
+
                         <li>
                             <a class="dropdown-item d-flex align-items-center" href="#" id="logout-link">
                                 <i class="bi bi-box-arrow-right"></i>
                                 <span>Sair</span>
                             </a>
                         </li>
-                    </ul>
-                </li>
+                    </ul><!-- End Profile Dropdown Items -->
+                </li><!-- End Profile Nav -->
+
             </ul>
-        </nav>
+        </nav><!-- End Icons Navigation -->
 
     </header><!-- End Header -->
 
     <!-- ======= Sidebar ======= -->
     <aside id="sidebar" class="sidebar">
+
         <ul class="sidebar-nav" id="sidebar-nav">
-            <!-- Sidebar content here -->
+            <li class="nav-heading">Transporte Escolar</li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="/dashboard-escolar">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Painel de Controle</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#escolas-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/escolas.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    <span>Escolas</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="escolas-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-escolas-form">
+                            <i class="bi bi-house-door"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-escolas-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#aluno-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/aluno.svg" alt="Censo Escolar"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    <span>Alunos</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="aluno-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-aluno-form">
+                            <i class="bi bi-person-plus"></i><span>Solicitar Cadastro</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-alunos-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/importar-aluno-form">
+                            <i class="bi bi-file-earmark-arrow-up"></i><span>Importar Dados</span>
+                        </a>
+                    </li>
+
+                </ul>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#routs-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/rotas.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    </i><span>Rotas</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="routs-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-rotas-form">
+                            <i class="bi bi-plus-square"></i><span>Cadastrar Rota</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="/desenhar-rotas-map">
+                            <i class="bi bi-pencil"></i><span>Gerar Rotas</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/visualizar-rotas">
+                            <i class="bi bi-eye"></i><span>Visualizar Rotas</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#driverbus-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/motoristas.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="driverbus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-motorista-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-motoristas-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerar-relatorio-view">
+                            <i class="bi bi-clipboard2-check"></i><span>Relatórios</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/monitor-icone-branco.png" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    </i><span>Monitores</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-monitores-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-monitores-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#fornecedores-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/fornecedores.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    </i><span>Fornecedor</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="fornecedores-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-fornecedores-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-fornecedores-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/vizualizar-fornecedores-map">
+                            <i class="bi bi-eye"></i><span>Vizualizar</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#bus-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/frotas.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    <span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="bus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-onibus-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-onibus-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/vizualizar-onibus-map">
+                            <i class="bi bi-eye"></i><span>Vizualizar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/solicitar-onibus-services">
+                            <i class="bi bi-file-earmark-text"></i><span>Ordem de Serviço</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="nav-heading">Administrativo</li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="/dashboard-adm">
+                    <i class="bi bi-speedometer"></i>
+                    <span>Painel de Controle</span>
+                </a>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#car-nav" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-car-front"></i><span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="car-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-carro-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-carros-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/localizar-carros-map">
+                            <i class="bi bi-geo-alt-fill"></i><span>Localizar</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#drivercar-nav" data-bs-toggle="collapse" href="#">
+                    <img src="/img/icones/motoristas.svg" alt="Escolas"
+                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
+                    <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="drivercar-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-motorista-carro-form">
+                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-motorista-carro-form">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#tarefas-nav" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-list-check"></i><span>Tarefas</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="tarefas-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-demandas">
+                            <i class="bi bi-file-earmark-text"></i><span>Nova Tarefa</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/tasks">
+                            <i class="bi bi-person-plus"></i><span>Gerenciar Tarefas</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-heading">Controle Financeiro</li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-target="#fuel-nav" data-bs-toggle="collapse" href="#">
+                    <i class="bi bi-droplet-half"></i><span>Abastecimento</span><i
+                        class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="fuel-nav" class="nav-content" data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="/cadastrar-abastecimento-view">
+                            <i class="bi bi-file-earmark-text"></i><span>Cadastrar Requisição</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/gerenciar-abastecimento-view">
+                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
         </ul>
+
     </aside><!-- End Sidebar-->
 
     <main id="main" class="main">
@@ -252,17 +514,54 @@
         </div>
     </div>
 
+    <!-- ======= Rodapé ======= -->
+    <footer id="footer" class="footer">
+        <div class="container">
+            <div class="row gy-4">
+
+
+                <div class="container mt-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="copyright">
+                                &copy; Direitos Autorais <strong><span>PyDenExpress</span></strong>. Todos os Direitos
+                                Reservados
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="credits">
+                                Desenvolvido por <a href="https://danilomorais.netlify.app/">Danilo de Morais</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    </footer>
+
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+            class="bi bi-arrow-up-short"></i></a>
+
     <!-- Vendor JS Files -->
+    <script src="/vendor/apexcharts/apexcharts.min.js"></script>
     <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+    <script src="/vendor/chart.js/chart.umd.js"></script>
+    <script src="/vendor/echarts/echarts.min.js"></script>
+    <script src="/vendor/quill/quill.min.js"></script>
+    <script src="/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="/vendor/tinymce/tinymce.min.js"></script>
+
+
+    <!-- Template Main JS File -->
+    <script src="/js/users-profile.js"></script>
+    <script src="/js/main.js"></script>
     <script>
         let chartInstance;
 
         document.addEventListener('DOMContentLoaded', function () {
             fetchMotoristas();
             fetchAbastecimentos();
+
+            document.getElementById('editQuantidadeLitros').addEventListener('input', calcularValorTotal);
+            document.getElementById('editTipoCombustivel').addEventListener('change', calcularValorTotal);
         });
 
         function fetchMotoristas() {
@@ -270,13 +569,27 @@
                 .then(response => response.json())
                 .then(data => {
                     const motoristaSelect = document.getElementById('filtroMotorista');
-                    const editMotoristaSelect = document.getElementById('editMotorista');
                     data.forEach(motorista => {
                         const option = document.createElement('option');
                         option.value = motorista.id;
                         option.textContent = motorista.nome_completo;
                         motoristaSelect.appendChild(option);
-                        editMotoristaSelect.appendChild(option.cloneNode(true));
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar motoristas:', error));
+        }
+
+        function fetchMotoristasParaEdicao() {
+            fetch('/api/motoristas-gerenciar-abastecimento')
+                .then(response => response.json())
+                .then(data => {
+                    const editMotoristaSelect = document.getElementById('editMotorista');
+                    editMotoristaSelect.innerHTML = '';
+                    data.forEach(motorista => {
+                        const option = document.createElement('option');
+                        option.value = motorista.id;
+                        option.textContent = motorista.nome_completo;
+                        editMotoristaSelect.appendChild(option);
                     });
                 })
                 .catch(error => console.error('Erro ao carregar motoristas:', error));
@@ -308,7 +621,7 @@
                             <td>${abastecimento.tipo_combustivel}</td>
                             <td>${abastecimento.quantidade_litros}</td>
                             <td>${abastecimento.valor_total}</td>
-                            <td>${abastecimento.data_abastecimento}</td>
+                            <td>${new Date(abastecimento.data_abastecimento).toLocaleDateString('pt-BR')}</td>
                             <td>${abastecimento.nome_motorista}</td>
                             <td>
                                 <button class="btn btn-primary btn-sm" onclick="editarAbastecimento(${abastecimento.id})">Editar</button>
@@ -322,13 +635,6 @@
                             valoresPorMes[mesAno] = 0;
                         }
                         valoresPorMes[mesAno] += parseFloat(abastecimento.valor_total);
-                    });
-
-                    // Initialize DataTables
-                    $('#abastecimentosTable').DataTable({
-                        language: {
-                            url: "https://cdn.datatables.net/plug-ins/1.11.3/i18n/pt-BR.json"
-                        }
                     });
 
                     const labels = Object.keys(valoresPorMes);
@@ -369,6 +675,7 @@
             fetch(`/api/abastecimentos/${id}`)
                 .then(response => response.json())
                 .then(data => {
+                    fetchMotoristasParaEdicao(); // Atualiza a lista de motoristas no modal de edição
                     document.getElementById('editId').value = data.id;
                     document.getElementById('editReqId').value = data.req_id;
                     document.getElementById('editCarro').value = data.carro;
@@ -377,29 +684,54 @@
                     document.getElementById('editTipoCombustivel').value = data.tipo_combustivel;
                     document.getElementById('editQuantidadeLitros').value = data.quantidade_litros;
                     document.getElementById('editValorTotal').value = data.valor_total;
-                    document.getElementById('editDataAbastecimento').value = data.data_abastecimento.split('T')[0];
+                    document.getElementById('editDataAbastecimento').value = new Date(data.data_abastecimento).toISOString().split('T')[0];
                     document.getElementById('editMotorista').value = data.motorista_id;
 
                     const editModal = new bootstrap.Modal(document.getElementById('editModal'));
                     editModal.show();
+
+                    calcularValorTotal();
                 })
                 .catch(error => console.error('Erro ao carregar dados do abastecimento:', error));
         }
 
+        function calcularValorTotal() {
+            const quantidadeLitros = parseFloat(document.getElementById('editQuantidadeLitros').value);
+            const tipoCombustivel = document.getElementById('editTipoCombustivel').value;
+
+            let valorUnitario = 0;
+            if (tipoCombustivel === 'Gasolina Comum') {
+                valorUnitario = 5.8;
+            } else if (tipoCombustivel === 'Diesel S10') {
+                valorUnitario = 6.9;
+            }
+
+            const valorTotal = quantidadeLitros * valorUnitario;
+            document.getElementById('editValorTotal').value = valorTotal.toFixed(2);
+        }
+
         function salvarEdicao() {
             const id = document.getElementById('editId').value;
-            const formData = new FormData(document.getElementById('editForm'));
+            const req_id = document.getElementById('editReqId').value;
+            const carro = document.getElementById('editCarro').value;
+            const placa = document.getElementById('editPlaca').value;
+            const quilometragem = document.getElementById('editQuilometragem').value;
+            const tipo_combustivel = document.getElementById('editTipoCombustivel').value;
+            const quantidade_litros = document.getElementById('editQuantidadeLitros').value;
+            const valor_total = document.getElementById('editValorTotal').value;
+            const data_abastecimento = document.getElementById('editDataAbastecimento').value;
+            const motorista_id = document.getElementById('editMotorista').value;
 
             const data = {
-                req_id: formData.get('editReqId'),
-                carro: formData.get('editCarro'),
-                placa: formData.get('editPlaca'),
-                quilometragem: formData.get('editQuilometragem'),
-                tipo_combustivel: formData.get('editTipoCombustivel'),
-                quantidade_litros: formData.get('editQuantidadeLitros'),
-                valor_total: formData.get('editValorTotal'),
-                data_abastecimento: formData.get('editDataAbastecimento'),
-                motorista_id: formData.get('editMotorista')
+                req_id,
+                carro,
+                placa,
+                quilometragem,
+                tipo_combustivel,
+                quantidade_litros,
+                valor_total,
+                data_abastecimento,
+                motorista_id
             };
 
             fetch(`/api/abastecimentos/${id}`, {
