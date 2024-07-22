@@ -143,6 +143,7 @@ async function sendMail(to, subject, htmlContent) {
             to: to,
             subject: subject,
             html: htmlContent,
+            text: text,
         };
 
         const result = await transporter.sendMail(mailOptions);
@@ -320,28 +321,21 @@ app.post('/solicitar-redefinir-senha', async (req, res) => {
         console.log(`URL de redefinição: ${resetUrl}`);
 
         const emailSubject = 'Redefinição de senha';
-        const emailHtml = `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
-                <h2 style="color: #333; text-align: center;">Redefinição de Senha</h2>
-                <p style="font-size: 16px; color: #555;">Olá,</p>
-                <p style="font-size: 16px; color: #555;">
-                    Você está recebendo este e-mail porque você (ou alguém) solicitou a redefinição da senha para sua conta.
-                </p>
-                <p style="text-align: center;">
-                    <a href="${resetUrl}" style="display: inline-block; padding: 15px 25px; font-size: 16px; color: #ffffff; background-color: #007bff; border-radius: 5px; text-decoration: none;">Redefinir Senha</a>
-                </p>
-                <p style="font-size: 16px; color: #555;">
-                    Se você não solicitou isso, por favor, ignore este e-mail e sua senha permanecerá inalterada.
-                </p>
-                <p style="font-size: 16px; color: #555;">
-                    Obrigado,
-                    <br>
-                    Equipe de Suporte
-                </p>
-            </div>
+        const emailText = `
+        Olá,
+
+        Você está recebendo este e-mail porque você (ou alguém) solicitou a redefinição da senha para sua conta.
+
+        Para redefinir sua senha, clique no link abaixo ou copie e cole no seu navegador:
+        ${resetUrl}
+
+        Se você não solicitou isso, por favor, ignore este e-mail e sua senha permanecerá inalterada.
+
+        Obrigado,
+        Equipe de Suporte
         `;
 
-        await sendMail(email, emailSubject, emailHtml);
+        await sendMail(email, emailSubject, emailText);
         console.log(`E-mail de redefinição de senha enviado para: ${email}`);
 
         client.release();
@@ -351,7 +345,6 @@ app.post('/solicitar-redefinir-senha', async (req, res) => {
         res.status(500).json({ message: 'Erro interno do servidor' });
     }
 });
-
 
 app.post('/admin/login', async (req, res) => {
     const { email, senha } = req.body;
