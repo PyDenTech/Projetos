@@ -28,6 +28,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+app.use('/docs', express.static(path.join(__dirname, 'public', 'uploads')));
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -1850,90 +1851,49 @@ app.post('/api/cadastrar-monitor', upload.fields([
         res.status(500).send('Erro ao cadastrar monitor');
     }
 });
-app.use((req, res, next) => {
-    res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
-});
 
 app.get('/api/monitores', async (req, res) => {
+    console.log('Recebido pedido GET para /api/monitores');
     try {
-        const client = await pool.connect();
-        const result = await client.query('SELECT * FROM monitores');
-        client.release();
-        res.status(200).json(result.rows);
+        const result = await pool.query('SELECT id, nome_completo, cpf, empresa, doc_rh, doc_monitor, doc_ensino_medio, rotas, data_cadastro FROM monitores');
+        res.json(result.rows);
     } catch (err) {
-        console.error(err);
-        res.status(500).send('Erro ao carregar monitores');
+        console.error('Erro ao buscar dados dos monitores:', err);
+        res.status(500).json({ error: 'Erro ao buscar dados dos monitores' });
     }
 });
 
-app.get('/api/monitores/:id', async (req, res) => {
+app.put('/api/monitores/:id', async (req, res) => {
     const { id } = req.params;
-    try {
-        const client = await pool.connect();
-        const result = await client.query('SELECT * FROM monitores WHERE id = $1', [id]);
-        client.release();
-        if (result.rows.length > 0) {
-            res.status(200).json(result.rows[0]);
-        } else {
-            res.status(404).send('Monitor não encontrado');
-        }
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Erro ao carregar monitor');
-    }
-});
-
-app.put('/api/monitores/:id', upload.fields([
-    { name: 'docRH', maxCount: 1 },
-    { name: 'docMonitor', maxCount: 1 },
-    { name: 'docEnsinoMedio', maxCount: 1 }
-]), async (req, res) => {
-    const { id } = req.params;
-    const { nomeCompleto, cpf, empresa } = req.body;
-
-    const docRH = req.files['docRH'] ? req.files['docRH'][0].filename : null;
-    const docMonitor = req.files['docMonitor'] ? req.files['docMonitor'][0].filename : null;
-    const docEnsinoMedio = req.files['docEnsinoMedio'] ? req.files['docEnsinoMedio'][0].filename : null;
+    const { nome_completo, cpf, empresa, rotas } = req.body;
 
     try {
-        const client = await pool.connect();
-        const query = `
-            UPDATE monitores
-            SET nome_completo = $1, cpf = $2, empresa = $3,
-                doc_rh = COALESCE($4, doc_rh),
-                doc_monitor = COALESCE($5, doc_monitor),
-                doc_ensino_medio = COALESCE($6, doc_ensino_medio)
-            WHERE id = $7 RETURNING *
-        `;
-        const values = [nomeCompleto, cpf, empresa, docRH, docMonitor, docEnsinoMedio, id];
-        const result = await client.query(query, values);
-        client.release();
-        if (result.rows.length > 0) {
-            res.status(200).json(result.rows[0]);
-        } else {
-            res.status(404).send('Monitor não encontrado');
-        }
+        await pool.query(
+            'UPDATE monitores SET nome_completo = $1, cpf = $2, empresa = $3, rotas = $4 WHERE id = $5',
+            [nome_completo, cpf, empresa, rotas, id]
+        );
+        res.json({ message: 'Monitor atualizado com sucesso' });
     } catch (err) {
-        console.error(err);
-        res.status(500).send('Erro ao editar monitor');
+        console.error('Erro ao atualizar monitor:', err);
+        res.status(500).json({ error: 'Erro ao atualizar monitor' });
     }
 });
 
 app.delete('/api/monitores/:id', async (req, res) => {
     const { id } = req.params;
+
     try {
-        const client = await pool.connect();
-        const result = await client.query('DELETE FROM monitores WHERE id = $1 RETURNING *', [id]);
-        client.release();
-        if (result.rows.length > 0) {
-            res.status(200).json(result.rows[0]);
-        } else {
-            res.status(404).send('Monitor não encontrado');
-        }
+        await pool.query('DELETE FROM monitores WHERE id = $1', [id]);
+        res.json({ message: 'Monitor excluído com sucesso' });
     } catch (err) {
-        console.error(err);
-        res.status(500).send('Erro ao excluir monitor');
+        console.error('Erro ao excluir monitor:', err);
+        res.status(500).json({ error: 'Erro ao excluir monitor' });
     }
+});
+
+
+app.use((req, res, next) => {
+    res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
 });
 
 app.listen(port, () => {
