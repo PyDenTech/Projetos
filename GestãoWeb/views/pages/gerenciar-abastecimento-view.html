@@ -263,7 +263,7 @@
                     </li>
                     <li>
                         <a href="/vizualizar-onibus-map">
-                            <i class="bi bi-eye"></i><span>Vizualizar</span>
+                            <i class="bi bi-eye"></i><span>Visualizar</span>
                         </a>
                     </li>
                     <li>
@@ -565,10 +565,11 @@
         });
 
         function fetchMotoristas() {
-            fetch('/api/motoristas')
+            fetch('/api/motoristas-gerenciar-abastecimento')
                 .then(response => response.json())
                 .then(data => {
                     const motoristaSelect = document.getElementById('filtroMotorista');
+                    motoristaSelect.innerHTML = '<option value="">Todos</option>';
                     data.forEach(motorista => {
                         const option = document.createElement('option');
                         option.value = motorista.id;
