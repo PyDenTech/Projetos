@@ -136,9 +136,7 @@ app.post('/api/upload-foto-perfil', ensureLoggedIn, upload.single('foto_perfil')
 
 // Configuração do Nodemailer para enviar e-mails
 const transporter = nodemailer.createTransport({
-    host: 'smtp.hostinger.com',
-    port: 465, // Porta para SSL
-    secure: true, // true para 465, false para outras portas
+    service: 'Gmail',
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
