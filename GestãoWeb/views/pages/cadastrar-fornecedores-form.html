@@ -123,12 +123,12 @@
       </li>
 
       <li class="nav-item">
-        <a class="nav-link" data-bs-target="#escolas-nav" data-bs-toggle="collapse" href="#">
+        <a class="nav-link collapsed" data-bs-target="#escolas-nav" data-bs-toggle="collapse" href="#">
           <img src="/img/icones/escolas.svg" alt="Escolas"
             style="width: 20px; height: 20px; margin-right: 5px; color: white;">
           <span>Escolas</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="escolas-nav" class="nav-content" data-bs-parent="#sidebar-nav">
+        <ul id="escolas-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
           <li>
             <a href="/cadastrar-escolas-form">
               <i class="bi bi-house-door"></i><span>Cadastrar</span>
@@ -236,12 +236,12 @@
       </li>
 
       <li class="nav-item">
-        <a class="nav-link collapsed" data-bs-target="#fornecedores-nav" data-bs-toggle="collapse" href="#">
+        <a class="nav-link" data-bs-target="#fornecedores-nav" data-bs-toggle="collapse" href="#">
           <img src="/img/icones/fornecedores.svg" alt="Escolas"
             style="width: 20px; height: 20px; margin-right: 5px; color: white;">
           </i><span>Fornecedor</span><i class="bi bi-chevron-down ms-auto"></i>
         </a>
-        <ul id="fornecedores-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+        <ul id="fornecedores-nav" class="nav-content" data-bs-parent="#sidebar-nav">
           <li>
             <a href="/cadastrar-fornecedores-form">
               <i class="bi bi-person-plus"></i><span>Cadastrar</span>
@@ -477,6 +477,7 @@
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
       class="bi bi-arrow-up-short"></i></a>
+
   <!-- Vendor JS Files -->
   <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="/vendor/echarts/echarts.min.js"></script>
@@ -494,7 +495,7 @@
 
   <!-- Leaflet JS -->
   <script>
-    var map = L.map('map').setView([-6.52989, -49.851665], 15);
+    var map = L.map('map').setView([-23.55052, -46.633308], 13);
 
     var baseMaps = {
       "Mapa": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -566,12 +567,28 @@
             alert('Fornecedor cadastrado com sucesso!');
             // Limpar formulário
             document.getElementById('fornecedorForm').reset();
+            // Adicionar marcador no mapa
+            L.marker([latitude, longitude]).addTo(map)
+              .bindPopup(`<b>${nomeFornecedor}</b><br>${endereco}`).openPopup();
           }
         })
         .catch(error => {
           console.error('Erro:', error);
         });
     });
+
+    // Fetch and display existing fornecedores
+    fetch('/api/fornecedores')
+      .then(response => response.json())
+      .then(fornecedores => {
+        fornecedores.forEach(fornecedor => {
+          L.marker([fornecedor.latitude, fornecedor.longitude]).addTo(map)
+            .bindPopup(`<b>${fornecedor.nome_fornecedor}</b><br>${fornecedor.endereco}`);
+        });
+      })
+      .catch(error => {
+        console.error('Erro ao buscar fornecedores:', error);
+      });
   </script>
 
 </body>
