@@ -136,13 +136,13 @@ app.post('/api/upload-foto-perfil', ensureLoggedIn, upload.single('foto_perfil')
     }
 });
 
-async function sendMail(to, subject, text) {
+async function sendMail(to, subject, htmlContent) {
     try {
         const mailOptions = {
             from: `PyDen™Tech <${process.env.EMAIL_USER}>`,
             to: to,
             subject: subject,
-            text: text,
+            html: htmlContent,
         };
 
         const result = await transporter.sendMail(mailOptions);
