@@ -1,11 +1,90 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solicitar Redefinição de Senha</title>
-    <link rel="stylesheet" href="/css/login.css">
+    <style>
+        /* Estilo geral */
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f2f5;
+            margin: 0;
+        }
+
+        .container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 400px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .input-field {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-field label {
+            display: block;
+            text-align: left;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .input-field input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-field input:focus {
+            border-color: #007bff;
+        }
+
+        button {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+            display: block;
+            margin-top: 15px;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
+
 <body>
     <div class="container">
         <h2>Solicitar Redefinição de Senha</h2>
@@ -27,14 +106,15 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: email })
             }).then(response => response.json())
-              .then(data => {
-                  alert(data.message);
-              })
-              .catch(error => {
-                  console.error('Erro:', error);
-                  alert('Erro ao solicitar redefinição de senha.');
-              });
+                .then(data => {
+                    alert(data.message);
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Erro ao solicitar redefinição de senha.');
+                });
         });
     </script>
 </body>
+
 </html>
