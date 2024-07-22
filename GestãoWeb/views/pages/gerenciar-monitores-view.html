@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Gerenciar Monitores</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+    <!-- Favicons -->
+    <link href="/img/favicon.png" rel="icon">
+    <link href="/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i" rel="stylesheet">
+    <!-- Vendor CSS Files -->
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="/vendor/simple-datatables/style.css" rel="stylesheet">
+    <!-- Template Main CSS File -->
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <header id="header" class="header fixed-top d-flex align-items-center">
+        <i class="bi bi-list toggle-sidebar-btn"></i>
+        <div class="d-flex align-items-center justify-content-between">
+            <a href="/dashboard-escolar" class="logo d-flex align-items-center">
+                <img src="/img/logo.png" alt="">
+            </a>
+        </div><!-- End Logo -->
+
+        <nav class="header-nav ms-auto">
+            <ul class="d-flex align-items-center">
+                <li class="nav-item dropdown pe-3">
+                    <a id="profile-link" class="nav-link nav-profile d-flex align-items-center pe-0" href="#"
+                        data-bs-toggle="dropdown">
+                        <img id="profile-image" src="/img/user.png" alt="Foto de Perfil" class="rounded-circle">
+                        <span id="usuarioNome" class="d-none d-md-block dropdown-toggle ps-2"></span>
+                    </a><!-- End Profile Image Icon -->
+
+                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="/users-profile">
+                                <i class="bi bi-person"></i>
+                                <span>Meu Perfil</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="/users-profile">
+                                <i class="bi bi-gear"></i>
+                                <span>Configurações de Conta</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="/faq">
+                                <i class="bi bi-question-circle"></i>
+                                <span>Ajuda</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="#" id="logout-link">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Sair</span>
+                            </a>
+                        </li>
+                    </ul><!-- End Profile Dropdown Items -->
+                </li><!-- End Profile Nav -->
+            </ul>
+        </nav><!-- End Icons Navigation -->
+
+    </header><!-- End Header -->
+
+    <!-- ======= Sidebar ======= -->
+    <aside id="sidebar" class="sidebar">
+        <!-- Sidebar content -->
+    </aside><!-- End Sidebar-->
+
+    <main id="main" class="main">
+        <div class="pagetitle">
+            <h1>Gerenciar Monitores</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/dashboard-escolar"><i class="bi bi-house"></i></a></li>
+                    <li class="breadcrumb-item active">Gerenciar Monitores</li>
+                </ol>
+            </nav>
+        </div><!-- End Page Title -->
+
+        <section class="section">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Lista de Monitores</h5>
+
+                            <table class="table table-striped" id="monitoresTable">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Nome Completo</th>
+                                        <th scope="col">CPF</th>
+                                        <th scope="col">Empresa</th>
+                                        <th scope="col">Documentos</th>
+                                        <th scope="col">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Conteúdo dinâmico dos monitores -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Modal para Editar Monitor -->
+        <div class="modal fade" id="editMonitorModal" tabindex="-1" aria-labelledby="editMonitorModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editMonitorModalLabel">Editar Monitor</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editMonitorForm" enctype="multipart/form-data">
+                            <input type="hidden" id="editMonitorId" name="id">
+                            <div class="mb-3">
+                                <label for="editNomeCompleto" class="form-label">Nome Completo</label>
+                                <input type="text" class="form-control" id="editNomeCompleto" name="nomeCompleto" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editCpf" class="form-label">CPF</label>
+                                <input type="text" class="form-control" id="editCpf" name="cpf" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editEmpresa" class="form-label">Empresa</label>
+                                <select class="form-select" id="editEmpresa" name="empresa" required>
+                                    <option value="Talismã">Talismã</option>
+                                    <option value="LOCAN">LOCAN</option>
+                                    <option value="SEMED">SEMED</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Documentos para Upload</label>
+                                <div class="d-flex">
+                                    <div class="me-2">
+                                        <label for="editDocRH" class="form-label">RH</label>
+                                        <input type="file" class="form-control" id="editDocRH" name="docRH">
+                                    </div>
+                                    <div class="me-2">
+                                        <label for="editDocMonitor" class="form-label">Certificado de Monitor</label>
+                                        <input type="file" class="form-control" id="editDocMonitor" name="docMonitor">
+                                    </div>
+                                    <div>
+                                        <label for="editDocEnsinoMedio" class="form-label">Certificado de Ensino Médio</label>
+                                        <input type="file" class="form-control" id="editDocEnsinoMedio" name="docEnsinoMedio">
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main><!-- End #main -->
+
+    <!-- ======= Rodapé ======= -->
+    <footer id="footer" class="footer">
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="copyright">
+                        &copy; Direitos Autorais <strong><span>PyDenExpress</span></strong>. Todos os Direitos Reservados
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="credits">
+                        Desenvolvido por <a href="https://danilomorais.netlify.app/">Danilo de Morais</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+            class="bi bi-arrow-up-short"></i></a>
+
+    <!-- Vendor JS Files -->
+    <script src="/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/vendor/chart.js/chart.umd.js"></script>
+    <script src="/vendor/echarts/echarts.min.js"></script>
+    <script src="/vendor/quill/quill.min.js"></script>
+    <script src="/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="/vendor/tinymce/tinymce.min.js"></script>
+
+
+    <!-- Template Main JS File -->
+    <script src="/js/users-profile.js"></script>
+    <script src="/js/main.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="/js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchMonitores();
+
+            document.getElementById('editMonitorForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+                editarMonitor();
+            });
+        });
+
+        function fetchMonitores() {
+            fetch('/api/monitores')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.querySelector('#monitoresTable tbody');
+                    tbody.innerHTML = '';
+                    data.forEach(monitor => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${monitor.nome_completo}</td>
+                            <td>${monitor.cpf}</td>
+                            <td>${monitor.empresa}</td>
+                            <td>
+                                <a href="/uploads/${monitor.doc_rh}" download>RH</a>,
+                                <a href="/uploads/${monitor.doc_monitor}" download>Monitor</a>,
+                                <a href="/uploads/${monitor.doc_ensino_medio}" download>Ensino Médio</a>
+                            </td>
+                            <td>
+                                <button class="btn btn-primary btn-sm" onclick="abrirModalEditar(${monitor.id})">Editar</button>
+                                <button class="btn btn-danger btn-sm" onclick="excluirMonitor(${monitor.id})">Excluir</button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar monitores:', error));
+        }
+
+        function abrirModalEditar(id) {
+            fetch(`/api/monitores/${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('editMonitorId').value = data.id;
+                    document.getElementById('editNomeCompleto').value = data.nome_completo;
+                    document.getElementById('editCpf').value = data.cpf;
+                    document.getElementById('editEmpresa').value = data.empresa;
+                    new bootstrap.Modal(document.getElementById('editMonitorModal')).show();
+                })
+                .catch(error => console.error('Erro ao carregar monitor:', error));
+        }
+
+        function editarMonitor() {
+            const form = document.getElementById('editMonitorForm');
+            const formData = new FormData(form);
+
+            fetch(`/api/monitores/${formData.get('id')}`, {
+                method: 'PUT',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro ao editar monitor.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                fetchMonitores();
+                new bootstrap.Modal(document.getElementById('editMonitorModal')).hide();
+                document.getElementById('statusMessage').textContent = 'Monitor editado com sucesso!';
+            })
+            .catch(error => {
+                console.error('Erro ao editar monitor:', error);
+                document.getElementById('statusMessage').textContent = 'Erro ao editar monitor.';
+            });
+        }
+
+        function excluirMonitor(id) {
+            if (confirm('Tem certeza que deseja excluir este monitor?')) {
+                fetch(`/api/monitores/${id}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro ao excluir monitor.');
+                    }
+                    fetchMonitores();
+                })
+                .catch(error => console.error('Erro ao excluir monitor:', error));
+            }
+        }
+    </script>
+
+</body>
+
+</html>

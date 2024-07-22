@@ -27,6 +27,7 @@ console.log('DATABASE_URL:', process.env.DATABASE_URL);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
@@ -144,7 +145,8 @@ const pages = [
     'gerenciar-motoristas-view',
     'cadastrar-abastecimento-view',
     'gerenciar-abastecimento-view',
-    'cadastrar-monitores-form'
+    'cadastrar-monitores-form',
+    'gerenciar-monitores-view'
 ];
 
 pages.forEach(page => {
@@ -1820,8 +1822,118 @@ app.get('/api/motoristas-gerenciar-abastecimento', async (req, res) => {
     }
 });
 
+app.post('/api/cadastrar-monitor', upload.fields([
+    { name: 'docRH', maxCount: 1 },
+    { name: 'docMonitor', maxCount: 1 },
+    { name: 'docEnsinoMedio', maxCount: 1 }
+]), async (req, res) => {
+    const { nomeCompleto, cpf, empresa, rotas } = req.body;
+
+    const docRH = req.files['docRH'] ? req.files['docRH'][0].filename : null;
+    const docMonitor = req.files['docMonitor'] ? req.files['docMonitor'][0].filename : null;
+    const docEnsinoMedio = req.files['docEnsinoMedio'] ? req.files['docEnsinoMedio'][0].filename : null;
+
+    if (!nomeCompleto || !cpf || !empresa || !docRH || !docMonitor || !docEnsinoMedio || !rotas) {
+        return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
+    }
+
+    try {
+        const client = await pool.connect();
+        const result = await client.query(
+            'INSERT INTO monitores (nome_completo, cpf, empresa, doc_rh, doc_monitor, doc_ensino_medio, rotas) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+            [nomeCompleto, cpf, empresa, docRH, docMonitor, docEnsinoMedio, JSON.parse(rotas)]
+        );
+        client.release();
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Erro ao cadastrar monitor');
+    }
+});
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
+});
+
+app.get('/api/monitores', async (req, res) => {
+    try {
+        const client = await pool.connect();
+        const result = await client.query('SELECT * FROM monitores');
+        client.release();
+        res.status(200).json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Erro ao carregar monitores');
+    }
+});
+
+app.get('/api/monitores/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const client = await pool.connect();
+        const result = await client.query('SELECT * FROM monitores WHERE id = $1', [id]);
+        client.release();
+        if (result.rows.length > 0) {
+            res.status(200).json(result.rows[0]);
+        } else {
+            res.status(404).send('Monitor não encontrado');
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Erro ao carregar monitor');
+    }
+});
+
+app.put('/api/monitores/:id', upload.fields([
+    { name: 'docRH', maxCount: 1 },
+    { name: 'docMonitor', maxCount: 1 },
+    { name: 'docEnsinoMedio', maxCount: 1 }
+]), async (req, res) => {
+    const { id } = req.params;
+    const { nomeCompleto, cpf, empresa } = req.body;
+
+    const docRH = req.files['docRH'] ? req.files['docRH'][0].filename : null;
+    const docMonitor = req.files['docMonitor'] ? req.files['docMonitor'][0].filename : null;
+    const docEnsinoMedio = req.files['docEnsinoMedio'] ? req.files['docEnsinoMedio'][0].filename : null;
+
+    try {
+        const client = await pool.connect();
+        const query = `
+            UPDATE monitores
+            SET nome_completo = $1, cpf = $2, empresa = $3,
+                doc_rh = COALESCE($4, doc_rh),
+                doc_monitor = COALESCE($5, doc_monitor),
+                doc_ensino_medio = COALESCE($6, doc_ensino_medio)
+            WHERE id = $7 RETURNING *
+        `;
+        const values = [nomeCompleto, cpf, empresa, docRH, docMonitor, docEnsinoMedio, id];
+        const result = await client.query(query, values);
+        client.release();
+        if (result.rows.length > 0) {
+            res.status(200).json(result.rows[0]);
+        } else {
+            res.status(404).send('Monitor não encontrado');
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Erro ao editar monitor');
+    }
+});
+
+app.delete('/api/monitores/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const client = await pool.connect();
+        const result = await client.query('DELETE FROM monitores WHERE id = $1 RETURNING *', [id]);
+        client.release();
+        if (result.rows.length > 0) {
+            res.status(200).json(result.rows[0]);
+        } else {
+            res.status(404).send('Monitor não encontrado');
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Erro ao excluir monitor');
+    }
 });
 
 app.listen(port, () => {

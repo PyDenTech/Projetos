@@ -42,18 +42,6 @@ CREATE TABLE IF NOT EXISTS bairros (
     nome VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS rotas (
-    id SERIAL PRIMARY KEY,
-    tipo_rota VARCHAR NOT NULL,
-    nome_rota VARCHAR NOT NULL,
-    horarios_funcionamento JSONB NOT NULL,
-    dificuldades_acesso JSONB,
-    escolas_atendidas JSONB NOT NULL,
-    alunos_atendidos JSONB,
-    data_cadastro TIMESTAMP DEFAULT NOW(),
-    area_urbana BOOLEAN
-);
-
 CREATE TABLE IF NOT EXISTS alunos (
     id SERIAL PRIMARY KEY,
     unidade VARCHAR(255),
@@ -69,6 +57,18 @@ CREATE TABLE IF NOT EXISTS alunos (
     rota_transporte VARCHAR(255),
     id_matricula VARCHAR(50) UNIQUE,
     usa_transporte_escolar BOOLEAN
+);
+
+CREATE TABLE IF NOT EXISTS rotas (
+    id SERIAL PRIMARY KEY,
+    tipo_rota VARCHAR NOT NULL,
+    nome_rota VARCHAR NOT NULL,
+    horarios_funcionamento JSONB NOT NULL,
+    dificuldades_acesso JSONB,
+    escolas_atendidas JSONB NOT NULL,
+    alunos_atendidos JSONB,
+    data_cadastro TIMESTAMP DEFAULT NOW(),
+    area_urbana BOOLEAN
 );
 
 CREATE TABLE IF NOT EXISTS rotas_geradas (
