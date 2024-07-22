@@ -2,7 +2,6 @@ require('dotenv').config();
 const cors = require('cors');
 const express = require('express');
 const multer = require('multer');
-const nodemailer = require('nodemailer');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
@@ -39,6 +38,20 @@ const pool = new Pool({
 });
 
 const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 }); // TTL padrão de 300 segundos (5 minutos)
+
+// Middleware de autenticação
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (token == null) return res.sendStatus(401);
+
+    jwt.verify(token, SECRET_KEY, (err, motorista) => {
+        if (err) return res.sendStatus(403);
+        req.motorista = motorista;
+        next();
+    });
+};
 
 pool.connect(err => {
     if (err) {
@@ -109,53 +122,6 @@ app.post('/api/upload-foto-perfil', ensureLoggedIn, upload.single('foto_perfil')
         res.status(500).json({ error: error.message });
     }
 });
-
-app.post('/request-password-reset', async (req, res) => {
-    const { email } = req.body;
-
-    try {
-        const result = await pool.query('SELECT * FROM usuarios WHERE email = $1', [email]);
-        if (result.rows.length === 0) {
-            return res.status(404).json({ message: 'Usuário não encontrado' });
-        }
-
-        const user = result.rows[0];
-        const resetToken = jwt.sign({ id: user.id }, SECRET_KEY, { expiresIn: '1h' });
-
-        const resetLink = `http://localhost:${port}/reset-password/${resetToken}`;
-
-        // Enviar email de recuperação
-        await transporter.sendMail({
-            from: process.env.EMAIL,
-            to: email,
-            subject: 'Redefinição de Senha',
-            text: `Clique no link para redefinir sua senha: ${resetLink}`
-        });
-
-        res.status(200).json({ message: 'Email de recuperação enviado com sucesso' });
-    } catch (error) {
-        console.error('Erro ao solicitar redefinição de senha:', error);
-        res.status(500).json({ message: 'Erro interno do servidor' });
-    }
-});
-
-app.post('/reset-password/:token', async (req, res) => {
-    const { token } = req.params;
-    const { newPassword } = req.body;
-
-    try {
-        const decoded = jwt.verify(token, SECRET_KEY);
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-        await pool.query('UPDATE usuarios SET password = $1 WHERE id = $2', [hashedPassword, decoded.id]);
-
-        res.status(200).json({ message: 'Senha redefinida com sucesso' });
-    } catch (error) {
-        console.error('Erro ao redefinir senha:', error);
-        res.status(500).json({ message: 'Erro interno do servidor' });
-    }
-});
-
 
 const pages = [
     'cadastrar-aluno-form',
