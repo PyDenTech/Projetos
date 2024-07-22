@@ -90,6 +90,15 @@ app.get('/dashboard-adm', ensureLoggedIn, (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'pages', 'dashboard-adm.html'));
 });
 
+app.get('/solicitar-redefinir-senha', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'solicitar-redefinir-senha.html'));
+});
+
+app.get('/redefinir-senha/:token', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'redefinir-senha.html'));
+});
+
+
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, 'public/uploads/');
