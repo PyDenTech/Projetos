@@ -1853,7 +1853,6 @@ app.post('/api/cadastrar-monitor', upload.fields([
 });
 
 app.get('/api/monitores', async (req, res) => {
-    console.log('Recebido pedido GET para /api/monitores');
     try {
         const result = await pool.query('SELECT id, nome_completo, cpf, empresa, doc_rh, doc_monitor, doc_ensino_medio, rotas, data_cadastro FROM monitores');
         res.json(result.rows);
