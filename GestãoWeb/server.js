@@ -139,7 +139,7 @@ app.post('/api/upload-foto-perfil', ensureLoggedIn, upload.single('foto_perfil')
 async function sendMail(to, subject, text) {
     try {
         const mailOptions = {
-            from: `Seu Nome <${process.env.EMAIL_USER}>`,
+            from: `PyDen™Tech <${process.env.EMAIL_USER}>`,
             to: to,
             subject: subject,
             text: text,
@@ -320,12 +320,14 @@ app.post('/solicitar-redefinir-senha', async (req, res) => {
         console.log(`URL de redefinição: ${resetUrl}`);
 
         const emailSubject = 'Redefinição de senha';
-        const emailText = `Você está recebendo este e-mail porque você (ou alguém) solicitou a redefinição da senha para sua conta.\n\n` +
-            `Clique no link a seguir ou cole no seu navegador para completar o processo:\n\n` +
-            `${resetUrl}\n\n` +
-            `Se você não solicitou isso, por favor, ignore este e-mail e sua senha permanecerá inalterada.\n`;
+        const emailHtml = `
+            <p>Você está recebendo este e-mail porque você (ou alguém) solicitou a redefinição da senha para sua conta.</p>
+            <p>Clique no botão abaixo para completar o processo:</p>
+            <a href="${resetUrl}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: #ffffff; background-color: #007bff; border-radius: 5px; text-decoration: none;">Redefinir Senha</a>
+            <p>Se você não solicitou isso, por favor, ignore este e-mail e sua senha permanecerá inalterada.</p>
+        `;
 
-        await sendMail(email, emailSubject, emailText);
+        await sendMail(email, emailSubject, emailHtml);
         console.log(`E-mail de redefinição de senha enviado para: ${email}`);
 
         client.release();
