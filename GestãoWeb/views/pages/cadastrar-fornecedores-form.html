@@ -15,8 +15,10 @@
 
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
-  
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+    rel="stylesheet">
+
   <!-- Vendor CSS Files -->
   <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
@@ -80,22 +82,26 @@
                 <div class="row mb-3">
                   <div class="col-md-6">
                     <label for="nomeFornecedor" class="form-label"><b>Nome do Fornecedor</b></label>
-                    <input type="text" class="form-control" id="nomeFornecedor" name="nomeFornecedor" placeholder="Informe o nome do fornecedor">
+                    <input type="text" class="form-control" id="nomeFornecedor" name="nomeFornecedor"
+                      placeholder="Informe o nome do fornecedor">
                   </div>
                   <div class="col-md-6">
                     <label for="tipoContrato" class="form-label"><b>Tipo de Contrato</b></label>
-                    <input type="text" class="form-control" id="tipoContrato" name="tipoContrato" placeholder="Informe o tipo de contrato">
+                    <input type="text" class="form-control" id="tipoContrato" name="tipoContrato"
+                      placeholder="Informe o tipo de contrato">
                   </div>
                 </div>
 
                 <div class="row mb-3">
                   <div class="col-md-6">
                     <label for="cnpjFornecedor" class="form-label"><b>CNPJ</b></label>
-                    <input type="text" class="form-control" id="cnpjFornecedor" name="cnpjFornecedor" placeholder="Informe o CNPJ">
+                    <input type="text" class="form-control" id="cnpjFornecedor" name="cnpjFornecedor"
+                      placeholder="Informe o CNPJ">
                   </div>
                   <div class="col-md-6">
                     <label for="contatoFornecedor" class="form-label"><b>Contato</b></label>
-                    <input type="text" class="form-control" id="contatoFornecedor" name="contatoFornecedor" placeholder="Informe o contato">
+                    <input type="text" class="form-control" id="contatoFornecedor" name="contatoFornecedor"
+                      placeholder="Informe o contato">
                   </div>
                 </div>
 
@@ -104,23 +110,26 @@
                 <div class="row mt-3">
                   <div class="col-md-6">
                     <label for="latitude" class="form-label"><b>Latitude</b></label>
-                    <input type="text" class="form-control" id="latitude" name="latitude" placeholder="Latitude" readonly>
+                    <input type="text" class="form-control" id="latitude" name="latitude" placeholder="Latitude"
+                      readonly>
                   </div>
                   <div class="col-md-6">
                     <label for="longitude" class="form-label"><b>Longitude</b></label>
-                    <input type="text" class="form-control" id="longitude" name="longitude" placeholder="Longitude" readonly>
+                    <input type="text" class="form-control" id="longitude" name="longitude" placeholder="Longitude"
+                      readonly>
                   </div>
                 </div>
                 <div class="row mt-3">
                   <div class="col-md-12">
                     <label for="endereco" class="form-label"><b>Endereço</b></label>
-                    <input type="text" class="form-control" id="endereco" name="endereco" placeholder="Endereço" readonly>
+                    <input type="text" class="form-control" id="endereco" name="endereco" placeholder="Endereço"
+                      readonly>
                   </div>
                 </div>
 
                 <div class="row mt-3">
                   <div class="col-12">
-                    <button type="submit" class="btn btn-primary">Cadastrar Fornecedor</button>
+                    <button type="button" class="btn btn-primary" id="cadastrarFornecedor">Cadastrar Fornecedor</button>
                   </div>
                 </div>
               </form>
@@ -149,7 +158,8 @@
     </div>
   </footer><!-- End Footer -->
 
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
 
   <!-- Vendor JS Files -->
   <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -171,7 +181,7 @@
 
     var marker;
 
-    map.on('click', function(e) {
+    map.on('click', function (e) {
       var lat = e.latlng.lat;
       var lon = e.latlng.lng;
 
@@ -189,6 +199,45 @@
         .then(response => response.json())
         .then(data => {
           document.getElementById('endereco').value = data.display_name;
+        });
+    });
+
+    document.getElementById('cadastrarFornecedor').addEventListener('click', function () {
+      var nomeFornecedor = document.getElementById('nomeFornecedor').value;
+      var tipoContrato = document.getElementById('tipoContrato').value;
+      var cnpjFornecedor = document.getElementById('cnpjFornecedor').value;
+      var contatoFornecedor = document.getElementById('contatoFornecedor').value;
+      var latitude = document.getElementById('latitude').value;
+      var longitude = document.getElementById('longitude').value;
+      var endereco = document.getElementById('endereco').value;
+
+      fetch('/api/fornecedores', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          nomeFornecedor: nomeFornecedor,
+          tipoContrato: tipoContrato,
+          cnpjFornecedor: cnpjFornecedor,
+          contatoFornecedor: contatoFornecedor,
+          latitude: latitude,
+          longitude: longitude,
+          endereco: endereco
+        })
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            alert('Erro: ' + data.error);
+          } else {
+            alert('Fornecedor cadastrado com sucesso!');
+            // Limpar formulário
+            document.getElementById('fornecedorForm').reset();
+          }
+        })
+        .catch(error => {
+          console.error('Erro:', error);
         });
     });
   </script>

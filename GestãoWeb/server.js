@@ -1179,6 +1179,23 @@ app.post('/api/stop-points', async (req, res) => {
     }
 });
 
+// Endpoint para cadastrar fornecedor
+app.post('/api/fornecedores', async (req, res) => {
+    const { nomeFornecedor, tipoContrato, cnpjFornecedor, contatoFornecedor, latitude, longitude, endereco } = req.body;
+
+    try {
+        const result = await pool.query(
+            'INSERT INTO fornecedores (nome_fornecedor, tipo_contrato, cnpj, contato, latitude, longitude, endereco) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+            [nomeFornecedor, tipoContrato, cnpjFornecedor, contatoFornecedor, latitude, longitude, endereco]
+        );
+        res.status(201).json(result.rows[0]);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro ao cadastrar fornecedor' });
+    }
+});
+
+
 // Endpoint para buscar todos os fornecedores
 app.get('/api/fornecedores', async (req, res) => {
     try {
