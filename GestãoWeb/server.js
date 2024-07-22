@@ -1896,5 +1896,5 @@ app.use((req, res, next) => {
 });
 
 app.listen(port, () => {
-    console.log(`Servidor rodando em http://localhost:${port}`);
+    console.log(`Servidor rodando em http://18.231.172.222:${port}`);
 });

@@ -492,7 +492,7 @@
 
         function fetchMonitores() {
             console.log('Iniciando fetch para /api/monitores');
-            fetch('http://localhost:3000/api/monitores')
+            fetch('http://18.231.172.222:3000/api/monitores')
                 .then(response => {
                     console.log('Resposta recebida:', response);
                     return response.json();
@@ -557,7 +557,7 @@
                         button.addEventListener('click', function () {
                             const monitorId = this.getAttribute('data-id');
                             if (confirm('Tem certeza que deseja excluir este monitor?')) {
-                                fetch(`http://localhost:3000/api/monitores/${monitorId}`, {
+                                fetch(`http://18.231.172.222:3000/api/monitores/${monitorId}`, {
                                     method: 'DELETE'
                                 })
                                     .then(response => response.json())
@@ -579,7 +579,7 @@
 
         function fetchRotas() {
             console.log('Iniciando fetch para /api/rotas');
-            fetch('http://localhost:3000/api/rotas')
+            fetch('http://18.231.172.222:3000/api/rotas')
                 .then(response => response.json())
                 .then(data => {
                     console.log('Dados das rotas recebidos:', data);
@@ -604,7 +604,7 @@
             const empresa = document.getElementById('editEmpresa').value;
             const rotas = Array.from(document.getElementById('editRotas').selectedOptions).map(option => option.value);
 
-            fetch(`http://localhost:3000/api/monitores/${monitorId}`, {
+            fetch(`http://18.231.172.222:3000/api/monitores/${monitorId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
