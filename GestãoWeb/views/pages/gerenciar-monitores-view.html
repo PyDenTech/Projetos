@@ -129,7 +129,8 @@
         </section>
 
         <!-- Modal para Editar Monitor -->
-        <div class="modal fade" id="editMonitorModal" tabindex="-1" aria-labelledby="editMonitorModalLabel" aria-hidden="true">
+        <div class="modal fade" id="editMonitorModal" tabindex="-1" aria-labelledby="editMonitorModalLabel"
+            aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -141,7 +142,8 @@
                             <input type="hidden" id="editMonitorId" name="id">
                             <div class="mb-3">
                                 <label for="editNomeCompleto" class="form-label">Nome Completo</label>
-                                <input type="text" class="form-control" id="editNomeCompleto" name="nomeCompleto" required>
+                                <input type="text" class="form-control" id="editNomeCompleto" name="nomeCompleto"
+                                    required>
                             </div>
                             <div class="mb-3">
                                 <label for="editCpf" class="form-label">CPF</label>
@@ -167,8 +169,10 @@
                                         <input type="file" class="form-control" id="editDocMonitor" name="docMonitor">
                                     </div>
                                     <div>
-                                        <label for="editDocEnsinoMedio" class="form-label">Certificado de Ensino Médio</label>
-                                        <input type="file" class="form-control" id="editDocEnsinoMedio" name="docEnsinoMedio">
+                                        <label for="editDocEnsinoMedio" class="form-label">Certificado de Ensino
+                                            Médio</label>
+                                        <input type="file" class="form-control" id="editDocEnsinoMedio"
+                                            name="docEnsinoMedio">
                                     </div>
                                 </div>
                             </div>
@@ -187,7 +191,8 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="copyright">
-                        &copy; Direitos Autorais <strong><span>PyDenExpress</span></strong>. Todos os Direitos Reservados
+                        &copy; Direitos Autorais <strong><span>PyDenExpress</span></strong>. Todos os Direitos
+                        Reservados
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -203,18 +208,7 @@
             class="bi bi-arrow-up-short"></i></a>
 
     <!-- Vendor JS Files -->
-    <script src="/vendor/apexcharts/apexcharts.min.js"></script>
     <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="/vendor/chart.js/chart.umd.js"></script>
-    <script src="/vendor/echarts/echarts.min.js"></script>
-    <script src="/vendor/quill/quill.min.js"></script>
-    <script src="/vendor/simple-datatables/simple-datatables.js"></script>
-    <script src="/vendor/tinymce/tinymce.min.js"></script>
-
-
-    <!-- Template Main JS File -->
-    <script src="/js/users-profile.js"></script>
-    <script src="/js/main.js"></script>
 
     <!-- Template Main JS File -->
     <script src="/js/main.js"></script>
@@ -230,7 +224,12 @@
 
         function fetchMonitores() {
             fetch('/api/monitores')
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro ao carregar monitores.');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     const tbody = document.querySelector('#monitoresTable tbody');
                     tbody.innerHTML = '';
@@ -253,12 +252,20 @@
                         tbody.appendChild(row);
                     });
                 })
-                .catch(error => console.error('Erro ao carregar monitores:', error));
+                .catch(error => {
+                    console.error('Erro ao carregar monitores:', error);
+                    document.getElementById('statusMessage').textContent = 'Erro ao carregar monitores.';
+                });
         }
 
         function abrirModalEditar(id) {
             fetch(`/api/monitores/${id}`)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro ao carregar monitor.');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     document.getElementById('editMonitorId').value = data.id;
                     document.getElementById('editNomeCompleto').value = data.nome_completo;
@@ -266,7 +273,10 @@
                     document.getElementById('editEmpresa').value = data.empresa;
                     new bootstrap.Modal(document.getElementById('editMonitorModal')).show();
                 })
-                .catch(error => console.error('Erro ao carregar monitor:', error));
+                .catch(error => {
+                    console.error('Erro ao carregar monitor:', error);
+                    document.getElementById('statusMessage').textContent = 'Erro ao carregar monitor.';
+                });
         }
 
         function editarMonitor() {
@@ -277,21 +287,21 @@
                 method: 'PUT',
                 body: formData
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Erro ao editar monitor.');
-                }
-                return response.json();
-            })
-            .then(data => {
-                fetchMonitores();
-                new bootstrap.Modal(document.getElementById('editMonitorModal')).hide();
-                document.getElementById('statusMessage').textContent = 'Monitor editado com sucesso!';
-            })
-            .catch(error => {
-                console.error('Erro ao editar monitor:', error);
-                document.getElementById('statusMessage').textContent = 'Erro ao editar monitor.';
-            });
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro ao editar monitor.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    fetchMonitores();
+                    new bootstrap.Modal(document.getElementById('editMonitorModal')).hide();
+                    document.getElementById('statusMessage').textContent = 'Monitor editado com sucesso!';
+                })
+                .catch(error => {
+                    console.error('Erro ao editar monitor:', error);
+                    document.getElementById('statusMessage').textContent = 'Erro ao editar monitor.';
+                });
         }
 
         function excluirMonitor(id) {
@@ -299,13 +309,16 @@
                 fetch(`/api/monitores/${id}`, {
                     method: 'DELETE'
                 })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Erro ao excluir monitor.');
-                    }
-                    fetchMonitores();
-                })
-                .catch(error => console.error('Erro ao excluir monitor:', error));
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erro ao excluir monitor.');
+                        }
+                        fetchMonitores();
+                    })
+                    .catch(error => {
+                        console.error('Erro ao excluir monitor:', error);
+                        document.getElementById('statusMessage').textContent = 'Erro ao excluir monitor.';
+                    });
             }
         }
     </script>
