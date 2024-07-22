@@ -136,12 +136,15 @@ app.post('/api/upload-foto-perfil', ensureLoggedIn, upload.single('foto_perfil')
 
 // Configuração do Nodemailer para enviar e-mails
 const transporter = nodemailer.createTransport({
-    service: 'Webmail', // ou outro serviço de e-mail que você estiver usando
+    host: 'smtp.hostinger.com', // ou o host SMTP fornecido pela Hostinger
+    port: 465, // ou 465 se você estiver usando SSL
+    secure: true, // true para 465, false para outras portas
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
     },
 });
+
 
 const pages = [
     'cadastrar-aluno-form',
