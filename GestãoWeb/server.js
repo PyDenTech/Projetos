@@ -137,14 +137,13 @@ app.post('/api/upload-foto-perfil', ensureLoggedIn, upload.single('foto_perfil')
 // Configuração do Nodemailer para enviar e-mails
 const transporter = nodemailer.createTransport({
     host: 'smtp.hostinger.com',
-    port: 465,
-    secure: true,
+    port: 465, // Porta para SSL
+    secure: true, // true para 465, false para outras portas
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
     },
 });
-
 
 const pages = [
     'cadastrar-aluno-form',
@@ -292,6 +291,8 @@ app.post('/solicitar-redefinir-senha', async (req, res) => {
 
     try {
         const client = await pool.connect();
+        console.log('Conectado ao banco de dados');
+
         const result = await client.query('SELECT * FROM usuarios WHERE email = $1', [email]);
         const user = result.rows[0];
 
@@ -300,16 +301,16 @@ app.post('/solicitar-redefinir-senha', async (req, res) => {
             return res.status(404).json({ message: 'Usuário não encontrado' });
         }
 
-        // Gerar token de redefinição de senha
         const token = crypto.randomBytes(20).toString('hex');
         const resetPasswordExpires = Date.now() + 3600000; // 1 hora
+        console.log(`Token gerado: ${token}`);
 
-        // Salvar o token no banco de dados
         await client.query('UPDATE usuarios SET reset_password_token = $1, reset_password_expires = $2 WHERE email = $3',
             [token, resetPasswordExpires, email]);
 
-        // Enviar e-mail com link de redefinição de senha
         const resetUrl = `http://${req.headers.host}/redefinir-senha/${token}`;
+        console.log(`URL de redefinição: ${resetUrl}`);
+
         const mailOptions = {
             to: email,
             from: process.env.EMAIL_USER,
@@ -321,9 +322,9 @@ app.post('/solicitar-redefinir-senha', async (req, res) => {
         };
 
         await transporter.sendMail(mailOptions);
-        client.release();
-
         console.log(`E-mail de redefinição de senha enviado para: ${email}`);
+
+        client.release();
         res.status(200).json({ message: 'E-mail de redefinição de senha enviado com sucesso' });
     } catch (error) {
         console.error('Erro ao solicitar redefinição de senha:', error);
