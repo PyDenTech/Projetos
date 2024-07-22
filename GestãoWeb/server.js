@@ -296,6 +296,7 @@ app.post('/solicitar-redefinir-senha', async (req, res) => {
         const user = result.rows[0];
 
         if (!user) {
+            console.log(`Usuário não encontrado: ${email}`);
             return res.status(404).json({ message: 'Usuário não encontrado' });
         }
 
@@ -322,12 +323,14 @@ app.post('/solicitar-redefinir-senha', async (req, res) => {
         await transporter.sendMail(mailOptions);
         client.release();
 
+        console.log(`E-mail de redefinição de senha enviado para: ${email}`);
         res.status(200).json({ message: 'E-mail de redefinição de senha enviado com sucesso' });
     } catch (error) {
         console.error('Erro ao solicitar redefinição de senha:', error);
         res.status(500).json({ message: 'Erro interno do servidor' });
     }
 });
+
 
 app.get('/redefinir-senha/:token', async (req, res) => {
     const { token } = req.params;
