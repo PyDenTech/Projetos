@@ -12,12 +12,10 @@ const jwt = require('jsonwebtoken');
 const NodeCache = require('node-cache');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
-const { google } = require('googleapis');
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(cors());
-const SECRET_KEY = 'DeD-140619';
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
@@ -42,20 +40,6 @@ const pool = new Pool({
 
 const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 }); // TTL padrão de 300 segundos (5 minutos)
 
-// Middleware de autenticação
-function authenticateToken(req, res, next) {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (token == null) return res.sendStatus(401);
-
-    jwt.verify(token, SECRET_KEY, (err, motorista) => {
-        if (err) return res.sendStatus(403);
-        req.motorista = motorista;
-        next();
-    });
-};
-
 pool.connect(err => {
     if (err) {
         console.error('Erro ao conectar ao banco de dados', err.stack);
@@ -79,6 +63,16 @@ function isAdmin(req, res, next) {
     }
 }
 
+const transporter = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    secure: process.env.EMAIL_SECURE === 'true', // true for 465, false for other ports
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+    },
+});
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'login.html'));
 });
@@ -95,7 +89,7 @@ app.get('/solicitar-redefinir-senha', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'solicitar-redefinir-senha.html'));
 });
 
-app.get('/redefinir-senha/:token', (req, res) => {
+app.get('/redefinir-senha/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'redefinir-senha.html'));
 });
 
@@ -142,19 +136,22 @@ app.post('/api/upload-foto-perfil', ensureLoggedIn, upload.single('foto_perfil')
     }
 });
 
-const oAuth2Client = new google.auth.OAuth2(
-    process.env.CLIENT_ID,
-    process.env.CLIENT_SECRET,
-    process.env.REDIRECT_URI
-);
+async function sendMail(to, subject, text) {
+    try {
+        const mailOptions = {
+            from: `Seu Nome <${process.env.EMAIL_USER}>`,
+            to: to,
+            subject: subject,
+            text: text,
+        };
 
-oAuth2Client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN });
-
-// Log para verificar as variáveis de ambiente
-console.log('CLIENT_ID:', process.env.CLIENT_ID);
-console.log('CLIENT_SECRET:', process.env.CLIENT_SECRET);
-console.log('REDIRECT_URI:', process.env.REDIRECT_URI);
-console.log('REFRESH_TOKEN:', process.env.REFRESH_TOKEN);
+        const result = await transporter.sendMail(mailOptions);
+        return result;
+    } catch (error) {
+        console.error('Erro ao enviar e-mail:', error);
+        throw error;
+    }
+}
 
 const pages = [
     'cadastrar-aluno-form',
@@ -297,36 +294,6 @@ app.get('/api/sessao-usuario', (req, res) => {
     }
 });
 
-async function sendMail(to, subject, text) {
-    try {
-        const accessToken = await oAuth2Client.getAccessToken();
-
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                type: 'OAuth2',
-                user: process.env.EMAIL_USER,
-                clientId: process.env.CLIENT_ID,
-                clientSecret: process.env.CLIENT_SECRET,
-                refreshToken: process.env.REFRESH_TOKEN,
-                accessToken: accessToken.token,
-            },
-        });
-
-        const mailOptions = {
-            from: `Seu Nome <${process.env.EMAIL_USER}>`,
-            to: to,
-            subject: subject,
-            text: text,
-        };
-
-        const result = await transporter.sendMail(mailOptions);
-        return result;
-    } catch (error) {
-        console.error('Erro ao enviar e-mail:', error);
-    }
-}
-
 app.post('/solicitar-redefinir-senha', async (req, res) => {
     const { email } = req.body;
 
@@ -368,7 +335,6 @@ app.post('/solicitar-redefinir-senha', async (req, res) => {
         res.status(500).json({ message: 'Erro interno do servidor' });
     }
 });
-
 
 app.post('/admin/login', async (req, res) => {
     const { email, senha } = req.body;
