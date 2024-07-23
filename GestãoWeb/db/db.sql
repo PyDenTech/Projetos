@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS rotas (
     id SERIAL PRIMARY KEY,
     tipo_rota VARCHAR NOT NULL,
     nome_rota VARCHAR NOT NULL,
+    identificador_unico INTEGER NOT NULL,
     horarios_funcionamento JSONB NOT NULL,
     dificuldades_acesso JSONB,
     escolas_atendidas JSONB NOT NULL,

@@ -878,6 +878,7 @@ app.get('/api/lista-escolas', async (req, res) => {
 
 app.post('/api/cadastrar-rota', async (req, res) => {
     const {
+        identificadorUnico,
         tipoRota,
         nomeRota,
         horariosFuncionamento,
@@ -890,6 +891,7 @@ app.post('/api/cadastrar-rota', async (req, res) => {
     try {
         const result = await pool.query(
             `INSERT INTO rotas (
+                identificador_unico,
                 tipo_rota, 
                 nome_rota, 
                 horarios_funcionamento, 
@@ -897,8 +899,9 @@ app.post('/api/cadastrar-rota', async (req, res) => {
                 area_urbana,
                 escolas_atendidas, 
                 alunos_atendidos
-            ) VALUES ($1, $2, $3::jsonb, $4::jsonb, $5, $6::jsonb, $7::jsonb) RETURNING *`,
+            ) VALUES ($1, $2, $3, $4::jsonb, $5::jsonb, $6, $7::jsonb, $8::jsonb) RETURNING *`,
             [
+                identificadorUnico,
                 tipoRota,
                 nomeRota,
                 JSON.stringify(horariosFuncionamento),
@@ -915,6 +918,7 @@ app.post('/api/cadastrar-rota', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 
 app.get('/api/rotas', async (req, res) => {
