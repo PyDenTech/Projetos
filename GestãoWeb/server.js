@@ -357,7 +357,7 @@ app.post('/redefinir-senha/:token', async (req, res) => {
         const client = await pool.connect();
         console.log('Conectado ao banco de dados');
 
-        const result = await client.query('SELECT * FROM usuarios WHERE reset_password_token = $1 AND reset_password_expires > NOW()', [token]);
+        const result = await client.query('SELECT * FROM usuarios WHERE reset_password_token = $1 AND reset_password_expires > $2', [token, Date.now()]);
         const user = result.rows[0];
 
         if (!user) {
