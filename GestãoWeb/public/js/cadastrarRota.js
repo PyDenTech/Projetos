@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("salvarRota").addEventListener("click", async function () {
         const formData = new FormData(form);
         const data = {
+            identificadorUnico: formData.get("identificadorUnico"),
             tipoRota: formData.get("tipoRota"),
             nomeRota: formData.get("nomeRota"),
             horariosFuncionamento: Array.from(document.querySelectorAll("input[name='horariosFuncionamento']:checked")).map(el => el.value),
