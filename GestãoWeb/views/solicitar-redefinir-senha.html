@@ -5,100 +5,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solicitar Redefinição de Senha</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .container {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            width: 100%;
-        }
-
-        h2 {
-            color: #008374;
-            text-align: center;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        label {
-            margin-bottom: 10px;
-            color: #333333;
-        }
-
-        input[type="email"] {
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #cccccc;
-            border-radius: 5px;
-        }
-
-        button {
-            background-color: #008374;
-            color: #ffffff;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        button:hover {
-            background-color: #f85a40;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/solicitar-redefinir-senha.css">
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script>
-        async function resetPassword(event) {
+        async function solicitarRedefinicao(event) {
             event.preventDefault();
-            const token = window.location.pathname.split('/').pop();
-            const senha = document.getElementById('senha').value;
+            const email = document.getElementById('email').value;
 
             try {
-                const response = await fetch(`/redefinir-senha/${token}`, {
+                const response = await fetch('/solicitar-redefinir-senha', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ senha })
+                    body: JSON.stringify({ email })
                 });
 
                 const data = await response.json();
-                if (response.ok) {
-                    Toastify({
-                        text: data.message,
-                        duration: 3000,
-                        gravity: "top",
-                        position: "center",
-                        backgroundColor: "#008374",
-                    }).showToast();
-                } else {
-                    Toastify({
-                        text: data.message,
-                        duration: 3000,
-                        gravity: "top",
-                        position: "center",
-                        backgroundColor: "#f85a40",
-                    }).showToast();
-                }
-            } catch (error) {
-                console.error('Erro ao redefinir senha:', error);
                 Toastify({
-                    text: "Erro ao redefinir senha.",
+                    text: data.message,
+                    duration: 3000,
+                    gravity: "top",
+                    position: "center",
+                    backgroundColor: response.ok ? "#008374" : "#f85a40",
+                }).showToast();
+            } catch (error) {
+                console.error('Erro ao solicitar redefinição de senha:', error);
+                Toastify({
+                    text: "Erro ao solicitar redefinição de senha.",
                     duration: 3000,
                     gravity: "top",
                     position: "center",
@@ -110,12 +46,14 @@
 </head>
 
 <body>
-    <h2>Solicitar Redefinição de Senha</h2>
-    <form action="/solicitar-redefinir-senha" method="post">
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-        <button type="submit">Enviar</button>
-    </form>
+    <div class="container">
+        <h2>Solicitar Redefinição de Senha</h2>
+        <form onsubmit="solicitarRedefinicao(event)">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
 </body>
 
 </html>
