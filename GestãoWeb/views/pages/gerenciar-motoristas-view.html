@@ -475,7 +475,7 @@
             fetchMotoristas();
 
             function fetchMotoristas() {
-                fetch('/api/motoristas_escolares')
+                fetch('http://18.231.172.222:4000/api/motoristas_escolares')
                     .then(response => response.json())
                     .then(data => {
                         console.log('Motoristas recebidos:', data); // Adicione este log
@@ -493,8 +493,8 @@
                                 <td>${motorista.cpf}</td>
                                 <td>${motorista.cnh}</td>
                                 <td>${motorista.empresa}</td>
-                                <td>${motorista.rota_id}</td>
-                                <td>${motorista.rota_nome || 'N/A'}</td>
+                                <td>${motorista.rota_id || 'Sem rota atribuida'}</td>
+                                <td>${motorista.rota_nome || 'Sem rota atribuida'}</td>
                                 <td>
                                     <button class="btn btn-primary btn-sm" onclick="editarMotorista(${motorista.id})">Editar</button>
                                     <button class="btn btn-danger btn-sm" onclick="excluirMotorista(${motorista.id})">Excluir</button>
@@ -510,7 +510,7 @@
             }
 
             window.editarMotorista = function (motoristaId) {
-                fetch(`/api/motoristas_escolares/${motoristaId}`)
+                fetch(`http://18.231.172.222:4000/api/motoristas_escolares/${motoristaId}`)
                     .then(response => {
                         if (!response.ok) {
                             throw new Error('Motorista não encontrado.');
@@ -535,7 +535,7 @@
                 const motoristaId = document.getElementById('editMotoristaId').value;
                 const formData = new FormData(document.getElementById('editForm'));
 
-                fetch(`/api/motoristas_escolares/${motoristaId}`, {
+                fetch(`http://18.231.172.222:4000/api/motoristas_escolares/${motoristaId}`, {
                     method: 'PUT',
                     body: JSON.stringify(Object.fromEntries(formData)),
                     headers: {
@@ -554,7 +554,7 @@
 
             window.excluirMotorista = function (motoristaId) {
                 if (confirm('Tem certeza que deseja excluir este motorista?')) {
-                    fetch(`/api/motoristas_escolares/${motoristaId}`, {
+                    fetch(`http://18.231.172.222:4000/api/motoristas_escolares/${motoristaId}`, {
                         method: 'DELETE'
                     })
                         .then(response => {
