@@ -1783,6 +1783,20 @@ app.get('/api/motoristas_escolares/:id', async (req, res) => {
     }
 });
 
+app.delete('/api/motoristas_escolares/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await pool.query('DELETE FROM motoristas_escolares WHERE id = $1 RETURNING *', [id]);
+        if (result.rows.length > 0) {
+            res.status(200).json({ message: 'Motorista excluído com sucesso' });
+        } else {
+            res.status(404).json({ message: 'Motorista não encontrado' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.get('/api/rotas/motorista/:motorista_id', async (req, res) => {
     const { motorista_id } = req.params;
     try {
