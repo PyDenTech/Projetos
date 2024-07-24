@@ -751,17 +751,17 @@
 
     document.addEventListener('DOMContentLoaded', async function () {
       try {
-        const response = await fetch('/api/dashboard-data');
-        data = await response.json();
+        const response = await fetch('/api/dashboard-data'); // Verifique o endpoint correto
+        const data = await response.json();
 
         // Atualizando contagem de escolas
-        document.getElementById('escolasAtendidas').textContent = data.escolasCount;
+        document.getElementById('escolasAtendidas').textContent = data.escolasCount || 0;
 
         // Atualizando contagem de alunos
-        document.getElementById('alunosAtendidos').textContent = data.alunosCount;
+        document.getElementById('alunosAtendidos').textContent = data.alunosCount || 0;
 
         // Atualizando quantidade de rotas
-        document.getElementById('quantidade-rotas').innerText = data.rotasCount;
+        document.getElementById('quantidade-rotas').innerText = data.rotasCount || 0;
 
         // Atualizando quilometragem total
         document.getElementById('quilometragem-total').innerText = formatNumber(data.quilometragemTotal) + ' km';
@@ -775,8 +775,12 @@
     });
 
     function formatNumber(number) {
+      if (number === null || number === undefined) {
+        return '0,00'; // Retorna um valor padrão caso o número seja null ou undefined
+      }
       return number.toFixed(2).replace('.', ',');
     }
+
 
     function updateChart(rotasMensais) {
       const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
