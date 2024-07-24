@@ -1797,6 +1797,35 @@ app.delete('/api/motoristas_escolares/:id', async (req, res) => {
     }
 });
 
+app.put('/api/motoristas_escolares/:id', async (req, res) => {
+    const { id } = req.params;
+    const { nome_completo, cpf, cnh, empresa, rota_id } = req.body;
+    try {
+        const result = await pool.query(
+            `UPDATE motoristas_escolares
+         SET nome_completo = $1, cpf = $2, cnh = $3, empresa = $4, rota_id = $5
+         WHERE id = $6 RETURNING *`,
+            [nome_completo, cpf, cnh, empresa, rota_id, id]
+        );
+        if (result.rows.length > 0) {
+            res.status(200).json(result.rows[0]);
+        } else {
+            res.status(404).json({ message: 'Motorista não encontrado' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.get('/api/motoristas_escolares', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM motoristas_escolares');
+        res.status(200).json(result.rows);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.get('/api/rotas/motorista/:motorista_id', async (req, res) => {
     const { motorista_id } = req.params;
     try {
