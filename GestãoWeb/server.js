@@ -889,6 +889,17 @@ app.post('/api/cadastrar-rota', async (req, res) => {
     } = req.body;
 
     try {
+        // Verificar se o identificador único já existe
+        const existingRota = await pool.query(
+            'SELECT * FROM rotas WHERE identificador_unico = $1',
+            [identificadorUnico]
+        );
+
+        if (existingRota.rows.length > 0) {
+            return res.status(400).json({ error: 'Identificador único já existe.' });
+        }
+
+        // Inserir nova rota
         const result = await pool.query(
             `INSERT INTO rotas (
                 identificador_unico,
@@ -918,8 +929,6 @@ app.post('/api/cadastrar-rota', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-
-
 
 app.get('/api/rotas', async (req, res) => {
     try {
