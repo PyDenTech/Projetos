@@ -1754,12 +1754,17 @@ app.delete('/api/usuarios/:userId', isAdmin, async (req, res) => {
 
 app.get('/api/motoristas_escolares', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM motoristas_escolares');
+        const result = await pool.query(`
+        SELECT m.*, r.nome_rota 
+        FROM motoristas_escolares m 
+        LEFT JOIN rotas r ON m.rota_id = r.id
+      `);
         res.status(200).json(result.rows);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
+
 
 app.get('/api/motoristas_escolares/:id', async (req, res) => {
     const { id } = req.params;
@@ -1834,7 +1839,6 @@ app.get('/api/rotas/motorista/:motorista_id', async (req, res) => {
         res.status(500).json({ error: 'Erro ao buscar rotas do motorista' });
     }
 });
-
 
 app.get('/api/rota-gerada/:id', async (req, res) => {
     const { id } = req.params;
