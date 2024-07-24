@@ -434,7 +434,6 @@ app.post('/api/loginMotoristasAdministrativos', async (req, res) => {
     }
 });
 
-
 app.post('/api/loginWeb', async (req, res) => {
     const { email, senha } = req.body;
 
@@ -1755,65 +1754,34 @@ app.delete('/api/usuarios/:userId', isAdmin, async (req, res) => {
 app.get('/api/motoristas_escolares', async (req, res) => {
     try {
         const result = await pool.query(`
-        SELECT m.*, r.nome_rota 
-        FROM motoristas_escolares m 
+        SELECT m.*, r.id AS rota_id, r.nome_rota AS rota_nome
+        FROM motoristas_escolares m
         LEFT JOIN rotas r ON m.rota_id = r.id
       `);
         res.status(200).json(result.rows);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+    } catch (error) {
+        console.error('Erro ao buscar motoristas:', error);
+        res.status(500).json({ error: 'Erro ao processar a solicitação' });
     }
 });
 
-
+// Endpoint para obter um motorista escolar por ID
 app.get('/api/motoristas_escolares/:id', async (req, res) => {
     const { id } = req.params;
+
     try {
         const result = await pool.query('SELECT * FROM motoristas_escolares WHERE id = $1', [id]);
+
         if (result.rows.length > 0) {
             res.status(200).json(result.rows[0]);
         } else {
             res.status(404).json({ message: 'Motorista não encontrado' });
         }
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+    } catch (error) {
+        console.error('Erro ao buscar dados do motorista:', error);
+        res.status(500).json({ message: 'Erro ao processar a solicitação' });
     }
 });
-
-app.put('/api/motoristas_escolares/:id', async (req, res) => {
-    const { id } = req.params;
-    const { nome_completo, cpf, cnh, empresa, rota_id } = req.body;
-    try {
-        const result = await pool.query(
-            `UPDATE motoristas_escolares
-         SET nome_completo = $1, cpf = $2, cnh = $3, empresa = $4, rota_id = $5
-         WHERE id = $6 RETURNING *`,
-            [nome_completo, cpf, cnh, empresa, rota_id, id]
-        );
-        if (result.rows.length > 0) {
-            res.status(200).json(result.rows[0]);
-        } else {
-            res.status(404).json({ message: 'Motorista não encontrado' });
-        }
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-app.delete('/api/motoristas_escolares/:id', async (req, res) => {
-    const { id } = req.params;
-    try {
-        const result = await pool.query('DELETE FROM motoristas_escolares WHERE id = $1 RETURNING *', [id]);
-        if (result.rows.length > 0) {
-            res.status(200).json({ message: 'Motorista excluído com sucesso' });
-        } else {
-            res.status(404).json({ message: 'Motorista não encontrado' });
-        }
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
 
 app.get('/api/rotas/motorista/:motorista_id', async (req, res) => {
     const { motorista_id } = req.params;
@@ -1839,6 +1807,7 @@ app.get('/api/rotas/motorista/:motorista_id', async (req, res) => {
         res.status(500).json({ error: 'Erro ao buscar rotas do motorista' });
     }
 });
+
 
 app.get('/api/rota-gerada/:id', async (req, res) => {
     const { id } = req.params;
