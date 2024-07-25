@@ -61,7 +61,7 @@ function ensureLoggedIn(req, res, next) {
             <body>
                 <script>
                     alert('Você precisa estar logado para acessar esta página.');
-                    window.location.href = '/login';
+                    window.location.href = '/';
                 </script>
             </body>
             </html>
