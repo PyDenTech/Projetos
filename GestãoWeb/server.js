@@ -1191,25 +1191,6 @@ app.delete('/api/alunos/:id', async (req, res) => {
     }
 });
 
-
-// Endpoint para obter uma rota gerada específica
-
-/* app.get('/api/rota-gerada/:id', async (req, res) => {
-    const { id } = req.params;
-    try {
-        const result = await pool.query('SELECT coordenadas FROM rotas_geradas WHERE rota_id = $1', [id]);
-        if (result.rows.length > 0) {
-            res.json(JSON.parse(result.rows[0].coordenadas));
-        } else {
-            res.status(404).json({ message: 'Rota gerada não encontrada' });
-        }
-    } catch (error) {
-        console.error('Erro ao buscar rota gerada:', error);
-        res.status(500).json({ message: 'Erro ao buscar rota gerada' });
-    }
-}); */
-
-
 app.get('/api/dashboard-data', async (req, res) => {
     let client;
     try {
@@ -1885,18 +1866,27 @@ app.get('/api/rotas/motorista/:motorista_id', async (req, res) => {
 
 app.get('/api/rota-gerada/:id', async (req, res) => {
     const { id } = req.params;
+
     try {
-        const result = await pool.query('SELECT coordenadas FROM rotas_geradas WHERE rota_id = $1', [id]);
-        if (result.rows.length > 0) {
-            res.json(JSON.parse(result.rows[0].coordenadas));
-        } else {
-            res.status(404).json({ message: 'Rota gerada não encontrada' });
+        const result = await pool.query('SELECT * FROM rotas_geradas WHERE id = $1', [id]);
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Rota não encontrada' });
         }
+
+        const rota = result.rows[0];
+        const waypoints = [
+            rota.ponto_inicial,
+            ...rota.pontos_parada,
+            rota.ponto_final
+        ];
+
+        res.status(200).json(waypoints);
     } catch (error) {
         console.error('Erro ao buscar rota gerada:', error);
-        res.status(500).json({ message: 'Erro ao buscar rota gerada' });
+        res.status(500).json({ error: 'Erro ao buscar rota gerada' });
     }
 });
+
 
 // Endpoint para buscar motoristas
 app.get('/api/motoristas-abastecimento', async (req, res) => {

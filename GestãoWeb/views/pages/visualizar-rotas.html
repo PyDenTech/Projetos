@@ -654,6 +654,10 @@
                 fetch(`/api/rota-gerada/${rotaId}`)
                     .then(response => response.json())
                     .then(data => {
+                        if (!Array.isArray(data)) {
+                            throw new Error('Resposta inesperada do servidor');
+                        }
+
                         if (routingControl) {
                             map.removeControl(routingControl);
                         }
