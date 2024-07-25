@@ -1863,27 +1863,30 @@ app.get('/api/rotas/motorista/:motorista_id', async (req, res) => {
     }
 });
 
-
-app.get('/api/rota-gerada/:id', async (req, res) => {
-    const { id } = req.params;
+app.get('/api/rota-gerada/:rota_id', async (req, res) => {
+    const { rota_id } = req.params;
 
     try {
-        const result = await pool.query('SELECT * FROM rotas_geradas WHERE id = $1', [id]);
+        const result = await pool.query(
+            'SELECT ponto_inicial, pontos_parada, ponto_final FROM rotas_geradas WHERE rota_id = $1',
+            [rota_id]
+        );
+
         if (result.rows.length === 0) {
-            return res.status(404).json({ error: 'Rota não encontrada' });
+            return res.status(404).json({ error: 'Rota gerada não encontrada' });
         }
 
-        const rota = result.rows[0];
-        const waypoints = [
-            rota.ponto_inicial,
-            ...rota.pontos_parada,
-            rota.ponto_final
-        ];
+        const rotaGerada = result.rows[0];
+        const pontoInicial = JSON.parse(rotaGerada.ponto_inicial);
+        const pontosParada = JSON.parse(rotaGerada.pontos_parada);
+        const pontoFinal = JSON.parse(rotaGerada.ponto_final);
 
-        res.status(200).json(waypoints);
-    } catch (error) {
-        console.error('Erro ao buscar rota gerada:', error);
-        res.status(500).json({ error: 'Erro ao buscar rota gerada' });
+        const pontos = [pontoInicial, ...pontosParada, pontoFinal];
+
+        res.json(pontos);
+    } catch (err) {
+        console.error('Erro ao buscar a rota gerada:', err);
+        res.status(500).json({ error: 'Erro interno do servidor' });
     }
 });
 
