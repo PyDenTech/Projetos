@@ -424,6 +424,54 @@
                 </div>
             </div>
         </section>
+        <!-- Modal de Edição de Rota -->
+        <div class="modal fade" id="editRotaModal" tabindex="-1" aria-labelledby="editRotaModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editRotaModalLabel">Editar Rota</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editRotaForm">
+                            <input type="hidden" id="editRotaId">
+                            <div class="mb-3">
+                                <label for="editIdentificadorUnico" class="form-label">Identificador Único</label>
+                                <input type="text" class="form-control" id="editIdentificadorUnico" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editNomeRota" class="form-label">Nome da Rota</label>
+                                <input type="text" class="form-control" id="editNomeRota" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editHorariosFuncionamento" class="form-label">Horários de
+                                    Funcionamento</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="editManha" value="Manhã">
+                                    <label class="form-check-label" for="editManha">Manhã</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="editTarde" value="Tarde">
+                                    <label class="form-check-label" for="editTarde">Tarde</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="editNoite" value="Noite">
+                                    <label class="form-check-label" for="editNoite">Noite</label>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editEscolasAtendidas" class="form-label">Escolas Atendidas</label>
+                                <select multiple class="form-select" id="editEscolasAtendidas">
+                                    <!-- Opções carregadas dinamicamente -->
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-primary" id="salvarEdicaoRota">Salvar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <footer id="footer" class="footer">
@@ -573,9 +621,69 @@
                     .catch(error => console.error('Erro ao visualizar rota:', error));
             };
 
-            window.editarRota = function (id) {
-                // Implementar função de editar rota
+            window.editarRota = function (rotaId) {
+                fetch(`/api/rotas/${rotaId}`)
+                    .then(response => response.json())
+                    .then(rota => {
+                        document.getElementById('editRotaId').value = rota.id;
+                        document.getElementById('editIdentificadorUnico').value = rota.identificador_unico;
+                        document.getElementById('editNomeRota').value = rota.nome_rota;
+
+                        // Limpar e preencher horários de funcionamento
+                        ['Manhã', 'Tarde', 'Noite'].forEach(periodo => {
+                            document.getElementById(`edit${periodo}`).checked = rota.horarios_funcionamento.includes(periodo);
+                        });
+
+                        // Carregar opções de escolas e marcar as selecionadas
+                        fetch('/api/escolas')
+                            .then(response => response.json())
+                            .then(escolas => {
+                                const escolasSelect = document.getElementById('editEscolasAtendidas');
+                                escolasSelect.innerHTML = escolas.map(escola => `<option value="${escola.id}">${escola.nome}</option>`).join('');
+                                rota.escolas_atendidas.forEach(id => {
+                                    const option = escolasSelect.querySelector(`option[value="${id}"]`);
+                                    if (option) {
+                                        option.selected = true;
+                                    }
+                                });
+                            })
+                            .catch(error => console.error('Erro ao carregar escolas:', error));
+
+                        const editRotaModal = new bootstrap.Modal(document.getElementById('editRotaModal'));
+                        editRotaModal.show();
+                    })
+                    .catch(error => console.error('Erro ao carregar dados da rota:', error));
             };
+
+            document.getElementById('salvarEdicaoRota').addEventListener('click', function () {
+                const rotaId = document.getElementById('editRotaId').value;
+                const data = {
+                    identificadorUnico: document.getElementById('editIdentificadorUnico').value,
+                    nomeRota: document.getElementById('editNomeRota').value,
+                    horariosFuncionamento: Array.from(document.querySelectorAll('#editRotaForm input[type="checkbox"]:checked')).map(el => el.value),
+                    escolasAtendidas: Array.from(document.getElementById('editEscolasAtendidas').selectedOptions).map(option => option.value)
+                };
+
+                fetch(`/api/rotas/${rotaId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Rota atualizada com sucesso!');
+                            fetchRotas();
+                        } else {
+                            alert('Erro ao atualizar rota.');
+                        }
+                        const editRotaModal = bootstrap.Modal.getInstance(document.getElementById('editRotaModal'));
+                        editRotaModal.hide();
+                    })
+                    .catch(error => console.error('Erro ao atualizar rota:', error));
+            });
 
             window.excluirRota = function (id) {
                 if (confirm('Tem certeza que deseja excluir esta rota?')) {
