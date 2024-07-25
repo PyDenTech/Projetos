@@ -1418,56 +1418,35 @@ app.get('/api/escolas', async (req, res) => {
 
 // Endpoint para salvar a rota gerada
 app.post('/api/salvar-rota-gerada', async (req, res) => {
-    const { rotaId, coordenadas, detalhes, distancia, tempo, pontos_parada } = req.body;
-
-    if (!rotaId || !coordenadas || !detalhes || !distancia || !tempo || !pontos_parada) {
-        return res.status(400).json({ error: 'Dados incompletos' });
-    }
+    const { ponto_inicial, pontos_parada, ponto_final, rota_id, distancia_total, tempo_total } = req.body;
 
     try {
-        const client = await pool.connect();
-        try {
-            await client.query('BEGIN');
+        const result = await pool.query(
+            `INSERT INTO rotas_geradas (
+                ponto_inicial, 
+                pontos_parada, 
+                ponto_final, 
+                rota_id, 
+                distancia_total, 
+                tempo_total
+            ) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+            [
+                ponto_inicial,
+                pontos_parada,
+                ponto_final,
+                rota_id,
+                distancia_total,
+                tempo_total
+            ]
+        );
 
-            // Verificar se a rota já foi salva
-            const checkQuery = 'SELECT * FROM rotas_geradas WHERE rota_id = $1';
-            const checkResult = await client.query(checkQuery, [rotaId]);
-
-            if (checkResult.rows.length > 0) {
-                await client.query('ROLLBACK');
-                return res.status(409).json({ error: 'Rota já foi salva anteriormente' });
-            }
-
-            const insertQuery = `
-                INSERT INTO rotas_geradas (rota_id, coordenadas, detalhes, distancia, tempo, pontos_parada)
-                VALUES ($1, $2, $3, $4, $5, $6)
-                RETURNING *
-            `;
-
-            const result = await client.query(insertQuery, [
-                rotaId,
-                JSON.stringify(coordenadas),
-                detalhes,
-                distancia,
-                tempo,
-                JSON.stringify(pontos_parada)
-            ]);
-
-            await client.query('COMMIT');
-
-            res.status(201).json(result.rows[0]);
-        } catch (err) {
-            await client.query('ROLLBACK');
-            console.error('Erro ao salvar rota gerada:', err);
-            res.status(500).json({ error: 'Erro interno do servidor' });
-        } finally {
-            client.release();
-        }
-    } catch (err) {
-        console.error('Erro ao conectar ao banco de dados:', err);
-        res.status(500).json({ error: 'Erro de conexão com o banco de dados' });
+        res.status(201).json(result.rows[0]);
+    } catch (error) {
+        console.error('Erro ao salvar rota gerada:', error);
+        res.status(500).json({ error: 'Erro ao salvar rota gerada' });
     }
 });
+
 
 
 app.get('/api/motoristas', async (req, res) => {

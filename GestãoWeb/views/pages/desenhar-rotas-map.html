@@ -409,10 +409,16 @@
             const addStartPointButton = document.getElementById('addStartPointButton');
             const addEndPointButton = document.getElementById('addEndPointButton');
             const addWayPointButton = document.getElementById('addWayPointButton');
+            const saveRouteButton = document.createElement('button');
+            saveRouteButton.textContent = 'Salvar Rota';
+            saveRouteButton.classList.add('btn', 'btn-success', 'mt-3');
+            document.querySelector('.card-body').appendChild(saveRouteButton);
+
             const map = L.map('map').setView([-6.530379, -49.851744], 13);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
+
             let routingControl;
             let startPoint = null;
             let endPoint = null;
@@ -585,6 +591,37 @@
             addWayPointButton.disabled = true;
             addEndPointButton.disabled = true;
             rotaSelect.disabled = true;
+
+            // Função para salvar a rota gerada
+            saveRouteButton.addEventListener('click', function () {
+                if (!startPoint || !endPoint || waypoints.length < 2 || !rotaSelect.value) {
+                    alert('Certifique-se de ter selecionado o ponto inicial, pelo menos dois pontos de parada, o ponto final e uma rota.');
+                    return;
+                }
+
+                const pontosParadaCoords = waypoints.map(wp => ({ lat: wp.getLatLng().lat, lng: wp.getLatLng().lng }));
+                const data = {
+                    ponto_inicial: { lat: startPoint.getLatLng().lat, lng: startPoint.getLatLng().lng },
+                    pontos_parada: pontosParadaCoords,
+                    ponto_final: { lat: endPoint.getLatLng().lat, lng: endPoint.getLatLng().lng },
+                    rota_id: parseInt(rotaSelect.value),
+                    distancia_total: parseFloat(document.querySelector('#routingInstructions').innerText.split(' ')[2]), // Pega a distância total da instrução
+                    tempo_total: parseFloat(document.querySelector('#routingInstructions').innerText.split(' ')[6]) // Pega o tempo total da instrução
+                };
+
+                fetch('/api/salvar-rota-gerada', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                    .then(response => response.json())
+                    .then(result => {
+                        alert('Rota gerada salva com sucesso!');
+                    })
+                    .catch(error => console.error('Erro ao salvar rota gerada:', error));
+            });
         });
     </script>
 </body>
