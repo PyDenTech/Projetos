@@ -233,10 +233,12 @@
                             const routes = e.routes;
                             const summary = routes[0].summary;
                             const instructions = document.getElementById('routingInstructions');
-                            instructions.innerHTML = '<b>Total distance:</b> ' + (summary.totalDistance / 1000).toFixed(2) + ' km<br><b>Total time:</b> ' + (summary.totalTime / 60).toFixed(0) + ' mins<br><br>';
-                            instructions.innerHTML += '<ol>';
-                            routes[0].instructions.forEach(function (instruction) {
-                                instructions.innerHTML += '<li>' + instruction.text + '</li>';
+                            instructions.innerHTML = '<b>Distância Total:</b> ' + (summary.totalDistance / 1000).toFixed(2) + ' km<br><b>Tempo Total:</b> ' + (summary.totalTime / 60).toFixed(0) + ' mins<br><br>';
+                            instructions.innerHTML += '<b>Pontos de Parada:</b><ol>';
+                            routeWaypoints.forEach((wp, index) => {
+                                if (index !== 0 && index !== routeWaypoints.length - 1) { // Ignorar o ponto inicial e final
+                                    instructions.innerHTML += `<li>${wp.lat.toFixed(5)}, ${wp.lng.toFixed(5)}</li>`;
+                                }
                             });
                             instructions.innerHTML += '</ol>';
                         });
