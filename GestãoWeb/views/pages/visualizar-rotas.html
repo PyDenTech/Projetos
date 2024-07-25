@@ -437,6 +437,11 @@
                         <form id="editRotaForm">
                             <input type="hidden" id="editRotaId">
                             <div class="mb-3">
+                                <label for="editIdentificadorUnico" class="form-label">Identificador Único</label>
+                                <input type="text" class="form-control" id="editIdentificadorUnico"
+                                    name="identificadorUnico" required>
+                            </div>
+                            <div class="mb-3">
                                 <label for="editTipoRota" class="form-label">Tipo da Rota</label>
                                 <select class="form-select" id="editTipoRota" name="tipoRota">
                                     <option value="Rodoviária">Rodoviária</option>
@@ -565,6 +570,7 @@
 
 
     <!-- Template Main JS File -->
+    <script src="/js/users-profile.js"></script>
     <script src="/js/main.js"></script>
 
     <script>
@@ -680,20 +686,34 @@
 
             window.editarRota = function (id) {
                 fetch(`/api/rotas/${id}`)
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erro ao carregar dados da rota para edição');
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         document.getElementById('editRotaId').value = data.id;
+                        document.getElementById('editIdentificadorUnico').value = data.identificador_unico;
                         document.getElementById('editTipoRota').value = data.tipo_rota;
                         document.getElementById('editNomeRota').value = data.nome_rota;
-                        document.getElementById('editHorariosFuncionamento').value = data.horarios_funcionamento;
+
                         // Marcar os checkboxes de horários de funcionamento
                         ['Manhã', 'Tarde', 'Noite'].forEach(periodo => {
-                            document.getElementById(`edit${periodo}`).checked = data.horarios_funcionamento.includes(periodo);
+                            const checkbox = document.getElementById(`edit${periodo}`);
+                            if (checkbox) {
+                                checkbox.checked = data.horarios_funcionamento.includes(periodo);
+                            }
                         });
+
                         // Marcar os checkboxes de dificuldades de acesso
                         ['Porteira', 'MataBurro', 'Colchete', 'Atoleiro', 'Ponte'].forEach(dificuldade => {
-                            document.getElementById(`edit${dificuldade}`).checked = data.dificuldades_acesso.includes(dificuldade);
+                            const checkbox = document.getElementById(`edit${dificuldade}`);
+                            if (checkbox) {
+                                checkbox.checked = data.dificuldades_acesso.includes(dificuldade);
+                            }
                         });
+
                         // Marcar o rádio de área urbana
                         document.getElementById('editUrbana').checked = data.area_urbana;
                         document.getElementById('editRural').checked = !data.area_urbana;
@@ -704,7 +724,12 @@
                             .then(escolas => {
                                 const escolasAtendidasSelect = document.getElementById('editEscolasAtendidas');
                                 escolasAtendidasSelect.innerHTML = escolas.map(escola => `<option value="${escola.id}">${escola.nome}</option>`).join('');
-                                escolasAtendidasSelect.value = data.escolas_atendidas;
+                                data.escolas_atendidas.forEach(id => {
+                                    const option = escolasAtendidasSelect.querySelector(`option[value="${id}"]`);
+                                    if (option) {
+                                        option.selected = true;
+                                    }
+                                });
                             });
 
                         // Carregar as opções de alunos atendidos
@@ -713,7 +738,12 @@
                             .then(alunos => {
                                 const alunosAtendidosSelect = document.getElementById('editAlunosAtendidos');
                                 alunosAtendidosSelect.innerHTML = alunos.map(aluno => `<option value="${aluno.id}">${aluno.nome}</option>`).join('');
-                                alunosAtendidosSelect.value = data.alunos_atendidos;
+                                data.alunos_atendidos.forEach(id => {
+                                    const option = alunosAtendidosSelect.querySelector(`option[value="${id}"]`);
+                                    if (option) {
+                                        option.selected = true;
+                                    }
+                                });
                             });
 
                         const editRotaModal = new bootstrap.Modal(document.getElementById('editRotaModal'));
@@ -724,6 +754,7 @@
 
             document.getElementById('salvarEdicaoRota').addEventListener('click', function () {
                 const id = document.getElementById('editRotaId').value;
+                const identificadorUnico = document.getElementById('editIdentificadorUnico').value;
                 const tipoRota = document.getElementById('editTipoRota').value;
                 const nomeRota = document.getElementById('editNomeRota').value;
                 const horariosFuncionamento = Array.from(document.querySelectorAll("input[name='horariosFuncionamento']:checked")).map(el => el.value);
@@ -733,6 +764,7 @@
                 const alunosAtendidos = Array.from(document.getElementById('editAlunosAtendidos').selectedOptions).map(option => option.value);
 
                 const data = {
+                    identificador_unico: identificadorUnico,
                     tipo_rota: tipoRota,
                     nome_rota: nomeRota,
                     horarios_funcionamento: horariosFuncionamento,

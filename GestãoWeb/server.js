@@ -981,21 +981,46 @@ app.post('/api/escolas-nomes', async (req, res) => {
         res.status(500).send('Server error');
     }
 });
+app.get('/api/rotas/:id', async (req, res) => {
+    const { id } = req.params;
 
+    try {
+        const result = await pool.query('SELECT * FROM rotas WHERE id = $1', [id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Rota não encontrada' });
+        }
+
+        res.status(200).json(result.rows[0]);
+    } catch (error) {
+        console.error('Erro ao buscar rota:', error);
+        res.status(500).json({ error: 'Erro ao buscar rota' });
+    }
+});
 
 // Endpoint para editar uma rota
 app.put('/api/rotas/:id', async (req, res) => {
     const { id } = req.params;
-    const { tipo_rota, nome_rota, horarios_funcionamento, dificuldades_acesso, escolas_atendidas, alunos_atendidos, area_urbana } = req.body;
+    const { identificador_unico, tipo_rota, nome_rota, horarios_funcionamento, dificuldades_acesso, escolas_atendidas, alunos_atendidos, area_urbana } = req.body;
 
     try {
         const result = await pool.query(
             `UPDATE rotas
-             SET tipo_rota = $1, nome_rota = $2, horarios_funcionamento = $3, dificuldades_acesso = $4,
-                 escolas_atendidas = $5, alunos_atendidos = $6, area_urbana = $7
-             WHERE id = $8
+             SET identificador_unico = $1, tipo_rota = $2, nome_rota = $3, horarios_funcionamento = $4::jsonb, dificuldades_acesso = $5::jsonb,
+                 escolas_atendidas = $6::jsonb, alunos_atendidos = $7::jsonb, area_urbana = $8
+             WHERE id = $9
              RETURNING *`,
-            [tipo_rota, nome_rota, horarios_funcionamento, dificuldades_acesso, escolas_atendidas, alunos_atendidos, area_urbana, id]
+            [
+                identificador_unico,
+                tipo_rota,
+                nome_rota,
+                JSON.stringify(horarios_funcionamento),
+                JSON.stringify(dificuldades_acesso),
+                JSON.stringify(escolas_atendidas),
+                JSON.stringify(alunos_atendidos),
+                area_urbana,
+                id
+            ]
         );
 
         if (result.rows.length === 0) {
@@ -1008,6 +1033,7 @@ app.put('/api/rotas/:id', async (req, res) => {
         res.status(500).json({ error: 'Erro ao editar rota' });
     }
 });
+
 
 
 // Endpoint para excluir uma rota

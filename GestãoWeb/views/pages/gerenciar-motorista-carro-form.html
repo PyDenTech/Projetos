@@ -431,6 +431,25 @@
         </div>
     </div>
 
+    <!-- Modal para exibir o mapa -->
+    <div class="modal fade" id="localizacaoModal" tabindex="-1" aria-labelledby="localizacaoModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="localizacaoModalLabel">Localização do Motorista</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="map" style="height: 400px;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal para Aviso Geral -->
     <div class="modal fade" id="modalAvisoGeral" tabindex="-1" aria-labelledby="modalAvisoGeralLabel"
         aria-hidden="true">
@@ -652,24 +671,6 @@
         });
     </script>
 
-    <!-- Modal para exibir o mapa -->
-    <div class="modal fade" id="localizacaoModal" tabindex="-1" aria-labelledby="localizacaoModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="localizacaoModalLabel">Localização do Motorista</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="map" style="height: 400px;"></div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
 </body>
 
