@@ -124,6 +124,10 @@ app.get('/termos', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'termos.html'));
 });
 
+app.get('/visualizar-rotas', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'pages', 'visualizar-rotas.html'));
+});
+
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, 'public/uploads/');
