@@ -50,10 +50,29 @@ pool.connect(err => {
 
 function ensureLoggedIn(req, res, next) {
     if (!req.session.user) {
-        return res.status(401).send('Você precisa estar logado para acessar esta página.');
+        res.send(`
+            <!DOCTYPE html>
+            <html lang="pt-br">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Redirecionando...</title>
+            </head>
+            <body>
+                <script>
+                    alert('Você precisa estar logado para acessar esta página.');
+                    window.location.href = '/login';
+                </script>
+            </body>
+            </html>
+        `);
+    } else {
+        next();
     }
-    next();
 }
+
+module.exports = ensureLoggedIn;
+
 
 function isAdmin(req, res, next) {
     if (req.session.admin && req.session.admin.role === 'admin') {
