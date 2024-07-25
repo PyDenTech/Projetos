@@ -400,6 +400,7 @@
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
     <!-- Template Main JS File -->
+    <script src="/js/users-profile.js"></script>
     <script src="/js/main.js"></script>
 
     <script>
@@ -442,6 +443,7 @@
                 iconAnchor: [16, 32]
             });
 
+
             // Carregar rotas no select
             fetch('/api/rotas')
                 .then(response => response.json())
@@ -461,29 +463,47 @@
                         map.removeLayer(startPoint);
                     }
                     startPoint = L.marker(e.latlng, { icon: startIcon }).addTo(map).bindPopup('Ponto Inicial').openPopup();
+                    addWayPointButton.disabled = false; // Habilitar o botão de adicionar pontos de parada
                 });
             });
 
             // Adicionar ponto final ao clicar no mapa
             addEndPointButton.addEventListener('click', function () {
+                if (waypoints.length < 2) {
+                    alert('Você precisa adicionar pelo menos dois pontos de parada antes de selecionar o ponto final.');
+                    return;
+                }
                 map.once('click', function (e) {
                     if (endPoint) {
                         map.removeLayer(endPoint);
                     }
                     endPoint = L.marker(e.latlng, { icon: endIcon }).addTo(map).bindPopup('Ponto Final').openPopup();
+                    rotaSelect.disabled = false; // Habilitar o seletor de rotas
                 });
             });
 
             // Adicionar ponto de parada ao clicar no mapa
             addWayPointButton.addEventListener('click', function () {
+                if (!startPoint) {
+                    alert('Você precisa selecionar o ponto inicial primeiro.');
+                    return;
+                }
                 map.once('click', function (e) {
                     const wayPoint = L.marker(e.latlng, { icon: wayPointIcon }).addTo(map).bindPopup('Ponto de Parada').openPopup();
                     waypoints.push(wayPoint);
+                    if (waypoints.length >= 2) {
+                        addEndPointButton.disabled = false; // Habilitar o botão de adicionar ponto final
+                    }
                 });
             });
 
             // Quando uma rota é selecionada, carregar as escolas e gerar o traçado
             rotaSelect.addEventListener('change', function () {
+                if (!endPoint) {
+                    alert('Você precisa selecionar o ponto final primeiro.');
+                    rotaSelect.value = ''; // Resetar a seleção da rota
+                    return;
+                }
                 const rotaId = this.value;
                 fetch(`/api/rotas/${rotaId}`)
                     .then(response => response.json())
@@ -560,6 +580,11 @@
                     })
                     .catch(error => console.error('Erro ao gerar traçado de rota:', error));
             });
+
+            // Inicialmente desabilitar os botões e seletor
+            addWayPointButton.disabled = true;
+            addEndPointButton.disabled = true;
+            rotaSelect.disabled = true;
         });
     </script>
 </body>
