@@ -450,6 +450,7 @@
             });
 
 
+
             // Carregar rotas no select
             fetch('/api/rotas')
                 .then(response => response.json())
@@ -462,13 +463,29 @@
                     });
                 });
 
+            // Função para criar um marcador arrastável e removível
+            function createMarker(latlng, icon, popupText) {
+                const marker = L.marker(latlng, { icon: icon, draggable: true }).addTo(map).bindPopup(popupText).openPopup();
+                marker.on('click', function () {
+                    if (confirm('Deseja remover este ponto?')) {
+                        map.removeLayer(marker);
+                        waypoints = waypoints.filter(wp => wp !== marker);
+                        if (marker === startPoint) startPoint = null;
+                        if (marker === endPoint) endPoint = null;
+                        if (waypoints.length < 2) addEndPointButton.disabled = true;
+                        rotaSelect.disabled = true;
+                    }
+                });
+                return marker;
+            }
+
             // Adicionar ponto inicial ao clicar no mapa
             addStartPointButton.addEventListener('click', function () {
                 map.once('click', function (e) {
                     if (startPoint) {
                         map.removeLayer(startPoint);
                     }
-                    startPoint = L.marker(e.latlng, { icon: startIcon }).addTo(map).bindPopup('Ponto Inicial').openPopup();
+                    startPoint = createMarker(e.latlng, startIcon, 'Ponto Inicial');
                     addWayPointButton.disabled = false; // Habilitar o botão de adicionar pontos de parada
                 });
             });
@@ -483,7 +500,7 @@
                     if (endPoint) {
                         map.removeLayer(endPoint);
                     }
-                    endPoint = L.marker(e.latlng, { icon: endIcon }).addTo(map).bindPopup('Ponto Final').openPopup();
+                    endPoint = createMarker(e.latlng, endIcon, 'Ponto Final');
                     rotaSelect.disabled = false; // Habilitar o seletor de rotas
                 });
             });
@@ -495,7 +512,7 @@
                     return;
                 }
                 map.once('click', function (e) {
-                    const wayPoint = L.marker(e.latlng, { icon: wayPointIcon }).addTo(map).bindPopup('Ponto de Parada').openPopup();
+                    const wayPoint = createMarker(e.latlng, wayPointIcon, 'Ponto de Parada');
                     waypoints.push(wayPoint);
                     if (waypoints.length >= 2) {
                         addEndPointButton.disabled = false; // Habilitar o botão de adicionar ponto final
