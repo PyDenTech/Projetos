@@ -924,18 +924,24 @@ app.post('/api/cadastrar-rota', async (req, res) => {
 
 app.get('/api/rotas', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM rotas');
-
+        const result = await pool.query('SELECT id, nome_rota, escolas_atendidas FROM rotas');
         if (result.rows.length === 0) {
             return res.status(404).json({ message: 'Nenhuma rota encontrada' });
         }
 
-        res.status(200).json(result.rows);
+        // Parse JSON fields
+        const rotas = result.rows.map(rota => ({
+            ...rota,
+            escolas_atendidas: JSON.parse(rota.escolas_atendidas)
+        }));
+
+        res.status(200).json(rotas);
     } catch (error) {
         console.error('Erro ao buscar rotas:', error);
         res.status(500).json({ error: 'Erro ao buscar rotas' });
     }
 });
+
 
 // Endpoint para buscar informações de uma rota por ID
 app.get('/api/rotas', async (req, res) => {

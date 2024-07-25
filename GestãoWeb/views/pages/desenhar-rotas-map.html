@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -372,6 +371,7 @@
                         <div class="card-body">
                             <h5 class="card-title">Selecione a Rota</h5>
                             <select class="form-select" id="rotaSelect">
+                                <option value="">Selecione uma Rota</option>
                                 <!-- Opções carregadas dinamicamente -->
                             </select>
                             <button class="btn btn-primary mt-3" id="addStartPointButton">Adicionar Ponto
@@ -415,18 +415,9 @@
             document.querySelector('.card-body').appendChild(saveRouteButton);
 
             const map = L.map('map').setView([-6.530379, -49.851744], 13);
-
-            const tileLayers = {
-                "Mapa Padrão": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    attribution: '&copy; OpenStreetMap contributors'
-                }),
-                "Satélite": L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZGFuaWxvbW9yYWlzIiwiYSI6ImNsdzZocmJ5eDFqenoyanFzenBoMTc4c28ifQ._RiYYX1oIBe7_MBpTyYWxQ', {
-                    attribution: 'Map data &copy; <a href="https://www.mapbox.com/">Mapbox</a>'
-                })
-            };
-
-            tileLayers["Mapa Padrão"].addTo(map);
-            L.control.layers(tileLayers).addTo(map);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
 
             let routingControl;
             let startPoint = null;
@@ -465,7 +456,7 @@
                     rotas.forEach(rota => {
                         const option = document.createElement('option');
                         option.value = rota.id;
-                        option.textContent = rota.nome_rota;
+                        option.textContent = `${rota.id} - ${rota.nome_rota} - ${rota.escolas_atendidas.join(', ')}`;
                         rotaSelect.appendChild(option);
                     });
                 });
@@ -658,5 +649,4 @@
         });
     </script>
 </body>
-
 </html>
