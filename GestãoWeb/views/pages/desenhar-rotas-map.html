@@ -55,6 +55,8 @@
                             <select class="form-select" id="rotaSelect">
                                 <!-- Opções carregadas dinamicamente -->
                             </select>
+                            <button class="btn btn-primary mt-3" id="addStartPointButton">Adicionar Ponto
+                                Inicial</button>
                             <div id="map"></div>
                         </div>
                     </div>
@@ -81,11 +83,13 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const rotaSelect = document.getElementById('rotaSelect');
+            const addStartPointButton = document.getElementById('addStartPointButton');
             const map = L.map('map').setView([-6.530379, -49.851744], 13);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
             let routingControl;
+            let startPoint = null;
 
             // Carregar rotas no select
             fetch('/api/rotas')
@@ -98,6 +102,16 @@
                         rotaSelect.appendChild(option);
                     });
                 });
+
+            // Adicionar ponto inicial ao clicar no mapa
+            addStartPointButton.addEventListener('click', function () {
+                map.once('click', function (e) {
+                    if (startPoint) {
+                        map.removeLayer(startPoint);
+                    }
+                    startPoint = L.marker(e.latlng).addTo(map).bindPopup('Ponto Inicial').openPopup();
+                });
+            });
 
             // Quando uma rota é selecionada, carregar as escolas e gerar o traçado
             rotaSelect.addEventListener('change', function () {
@@ -119,6 +133,10 @@
                     .then(escolas => {
                         const waypoints = escolas.map(escola => L.latLng(escola.latitude, escola.longitude));
 
+                        if (startPoint) {
+                            waypoints.unshift(startPoint.getLatLng());
+                        }
+
                         if (routingControl) {
                             map.removeControl(routingControl);
                         }
@@ -127,7 +145,7 @@
                             waypoints: waypoints,
                             routeWhileDragging: false,
                             createMarker: function (i, wp) {
-                                return L.marker(wp.latLng).bindPopup(escolas[i].nome);
+                                return L.marker(wp.latLng).bindPopup(i === 0 ? 'Ponto Inicial' : escolas[i - 1].nome);
                             }
                         }).addTo(map);
 
