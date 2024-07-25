@@ -104,6 +104,31 @@
             let endPoint = null;
             let waypoints = [];
 
+            // Ícones personalizados
+            const startIcon = L.icon({
+                iconUrl: 'img/icones/start-icon.png',
+                iconSize: [32, 32],
+                iconAnchor: [16, 32]
+            });
+
+            const endIcon = L.icon({
+                iconUrl: 'img/icones/end-icon.png',
+                iconSize: [32, 32],
+                iconAnchor: [16, 32]
+            });
+
+            const wayPointIcon = L.icon({
+                iconUrl: 'img/icones/waypoint-icon.png',
+                iconSize: [32, 32],
+                iconAnchor: [16, 32]
+            });
+
+            const schoolIcon = L.icon({
+                iconUrl: 'img/icones/school-icon.png',
+                iconSize: [32, 32],
+                iconAnchor: [16, 32]
+            });
+
             // Carregar rotas no select
             fetch('/api/rotas')
                 .then(response => response.json())
@@ -122,7 +147,7 @@
                     if (startPoint) {
                         map.removeLayer(startPoint);
                     }
-                    startPoint = L.marker(e.latlng).addTo(map).bindPopup('Ponto Inicial').openPopup();
+                    startPoint = L.marker(e.latlng, { icon: startIcon }).addTo(map).bindPopup('Ponto Inicial').openPopup();
                 });
             });
 
@@ -132,14 +157,14 @@
                     if (endPoint) {
                         map.removeLayer(endPoint);
                     }
-                    endPoint = L.marker(e.latlng).addTo(map).bindPopup('Ponto Final').openPopup();
+                    endPoint = L.marker(e.latlng, { icon: endIcon }).addTo(map).bindPopup('Ponto Final').openPopup();
                 });
             });
 
             // Adicionar ponto de parada ao clicar no mapa
             addWayPointButton.addEventListener('click', function () {
                 map.once('click', function (e) {
-                    const wayPoint = L.marker(e.latlng).addTo(map).bindPopup('Ponto de Parada').openPopup();
+                    const wayPoint = L.marker(e.latlng, { icon: wayPointIcon }).addTo(map).bindPopup('Ponto de Parada').openPopup();
                     waypoints.push(wayPoint);
                 });
             });
@@ -191,13 +216,13 @@
                             routeWhileDragging: false,
                             createMarker: function (i, wp) {
                                 if (i === 0 && startPoint) {
-                                    return startPoint;
+                                    return L.marker(wp.latLng, { icon: startIcon }).bindPopup('Ponto Inicial');
                                 } else if (i === routeWaypoints.length - 1 && endPoint) {
-                                    return endPoint;
+                                    return L.marker(wp.latLng, { icon: endIcon }).bindPopup('Ponto Final');
                                 } else if (waypoints.find(point => point.getLatLng().equals(wp.latLng))) {
-                                    return L.marker(wp.latLng).bindPopup('Ponto de Parada');
+                                    return L.marker(wp.latLng, { icon: wayPointIcon }).bindPopup('Ponto de Parada');
                                 } else {
-                                    return L.marker(wp.latLng).bindPopup(escolas[i - waypoints.length - 1].nome);
+                                    return L.marker(wp.latLng, { icon: schoolIcon }).bindPopup(escolas[i - waypoints.length - 1].nome);
                                 }
                             },
                             show: false,
