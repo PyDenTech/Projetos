@@ -424,10 +424,10 @@
                 </div>
             </div>
         </section>
-        <!-- Modal de Edição de Rota -->
+        <!-- Modal de Edição -->
         <div class="modal fade" id="editRotaModal" tabindex="-1" aria-labelledby="editRotaModalLabel"
             aria-hidden="true">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="editRotaModalLabel">Editar Rota</h5>
@@ -437,32 +437,86 @@
                         <form id="editRotaForm">
                             <input type="hidden" id="editRotaId">
                             <div class="mb-3">
-                                <label for="editIdentificadorUnico" class="form-label">Identificador Único</label>
-                                <input type="text" class="form-control" id="editIdentificadorUnico" required>
+                                <label for="editTipoRota" class="form-label">Tipo da Rota</label>
+                                <select class="form-select" id="editTipoRota" name="tipoRota">
+                                    <option value="Rodoviária">Rodoviária</option>
+                                    <option value="Aquaviária">Aquaviária</option>
+                                    <option value="Mista">Mista</option>
+                                </select>
                             </div>
                             <div class="mb-3">
                                 <label for="editNomeRota" class="form-label">Nome da Rota</label>
-                                <input type="text" class="form-control" id="editNomeRota" required>
+                                <input type="text" class="form-control" id="editNomeRota" name="nomeRota" required>
                             </div>
                             <div class="mb-3">
                                 <label for="editHorariosFuncionamento" class="form-label">Horários de
                                     Funcionamento</label>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="editManha" value="Manhã">
+                                <div>
+                                    <input class="form-check-input" type="checkbox" id="editManha"
+                                        name="horariosFuncionamento" value="Manhã">
                                     <label class="form-check-label" for="editManha">Manhã</label>
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="editTarde" value="Tarde">
+                                <div>
+                                    <input class="form-check-input" type="checkbox" id="editTarde"
+                                        name="horariosFuncionamento" value="Tarde">
                                     <label class="form-check-label" for="editTarde">Tarde</label>
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="editNoite" value="Noite">
+                                <div>
+                                    <input class="form-check-input" type="checkbox" id="editNoite"
+                                        name="horariosFuncionamento" value="Noite">
                                     <label class="form-check-label" for="editNoite">Noite</label>
                                 </div>
                             </div>
                             <div class="mb-3">
+                                <label for="editDificuldadesAcesso" class="form-label">Dificuldades de Acesso</label>
+                                <div>
+                                    <input class="form-check-input" type="checkbox" id="editPorteira"
+                                        name="dificuldadesAcesso" value="Porteira">
+                                    <label class="form-check-label" for="editPorteira">Porteira</label>
+                                </div>
+                                <div>
+                                    <input class="form-check-input" type="checkbox" id="editMataBurro"
+                                        name="dificuldadesAcesso" value="Mata-Burro">
+                                    <label class="form-check-label" for="editMataBurro">Mata-Burro</label>
+                                </div>
+                                <div>
+                                    <input class="form-check-input" type="checkbox" id="editColchete"
+                                        name="dificuldadesAcesso" value="Colchete">
+                                    <label class="form-check-label" for="editColchete">Colchete</label>
+                                </div>
+                                <div>
+                                    <input class="form-check-input" type="checkbox" id="editAtoleiro"
+                                        name="dificuldadesAcesso" value="Atoleiro">
+                                    <label class="form-check-label" for="editAtoleiro">Atoleiro</label>
+                                </div>
+                                <div>
+                                    <input class="form-check-input" type="checkbox" id="editPonte"
+                                        name="dificuldadesAcesso" value="Ponte Rústica">
+                                    <label class="form-check-label" for="editPonte">Ponte Rústica</label>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editAreaUrbana" class="form-label">Área da Rota</label>
+                                <div>
+                                    <input class="form-check-input" type="radio" name="areaUrbana" id="editUrbana"
+                                        value="true">
+                                    <label class="form-check-label" for="editUrbana">Urbana</label>
+                                </div>
+                                <div>
+                                    <input class="form-check-input" type="radio" name="areaUrbana" id="editRural"
+                                        value="false">
+                                    <label class="form-check-label" for="editRural">Rural</label>
+                                </div>
+                            </div>
+                            <div class="mb-3">
                                 <label for="editEscolasAtendidas" class="form-label">Escolas Atendidas</label>
-                                <select multiple class="form-select" id="editEscolasAtendidas">
+                                <select multiple class="form-select" id="editEscolasAtendidas" name="escolasAtendidas">
+                                    <!-- Opções carregadas dinamicamente -->
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editAlunosAtendidos" class="form-label">Alunos Atendidos</label>
+                                <select multiple class="form-select" id="editAlunosAtendidos" name="alunosAtendidos">
                                     <!-- Opções carregadas dinamicamente -->
                                 </select>
                             </div>
@@ -506,6 +560,9 @@
     <script src="/vendor/simple-datatables/simple-datatables.js"></script>
     <script src="/vendor/tinymce/tinymce.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
 
     <!-- Template Main JS File -->
     <script src="/js/main.js"></script>
@@ -621,68 +678,90 @@
                     .catch(error => console.error('Erro ao visualizar rota:', error));
             };
 
-            window.editarRota = function (rotaId) {
-                fetch(`/api/rotas/${rotaId}`)
+            window.editarRota = function (id) {
+                fetch(`/api/rotas/${id}`)
                     .then(response => response.json())
-                    .then(rota => {
-                        document.getElementById('editRotaId').value = rota.id;
-                        document.getElementById('editIdentificadorUnico').value = rota.identificador_unico;
-                        document.getElementById('editNomeRota').value = rota.nome_rota;
-
-                        // Limpar e preencher horários de funcionamento
+                    .then(data => {
+                        document.getElementById('editRotaId').value = data.id;
+                        document.getElementById('editTipoRota').value = data.tipo_rota;
+                        document.getElementById('editNomeRota').value = data.nome_rota;
+                        document.getElementById('editHorariosFuncionamento').value = data.horarios_funcionamento;
+                        // Marcar os checkboxes de horários de funcionamento
                         ['Manhã', 'Tarde', 'Noite'].forEach(periodo => {
-                            document.getElementById(`edit${periodo}`).checked = rota.horarios_funcionamento.includes(periodo);
+                            document.getElementById(`edit${periodo}`).checked = data.horarios_funcionamento.includes(periodo);
                         });
+                        // Marcar os checkboxes de dificuldades de acesso
+                        ['Porteira', 'MataBurro', 'Colchete', 'Atoleiro', 'Ponte'].forEach(dificuldade => {
+                            document.getElementById(`edit${dificuldade}`).checked = data.dificuldades_acesso.includes(dificuldade);
+                        });
+                        // Marcar o rádio de área urbana
+                        document.getElementById('editUrbana').checked = data.area_urbana;
+                        document.getElementById('editRural').checked = !data.area_urbana;
 
-                        // Carregar opções de escolas e marcar as selecionadas
+                        // Carregar as opções de escolas atendidas
                         fetch('/api/escolas')
                             .then(response => response.json())
                             .then(escolas => {
-                                const escolasSelect = document.getElementById('editEscolasAtendidas');
-                                escolasSelect.innerHTML = escolas.map(escola => `<option value="${escola.id}">${escola.nome}</option>`).join('');
-                                rota.escolas_atendidas.forEach(id => {
-                                    const option = escolasSelect.querySelector(`option[value="${id}"]`);
-                                    if (option) {
-                                        option.selected = true;
-                                    }
-                                });
-                            })
-                            .catch(error => console.error('Erro ao carregar escolas:', error));
+                                const escolasAtendidasSelect = document.getElementById('editEscolasAtendidas');
+                                escolasAtendidasSelect.innerHTML = escolas.map(escola => `<option value="${escola.id}">${escola.nome}</option>`).join('');
+                                escolasAtendidasSelect.value = data.escolas_atendidas;
+                            });
+
+                        // Carregar as opções de alunos atendidos
+                        fetch('/api/alunos')
+                            .then(response => response.json())
+                            .then(alunos => {
+                                const alunosAtendidosSelect = document.getElementById('editAlunosAtendidos');
+                                alunosAtendidosSelect.innerHTML = alunos.map(aluno => `<option value="${aluno.id}">${aluno.nome}</option>`).join('');
+                                alunosAtendidosSelect.value = data.alunos_atendidos;
+                            });
 
                         const editRotaModal = new bootstrap.Modal(document.getElementById('editRotaModal'));
                         editRotaModal.show();
                     })
-                    .catch(error => console.error('Erro ao carregar dados da rota:', error));
+                    .catch(error => console.error('Erro ao carregar dados da rota para edição:', error));
             };
 
             document.getElementById('salvarEdicaoRota').addEventListener('click', function () {
-                const rotaId = document.getElementById('editRotaId').value;
+                const id = document.getElementById('editRotaId').value;
+                const tipoRota = document.getElementById('editTipoRota').value;
+                const nomeRota = document.getElementById('editNomeRota').value;
+                const horariosFuncionamento = Array.from(document.querySelectorAll("input[name='horariosFuncionamento']:checked")).map(el => el.value);
+                const dificuldadesAcesso = Array.from(document.querySelectorAll("input[name='dificuldadesAcesso']:checked")).map(el => el.value);
+                const areaUrbana = document.querySelector("input[name='areaUrbana']:checked").value === 'true';
+                const escolasAtendidas = Array.from(document.getElementById('editEscolasAtendidas').selectedOptions).map(option => option.value);
+                const alunosAtendidos = Array.from(document.getElementById('editAlunosAtendidos').selectedOptions).map(option => option.value);
+
                 const data = {
-                    identificadorUnico: document.getElementById('editIdentificadorUnico').value,
-                    nomeRota: document.getElementById('editNomeRota').value,
-                    horariosFuncionamento: Array.from(document.querySelectorAll('#editRotaForm input[type="checkbox"]:checked')).map(el => el.value),
-                    escolasAtendidas: Array.from(document.getElementById('editEscolasAtendidas').selectedOptions).map(option => option.value)
+                    tipo_rota: tipoRota,
+                    nome_rota: nomeRota,
+                    horarios_funcionamento: horariosFuncionamento,
+                    dificuldades_acesso: dificuldadesAcesso,
+                    escolas_atendidas: escolasAtendidas,
+                    alunos_atendidos: alunosAtendidos,
+                    area_urbana: areaUrbana
                 };
 
-                fetch(`/api/rotas/${rotaId}`, {
+                fetch(`/api/rotas/${id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(data)
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert('Rota atualizada com sucesso!');
-                            fetchRotas();
-                        } else {
-                            alert('Erro ao atualizar rota.');
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erro ao salvar edição da rota.');
                         }
+                        return response.json();
+                    })
+                    .then(() => {
+                        alert('Rota editada com sucesso!');
+                        fetchRotas();
                         const editRotaModal = bootstrap.Modal.getInstance(document.getElementById('editRotaModal'));
                         editRotaModal.hide();
                     })
-                    .catch(error => console.error('Erro ao atualizar rota:', error));
+                    .catch(error => console.error('Erro ao salvar edição da rota:', error));
             });
 
             window.excluirRota = function (id) {
