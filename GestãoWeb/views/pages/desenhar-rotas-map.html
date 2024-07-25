@@ -57,8 +57,6 @@
                             </select>
                             <button class="btn btn-primary mt-3" id="addStartPointButton">Adicionar Ponto
                                 Inicial</button>
-                            <button class="btn btn-secondary mt-3" id="addEndPointButton">Adicionar Ponto Final</button>
-                            <button class="btn btn-info mt-3" id="addWayPointButton">Adicionar Ponto de Parada</button>
                             <div id="map"></div>
                         </div>
                     </div>
@@ -86,16 +84,12 @@
         document.addEventListener('DOMContentLoaded', function () {
             const rotaSelect = document.getElementById('rotaSelect');
             const addStartPointButton = document.getElementById('addStartPointButton');
-            const addEndPointButton = document.getElementById('addEndPointButton');
-            const addWayPointButton = document.getElementById('addWayPointButton');
             const map = L.map('map').setView([-6.530379, -49.851744], 13);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
             let routingControl;
             let startPoint = null;
-            let endPoint = null;
-            let waypoints = [];
 
             // Carregar rotas no select
             fetch('/api/rotas')
@@ -119,24 +113,6 @@
                 });
             });
 
-            // Adicionar ponto final ao clicar no mapa
-            addEndPointButton.addEventListener('click', function () {
-                map.once('click', function (e) {
-                    if (endPoint) {
-                        map.removeLayer(endPoint);
-                    }
-                    endPoint = L.marker(e.latlng).addTo(map).bindPopup('Ponto Final').openPopup();
-                });
-            });
-
-            // Adicionar ponto de parada ao clicar no mapa
-            addWayPointButton.addEventListener('click', function () {
-                map.once('click', function (e) {
-                    const wayPoint = L.marker(e.latlng).addTo(map).bindPopup('Ponto de Parada').openPopup();
-                    waypoints.push(wayPoint);
-                });
-            });
-
             // Quando uma rota é selecionada, carregar as escolas e gerar o traçado
             rotaSelect.addEventListener('change', function () {
                 const rotaId = this.value;
@@ -155,24 +131,10 @@
                     })
                     .then(response => response.json())
                     .then(escolas => {
-                        const escolaWaypoints = escolas.map(escola => L.latLng(escola.latitude, escola.longitude));
-
-                        let routeWaypoints = [];
+                        const waypoints = escolas.map(escola => L.latLng(escola.latitude, escola.longitude));
 
                         if (startPoint) {
-                            routeWaypoints.push(startPoint.getLatLng());
-                        }
-
-                        waypoints.forEach(wp => {
-                            routeWaypoints.push(wp.getLatLng());
-                        });
-
-                        escolaWaypoints.forEach(wp => {
-                            routeWaypoints.push(wp);
-                        });
-
-                        if (endPoint) {
-                            routeWaypoints.push(endPoint.getLatLng());
+                            waypoints.unshift(startPoint.getLatLng());
                         }
 
                         if (routingControl) {
@@ -180,22 +142,14 @@
                         }
 
                         routingControl = L.Routing.control({
-                            waypoints: routeWaypoints,
+                            waypoints: waypoints,
                             routeWhileDragging: false,
                             createMarker: function (i, wp) {
-                                if (i === 0 && startPoint) {
-                                    return startPoint;
-                                } else if (i === routeWaypoints.length - 1 && endPoint) {
-                                    return endPoint;
-                                } else if (waypoints.includes(wp.latLng)) {
-                                    return L.marker(wp.latLng).bindPopup('Ponto de Parada');
-                                } else {
-                                    return L.marker(wp.latLng).bindPopup(escolas[i - waypoints.length - 1].nome);
-                                }
+                                return L.marker(wp.latLng).bindPopup(i === 0 ? 'Ponto Inicial' : escolas[i - 1].nome);
                             }
                         }).addTo(map);
 
-                        map.fitBounds(routeWaypoints);
+                        map.fitBounds(waypoints);
                     })
                     .catch(error => console.error('Erro ao gerar traçado de rota:', error));
             });
