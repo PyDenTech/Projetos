@@ -1220,7 +1220,7 @@ app.get('/api/dashboard-data', async (req, res) => {
             client.query('SELECT COUNT(*) AS count FROM escolas'),
             client.query('SELECT COUNT(*) AS count FROM alunos'),
             client.query('SELECT COUNT(*) AS count FROM rotas'),
-            client.query('SELECT SUM(distancia) AS quilometragemTotal FROM rotas_geradas'),
+            client.query('SELECT SUM(distancia_total) AS quilometragemTotal FROM rotas_geradas'),
             client.query(`
                     SELECT 
                         EXTRACT(YEAR FROM data_cadastro) AS ano, 
@@ -1420,6 +1420,15 @@ app.get('/api/escolas', async (req, res) => {
 app.post('/api/salvar-rota-gerada', async (req, res) => {
     const { ponto_inicial, pontos_parada, ponto_final, rota_id, distancia_total, tempo_total } = req.body;
 
+    console.log('Dados recebidos:', {
+        ponto_inicial,
+        pontos_parada,
+        ponto_final,
+        rota_id,
+        distancia_total,
+        tempo_total
+    });
+
     try {
         const result = await pool.query(
             `INSERT INTO rotas_geradas (
@@ -1431,9 +1440,9 @@ app.post('/api/salvar-rota-gerada', async (req, res) => {
                 tempo_total
             ) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
             [
-                ponto_inicial,
-                pontos_parada,
-                ponto_final,
+                JSON.stringify(ponto_inicial),
+                JSON.stringify(pontos_parada),
+                JSON.stringify(ponto_final),
                 rota_id,
                 distancia_total,
                 tempo_total
@@ -1446,8 +1455,6 @@ app.post('/api/salvar-rota-gerada', async (req, res) => {
         res.status(500).json({ error: 'Erro ao salvar rota gerada' });
     }
 });
-
-
 
 app.get('/api/motoristas', async (req, res) => {
     try {

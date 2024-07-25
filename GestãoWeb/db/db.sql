@@ -76,12 +76,15 @@ CREATE TABLE IF NOT EXISTS rotas (
 
 CREATE TABLE IF NOT EXISTS rotas_geradas (
     id SERIAL PRIMARY KEY,
-    rota_id INT REFERENCES rotas(id),
-    coordenadas JSONB,
-    detalhes TEXT,
-    distancia FLOAT,
-    tempo FLOAT
+    ponto_inicial JSONB NOT NULL,
+    pontos_parada JSONB NOT NULL,
+    ponto_final JSONB NOT NULL,
+    rota_id INTEGER REFERENCES rotas(id),
+    distancia_total DOUBLE PRECISION NOT NULL,
+    tempo_total DOUBLE PRECISION NOT NULL,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
 
 CREATE TABLE IF NOT EXISTS motoristas_escolares (
     id SERIAL PRIMARY KEY,

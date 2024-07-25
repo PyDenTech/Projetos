@@ -449,8 +449,6 @@
                 iconAnchor: [16, 32]
             });
 
-
-
             // Carregar rotas no select
             fetch('/api/rotas')
                 .then(response => response.json())
@@ -588,8 +586,10 @@
                         routingControl.on('routesfound', function (e) {
                             const routes = e.routes;
                             const summary = routes[0].summary;
+                            totalDistance = (summary.totalDistance / 1000).toFixed(2);
+                            totalTime = (summary.totalTime / 60).toFixed(0);
                             const instructions = document.getElementById('routingInstructions');
-                            instructions.innerHTML = '<b>Distância Total:</b> ' + (summary.totalDistance / 1000).toFixed(2) + ' km<br><b>Tempo Total:</b> ' + (summary.totalTime / 60).toFixed(0) + ' mins<br><br>';
+                            instructions.innerHTML = '<b>Distância Total:</b> ' + totalDistance + ' km<br><b>Tempo Total:</b> ' + totalTime + ' mins<br><br>';
                             instructions.innerHTML += '<b>Pontos de Parada:</b><ol>';
                             routeWaypoints.forEach((wp, index) => {
                                 if (index !== 0 && index !== routeWaypoints.length - 1) { // Ignorar o ponto inicial e final
@@ -622,9 +622,11 @@
                     pontos_parada: pontosParadaCoords,
                     ponto_final: { lat: endPoint.getLatLng().lat, lng: endPoint.getLatLng().lng },
                     rota_id: parseInt(rotaSelect.value),
-                    distancia_total: parseFloat(document.querySelector('#routingInstructions').innerText.split(' ')[2]), // Pega a distância total da instrução
-                    tempo_total: parseFloat(document.querySelector('#routingInstructions').innerText.split(' ')[6]) // Pega o tempo total da instrução
+                    distancia_total: parseFloat(totalDistance), // Pega a distância total da instrução
+                    tempo_total: parseFloat(totalTime) // Pega o tempo total da instrução
                 };
+
+                console.log('Enviando dados:', data);
 
                 fetch('/api/salvar-rota-gerada', {
                     method: 'POST',
@@ -633,7 +635,12 @@
                     },
                     body: JSON.stringify(data)
                 })
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erro ao salvar rota gerada.');
+                        }
+                        return response.json();
+                    })
                     .then(result => {
                         alert('Rota gerada salva com sucesso!');
                     })
