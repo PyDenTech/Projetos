@@ -964,31 +964,44 @@ app.post('/api/escolas-nomes', async (req, res) => {
 });
 
 
-// Endpoint para editar uma rota
 app.put('/api/rotas/:id', async (req, res) => {
     const { id } = req.params;
-    const { tipo_rota, nome_rota, horarios_funcionamento, dificuldades_acesso, escolas_atendidas, alunos_atendidos, area_urbana } = req.body;
+    const {
+        identificadorUnico,
+        nomeRota,
+        horariosFuncionamento,
+        escolasAtendidas
+    } = req.body;
 
     try {
         const result = await pool.query(
             `UPDATE rotas
-             SET tipo_rota = $1, nome_rota = $2, horarios_funcionamento = $3, dificuldades_acesso = $4,
-                 escolas_atendidas = $5, alunos_atendidos = $6, area_urbana = $7
-             WHERE id = $8
+             SET identificador_unico = $1,
+                 nome_rota = $2,
+                 horarios_funcionamento = $3::jsonb,
+                 escolas_atendidas = $4::jsonb
+             WHERE id = $5
              RETURNING *`,
-            [tipo_rota, nome_rota, horarios_funcionamento, dificuldades_acesso, escolas_atendidas, alunos_atendidos, area_urbana, id]
+            [
+                identificadorUnico,
+                nomeRota,
+                JSON.stringify(horariosFuncionamento),
+                JSON.stringify(escolasAtendidas),
+                id
+            ]
         );
 
-        if (result.rows.length === 0) {
-            return res.status(404).json({ error: 'Rota não encontrada' });
+        if (result.rows.length > 0) {
+            res.status(200).json({ success: true, rota: result.rows[0] });
+        } else {
+            res.status(404).json({ success: false, message: 'Rota não encontrada.' });
         }
-
-        res.status(200).json(result.rows[0]);
     } catch (error) {
-        console.error('Erro ao editar rota:', error);
-        res.status(500).json({ error: 'Erro ao editar rota' });
+        console.error('Erro ao atualizar rota:', error);
+        res.status(500).json({ success: false, message: 'Erro ao atualizar rota.' });
     }
 });
+
 
 // Endpoint para excluir uma rota
 app.delete('/api/rotas/:id', async (req, res) => {
