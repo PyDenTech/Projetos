@@ -967,20 +967,19 @@ app.get('/api/rotas', async (req, res) => {
     }
 });
 
-// Endpoint para obter os nomes das escolas pelos IDs
+// Endpoint para obter nomes e coordenadas das escolas
 app.post('/api/escolas-nomes', async (req, res) => {
     const { ids } = req.body;
+
     try {
-        const result = await pool.query(
-            'SELECT id, nome FROM escolas WHERE id = ANY($1)',
-            [ids]
-        );
-        res.json(result.rows);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Server error');
+        const result = await pool.query('SELECT id, nome, latitude, longitude FROM escolas WHERE id = ANY($1::int[])', [ids]);
+        res.status(200).json(result.rows);
+    } catch (error) {
+        console.error('Erro ao obter nomes das escolas:', error);
+        res.status(500).json({ error: 'Erro ao obter nomes das escolas' });
     }
 });
+
 app.get('/api/rotas/:id', async (req, res) => {
     const { id } = req.params;
 

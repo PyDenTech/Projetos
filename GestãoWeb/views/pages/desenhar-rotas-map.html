@@ -4,16 +4,13 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Gerar Rotas</title>
+    <title>Gerar Traçado de Rota</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
 
-    <!-- Favicons -->
-    <link href="/img/favicon.png" rel="icon">
-    <link href="/img/apple-touch-icon.png" rel="apple-touch-icon">
-
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
 
     <!-- Vendor CSS Files -->
     <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -30,417 +27,41 @@
     <style>
         #map {
             height: 600px;
+            margin-top: 20px;
         }
     </style>
 </head>
 
 <body>
-
-    <!-- ======= Header ======= -->
-    <header id="header" class="header fixed-top d-flex align-items-center">
-        <i class="bi bi-list toggle-sidebar-btn"></i>
-        <div class="d-flex align-items-center justify-content-between">
-            <a href="/dashboard-escolar" class="logo d-flex align-items-center">
-                <img src="/img/logo.png" alt="">
-            </a>
-        </div><!-- End Logo -->
-
-        <nav class="header-nav ms-auto">
-            <ul class="d-flex align-items-center">
-                <li class="nav-item dropdown pe-3">
-                    <a id="profile-link" class="nav-link nav-profile d-flex align-items-center pe-0" href="#"
-                        data-bs-toggle="dropdown">
-                        <img id="profile-image" src="/img/user.png" alt="Foto de Perfil" class="rounded-circle">
-                        <span id="usuarioNome" class="d-none d-md-block dropdown-toggle ps-2"></span>
-                    </a><!-- End Profile Image Icon -->
-
-                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center" href="/users-profile">
-                                <i class="bi bi-person"></i>
-                                <span>Meu Perfil</span>
-                            </a>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center" href="/users-profile">
-                                <i class="bi bi-gear"></i>
-                                <span>Configurações de Conta</span>
-                            </a>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center" href="/faq">
-                                <i class="bi bi-question-circle"></i>
-                                <span>Ajuda</span>
-                            </a>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center" href="#" id="logout-link">
-                                <i class="bi bi-box-arrow-right"></i>
-                                <span>Sair</span>
-                            </a>
-                        </li>
-                    </ul><!-- End Profile Dropdown Items -->
-                </li><!-- End Profile Nav -->
-
-            </ul>
-        </nav><!-- End Icons Navigation -->
-
-    </header><!-- End Header -->
-
-    <!-- ======= Sidebar ======= -->
-    <aside id="sidebar" class="sidebar">
-        <ul class="sidebar-nav" id="sidebar-nav">
-            <li class="nav-heading">Transporte Escolar</li>
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="/dashboard-escolar">
-                    <i class="bi bi-speedometer2"></i>
-                    <span>Painel de Controle</span>
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#escolas-nav" data-bs-toggle="collapse" href="#">
-                    <img src="/img/icones/escolas.svg" alt="Escolas"
-                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
-                    <span>Escolas</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="escolas-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="/cadastrar-escolas-form">
-                            <i class="bi bi-house-door"></i><span>Cadastrar</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/gerenciar-escolas-view">
-                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#aluno-nav" data-bs-toggle="collapse" href="#">
-                    <img src="/img/icones/aluno.svg" alt="Censo Escolar"
-                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
-                    <span>Alunos</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="aluno-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="/cadastrar-aluno-form">
-                            <i class="bi bi-person-plus"></i><span>Solicitar Cadastro</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/gerenciar-alunos-view">
-                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/importar-aluno-form">
-                            <i class="bi bi-file-earmark-arrow-up"></i><span>Importar Dados</span>
-                        </a>
-                    </li>
-                </ul>
-            <li class="nav-item">
-                <a class="nav-link" data-bs-target="#routs-nav" data-bs-toggle="collapse" href="#">
-                    <img src="/img/icones/rotas.svg" alt="Escolas"
-                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
-                    </i><span>Rotas</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="routs-nav" class="nav-content" data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="/cadastrar-rotas-form">
-                            <i class="bi bi-plus-square"></i><span>Cadastrar Rota</span>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href="/desenhar-rotas-map">
-                            <i class="bi bi-pencil"></i><span>Gerar Rotas</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/visualizar-rotas">
-                            <i class="bi bi-eye"></i><span>Visualizar Rotas</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#driverbus-nav" data-bs-toggle="collapse" href="#">
-                    <img src="/img/icones/motoristas.svg" alt="Escolas"
-                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
-                    <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="driverbus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="/cadastrar-motorista-form">
-                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/gerenciar-motoristas-view">
-                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/gerar-relatorio-view">
-                            <i class="bi bi-clipboard2-check"></i><span>Relatórios</span>
-                        </a>
-                    </li>
-
-                </ul>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
-                    <img src="/img/icones/monitor-icone-branco.png" alt="Escolas"
-                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
-                    </i><span>Monitores</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="/cadastrar-monitores-form">
-                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/gerenciar-monitores-view">
-                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#fornecedores-nav" data-bs-toggle="collapse" href="#">
-                    <img src="/img/icones/fornecedores.svg" alt="Escolas"
-                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
-                    </i><span>Fornecedor</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="fornecedores-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="/cadastrar-fornecedores-form">
-                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/gerenciar-fornecedores-view">
-                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-                        </a>
-                    </li>
-
-                </ul>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#bus-nav" data-bs-toggle="collapse" href="#">
-                    <img src="/img/icones/frotas.svg" alt="Escolas"
-                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
-                    <span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="bus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="/cadastrar-onibus-form">
-                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/gerenciar-onibus-view">
-                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/vizualizar-onibus-map">
-                            <i class="bi bi-eye"></i><span>Vizualizar</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/solicitar-onibus-services">
-                            <i class="bi bi-file-earmark-text"></i><span>Ordem de Serviço</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-
-            <li class="nav-heading">Administrativo</li>
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="/dashboard-adm">
-                    <i class="bi bi-speedometer"></i>
-                    <span>Painel de Controle</span>
-                </a>
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#car-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-car-front"></i><span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="car-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="/cadastrar-carro-form">
-                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/gerenciar-carros-view">
-                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/localizar-carros-map">
-                            <i class="bi bi-geo-alt-fill"></i><span>Localizar</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#drivercar-nav" data-bs-toggle="collapse" href="#">
-                    <img src="/img/icones/motoristas.svg" alt="Escolas"
-                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
-                    <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="drivercar-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="/cadastrar-motorista-carro-form">
-                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/gerenciar-motorista-carro-form">
-                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#tarefas-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-list-check"></i><span>Tarefas</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="tarefas-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="/cadastrar-demandas">
-                            <i class="bi bi-file-earmark-text"></i><span>Nova Tarefa</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/tasks">
-                            <i class="bi bi-person-plus"></i><span>Gerenciar Tarefas</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-            <li class="nav-heading">Controle Financeiro</li>
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#fuel-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-droplet-half"></i><span>Abastecimento</span><i
-                        class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="fuel-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="/cadastrar-abastecimento-view">
-                            <i class="bi bi-file-earmark-text"></i><span>Cadastrar Requisição</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/gerenciar-abastecimento-view">
-                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-
-        </ul>
-
-    </aside><!-- End Sidebar-->
+    <!-- Header e Sidebar aqui -->
 
     <main id="main" class="main">
         <div class="pagetitle">
-            <h1>Gerar Rotas</h1>
+            <h1>Gerar Traçado de Rota</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/dashboard-escolar"><i class="bi bi-house"></i></a></li>
-                    <li class="breadcrumb-item active">Gerar Rotas</li>
+                    <li class="breadcrumb-item active">Gerar Traçado de Rota</li>
                 </ol>
             </nav>
         </div>
 
         <section class="section">
             <div class="row">
-                <div class="col-lg-8">
+                <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Mapa de Rotas</h5>
+                            <h5 class="card-title">Selecione a Rota</h5>
+                            <select class="form-select" id="rotaSelect">
+                                <!-- Opções carregadas dinamicamente -->
+                            </select>
                             <div id="map"></div>
-                            <button id="gerarRota" class="btn btn-primary mt-3">Gerar Rota</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">Seleção de Pontos</h5>
-                            <div class="mb-3">
-                                <label for="fornecedorSelect" class="form-label">Fornecedor</label>
-                                <select id="fornecedorSelect" class="form-select mb-3" multiple>
-                                    <!-- Opções de fornecedores serão carregadas dinamicamente -->
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="escolaSelect" class="form-label">Escolas</label>
-                                <select id="escolaSelect" class="form-select mb-3" multiple>
-                                    <!-- Opções de escolas serão carregadas dinamicamente -->
-                                </select>
-                            </div>
-                            <h5 class="card-title">Detalhes da Rota</h5>
-                            <div id="detalhesRota"></div>
-                            <div class="mb-3">
-                                <label for="rotaSelect" class="form-label">Selecionar Rota</label>
-                                <select id="rotaSelect" class="form-select mb-3">
-                                    <!-- Opções de rotas serão carregadas dinamicamente -->
-                                </select>
-                            </div>
-                            <button id="salvarRota" class="btn btn-success mt-3">Salvar Rota</button>
-                        </div>
-                    </div>
-                    <div class="card mt-4">
-                        <div class="card-body">
-                            <h5 class="card-title">Pontos de Parada</h5>
-                            <ul id="pontosList" class="list-group"></ul>
-                            <button id="save-points" class="btn btn-success mt-3">Salvar Pontos de Parada</button>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
     </main>
-
-    <footer id="footer" class="footer">
-        <div class="container">
-            <div class="row gy-4">
-                <div class="container mt-4">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="copyright">
-                                &copy; Direitos Autorais <strong><span>PyDenExpress</span></strong>. Todos os Direitos
-                                Reservados
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="credits">
-                                Desenvolvido por <a href="https://danilomorais.netlify.app/">Danilo de Morais</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-    </footer>
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -455,230 +76,67 @@
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
     <!-- Template Main JS File -->
-    <script src="/js/users-profile.js"></script>
     <script src="/js/main.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            var map = L.map('map').setView([-6.530379, -49.851744], 13);
-
+            const rotaSelect = document.getElementById('rotaSelect');
+            const map = L.map('map').setView([-6.530379, -49.851744], 13);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
+            let routingControl;
 
-            var waypoints = [];
-            var markers = [];
-            var routingControl = L.Routing.control({
-                waypoints: waypoints,
-                routeWhileDragging: true,
-                createMarker: function () { return null; }
-            }).addTo(map);
-
-            // Carregar fornecedores
-            fetch('/api/fornecedores')
-                .then(response => response.json())
-                .then(data => {
-                    const fornecedorSelect = document.getElementById('fornecedorSelect');
-                    data.forEach(fornecedor => {
-                        const option = document.createElement('option');
-                        option.value = fornecedor.id;
-                        option.textContent = fornecedor.nome;
-                        fornecedorSelect.appendChild(option);
-                    });
-                })
-                .catch(error => console.error('Erro ao carregar fornecedores:', error));
-
-            // Carregar escolas
-            fetch('/api/escolas')
-                .then(response => response.json())
-                .then(data => {
-                    const escolaSelect = document.getElementById('escolaSelect');
-                    data.forEach(escola => {
-                        const option = document.createElement('option');
-                        option.value = escola.id;
-                        option.textContent = escola.nome;
-                        escolaSelect.appendChild(option);
-                    });
-                })
-                .catch(error => console.error('Erro ao carregar escolas:', error));
-
-            document.getElementById('fornecedorSelect').addEventListener('change', function () {
-                const selectedOptions = Array.from(this.selectedOptions);
-                selectedOptions.forEach(option => {
-                    const fornecedorId = option.value;
-                    fetch(`/api/fornecedores/${fornecedorId}`)
-                        .then(response => response.json())
-                        .then(fornecedor => {
-                            const marker = L.marker([fornecedor.latitude, fornecedor.longitude], {
-                                icon: L.icon({
-                                    iconUrl: '/img/icones/fornecedor.png',
-                                    iconSize: [40, 40]
-                                })
-                            }).addTo(map);
-                            markers.push(marker);
-                            waypoints.push(L.latLng(fornecedor.latitude, fornecedor.longitude));
-                        })
-                        .catch(error => console.error('Erro ao carregar fornecedor:', error));
-                });
-            });
-
-            document.getElementById('escolaSelect').addEventListener('change', function () {
-                const selectedOptions = Array.from(this.selectedOptions);
-                selectedOptions.forEach(option => {
-                    const escolaId = option.value;
-                    fetch(`/api/escolas/${escolaId}`)
-                        .then(response => response.json())
-                        .then(escola => {
-                            const marker = L.marker([escola.latitude, escola.longitude], {
-                                icon: L.icon({
-                                    iconUrl: '/img/icones/escola.png',
-                                    iconSize: [40, 40]
-                                })
-                            }).addTo(map);
-                            markers.push(marker);
-                            waypoints.push(L.latLng(escola.latitude, escola.longitude));
-                        })
-                        .catch(error => console.error('Erro ao carregar escola:', error));
-                });
-            });
-
-            document.getElementById('rotaSelect').addEventListener('change', function () {
-                const rotaId = this.value;
-                fetch(`/api/rotas_geradas/${rotaId}`)
-                    .then(response => response.json())
-                    .then(rota => {
-                        if (rota) {
-                            // Limpar marcadores e waypoints atuais
-                            markers.forEach(marker => map.removeLayer(marker));
-                            markers = [];
-                            waypoints = [];
-
-                            // Adicionar coordenadas da rota salva
-                            rota.pontos_parada.forEach(ponto => {
-                                const marker = L.marker([ponto.lat, ponto.lng]).addTo(map);
-                                markers.push(marker);
-                                waypoints.push(L.latLng(ponto.lat, ponto.lng));
-                            });
-
-                            routingControl.setWaypoints(waypoints);
-
-                            // Exibir detalhes da rota
-                            const detalhesRota = document.getElementById('detalhesRota');
-                            detalhesRota.innerHTML = `
-                                <p>${rota.detalhes}</p>
-                                <p>${rota.distancia} km, ${rota.tempo} min</p>
-                            `;
-                        }
-                    })
-                    .catch(error => console.error('Erro ao carregar rota gerada:', error));
-            });
-
-            map.on('click', function (e) {
-                const marker = L.marker(e.latlng).addTo(map);
-                markers.push(marker);
-                waypoints.push(e.latlng);
-
-                const pontoList = document.getElementById('pontosList');
-                const listItem = document.createElement('li');
-                listItem.className = 'list-group-item';
-                listItem.textContent = `Ponto ${markers.length}: ${e.latlng.lat.toFixed(5)}, ${e.latlng.lng.toFixed(5)}`;
-                pontoList.appendChild(listItem);
-            });
-
-            document.getElementById('gerarRota').addEventListener('click', function () {
-                if (waypoints.length < 2) {
-                    alert('Por favor, selecione pelo menos dois pontos para gerar uma rota.');
-                    return;
-                }
-
-                routingControl.setWaypoints(waypoints);
-
-                routingControl.on('routesfound', function (e) {
-                    const route = e.routes[0];
-                    const detalhesRota = document.getElementById('detalhesRota');
-                    detalhesRota.innerHTML = `
-                        <p>${route.name}</p>
-                        <p>${(route.summary.totalDistance / 1000).toFixed(2)} km, ${(route.summary.totalTime / 60).toFixed(0)} min</p>
-                    `;
-                    detalhesRota.dataset.distancia = (route.summary.totalDistance / 1000).toFixed(2);
-                    detalhesRota.dataset.tempo = (route.summary.totalTime / 60).toFixed(0);
-                });
-            });
-
-            document.getElementById('salvarRota').addEventListener('click', async function () {
-                const rotaId = document.getElementById('rotaSelect').value;
-                const coordenadas = waypoints.map(p => ({ lat: p.lat, lng: p.lng }));
-                const detalhes = document.getElementById('detalhesRota').innerHTML;
-                const distancia = document.getElementById('detalhesRota').dataset.distancia;
-                const tempo = document.getElementById('detalhesRota').dataset.tempo;
-
-                try {
-                    const response = await fetch('/api/salvar-rota-gerada', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ rotaId, coordenadas: JSON.stringify(coordenadas), detalhes, distancia, tempo, pontos_parada: JSON.stringify(coordenadas) })
-                    });
-
-                    if (response.ok) {
-                        alert('Rota salva com sucesso!');
-                    } else if (response.status === 409) {
-                        alert('Esta rota já foi salva anteriormente.');
-                    } else if (response.status === 400) {
-                        const errorData = await response.json();
-                        alert('Erro: ' + errorData.error);
-                    } else {
-                        const errorData = await response.json();
-                        alert('Erro ao salvar rota: ' + errorData.error);
-                    }
-                } catch (error) {
-                    console.error('Erro ao salvar rota:', error);
-                    alert('Erro ao salvar rota.');
-                }
-            });
-
+            // Carregar rotas no select
             fetch('/api/rotas')
                 .then(response => response.json())
-                .then(data => {
-                    const rotaSelect = document.getElementById('rotaSelect');
-                    data.forEach(rota => {
+                .then(rotas => {
+                    rotas.forEach(rota => {
                         const option = document.createElement('option');
                         option.value = rota.id;
                         option.textContent = rota.nome_rota;
                         rotaSelect.appendChild(option);
                     });
-                })
-                .catch(error => console.error('Erro ao carregar rotas:', error));
+                });
 
-            document.getElementById('save-points').addEventListener('click', async function () {
-                const points = markers.map(marker => ({
-                    latitude: marker.getLatLng().lat,
-                    longitude: marker.getLatLng().lng
-                }));
+            // Quando uma rota é selecionada, carregar as escolas e gerar o traçado
+            rotaSelect.addEventListener('change', function () {
+                const rotaId = this.value;
+                fetch(`/api/rotas/${rotaId}`)
+                    .then(response => response.json())
+                    .then(rota => {
+                        const escolaIds = rota.escolas_atendidas;
 
-                try {
-                    const response = await fetch('/api/stop-points', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(points)
-                    });
+                        return fetch('/api/escolas-nomes', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ ids: escolaIds })
+                        });
+                    })
+                    .then(response => response.json())
+                    .then(escolas => {
+                        const waypoints = escolas.map(escola => L.latLng(escola.latitude, escola.longitude));
 
-                    if (response.ok) {
-                        alert('Pontos salvos com sucesso!');
-                    } else {
-                        alert('Erro ao salvar os pontos.');
-                    }
-                } catch (error) {
-                    console.error('Erro ao salvar os pontos:', error);
-                    alert('Erro ao salvar os pontos.');
-                }
+                        if (routingControl) {
+                            map.removeControl(routingControl);
+                        }
+
+                        routingControl = L.Routing.control({
+                            waypoints: waypoints,
+                            routeWhileDragging: false,
+                            createMarker: function (i, wp) {
+                                return L.marker(wp.latLng).bindPopup(escolas[i].nome);
+                            }
+                        }).addTo(map);
+
+                        map.fitBounds(waypoints);
+                    })
+                    .catch(error => console.error('Erro ao gerar traçado de rota:', error));
             });
         });
     </script>
-
 </body>
 
 </html>
