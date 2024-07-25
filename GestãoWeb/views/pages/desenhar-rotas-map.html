@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -372,7 +373,6 @@
                             <h5 class="card-title">Selecione a Rota</h5>
                             <select class="form-select" id="rotaSelect">
                                 <option value="">Selecione uma Rota</option>
-                                <!-- Opções carregadas dinamicamente -->
                             </select>
                             <button class="btn btn-primary mt-3" id="addStartPointButton">Adicionar Ponto
                                 Inicial</button>
@@ -390,6 +390,7 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js"></script>
 
     <!-- Vendor JS Files -->
     <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -415,8 +416,29 @@
             document.querySelector('.card-body').appendChild(saveRouteButton);
 
             const map = L.map('map').setView([-6.530379, -49.851744], 13);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors'
+
+            // Adicionar camada de mapa padrão do Mapbox
+            const streets = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+                id: 'mapbox/streets-v11',
+                accessToken: 'pk.eyJ1IjoiZGFuaWxvbW9yYWlzIiwiYSI6ImNsdzZocmJ5eDFqenoyanFzenBoMTc4c28ifQ._RiYYX1oIBe7_MBpTyYWxQ',
+                tileSize: 512,
+                zoomOffset: -1,
+                attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
+
+            // Adicionar camada de satélite do Mapbox
+            const satellite = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+                id: 'mapbox/satellite-v9',
+                accessToken: 'pk.eyJ1IjoiZGFuaWxvbW9yYWlzIiwiYSI6ImNsdzZocmJ5eDFqenoyanFzenBoMTc4c28ifQ._RiYYX1oIBe7_MBpTyYWxQ',
+                tileSize: 512,
+                zoomOffset: -1,
+                attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            });
+
+            // Adicionar controle de camadas
+            L.control.layers({
+                'Map View': streets,
+                'Satellite View': satellite
             }).addTo(map);
 
             let routingControl;
@@ -456,7 +478,7 @@
                     rotas.forEach(rota => {
                         const option = document.createElement('option');
                         option.value = rota.id;
-                        option.textContent = `${rota.id} - ${rota.nome_rota} - ${rota.escolas_atendidas.join(', ')}`;
+                        option.textContent = `${rota.identificador_unico} - ${rota.nome_rota}`;
                         rotaSelect.appendChild(option);
                     });
                 });
@@ -646,7 +668,66 @@
                     })
                     .catch(error => console.error('Erro ao salvar rota gerada:', error));
             });
+            saveRouteButton.addEventListener('click', function () {
+                if (!startPoint || !endPoint || waypoints.length < 2 || !rotaSelect.value) {
+                    alert('Certifique-se de ter selecionado o ponto inicial, pelo menos dois pontos de parada, o ponto final e uma rota.');
+                    return;
+                }
+
+                const pontosParadaCoords = waypoints.map(wp => ({ lat: wp.getLatLng().lat, lng: wp.getLatLng().lng }));
+                const data = {
+                    ponto_inicial: { lat: startPoint.getLatLng().lat, lng: startPoint.getLatLng().lng },
+                    pontos_parada: pontosParadaCoords,
+                    ponto_final: { lat: endPoint.getLatLng().lat, lng: endPoint.getLatLng().lng },
+                    rota_id: parseInt(rotaSelect.value),
+                    distancia_total: parseFloat(totalDistance), // Pega a distância total da instrução
+                    tempo_total: parseFloat(totalTime) // Pega o tempo total da instrução
+                };
+
+                fetch('/api/verificar-rota-gerada', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ rota_id: data.rota_id })
+                })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.existe) {
+                            const confirmarSubstituicao = confirm('Já existe uma rota gerada para este ID. Deseja substituir a rota existente?');
+                            if (confirmarSubstituicao) {
+                                data.substituir = true;
+                                salvarRotaGerada(data);
+                            }
+                        } else {
+                            data.substituir = false;
+                            salvarRotaGerada(data);
+                        }
+                    })
+                    .catch(error => console.error('Erro ao verificar rota gerada:', error));
+            });
+
+            function salvarRotaGerada(data) {
+                fetch('/api/salvar-rota-gerada', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erro ao salvar rota gerada.');
+                        }
+                        return response.json();
+                    })
+                    .then(result => {
+                        alert('Rota gerada salva com sucesso!');
+                    })
+                    .catch(error => console.error('Erro ao salvar rota gerada:', error));
+            }
         });
     </script>
 </body>
+
 </html>
