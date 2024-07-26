@@ -394,7 +394,8 @@
                                     <thead class="table-dark text-center">
                                         <tr>
                                             <th class="sortable" data-sort-key="identificador_unico">Identificador Único
-                                                <span class="bi bi-arrow-down-up"></span></th>
+                                                <span class="bi bi-arrow-down-up"></span>
+                                            </th>
                                             <th class="sortable" data-sort-key="nome_rota">Nome da Rota <span
                                                     class="bi bi-arrow-down-up"></span></th>
                                             <th class="sortable" data-sort-key="horarios_funcionamento">Horários de
@@ -438,7 +439,6 @@
                 </div>
             </div>
         </div>
-
         <!-- Modal de Edição -->
         <div class="modal fade" id="editRotaModal" tabindex="-1" aria-labelledby="editRotaModalLabel"
             aria-hidden="true">
@@ -688,24 +688,24 @@
                 dataToRender.forEach(rota => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${rota.identificador_unico}</td>
-                        <td>${rota.nome_rota}</td>
-                        <td>${rota.horarios_funcionamento.join(', ')}</td>
-                        <td>${rota.escolasNomes}</td>
-                        <td>
-                            <div class="table-actions">
-                                <button class="btn btn-primary btn-sm" onclick="visualizarRota(${rota.id})">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                                <button class="btn btn-primary btn-sm" onclick="editarRota(${rota.id})">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-danger btn-sm" onclick="excluirRota(${rota.id})">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    `;
+                <td>${rota.identificador_unico}</td>
+                <td>${rota.nome_rota}</td>
+                <td>${rota.horarios_funcionamento.join(', ')}</td>
+                <td>${rota.escolasNomes}</td>
+                <td>
+                    <div class="table-actions">
+                        <button class="btn btn-primary btn-sm" onclick="visualizarRota(${rota.id})">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <button class="btn btn-primary btn-sm" onclick="editarRota(${rota.id})">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="excluirRota(${rota.id})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            `;
                     rotasTableBody.appendChild(row);
                 });
 
@@ -765,7 +765,7 @@
             });
 
             window.visualizarRota = function (rotaId) {
-                fetch(`/api/rota-gerada/${rotaId}`)
+                fetch(`/api/rotas/${rotaId}`)
                     .then(response => {
                         if (!response.ok) {
                             throw new Error('Resposta inesperada do servidor');
@@ -773,8 +773,8 @@
                         return response.json();
                     })
                     .then(data => {
-                        if (!Array.isArray(data) || data.length === 0) {
-                            alert('Nenhuma rota gerada encontrada para esta rota.');
+                        if (!data) {
+                            alert('Nenhuma rota encontrada.');
                             return;
                         }
 
@@ -792,7 +792,7 @@
                             modalMapInitialized = true;
                         }
 
-                        const waypoints = data.map(coord => ({ location: new google.maps.LatLng(coord.lat, coord.lng), stopover: true }));
+                        const waypoints = data.coordenadas.map(coord => ({ location: new google.maps.LatLng(coord.lat, coord.lng), stopover: true }));
 
                         const startPoint = waypoints.shift().location;
                         const endPoint = waypoints.pop().location;
@@ -815,15 +815,15 @@
                                 const routeLeg = route.legs[0];
                                 const detalhesRotaDiv = document.getElementById('detalhesRotaModal');
                                 detalhesRotaDiv.innerHTML = `
-                                    <p><strong>Nome da Rota:</strong> ${data.nome_rota}</p>
-                                    <p><strong>Total de Pontos:</strong> ${waypoints.length + 2}</p>
-                                    <p><strong>Distância Total:</strong> ${(routeLeg.distance.value / 1000).toFixed(2)} km</p>
-                                    <p><strong>Tempo Estimado:</strong> ${Math.round(routeLeg.duration.value / 60)} minutos</p>
-                                    <p><strong>Pontos:</strong></p>
-                                    <ul>
-                                        ${route.overview_path.map((ponto, index) => `<li>Ponto ${index + 1}: ${ponto.lat().toFixed(5)}, ${ponto.lng().toFixed(5)}</li>`).join('')}
-                                    </ul>
-                                `;
+                            <p><strong>Nome da Rota:</strong> ${data.nome_rota}</p>
+                            <p><strong>Total de Pontos:</strong> ${waypoints.length + 2}</p>
+                            <p><strong>Distância Total:</strong> ${(routeLeg.distance.value / 1000).toFixed(2)} km</p>
+                            <p><strong>Tempo Estimado:</strong> ${Math.round(routeLeg.duration.value / 60)} minutos</p>
+                            <p><strong>Pontos:</strong></p>
+                            <ul>
+                                ${route.overview_path.map((ponto, index) => `<li>Ponto ${index + 1}: ${ponto.lat().toFixed(5)}, ${ponto.lng().toFixed(5)}</li>`).join('')}
+                            </ul>
+                        `;
                             } else {
                                 alert('Erro ao gerar a rota: ' + status);
                             }
@@ -1006,6 +1006,7 @@
                 }
             };
         });
+
     </script>
 </body>
 
