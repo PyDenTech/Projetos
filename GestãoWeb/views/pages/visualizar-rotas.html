@@ -29,7 +29,6 @@
     <script
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&libraries=places"></script>
 
-
     <style>
         .modal-fullscreen {
             width: 100%;
@@ -376,6 +375,20 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Rotas</h5>
+                            <div class="d-flex justify-content-between mb-3">
+                                <div>
+                                    <label for="itemsPerPage" class="form-label">Exibir:</label>
+                                    <select id="itemsPerPage" class="form-select form-select-sm"
+                                        style="width: auto; display: inline-block;">
+                                        <option value="10">10</option>
+                                        <option value="50">50</option>
+                                        <option value="all">Todas</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <span id="statusMessage" class="mt-3"></span>
+                                </div>
+                            </div>
                             <div class="table-responsive">
                                 <table class="table table-striped" id="rotasTable">
                                     <thead class="table-dark text-center">
@@ -397,7 +410,13 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div id="statusMessage" class="mt-3"></div>
+                            <div class="pagination-container mt-3">
+                                <nav aria-label="Page navigation">
+                                    <ul class="pagination justify-content-center">
+                                        <!-- Paginação será adicionada dinamicamente aqui -->
+                                    </ul>
+                                </nav>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -574,6 +593,9 @@
             var map;
             var directionsService;
             var directionsRenderer;
+            var currentPage = 1;
+            var itemsPerPage = 10;
+            var allData = [];
 
             // Initialize the modal map
             var modalMapInitialized = false;
@@ -606,10 +628,18 @@
             // Carregar rotas na tabela
             fetchRotas();
 
+            document.getElementById('itemsPerPage').addEventListener('change', function () {
+                itemsPerPage = this.value === 'all' ? allData.length : parseInt(this.value);
+                currentPage = 1;
+                renderTable();
+                renderPagination();
+            });
+
             function fetchRotas() {
                 fetch('/api/rotas')
                     .then(response => response.json())
                     .then(data => {
+                        allData = data;
                         const escolaIds = [];
                         data.forEach(rota => {
                             rota.escolas_atendidas.forEach(id => {
@@ -633,41 +663,72 @@
                                     escolasMap[escola.id] = escola.nome;
                                 });
 
-                                const rotasTableBody = document.getElementById('rotasTable').querySelector('tbody');
-                                rotasTableBody.innerHTML = '';
-
-                                data.forEach((rota, index) => {
-                                    const escolasNomes = rota.escolas_atendidas.map(id => escolasMap[id]).join(', ');
-
-                                    const row = document.createElement('tr');
-                                    row.innerHTML = `
-                                <td>${rota.identificador_unico}</td>
-                                <td>${rota.nome_rota}</td>
-                                <td>${rota.horarios_funcionamento.join(', ')}</td>
-                                <td>${escolasNomes}</td>
-                                <td>
-                                    <div class="table-actions">
-                                        <button class="btn btn-primary btn-sm" onclick="visualizarRota(${rota.id})">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
-                                        <button class="btn btn-primary btn-sm" onclick="editarRota(${rota.id})">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                                        <button class="btn btn-danger btn-sm" onclick="excluirRota(${rota.id})">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            `;
-                                    rotasTableBody.appendChild(row);
+                                allData.forEach((rota, index) => {
+                                    rota.escolasNomes = rota.escolas_atendidas.map(id => escolasMap[id]).join(', ');
                                 });
 
-                                const quantidadeRotas = data.length;
-                                document.getElementById('statusMessage').textContent = `Total de rotas: ${quantidadeRotas}`;
+                                renderTable();
+                                renderPagination();
                             })
                             .catch(error => console.error('Erro ao carregar nomes das escolas:', error));
                     })
                     .catch(error => console.error('Erro ao carregar rotas:', error));
+            }
+
+            function renderTable() {
+                const rotasTableBody = document.getElementById('rotasTable').querySelector('tbody');
+                rotasTableBody.innerHTML = '';
+
+                const start = (currentPage - 1) * itemsPerPage;
+                const end = start + itemsPerPage;
+                const dataToRender = allData.slice(start, end);
+
+                dataToRender.forEach(rota => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${rota.identificador_unico}</td>
+                        <td>${rota.nome_rota}</td>
+                        <td>${rota.horarios_funcionamento.join(', ')}</td>
+                        <td>${rota.escolasNomes}</td>
+                        <td>
+                            <div class="table-actions">
+                                <button class="btn btn-primary btn-sm" onclick="visualizarRota(${rota.id})">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-primary btn-sm" onclick="editarRota(${rota.id})">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm" onclick="excluirRota(${rota.id})">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    rotasTableBody.appendChild(row);
+                });
+
+                const quantidadeRotas = allData.length;
+                document.getElementById('statusMessage').textContent = `Total de rotas: ${quantidadeRotas}`;
+            }
+
+            function renderPagination() {
+                const paginationContainer = document.querySelector('.pagination');
+                paginationContainer.innerHTML = '';
+
+                const pageCount = Math.ceil(allData.length / itemsPerPage);
+
+                for (let i = 1; i <= pageCount; i++) {
+                    const li = document.createElement('li');
+                    li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                    li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                    li.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        currentPage = i;
+                        renderTable();
+                        renderPagination();
+                    });
+                    paginationContainer.appendChild(li);
+                }
             }
 
             window.visualizarRota = function (rotaId) {
@@ -721,15 +782,15 @@
                                 const routeLeg = route.legs[0];
                                 const detalhesRotaDiv = document.getElementById('detalhesRotaModal');
                                 detalhesRotaDiv.innerHTML = `
-                            <p><strong>Nome da Rota:</strong> ${rotaId}</p>
-                            <p><strong>Total de Pontos:</strong> ${waypoints.length + 2}</p>
-                            <p><strong>Distância Total:</strong> ${(routeLeg.distance.value / 1000).toFixed(2)} km</p>
-                            <p><strong>Tempo Estimado:</strong> ${Math.round(routeLeg.duration.value / 60)} minutos</p>
-                            <p><strong>Pontos:</strong></p>
-                            <ul>
-                                ${route.overview_path.map((ponto, index) => `<li>Ponto ${index + 1}: ${ponto.lat().toFixed(5)}, ${ponto.lng().toFixed(5)}</li>`).join('')}
-                            </ul>
-                        `;
+                                    <p><strong>Nome da Rota:</strong> ${rotaId}</p>
+                                    <p><strong>Total de Pontos:</strong> ${waypoints.length + 2}</p>
+                                    <p><strong>Distância Total:</strong> ${(routeLeg.distance.value / 1000).toFixed(2)} km</p>
+                                    <p><strong>Tempo Estimado:</strong> ${Math.round(routeLeg.duration.value / 60)} minutos</p>
+                                    <p><strong>Pontos:</strong></p>
+                                    <ul>
+                                        ${route.overview_path.map((ponto, index) => `<li>Ponto ${index + 1}: ${ponto.lat().toFixed(5)}, ${ponto.lng().toFixed(5)}</li>`).join('')}
+                                    </ul>
+                                `;
                             } else {
                                 alert('Erro ao gerar a rota: ' + status);
                             }
@@ -863,7 +924,7 @@
                 const data = {
                     identificador_unico: identificadorUnico,
                     tipo_rota: tipoRota,
-                    nome_rota: nomeRota,
+                    nome_rota: nome_rota,
                     horarios_funcionamento: horariosFuncionamento,
                     dificuldades_acesso: dificuldadesAcesso,
                     escolas_atendidas: escolasAtendidas,
