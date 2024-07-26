@@ -20,7 +20,7 @@ var markersLayer = L.layerGroup().addTo(map);
 
 // Ícone personalizado
 var customIcon = L.icon({
-    iconUrl: '/img/escola-marcador.png',
+    iconUrl: '/img/icones/escola-marcador.png',
     iconSize: [32, 32], // Tamanho do ícone
     iconAnchor: [16, 32], // Ponto de ancoragem do ícone
     popupAnchor: [0, -32] // Ponto de ancoragem do popup
