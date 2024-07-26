@@ -815,7 +815,7 @@
                                 const routeLeg = route.legs[0];
                                 const detalhesRotaDiv = document.getElementById('detalhesRotaModal');
                                 detalhesRotaDiv.innerHTML = `
-                                    <p><strong>Nome da Rota:</strong> ${rotaId}</p>
+                                    <p><strong>Nome da Rota:</strong> ${data.nome_rota}</p>
                                     <p><strong>Total de Pontos:</strong> ${waypoints.length + 2}</p>
                                     <p><strong>Distância Total:</strong> ${(routeLeg.distance.value / 1000).toFixed(2)} km</p>
                                     <p><strong>Tempo Estimado:</strong> ${Math.round(routeLeg.duration.value / 60)} minutos</p>
@@ -957,7 +957,7 @@
                 const data = {
                     identificador_unico: identificadorUnico,
                     tipo_rota: tipoRota,
-                    nome_rota: nome_rota,
+                    nome_rota: nomeRota,
                     horarios_funcionamento: horariosFuncionamento,
                     dificuldades_acesso: dificuldadesAcesso,
                     escolas_atendidas: escolasAtendidas,
