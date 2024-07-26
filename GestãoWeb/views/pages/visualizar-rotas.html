@@ -792,10 +792,10 @@
                             modalMapInitialized = true;
                         }
 
-                        const waypoints = data.coordenadas.map(coord => ({ location: new google.maps.LatLng(coord.lat, coord.lng), stopover: true }));
+                        const waypoints = data.pontos_parada.map(coord => ({ location: new google.maps.LatLng(coord.lat, coord.lng), stopover: true }));
 
-                        const startPoint = waypoints.shift().location;
-                        const endPoint = waypoints.pop().location;
+                        const startPoint = new google.maps.LatLng(data.ponto_inicial.lat, data.ponto_inicial.lng);
+                        const endPoint = new google.maps.LatLng(data.ponto_final.lat, data.ponto_final.lng);
 
                         const request = {
                             origin: startPoint,
@@ -815,15 +815,15 @@
                                 const routeLeg = route.legs[0];
                                 const detalhesRotaDiv = document.getElementById('detalhesRotaModal');
                                 detalhesRotaDiv.innerHTML = `
-                            <p><strong>Nome da Rota:</strong> ${data.nome_rota}</p>
-                            <p><strong>Total de Pontos:</strong> ${waypoints.length + 2}</p>
-                            <p><strong>Distância Total:</strong> ${(routeLeg.distance.value / 1000).toFixed(2)} km</p>
-                            <p><strong>Tempo Estimado:</strong> ${Math.round(routeLeg.duration.value / 60)} minutos</p>
-                            <p><strong>Pontos:</strong></p>
-                            <ul>
-                                ${route.overview_path.map((ponto, index) => `<li>Ponto ${index + 1}: ${ponto.lat().toFixed(5)}, ${ponto.lng().toFixed(5)}</li>`).join('')}
-                            </ul>
-                        `;
+                        <p><strong>Nome da Rota:</strong> ${data.nome_rota}</p>
+                        <p><strong>Total de Pontos:</strong> ${waypoints.length + 2}</p>
+                        <p><strong>Distância Total:</strong> ${(routeLeg.distance.value / 1000).toFixed(2)} km</p>
+                        <p><strong>Tempo Estimado:</strong> ${Math.round(routeLeg.duration.value / 60)} minutos</p>
+                        <p><strong>Pontos:</strong></p>
+                        <ul>
+                            ${route.overview_path.map((ponto, index) => `<li>Ponto ${index + 1}: ${ponto.lat().toFixed(5)}, ${ponto.lng().toFixed(5)}</li>`).join('')}
+                        </ul>
+                    `;
                             } else {
                                 alert('Erro ao gerar a rota: ' + status);
                             }
@@ -835,6 +835,46 @@
                     })
                     .catch(error => console.error('Erro ao visualizar rota:', error));
             };
+
+            function addCustomMarkers(route, waypoints) {
+                const leg = route.legs[0];
+                // Add the start marker
+                new google.maps.Marker({
+                    position: leg.start_location,
+                    map: map,
+                    icon: startIcon,
+                    title: 'Ponto Inicial'
+                });
+
+                // Add the end marker
+                new google.maps.Marker({
+                    position: leg.end_location,
+                    map: map,
+                    icon: endIcon,
+                    title: 'Ponto Final'
+                });
+
+                // Add waypoints markers
+                waypoints.forEach((waypoint, index) => {
+                    new google.maps.Marker({
+                        position: waypoint.location,
+                        map: map,
+                        icon: wayPointIcon,
+                        title: `Ponto de Parada ${index + 1}`
+                    });
+                });
+
+                // Add school markers (assuming schools are along the route, you may need to adjust this logic)
+                leg.steps.forEach(step => {
+                    new google.maps.Marker({
+                        position: step.start_location,
+                        map: map,
+                        icon: schoolIcon,
+                        title: 'Escola'
+                    });
+                });
+            }
+
 
             function addCustomMarkers(route, waypoints) {
                 const leg = route.legs[0];

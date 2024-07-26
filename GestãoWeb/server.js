@@ -1002,33 +1002,44 @@ app.get('/api/rotas/:id', async (req, res) => {
     }
 });
 
-app.get('/api/modalrotas/:id', async (req, res) => {
+app.get('/modalrotas/:id', async (req, res) => {
     const rotaId = req.params.id;
 
     try {
-        const rotaResult = await pool.query('SELECT * FROM rotas WHERE id = $1', [rotaId]);
-        const coordenadasResult = await pool.query('SELECT lat, lng FROM coordenadas WHERE rota_id = $1', [rotaId]);
+        const rotaQuery = `
+            SELECT r.*, rg.ponto_inicial, rg.pontos_parada, rg.ponto_final, rg.distancia_total, rg.tempo_total
+            FROM rotas r
+            LEFT JOIN rotas_geradas rg ON r.id = rg.rota_id
+            WHERE r.id = $1;
+        `;
+        const result = await pool.query(rotaQuery, [rotaId]);
 
-        if (rotaResult.rows.length === 0) {
+        if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Rota não encontrada' });
         }
 
-        const rota = rotaResult.rows[0];
-        const coordenadas = coordenadasResult.rows;
-
-        const data = {
+        const rota = result.rows[0];
+        const rotaDetalhes = {
             id: rota.id,
-            identificador_unico: rota.identificador_unico,
+            tipo_rota: rota.tipo_rota,
             nome_rota: rota.nome_rota,
+            identificador_unico: rota.identificador_unico,
             horarios_funcionamento: rota.horarios_funcionamento,
+            dificuldades_acesso: rota.dificuldades_acesso,
             escolas_atendidas: rota.escolas_atendidas,
-            coordenadas: coordenadas
+            alunos_atendidos: rota.alunos_atendidos,
+            area_urbana: rota.area_urbana,
+            ponto_inicial: rota.ponto_inicial,
+            pontos_parada: rota.pontos_parada,
+            ponto_final: rota.ponto_final,
+            distancia_total: rota.distancia_total,
+            tempo_total: rota.tempo_total,
         };
 
-        res.json(data);
+        res.json(rotaDetalhes);
     } catch (error) {
-        console.error('Erro ao obter detalhes da rota:', error);
-        res.status(500).json({ error: 'Erro ao obter detalhes da rota' });
+        console.error('Erro ao buscar os detalhes da rota:', error);
+        res.status(500).json({ error: 'Erro ao buscar os detalhes da rota' });
     }
 });
 
