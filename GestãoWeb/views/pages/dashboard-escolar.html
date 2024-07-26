@@ -858,7 +858,42 @@
       // Atualiza o gráfico com os dados filtrados
       updateChart(filteredData);
     }
+
+    // Exibe o modal de notificação
+    function showNotificationModal() {
+      const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
+      notificationModal.show();
+    }
+
+    // Chame a função showNotificationModal quando a página for carregada
+    document.addEventListener('DOMContentLoaded', function () {
+      showNotificationModal();
+    });
   </script>
+
+  <!-- Modal de Notificação -->
+  <div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="notificationModalLabel">Notificação</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>O sistema PyDen Express é registrado no INPI conforme a imagem abaixo:</p>
+          <img src="/path/to/your/image.jpg" alt="Certificado de Registro INPI" class="img-fluid">
+          <p><strong>Processo:</strong> BR 51 2024 002508-1</p>
+          <p><strong>Código:</strong> 730 - Expedição do Certificado de Registro</p>
+          <p><strong>Título:</strong> PyDen Express</p>
+          <p><strong>Titular:</strong> DANILO DE MORAIS GUSTAVO</p>
+          <p><strong>Criador:</strong> DANILO DE MORAIS GUSTAVO</p>
+          <p><strong>Linguagem:</strong> JAVA SCRIPT</p>
+          <p><strong>Data da Criação:</strong> 01/06/2024</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </body>
 
