@@ -765,7 +765,7 @@
             });
 
             window.visualizarRota = function (rotaId) {
-                fetch(`/api/rotas/${rotaId}`)
+                fetch(`/api/modalrotas/${rotaId}`)
                     .then(response => {
                         if (!response.ok) {
                             throw new Error('Resposta inesperada do servidor');

@@ -1002,6 +1002,36 @@ app.get('/api/rotas/:id', async (req, res) => {
     }
 });
 
+app.get('/api/modalrotas/:id', async (req, res) => {
+    const rotaId = req.params.id;
+
+    try {
+        const rotaResult = await pool.query('SELECT * FROM rotas WHERE id = $1', [rotaId]);
+        const coordenadasResult = await pool.query('SELECT lat, lng FROM coordenadas WHERE rota_id = $1', [rotaId]);
+
+        if (rotaResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Rota não encontrada' });
+        }
+
+        const rota = rotaResult.rows[0];
+        const coordenadas = coordenadasResult.rows;
+
+        const data = {
+            id: rota.id,
+            identificador_unico: rota.identificador_unico,
+            nome_rota: rota.nome_rota,
+            horarios_funcionamento: rota.horarios_funcionamento,
+            escolas_atendidas: rota.escolas_atendidas,
+            coordenadas: coordenadas
+        };
+
+        res.json(data);
+    } catch (error) {
+        console.error('Erro ao obter detalhes da rota:', error);
+        res.status(500).json({ error: 'Erro ao obter detalhes da rota' });
+    }
+});
+
 // Endpoint para editar uma rota
 app.put('/api/rotas/:id', async (req, res) => {
     const { id } = req.params;
