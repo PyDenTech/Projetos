@@ -36,6 +36,10 @@
             height: 100%;
             max-width: none;
         }
+
+        th.sortable:hover {
+            cursor: pointer;
+        }
     </style>
 
 </head>
@@ -376,10 +380,14 @@
                                 <table class="table table-striped" id="rotasTable">
                                     <thead class="table-dark text-center">
                                         <tr>
-                                            <th>Identificador Único</th>
-                                            <th>Nome da Rota <span class="bi bi-arrow-down-up"></span></th>
-                                            <th>Horários de Funcionamento <span class="bi bi-arrow-down-up"></span></th>
-                                            <th>Escolas Atendidas <span class="bi bi-arrow-down-up"></span></th>
+                                            <th class="sortable">Identificador Único <span
+                                                    class="bi bi-arrow-down-up"></span></th>
+                                            <th class="sortable">Nome da Rota <span class="bi bi-arrow-down-up"></span>
+                                            </th>
+                                            <th class="sortable">Horários de Funcionamento <span
+                                                    class="bi bi-arrow-down-up"></span></th>
+                                            <th class="sortable">Escolas Atendidas <span
+                                                    class="bi bi-arrow-down-up"></span></th>
                                             <th>Ações</th>
                                         </tr>
                                     </thead>
@@ -903,6 +911,36 @@
                         .catch(error => console.error('Erro ao excluir rota:', error));
                 }
             };
+
+            // Função para ordenar a tabela
+            function sortTable(columnIndex, numeric) {
+                const table = document.getElementById('rotasTable');
+                const tbody = table.querySelector('tbody');
+                const rows = Array.from(tbody.rows);
+                const isAscending = table.dataset.sortOrder === 'asc';
+
+                rows.sort((rowA, rowB) => {
+                    const cellA = rowA.cells[columnIndex].textContent.trim();
+                    const cellB = rowB.cells[columnIndex].textContent.trim();
+
+                    if (numeric) {
+                        return isAscending ? cellA - cellB : cellB - cellA;
+                    } else {
+                        return isAscending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+                    }
+                });
+
+                rows.forEach(row => tbody.appendChild(row));
+                table.dataset.sortOrder = isAscending ? 'desc' : 'asc';
+            }
+
+            // Adiciona evento de clique aos cabeçalhos
+            document.querySelectorAll('.sortable').forEach((header, index) => {
+                header.addEventListener('click', () => {
+                    const isNumeric = !isNaN(document.querySelectorAll('#rotasTable tbody tr td')[index].textContent.trim());
+                    sortTable(index, isNumeric);
+                });
+            });
         });
     </script>
 </body>
