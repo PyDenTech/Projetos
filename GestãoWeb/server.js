@@ -31,12 +31,29 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 app.use('/docs', express.static(path.join(__dirname, 'public', 'uploads')));
 
+// Configuração do pool de conexões
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    max: parseInt(process.env.DB_MAX_CONNECTIONS, 10) || 20,
-    idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT, 10) || 30000,
-    connectionTimeoutMillis: parseInt(process.env.DB_CONNECTION_TIMEOUT, 10) || 2000,
+    max: process.env.DB_MAX_CONNECTIONS,
+    idleTimeoutMillis: process.env.DB_IDLE_TIMEOUT,
+    connectionTimeoutMillis: process.env.DB_CONNECTION_TIMEOUT
 });
+
+// Função para tentar conectar ao banco de dados com tentativas de reconexão
+const connectWithRetry = () => {
+    pool.connect((err, client, release) => {
+        if (err) {
+            console.error('Erro ao adquirir cliente, tentando novamente em 5 segundos', err.stack);
+            setTimeout(connectWithRetry, 5000); // Tentar novamente após 5 segundos
+        } else {
+            console.log('Conectado ao banco de dados');
+            client.release();
+        }
+    });
+};
+
+// Tentativa inicial de conexão
+connectWithRetry();
 
 const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 }); // TTL padrão de 300 segundos (5 minutos)
 
