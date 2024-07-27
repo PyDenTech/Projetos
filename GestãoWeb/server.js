@@ -951,26 +951,48 @@ app.post('/api/verificar-rota-gerada', async (req, res) => {
 });
 
 app.post('/api/salvar-rota-gerada', async (req, res) => {
-    const { ponto_inicial, pontos_parada, ponto_final, rota_id, distancia_total, tempo_total, substituir } = req.body;
+    const { ponto_inicial, pontos_parada, ponto_final, rota_id, distancia_total, tempo_total } = req.body;
+
+    console.log('Dados recebidos:', {
+        ponto_inicial,
+        pontos_parada,
+        ponto_final,
+        rota_id,
+        distancia_total,
+        tempo_total
+    });
+
+    const pontoInicialStr = `${ponto_inicial.lat},${ponto_inicial.lng}`;
+    const pontoFinalStr = `${ponto_final.lat},${ponto_final.lng}`;
+    const pontosParadaStr = pontos_parada.map(p => `${p.lat},${p.lng}`);
 
     try {
-        if (substituir) {
-            await pool.query('DELETE FROM rotas_geradas WHERE rota_id = $1', [rota_id]);
-        }
-
-        await pool.query(
-            `INSERT INTO rotas_geradas (rota_id, ponto_inicial, pontos_parada, ponto_final, distancia_total, tempo_total) 
-             VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-            [rota_id, ponto_inicial, pontos_parada, ponto_final, distancia_total, tempo_total]
+        const result = await pool.query(
+            `INSERT INTO rotas_geradas (
+                ponto_inicial, 
+                pontos_parada, 
+                ponto_final, 
+                rota_id, 
+                distancia_total, 
+                tempo_total
+            ) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+            [
+                pontoInicialStr,
+                pontosParadaStr,
+                pontoFinalStr,
+                rota_id,
+                distancia_total,
+                tempo_total
+            ]
         );
 
-        res.status(201).json({ message: 'Rota gerada salva com sucesso!' });
+        res.status(201).json(result.rows[0]);
     } catch (error) {
-        console.error('Erro ao salvar rota gerada:', error);
+        console.error('Erro ao salvar rota gerada:', error.message);
+        console.error(error.stack); // Adicionado para obter mais detalhes do erro
         res.status(500).json({ error: 'Erro ao salvar rota gerada' });
     }
 });
-
 
 // Endpoint para obter nomes e coordenadas das escolas
 app.post('/api/escolas-nomes', async (req, res) => {
@@ -1440,46 +1462,6 @@ app.get('/api/escolas', async (req, res) => {
     } catch (err) {
         console.error('Error fetching schools:', err);
         res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-// Endpoint para salvar a rota gerada
-app.post('/api/salvar-rota-gerada', async (req, res) => {
-    const { ponto_inicial, pontos_parada, ponto_final, rota_id, distancia_total, tempo_total } = req.body;
-
-    console.log('Dados recebidos:', {
-        ponto_inicial,
-        pontos_parada,
-        ponto_final,
-        rota_id,
-        distancia_total,
-        tempo_total
-    });
-
-    try {
-        const result = await pool.query(
-            `INSERT INTO rotas_geradas (
-                ponto_inicial, 
-                pontos_parada, 
-                ponto_final, 
-                rota_id, 
-                distancia_total, 
-                tempo_total
-            ) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-            [
-                JSON.stringify(ponto_inicial),
-                JSON.stringify(pontos_parada),
-                JSON.stringify(ponto_final),
-                rota_id,
-                distancia_total,
-                tempo_total
-            ]
-        );
-
-        res.status(201).json(result.rows[0]);
-    } catch (error) {
-        console.error('Erro ao salvar rota gerada:', error);
-        res.status(500).json({ error: 'Erro ao salvar rota gerada' });
     }
 });
 
