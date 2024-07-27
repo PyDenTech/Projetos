@@ -33,9 +33,12 @@ app.use('/docs', express.static(path.join(__dirname, 'public', 'uploads')));
 
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    max: parseInt(process.env.DB_MAX_CONNECTIONS, 10) || 20,
-    idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT, 10) || 30000,
-    connectionTimeoutMillis: parseInt(process.env.DB_CONNECTION_TIMEOUT, 10) || 2000,
+    ssl: {
+        rejectUnauthorized: false
+    },
+    max: process.env.DB_MAX_CONNECTIONS,
+    idleTimeoutMillis: process.env.DB_IDLE_TIMEOUT,
+    connectionTimeoutMillis: process.env.DB_CONNECTION_TIMEOUT
 });
 
 const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 }); // TTL padrão de 300 segundos (5 minutos)
