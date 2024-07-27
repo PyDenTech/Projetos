@@ -3,13 +3,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.getElementById("salvarRota").addEventListener("click", async function () {
         const formData = new FormData(form);
+        const areaUrbanaValue = document.querySelector("input[name='areaUrbana']:checked").value;
+
         const data = {
             identificadorUnico: formData.get("identificadorUnico"),
             tipoRota: formData.get("tipoRota"),
             nomeRota: formData.get("nomeRota"),
             horariosFuncionamento: Array.from(document.querySelectorAll("input[name='horariosFuncionamento']:checked")).map(el => el.value),
             dificuldadesAcesso: Array.from(document.querySelectorAll("input[name='dificuldadesAcesso']:checked")).map(el => el.value),
-            areaUrbana: formData.get("areaUrbana") === "true",
+            areaUrbana: areaUrbanaValue === "true",
             escolasAtendidas: Array.from(document.getElementById("escolasAtendidas").selectedOptions).map(option => option.value),
             alunosAtendidos: Array.from(document.getElementById("alunosAtendidos").selectedOptions).map(option => option.value)
         };
