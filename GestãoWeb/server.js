@@ -1371,22 +1371,6 @@ app.put('/api/alunos/:id', async (req, res) => {
     }
 });
 
-app.delete('/api/alunos/:id', async (req, res) => {
-    const { id } = req.params;
-
-    try {
-        const result = await pool.query('DELETE FROM alunos WHERE id = $1 RETURNING *', [id]);
-        if (result.rows.length > 0) {
-            res.json({ message: 'Aluno excluído com sucesso' });
-        } else {
-            res.status(404).send('Aluno não encontrado');
-        }
-    } catch (error) {
-        console.error('Erro ao excluir aluno:', error);
-        res.status(500).send('Erro ao excluir aluno');
-    }
-});
-
 app.get('/api/dashboard-data', async (req, res) => {
     let client;
     try {
@@ -1417,9 +1401,9 @@ app.get('/api/dashboard-data', async (req, res) => {
         const escolasCount = escolasResult.rows[0].count;
         const alunosCount = alunosResult.rows[0].count;
         const rotasCount = rotasResult.rows[0].count;
-        const quilometragemTotal = quilometragemTotalResult.rows[0].quilometragemtotal;
-        const quilometragemMedia = quilometragemMediaResult.rows[0].quilometragemmedia;
-        const tempoMedio = tempoMedioResult.rows[0].tempomedio;
+        const quilometragemTotal = quilometragemTotalResult.rows[0].quilometragemtotal || 0;
+        const quilometragemMedia = quilometragemMediaResult.rows[0].quilometragemmedia || 0;
+        const tempoMedio = tempoMedioResult.rows[0].tempomedio || 0;
 
         const rotasMensais = rotasMensaisResult.rows.reduce((acc, row) => {
             const key = `${row.ano}-${String(row.mes).padStart(2, '0')}`;

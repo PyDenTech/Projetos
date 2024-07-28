@@ -755,6 +755,9 @@
         const response = await fetch('/api/dashboard-data'); // Verifique o endpoint correto
         const data = await response.json();
 
+        // Verifique se os dados foram recebidos corretamente
+        console.log(data);
+
         // Atualizando contagem de escolas
         document.getElementById('escolasAtendidas').textContent = data.escolasCount || 0;
 
