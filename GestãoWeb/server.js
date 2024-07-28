@@ -1393,7 +1393,7 @@ app.get('/api/dashboard-data', async (req, res) => {
         client = await pool.connect();
 
         // Consultas para obter dados
-        const [escolasResult, alunosResult, rotasResult, quilometragemTotalResult, rotasMensaisResult] = await Promise.all([
+        const [escolasResult, alunosResult, rotasResult, quilometragemTotalResult, rotasMensaisResult, quilometragemMediaResult] = await Promise.all([
             client.query('SELECT COUNT(*) AS count FROM escolas'),
             client.query('SELECT COUNT(*) AS count FROM alunos'),
             client.query('SELECT COUNT(*) AS count FROM rotas'),
@@ -1408,7 +1408,8 @@ app.get('/api/dashboard-data', async (req, res) => {
                     FROM rotas
                     GROUP BY EXTRACT(YEAR FROM data_cadastro), EXTRACT(MONTH FROM data_cadastro)
                     ORDER BY EXTRACT(YEAR FROM data_cadastro), EXTRACT(MONTH FROM data_cadastro);
-            `)
+            `),
+            client.query('SELECT AVG(distancia_total) AS quilometragemMedia FROM rotas_geradas')
         ]);
 
         // Processando os resultados
@@ -1416,6 +1417,7 @@ app.get('/api/dashboard-data', async (req, res) => {
         const alunosCount = alunosResult.rows[0].count;
         const rotasCount = rotasResult.rows[0].count;
         const quilometragemTotal = quilometragemTotalResult.rows[0].quilometragemtotal;
+        const quilometragemMedia = quilometragemMediaResult.rows[0].quilometragemmedia;
 
         const rotasMensais = rotasMensaisResult.rows.reduce((acc, row) => {
             const key = `${row.ano}-${String(row.mes).padStart(2, '0')}`;
@@ -1432,6 +1434,7 @@ app.get('/api/dashboard-data', async (req, res) => {
             alunosCount,
             rotasCount,
             quilometragemTotal,
+            quilometragemMedia,
             rotasMensais
         });
     } catch (error) {
@@ -1441,6 +1444,7 @@ app.get('/api/dashboard-data', async (req, res) => {
         if (client) client.release();
     }
 });
+
 
 app.get('/api/stop-points', async (req, res) => {
     try {

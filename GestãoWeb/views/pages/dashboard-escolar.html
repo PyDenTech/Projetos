@@ -464,6 +464,7 @@
                 </div>
               </div>
             </div>
+
             <!-- Tempo Médio das Rotas -->
             <div class="col-xxl-4 col-md-6">
               <div class="card info-card">
@@ -765,6 +766,9 @@
 
         // Atualizando quilometragem total
         document.getElementById('quilometragem-total').innerText = formatNumber(data.quilometragemTotal) + ' km';
+
+        // Atualizando quilometragem média
+        document.getElementById('quilometragem-media').innerText = formatNumber(data.quilometragemMedia) + ' km';
 
         // Atualizando dados das rotas mensais
         updateChart(data.rotasMensais);
