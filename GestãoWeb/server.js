@@ -921,20 +921,188 @@ app.post('/api/cadastrar-rota', async (req, res) => {
     }
 });
 
-app.get('/api/rotas', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT * FROM rotas');
+app.post('/api/cadastrar-tracado-rota', async (req, res) => {
+    const {
+        rotaId,
+        nomeRota,
+        distanciaTotal,
+        tempoTotal,
+        pontoInicial,
+        pontoFinal,
+        pontosParada,
+        escolasAtendidas
+    } = req.body;
 
-        if (result.rows.length === 0) {
-            return res.status(404).json({ message: 'Nenhuma rota encontrada' });
+    try {
+        // Verifica se já existe um traçado cadastrado para a rota
+        const existingRoute = await pool.query(
+            'SELECT * FROM rotas_geradas WHERE rota_id = $1',
+            [rotaId]
+        );
+
+        if (existingRoute.rows.length > 0) {
+            return res.status(409).json({ error: 'Já existe um traçado cadastrado para essa rota. Deseja sobrescrever?' });
         }
 
-        res.status(200).json(result.rows);
+        // Insira os dados na tabela rotas_geradas
+        const result = await pool.query(
+            `INSERT INTO rotas_geradas (
+                rota_id,
+                nome_rota,
+                distancia_total,
+                tempo_total,
+                ponto_inicial,
+                ponto_final,
+                pontos_parada,
+                escolas_atendidas
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+            [
+                parseInt(rotaId),
+                nomeRota,
+                parseFloat(distanciaTotal),
+                parseFloat(tempoTotal),
+                pontoInicial,
+                pontoFinal,
+                pontosParada,
+                escolasAtendidas
+            ]
+        );
+
+        res.status(201).json(result.rows[0]);
     } catch (error) {
-        console.error('Erro ao buscar rotas:', error);
-        res.status(500).json({ error: 'Erro ao buscar rotas' });
+        console.error('Erro ao cadastrar traçado da rota:', error);
+        res.status(500).json({ error: error.message });
     }
 });
+
+app.put('/api/atualizar-tracado-rota', async (req, res) => {
+    const {
+        rotaId,
+        nomeRota,
+        distanciaTotal,
+        tempoTotal,
+        pontoInicial,
+        pontoFinal,
+        pontosParada,
+        escolasAtendidas
+    } = req.body;
+
+    try {
+        // Atualize os dados na tabela rotas_geradas
+        const result = await pool.query(
+            `UPDATE rotas_geradas SET
+                nome_rota = $2,
+                distancia_total = $3,
+                tempo_total = $4,
+                ponto_inicial = $5,
+                ponto_final = $6,
+                pontos_parada = $7,
+                escolas_atendidas = $8
+            WHERE rota_id = $1 RETURNING *`,
+            [
+                parseInt(rotaId),
+                nomeRota,
+                parseFloat(distanciaTotal),
+                parseFloat(tempoTotal),
+                pontoInicial,
+                pontoFinal,
+                pontosParada,
+                escolasAtendidas
+            ]
+        );
+
+        res.status(200).json(result.rows[0]);
+    } catch (error) {
+        console.error('Erro ao atualizar traçado da rota:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
+app.get('/api/rotas', async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT * FROM rotas
+            ORDER BY 
+                CAST(regexp_replace(identificador_unico, '[^0-9]', '', 'g') AS INTEGER),
+                regexp_replace(identificador_unico, '[0-9]', '', 'g')
+        `);
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Erro ao buscar rotas:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.get('/api/consultar-rotas-com-escolas', async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 15;
+        const offset = parseInt(req.query.offset) || 0;
+
+        const rotasResult = await pool.query(`
+            SELECT id, identificador_unico, nome_rota, escolas_atendidas
+            FROM rotas
+            ORDER BY
+                CAST(regexp_replace(identificador_unico::text, '[^0-9]', '', 'g') AS INTEGER),
+                regexp_replace(identificador_unico::text, '[0-9]', '', 'g')
+            LIMIT $1 OFFSET $2
+        `, [limit, offset]);
+
+        const rotas = rotasResult.rows;
+
+        // Prepare to fetch school names
+        const escolasIds = [];
+        rotas.forEach(rota => {
+            rota.escolas_atendidas.forEach(id => {
+                if (!escolasIds.includes(id)) {
+                    escolasIds.push(id);
+                }
+            });
+        });
+
+        const escolasResult = await pool.query(`
+            SELECT id, nome
+            FROM escolas
+            WHERE id = ANY($1::int[])
+        `, [escolasIds]);
+
+        const escolasMap = {};
+        escolasResult.rows.forEach(escola => {
+            escolasMap[escola.id] = escola.nome;
+        });
+
+        // Map school names to routes
+        rotas.forEach(rota => {
+            rota.escolas_atendidas_nomes = rota.escolas_atendidas.map(id => escolasMap[id]);
+        });
+
+        const totalResult = await pool.query('SELECT COUNT(*) FROM rotas');
+        const totalRotas = parseInt(totalResult.rows[0].count);
+
+        res.status(200).json({ rotas, totalRotas });
+    } catch (error) {
+        console.error('Erro ao consultar rotas:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.get('/api/rotas-geradas/:rotaId', async (req, res) => {
+    const { rotaId } = req.params;
+
+    try {
+        const result = await pool.query('SELECT * FROM rotas_geradas WHERE rota_id = $1', [rotaId]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Rota não encontrada.' });
+        }
+
+        res.status(200).json(result.rows[0]);
+    } catch (error) {
+        console.error('Erro ao buscar rota gerada:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 
 app.post('/api/verificar-rota-gerada', async (req, res) => {
     const { rota_id } = req.body;
@@ -1027,68 +1195,64 @@ app.get('/api/rotas/:id', async (req, res) => {
     }
 });
 
-app.get('/modalrotas/:id', async (req, res) => {
-    const rotaId = req.params.id;
+
+app.get('/api/rotas/:rotaId/escolas', async (req, res) => {
+    const { rotaId } = req.params;
 
     try {
-        const rotaQuery = `
-            SELECT r.*, rg.ponto_inicial, rg.pontos_parada, rg.ponto_final, rg.distancia_total, rg.tempo_total
-            FROM rotas r
-            LEFT JOIN rotas_geradas rg ON r.id = rg.rota_id
-            WHERE r.id = $1;
-        `;
-        const result = await pool.query(rotaQuery, [rotaId]);
+        const rota = await pool.query('SELECT escolas_atendidas FROM rotas WHERE id = $1', [rotaId]);
 
-        if (result.rows.length === 0) {
-            return res.status(404).json({ error: 'Rota não encontrada' });
+        if (rota.rows.length === 0) {
+            return res.status(404).json({ error: 'Rota não encontrada.' });
         }
 
-        const rota = result.rows[0];
-        const rotaDetalhes = {
-            id: rota.id,
-            tipo_rota: rota.tipo_rota,
-            nome_rota: rota.nome_rota,
-            identificador_unico: rota.identificador_unico,
-            horarios_funcionamento: rota.horarios_funcionamento,
-            dificuldades_acesso: rota.dificuldades_acesso,
-            escolas_atendidas: rota.escolas_atendidas,
-            alunos_atendidos: rota.alunos_atendidos,
-            area_urbana: rota.area_urbana,
-            ponto_inicial: rota.ponto_inicial,
-            pontos_parada: rota.pontos_parada,
-            ponto_final: rota.ponto_final,
-            distancia_total: rota.distancia_total,
-            tempo_total: rota.tempo_total,
-        };
+        const escolasIds = rota.rows[0].escolas_atendidas;
 
-        res.json(rotaDetalhes);
+        const escolas = await pool.query('SELECT id, latitude, longitude FROM escolas WHERE id = ANY($1)', [escolasIds]);
+
+        res.json(escolas.rows);
     } catch (error) {
-        console.error('Erro ao buscar os detalhes da rota:', error);
-        res.status(500).json({ error: 'Erro ao buscar os detalhes da rota' });
+        console.error('Erro ao buscar escolas da rota:', error);
+        res.status(500).json({ error: error.message });
     }
 });
 
-// Endpoint para editar uma rota
-app.put('/api/rotas/:id', async (req, res) => {
+// Atualizar uma rota
+app.put('/api/atualizar-rota/:id', async (req, res) => {
     const { id } = req.params;
-    const { identificador_unico, tipo_rota, nome_rota, horarios_funcionamento, dificuldades_acesso, escolas_atendidas, alunos_atendidos, area_urbana } = req.body;
+    const {
+        identificadorUnico,
+        tipoRota,
+        nomeRota,
+        horariosFuncionamento,
+        dificuldadesAcesso,
+        escolasAtendidas,
+        alunosAtendidos,
+        areaUrbana
+    } = req.body;
 
     try {
         const result = await pool.query(
-            `UPDATE rotas
-             SET identificador_unico = $1, tipo_rota = $2, nome_rota = $3, horarios_funcionamento = $4::jsonb, dificuldades_acesso = $5::jsonb,
-                 escolas_atendidas = $6::jsonb, alunos_atendidos = $7::jsonb, area_urbana = $8
-             WHERE id = $9
-             RETURNING *`,
+            `UPDATE rotas 
+            SET identificador_unico = $1,
+                tipo_rota = $2,
+                nome_rota = $3,
+                horarios_funcionamento = $4,
+                dificuldades_acesso = $5,
+                escolas_atendidas = $6,
+                alunos_atendidos = $7,
+                area_urbana = $8
+            WHERE id = $9
+            RETURNING *`,
             [
-                identificador_unico,
-                tipo_rota,
-                nome_rota,
-                JSON.stringify(horarios_funcionamento),
-                JSON.stringify(dificuldades_acesso),
-                JSON.stringify(escolas_atendidas),
-                JSON.stringify(alunos_atendidos),
-                area_urbana,
+                identificadorUnico,
+                tipoRota,
+                nomeRota,
+                horariosFuncionamento,
+                dificuldadesAcesso,
+                escolasAtendidas,
+                alunosAtendidos,
+                areaUrbana,
                 id
             ]
         );
@@ -1099,12 +1263,10 @@ app.put('/api/rotas/:id', async (req, res) => {
 
         res.status(200).json(result.rows[0]);
     } catch (error) {
-        console.error('Erro ao editar rota:', error);
-        res.status(500).json({ error: 'Erro ao editar rota' });
+        console.error('Erro ao atualizar rota:', error);
+        res.status(500).json({ error: 'Erro ao atualizar rota' });
     }
 });
-
-
 
 // Endpoint para excluir uma rota
 app.delete('/api/rotas/:id', async (req, res) => {
