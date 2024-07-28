@@ -31,6 +31,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 app.use('/docs', express.static(path.join(__dirname, 'public', 'uploads')));
 
+const saltRounds = 10;
+
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: {
@@ -76,6 +78,16 @@ function ensureLoggedIn(req, res, next) {
 
 module.exports = ensureLoggedIn;
 
+async function emailExiste(email) {
+    const query = 'SELECT COUNT(*) FROM usuarios WHERE email = $1';
+    try {
+        const result = await pool.query(query, [email]);
+        return result.rows[0].count > 0;
+    } catch (error) {
+        console.error('Erro ao verificar o email:', error);
+        throw error;
+    }
+}
 
 function isAdmin(req, res, next) {
     if (req.session.admin && req.session.admin.role === 'admin') {
@@ -94,6 +106,8 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASS,
     },
 });
+
+/* API'S PARA APLICATIVO DE GESTÃO WEB */
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'login.html'));
@@ -425,37 +439,6 @@ app.post('/admin/login', async (req, res) => {
     }
 });
 
-
-app.post('/api/loginMotoristasAdministrativos', async (req, res) => {
-    const { email, senha } = req.body;
-
-    try {
-        const userQuery = await pool.query('SELECT * FROM motoristas_administrativos WHERE email = $1', [email]);
-        if (userQuery.rows.length === 0) {
-            return res.status(404).send('Usuário não encontrado.');
-        }
-
-        const user = userQuery.rows[0];
-        const isValidPassword = await bcrypt.compare(senha, user.senha);
-
-        if (!isValidPassword) {
-            return res.status(401).send('Senha incorreta.');
-        }
-
-        req.session.user = {
-            id: user.id,
-            nome: user.nome_completo,
-            email: user.email,
-            role: 'motorista_administrativo'
-        };
-
-        res.json({ userId: user.id, nome: user.nome_completo, empresa: user.empresa });
-    } catch (error) {
-        console.error('Erro no login:', error);
-        res.status(500).send('Erro ao processar o login');
-    }
-});
-
 app.post('/api/loginWeb', async (req, res) => {
     const { email, senha } = req.body;
 
@@ -489,7 +472,6 @@ app.post('/api/loginWeb', async (req, res) => {
         res.status(500).send('Erro ao processar o login');
     }
 });
-
 
 app.get('/api/usuario-logado', async (req, res) => {
     if (!req.session.user) {
@@ -534,7 +516,6 @@ app.post('/api/usuarios/:userId/status', isAdmin, async (req, res) => {
     }
 });
 
-
 app.post('/api/usuarios/:userId/cargo', isAdmin, async (req, res) => {
     const { userId } = req.params;
     const { role } = req.body;
@@ -550,19 +531,6 @@ app.post('/api/usuarios/:userId/cargo', isAdmin, async (req, res) => {
         res.status(500).json({ success: false, message: 'Erro ao processar a solicitação.' });
     }
 });
-
-const saltRounds = 10;
-
-async function emailExiste(email) {
-    const query = 'SELECT COUNT(*) FROM usuarios WHERE email = $1';
-    try {
-        const result = await pool.query(query, [email]);
-        return result.rows[0].count > 0;
-    } catch (error) {
-        console.error('Erro ao verificar o email:', error);
-        throw error;
-    }
-}
 
 async function cpfExiste(cpf) {
     const query = 'SELECT COUNT(*) FROM usuarios WHERE cpf = $1';
@@ -639,7 +607,6 @@ app.post('/cadastrar-usuario', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-
 
 app.get('/api/usuarios-pendentes', async (req, res) => {
     try {
@@ -1103,7 +1070,6 @@ app.get('/api/rotas-geradas/:rotaId', async (req, res) => {
     }
 });
 
-
 app.post('/api/verificar-rota-gerada', async (req, res) => {
     const { rota_id } = req.body;
 
@@ -1165,7 +1131,6 @@ app.post('/api/salvar-rota-gerada', async (req, res) => {
     }
 });
 
-// Endpoint para obter nomes e coordenadas das escolas
 app.post('/api/escolas-nomes', async (req, res) => {
     const { ids } = req.body;
 
@@ -1195,7 +1160,6 @@ app.get('/api/rotas/:id', async (req, res) => {
     }
 });
 
-
 app.get('/api/rotas/:rotaId/escolas', async (req, res) => {
     const { rotaId } = req.params;
 
@@ -1217,7 +1181,6 @@ app.get('/api/rotas/:rotaId/escolas', async (req, res) => {
     }
 });
 
-// Atualizar uma rota
 app.put('/api/atualizar-rota/:id', async (req, res) => {
     const { id } = req.params;
     const {
@@ -1268,7 +1231,6 @@ app.put('/api/atualizar-rota/:id', async (req, res) => {
     }
 });
 
-// Endpoint para excluir uma rota
 app.delete('/api/rotas/:id', async (req, res) => {
     const { id } = req.params;
 
@@ -1293,8 +1255,6 @@ app.delete('/api/rotas/:id', async (req, res) => {
         res.status(500).send('Erro ao excluir a rota');
     }
 });
-
-
 
 app.post('/api/cadastrar-aluno', async (req, res) => {
     const {
@@ -1347,7 +1307,6 @@ app.post('/api/cadastrar-aluno', async (req, res) => {
     }
 });
 
-// Endpoint para buscar alunos por escola
 app.get('/api/alunos', async (req, res) => {
     const escolaId = req.query.escolaId;
 
@@ -1367,8 +1326,6 @@ app.get('/api/alunos', async (req, res) => {
     }
 });
 
-
-// Endpoint para buscar um aluno específico por ID
 app.get('/api/alunos/:id', async (req, res) => {
     const { id } = req.params;
     try {
@@ -1384,7 +1341,6 @@ app.get('/api/alunos/:id', async (req, res) => {
     }
 });
 
-// Endpoint para editar um aluno
 app.put('/api/alunos/:id', async (req, res) => {
     const { id } = req.params;
     const { nome, dt_nascimento, situacao, serie, turma, endereco, rota_transporte, usa_transporte_escolar } = req.body;
@@ -1407,7 +1363,6 @@ app.put('/api/alunos/:id', async (req, res) => {
     }
 });
 
-// Endpoint para excluir um aluno
 app.delete('/api/alunos/:id', async (req, res) => {
     const { id } = req.params;
 
@@ -1479,7 +1434,6 @@ app.get('/api/dashboard-data', async (req, res) => {
     }
 });
 
-// Endpoint para obter todos os pontos de parada
 app.get('/api/stop-points', async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM stop_points');
@@ -1490,7 +1444,6 @@ app.get('/api/stop-points', async (req, res) => {
     }
 });
 
-// Endpoint para armazenar os pontos de parada
 app.post('/api/stop-points', async (req, res) => {
     const points = req.body;
 
@@ -1534,7 +1487,6 @@ app.post('/api/stop-points', async (req, res) => {
     }
 });
 
-// Endpoint para cadastrar fornecedor
 app.post('/api/fornecedores', async (req, res) => {
     const { nomeFornecedor, tipoContrato, cnpjFornecedor, contatoFornecedor, latitude, longitude, endereco } = req.body;
 
@@ -1550,8 +1502,6 @@ app.post('/api/fornecedores', async (req, res) => {
     }
 });
 
-
-// Endpoint para buscar todos os fornecedores
 app.get('/api/fornecedores', async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM fornecedores');
@@ -1562,7 +1512,6 @@ app.get('/api/fornecedores', async (req, res) => {
     }
 });
 
-// Endpoint para buscar um fornecedor específico
 app.get('/api/fornecedores/:id', async (req, res) => {
     const id = req.params.id;
     try {
@@ -1578,7 +1527,6 @@ app.get('/api/fornecedores/:id', async (req, res) => {
     }
 });
 
-// Endpoint para editar um fornecedor específico
 app.put('/api/fornecedores/:id', async (req, res) => {
     const id = req.params.id;
     const { nomeFornecedor, tipoContrato, cnpjFornecedor, contatoFornecedor, latitude, longitude, endereco } = req.body;
@@ -1600,7 +1548,6 @@ app.put('/api/fornecedores/:id', async (req, res) => {
     }
 });
 
-// Endpoint para excluir um fornecedor específico
 app.delete('/api/fornecedores/:id', async (req, res) => {
     const id = req.params.id;
 
@@ -1618,8 +1565,6 @@ app.delete('/api/fornecedores/:id', async (req, res) => {
     }
 });
 
-
-// Endpoint para obter todas as escolas
 app.get('/api/escolas', async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM escolas');
@@ -1639,6 +1584,75 @@ app.get('/api/motoristas', async (req, res) => {
         res.status(500).json({ error: 'Erro ao buscar motoristas' });
     }
 });
+
+app.post('/api/cadastrar-monitor', upload.fields([
+    { name: 'docRH', maxCount: 1 },
+    { name: 'docMonitor', maxCount: 1 },
+    { name: 'docEnsinoMedio', maxCount: 1 }
+]), async (req, res) => {
+    const { nomeCompleto, cpf, empresa, rotas } = req.body;
+
+    const docRH = req.files['docRH'] ? req.files['docRH'][0].filename : null;
+    const docMonitor = req.files['docMonitor'] ? req.files['docMonitor'][0].filename : null;
+    const docEnsinoMedio = req.files['docEnsinoMedio'] ? req.files['docEnsinoMedio'][0].filename : null;
+
+    if (!nomeCompleto || !cpf || !empresa || !docRH || !docMonitor || !docEnsinoMedio || !rotas) {
+        return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
+    }
+
+    try {
+        const client = await pool.connect();
+        const result = await client.query(
+            'INSERT INTO monitores (nome_completo, cpf, empresa, doc_rh, doc_monitor, doc_ensino_medio, rotas) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+            [nomeCompleto, cpf, empresa, docRH, docMonitor, docEnsinoMedio, JSON.parse(rotas)]
+        );
+        client.release();
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Erro ao cadastrar monitor');
+    }
+});
+
+app.get('/api/monitores', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT id, nome_completo, cpf, empresa, doc_rh, doc_monitor, doc_ensino_medio, rotas, data_cadastro FROM monitores');
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Erro ao buscar dados dos monitores:', err);
+        res.status(500).json({ error: 'Erro ao buscar dados dos monitores' });
+    }
+});
+
+app.put('/api/monitores/:id', async (req, res) => {
+    const { id } = req.params;
+    const { nome_completo, cpf, empresa, rotas } = req.body;
+
+    try {
+        await pool.query(
+            'UPDATE monitores SET nome_completo = $1, cpf = $2, empresa = $3, rotas = $4 WHERE id = $5',
+            [nome_completo, cpf, empresa, rotas, id]
+        );
+        res.json({ message: 'Monitor atualizado com sucesso' });
+    } catch (err) {
+        console.error('Erro ao atualizar monitor:', err);
+        res.status(500).json({ error: 'Erro ao atualizar monitor' });
+    }
+});
+
+app.delete('/api/monitores/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        await pool.query('DELETE FROM monitores WHERE id = $1', [id]);
+        res.json({ message: 'Monitor excluído com sucesso' });
+    } catch (err) {
+        console.error('Erro ao excluir monitor:', err);
+        res.status(500).json({ error: 'Erro ao excluir monitor' });
+    }
+});
+
+/* API'S PARA APLICATIVO DE TRANSPORTE ADMINISTRATIVO E GESTÃO WEB COMBINADOS */
 
 app.post('/api/criarDemanda', async (req, res) => {
     const { origem, destino, data_hora_partida, data_hora_termino_estimado, solicitante, tem_carga, quantidade_passageiros, motoristas } = req.body;
@@ -1673,7 +1687,6 @@ app.post('/api/criarDemanda', async (req, res) => {
     }
 });
 
-
 app.post('/api/obterDemandas', async (req, res) => {
     const { motorista_id } = req.body;
 
@@ -1701,8 +1714,6 @@ app.post('/api/obterDemandas', async (req, res) => {
     }
 });
 
-
-// Endpoint para buscar demandas pendentes
 app.post('/api/demandasPendentes', async (req, res) => {
     const { motorista_id } = req.body;
 
@@ -1803,7 +1814,6 @@ app.post('/api/informarAtraso', async (req, res) => {
     }
 });
 
-
 app.post('/api/getMotorista', async (req, res) => {
     const { email } = req.body;
 
@@ -1884,8 +1894,6 @@ app.post('/api/atualizarLocalizacao', async (req, res) => {
     }
 });
 
-
-// Endpoint para criar um novo aviso
 app.post('/api/avisos', async (req, res) => {
     const { titulo, mensagem, destinatario } = req.body;
 
@@ -1955,6 +1963,41 @@ app.delete('/api/usuarios/:userId', isAdmin, async (req, res) => {
         client.release();
     }
 });
+
+app.post('/api/cadastrar-abastecimento-administrativos', async (req, res) => {
+    const {
+        reqId,
+        carro,
+        placa,
+        odometro,
+        combustivel,
+        litros,
+        motoristaId
+    } = req.body;
+
+    let valorUnitario = 0;
+
+    if (combustivel === 'Gasolina Comum') {
+        valorUnitario = 5.8;
+    } else if (combustivel === 'Diesel S10') {
+        valorUnitario = 6.9;
+    }
+
+    const valorTotal = (litros * valorUnitario).toFixed(2);
+
+    try {
+        const result = await pool.query(
+            'INSERT INTO abastecimentos (req_id, carro, placa, quilometragem, tipo_combustivel, quantidade_litros, valor_total, motorista_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+            [reqId, carro, placa, odometro, combustivel, litros, valorTotal, motoristaId]
+        );
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        console.error('Erro ao cadastrar abastecimento:', err);
+        res.status(500).json({ error: 'Erro ao cadastrar abastecimento' });
+    }
+});
+
+/* API'S PARA APLICATIVO DE TRANSPORTE ESCOLAR E GESTÃO WEB */
 
 app.get('/api/motoristas_escolares', async (req, res) => {
     try {
@@ -2083,7 +2126,6 @@ app.get('/api/rota-gerada/:rota_id', async (req, res) => {
     }
 });
 
-
 // Endpoint para buscar motoristas
 app.get('/api/motoristas-abastecimento', async (req, res) => {
     const tipo = req.query.tipo;
@@ -2108,40 +2150,6 @@ app.get('/api/motoristas-abastecimento', async (req, res) => {
 
 // Endpoint para cadastrar abastecimento para motoristas escolares
 app.post('/api/cadastrar-abastecimento-escolares', async (req, res) => {
-    const {
-        reqId,
-        carro,
-        placa,
-        odometro,
-        combustivel,
-        litros,
-        motoristaId
-    } = req.body;
-
-    let valorUnitario = 0;
-
-    if (combustivel === 'Gasolina Comum') {
-        valorUnitario = 5.8;
-    } else if (combustivel === 'Diesel S10') {
-        valorUnitario = 6.9;
-    }
-
-    const valorTotal = (litros * valorUnitario).toFixed(2);
-
-    try {
-        const result = await pool.query(
-            'INSERT INTO abastecimentos (req_id, carro, placa, quilometragem, tipo_combustivel, quantidade_litros, valor_total, motorista_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-            [reqId, carro, placa, odometro, combustivel, litros, valorTotal, motoristaId]
-        );
-        res.status(201).json(result.rows[0]);
-    } catch (err) {
-        console.error('Erro ao cadastrar abastecimento:', err);
-        res.status(500).json({ error: 'Erro ao cadastrar abastecimento' });
-    }
-});
-
-// Endpoint para cadastrar abastecimento para motoristas administrativos
-app.post('/api/cadastrar-abastecimento-administrativos', async (req, res) => {
     const {
         reqId,
         carro,
@@ -2313,73 +2321,91 @@ app.get('/api/motoristas-gerenciar-abastecimento', async (req, res) => {
     }
 });
 
-app.post('/api/cadastrar-monitor', upload.fields([
-    { name: 'docRH', maxCount: 1 },
-    { name: 'docMonitor', maxCount: 1 },
-    { name: 'docEnsinoMedio', maxCount: 1 }
-]), async (req, res) => {
-    const { nomeCompleto, cpf, empresa, rotas } = req.body;
+/* API'S PARA APLICATIVO DE TRANSPORTE ADMINISTRATIVO */
 
-    const docRH = req.files['docRH'] ? req.files['docRH'][0].filename : null;
-    const docMonitor = req.files['docMonitor'] ? req.files['docMonitor'][0].filename : null;
-    const docEnsinoMedio = req.files['docEnsinoMedio'] ? req.files['docEnsinoMedio'][0].filename : null;
+app.post('/api/registroMotoristasAdministrativos', async (req, res) => {
+    console.log('Recebendo requisição de registro');
 
-    if (!nomeCompleto || !cpf || !empresa || !docRH || !docMonitor || !docEnsinoMedio || !rotas) {
+    const {
+        nome_completo,
+        cpf,
+        cnh,
+        email,
+        password,
+        empresa,
+        tipo_veiculo,
+        modelo,
+        placa,
+    } = req.body;
+
+    console.log('Dados recebidos:', req.body);
+
+    if (
+        !nome_completo ||
+        !cpf ||
+        !cnh ||
+        !email ||
+        !password ||
+        !empresa ||
+        !tipo_veiculo ||
+        !modelo ||
+        !placa
+    ) {
         return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
     }
 
     try {
-        const client = await pool.connect();
-        const result = await client.query(
-            'INSERT INTO monitores (nome_completo, cpf, empresa, doc_rh, doc_monitor, doc_ensino_medio, rotas) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
-            [nomeCompleto, cpf, empresa, docRH, docMonitor, docEnsinoMedio, JSON.parse(rotas)]
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const result = await pool.query(
+            `INSERT INTO motoristas_administrativos (nome_completo, cpf, cnh, email, senha, empresa, tipo_veiculo, modelo, placa)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+         RETURNING id`,
+            [nome_completo, cpf, cnh, email, hashedPassword, empresa, tipo_veiculo, modelo, placa]
         );
-        client.release();
-        res.status(201).json(result.rows[0]);
+
+        console.log('Motorista registrado com sucesso:', result.rows[0].id);
+
+        res.status(201).json({ id: result.rows[0].id, message: 'Motorista registrado com sucesso' });
     } catch (err) {
-        console.error(err);
-        res.status(500).send('Erro ao cadastrar monitor');
+        console.error('Erro ao registrar motorista:', err);
+
+        if (err.code === '23505') {
+            res.status(400).json({ error: 'CPF, CNH, email ou placa já cadastrados' });
+        } else {
+            res.status(500).json({ error: 'Erro ao registrar motorista' });
+        }
     }
 });
 
-app.get('/api/monitores', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT id, nome_completo, cpf, empresa, doc_rh, doc_monitor, doc_ensino_medio, rotas, data_cadastro FROM monitores');
-        res.json(result.rows);
-    } catch (err) {
-        console.error('Erro ao buscar dados dos monitores:', err);
-        res.status(500).json({ error: 'Erro ao buscar dados dos monitores' });
-    }
-});
-
-app.put('/api/monitores/:id', async (req, res) => {
-    const { id } = req.params;
-    const { nome_completo, cpf, empresa, rotas } = req.body;
+app.post('/api/loginMotoristasAdministrativos', async (req, res) => {
+    const { email, senha } = req.body;
 
     try {
-        await pool.query(
-            'UPDATE monitores SET nome_completo = $1, cpf = $2, empresa = $3, rotas = $4 WHERE id = $5',
-            [nome_completo, cpf, empresa, rotas, id]
-        );
-        res.json({ message: 'Monitor atualizado com sucesso' });
-    } catch (err) {
-        console.error('Erro ao atualizar monitor:', err);
-        res.status(500).json({ error: 'Erro ao atualizar monitor' });
+        const userQuery = await pool.query('SELECT * FROM motoristas_administrativos WHERE email = $1', [email]);
+        if (userQuery.rows.length === 0) {
+            return res.status(404).send('Usuário não encontrado.');
+        }
+
+        const user = userQuery.rows[0];
+        const isValidPassword = await bcrypt.compare(senha, user.senha);
+
+        if (!isValidPassword) {
+            return res.status(401).send('Senha incorreta.');
+        }
+
+        req.session.user = {
+            id: user.id,
+            nome: user.nome_completo,
+            email: user.email,
+            role: 'motorista_administrativo'
+        };
+
+        res.json({ userId: user.id, nome: user.nome_completo, empresa: user.empresa });
+    } catch (error) {
+        console.error('Erro no login:', error);
+        res.status(500).send('Erro ao processar o login');
     }
 });
-
-app.delete('/api/monitores/:id', async (req, res) => {
-    const { id } = req.params;
-
-    try {
-        await pool.query('DELETE FROM monitores WHERE id = $1', [id]);
-        res.json({ message: 'Monitor excluído com sucesso' });
-    } catch (err) {
-        console.error('Erro ao excluir monitor:', err);
-        res.status(500).json({ error: 'Erro ao excluir monitor' });
-    }
-});
-
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
