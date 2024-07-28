@@ -770,6 +770,9 @@
         // Atualizando quilometragem média
         document.getElementById('quilometragem-media').innerText = formatNumber(data.quilometragemMedia) + ' km';
 
+        // Atualizando tempo médio
+        document.getElementById('tempo-medio').innerText = formatMinutes(data.tempoMedio) + ' min';
+
         // Atualizando dados das rotas mensais
         updateChart(data.rotasMensais);
 
@@ -783,6 +786,13 @@
         return '0,00'; // Retorna um valor padrão caso o número seja null, undefined ou não seja um número válido
       }
       return number.toFixed(2).replace('.', ',');
+    }
+
+    function formatMinutes(minutes) {
+      if (typeof minutes !== 'number' || isNaN(minutes)) {
+        return '0'; // Retorna um valor padrão caso o número seja null, undefined ou não seja um número válido
+      }
+      return Math.round(minutes);
     }
 
     function updateChart(rotasMensais) {
