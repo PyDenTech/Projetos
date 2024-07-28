@@ -107,6 +107,14 @@ const transporter = nodemailer.createTransport({
     },
 });
 
+function formatNumber(number) {
+    if (typeof number !== 'number' || isNaN(number)) {
+        return '0,00'; // Retorna um valor padrão caso o número seja null, undefined ou não seja um número válido
+    }
+    return number.toFixed(2).replace('.', ',');
+}
+
+
 /* API'S PARA APLICATIVO DE GESTÃO WEB */
 
 app.get('/', (req, res) => {
