@@ -458,7 +458,7 @@
                       <i class="bi bi-calculator"></i>
                     </div>
                     <div class="ps-3">
-                      <h6 id="quilometragem-media">0</h6>
+                      <h6 id="quilometragem-media">0,00 km</h6>
                     </div>
                   </div>
                 </div>
@@ -475,12 +475,13 @@
                       <i class="bi bi-clock"></i>
                     </div>
                     <div class="ps-3">
-                      <h6 id="tempo-medio">0</h6>
+                      <h6 id="tempo-medio">0 min</h6>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+
 
             <!-- Reports -->
             <!-- HTML -->
@@ -751,52 +752,63 @@
     let data; // Declare a variável data fora do bloco try para poder acessá-la dentro da função filterRoutes
 
     document.addEventListener('DOMContentLoaded', async function () {
-      try {
-        const response = await fetch('/api/dashboard-data'); // Verifique o endpoint correto
-        const data = await response.json();
+  try {
+    const response = await fetch('/api/dashboard-data');
+    const data = await response.json();
 
-        // Verifique se os dados foram recebidos corretamente
-        console.log(data);
+    // Verifique se os dados foram recebidos corretamente
+    console.log('Dados recebidos do backend:', data);
 
-        // Atualizando contagem de escolas
-        document.getElementById('escolasAtendidas').textContent = data.escolasCount || 0;
+    // Atualizando contagem de escolas
+    document.getElementById('escolasAtendidas').textContent = data.escolasCount || 0;
 
-        // Atualizando contagem de alunos
-        document.getElementById('alunosAtendidos').textContent = data.alunosCount || 0;
+    // Atualizando contagem de alunos
+    document.getElementById('alunosAtendidos').textContent = data.alunosCount || 0;
 
-        // Atualizando quantidade de rotas
-        document.getElementById('quantidade-rotas').innerText = data.rotasCount || 0;
+    // Atualizando quantidade de rotas
+    document.getElementById('quantidade-rotas').innerText = data.rotasCount || 0;
 
-        // Atualizando quilometragem total
-        document.getElementById('quilometragem-total').innerText = formatNumber(data.quilometragemTotal) + ' km';
+    // Convertendo valores de string para número
+    const quilometragemTotal = parseFloat(data.quilometragemTotal);
+    const quilometragemMedia = parseFloat(data.quilometragemMedia);
+    const tempoMedio = parseFloat(data.tempoMedio);
 
-        // Atualizando quilometragem média
-        document.getElementById('quilometragem-media').innerText = formatNumber(data.quilometragemMedia) + ' km';
+    // Atualizando quilometragem total
+    const quilometragemTotalElem = document.getElementById('quilometragem-total');
+    quilometragemTotalElem.innerText = formatNumber(quilometragemTotal) + ' km';
+    console.log('Quilometragem Total Atualizada:', quilometragemTotalElem.innerText);
 
-        // Atualizando tempo médio
-        document.getElementById('tempo-medio').innerText = formatMinutes(data.tempoMedio) + ' min';
+    // Atualizando quilometragem média
+    const quilometragemMediaElem = document.getElementById('quilometragem-media');
+    quilometragemMediaElem.innerText = formatNumber(quilometragemMedia) + ' km';
+    console.log('Quilometragem Média Atualizada:', quilometragemMediaElem.innerText);
 
-        // Atualizando dados das rotas mensais
-        updateChart(data.rotasMensais);
+    // Atualizando tempo médio
+    const tempoMedioElem = document.getElementById('tempo-medio');
+    tempoMedioElem.innerText = formatMinutes(tempoMedio) + ' min';
+    console.log('Tempo Médio Atualizado:', tempoMedioElem.innerText);
 
-      } catch (error) {
-        console.error('Erro ao buscar dados do dashboard:', error);
-      }
-    });
+    // Atualizando dados das rotas mensais
+    updateChart(data.rotasMensais);
 
-    function formatNumber(number) {
-      if (typeof number !== 'number' || isNaN(number)) {
-        return '0,00'; // Retorna um valor padrão caso o número seja null, undefined ou não seja um número válido
-      }
-      return number.toFixed(2).replace('.', ',');
-    }
+  } catch (error) {
+    console.error('Erro ao buscar dados do dashboard:', error);
+  }
+});
 
-    function formatMinutes(minutes) {
-      if (typeof minutes !== 'number' || isNaN(minutes)) {
-        return '0'; // Retorna um valor padrão caso o número seja null, undefined ou não seja um número válido
-      }
-      return Math.round(minutes);
-    }
+function formatNumber(number) {
+  if (typeof number !== 'number' || isNaN(number)) {
+    return '0,00'; // Retorna um valor padrão caso o número seja null, undefined ou não seja um número válido
+  }
+  return number.toFixed(2).replace('.', ',');
+}
+
+function formatMinutes(minutes) {
+  if (typeof minutes !== 'number' || isNaN(minutes)) {
+    return '0'; // Retorna um valor padrão caso o número seja null, undefined ou não seja um número válido
+  }
+  return Math.round(minutes);
+}
 
     function updateChart(rotasMensais) {
       const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];

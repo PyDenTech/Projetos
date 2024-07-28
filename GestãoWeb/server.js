@@ -1405,6 +1405,15 @@ app.get('/api/dashboard-data', async (req, res) => {
         const quilometragemMedia = quilometragemMediaResult.rows[0].quilometragemmedia || 0;
         const tempoMedio = tempoMedioResult.rows[0].tempomedio || 0;
 
+        // Adicionando logs para depuração
+        console.log('Dados do Dashboard:');
+        console.log('Escolas Count:', escolasCount);
+        console.log('Alunos Count:', alunosCount);
+        console.log('Rotas Count:', rotasCount);
+        console.log('Quilometragem Total:', quilometragemTotal);
+        console.log('Quilometragem Média:', quilometragemMedia);
+        console.log('Tempo Médio:', tempoMedio);
+
         const rotasMensais = rotasMensaisResult.rows.reduce((acc, row) => {
             const key = `${row.ano}-${String(row.mes).padStart(2, '0')}`;
             acc[key] = {
@@ -1431,6 +1440,7 @@ app.get('/api/dashboard-data', async (req, res) => {
         if (client) client.release();
     }
 });
+
 
 app.get('/api/stop-points', async (req, res) => {
     try {
