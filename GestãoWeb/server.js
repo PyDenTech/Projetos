@@ -1781,6 +1781,30 @@ app.post('/api/iniciarDemanda', async (req, res) => {
     }
 });
 
+app.post('/api/cancelarDemanda', async (req, res) => {
+    const { demanda_id } = req.body;
+
+    if (!demanda_id) {
+        return res.status(400).json({ error: 'demanda_id é necessário' });
+    }
+
+    try {
+        const query = 'UPDATE demandas SET status = $1 WHERE id = $2 RETURNING *';
+        const values = ['Cancelada', demanda_id];
+
+        const result = await pool.query(query, values);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Demanda não encontrada' });
+        }
+
+        res.status(200).json({ message: 'Demanda cancelada com sucesso', demanda: result.rows[0] });
+    } catch (error) {
+        console.error('Erro ao cancelar demanda:', error);
+        res.status(500).json({ error: 'Erro ao cancelar demanda' });
+    }
+});
+
 app.post('/api/finalizarDemanda', async (req, res) => {
     const { demanda_id, motorista_id } = req.body;
 
