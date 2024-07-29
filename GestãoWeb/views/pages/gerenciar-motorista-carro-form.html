@@ -23,8 +23,9 @@
     <link href="/vendor/simple-datatables/style.css" rel="stylesheet">
     <!-- Template Main CSS File -->
     <link href="/css/style.css" rel="stylesheet">
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&callback=initMap"
+        async defer></script>
 </head>
 
 <body>
@@ -483,9 +484,6 @@
     <script src="/vendor/simple-datatables/simple-datatables.js"></script>
     <script src="/vendor/tinymce/tinymce.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-
     <!-- Template Main JS File -->
     <script src="/js/users-profile.js"></script>
     <script src="/js/main.js"></script>
@@ -542,17 +540,20 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.latitude && data.longitude) {
+                            const location = { lat: data.latitude, lng: data.longitude };
                             if (!map) {
-                                map = L.map('map').setView([data.latitude, data.longitude], 13);
-                                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                                    attribution: '&copy; OpenStreetMap contributors'
-                                }).addTo(map);
-                                marker = L.marker([data.latitude, data.longitude]).addTo(map)
-                                    .bindPopup('Localização do Motorista')
-                                    .openPopup();
+                                map = new google.maps.Map(document.getElementById('map'), {
+                                    center: location,
+                                    zoom: 13
+                                });
+                                marker = new google.maps.Marker({
+                                    position: location,
+                                    map: map,
+                                    title: 'Localização do Motorista'
+                                });
                             } else {
-                                map.setView([data.latitude, data.longitude], 13);
-                                marker.setLatLng([data.latitude, data.longitude]);
+                                map.setCenter(location);
+                                marker.setPosition(location);
                             }
                         } else {
                             alert('Localização não disponível.');
@@ -670,8 +671,6 @@
             });
         });
     </script>
-
-
 </body>
 
 </html>
