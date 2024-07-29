@@ -405,34 +405,6 @@
         </section>
     </main><!-- End #main -->
 
-    <!-- Modal para Aviso Específico -->
-    <div class="modal fade" id="modalAvisoEspecifico" tabindex="-1" aria-labelledby="modalAvisoEspecificoLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalAvisoEspecificoLabel">Enviar Aviso Específico</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="formAvisoEspecifico">
-                        <div class="mb-3">
-                            <label for="tituloAvisoEspecifico" class="form-label">Título</label>
-                            <input type="text" class="form-control" id="tituloAvisoEspecifico" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="mensagemAvisoEspecifico" class="form-label">Mensagem</label>
-                            <textarea class="form-control" id="mensagemAvisoEspecifico" rows="3" required></textarea>
-                        </div>
-                        <input type="hidden" id="destinatarioAvisoEspecifico">
-                        <button type="submit" class="btn btn-primary">Enviar Aviso</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal para exibir o mapa -->
     <div class="modal fade" id="localizacaoModal" tabindex="-1" aria-labelledby="localizacaoModalLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -451,40 +423,12 @@
         </div>
     </div>
 
-    <!-- Modal para Aviso Geral -->
-    <div class="modal fade" id="modalAvisoGeral" tabindex="-1" aria-labelledby="modalAvisoGeralLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalAvisoGeralLabel">Enviar Aviso Geral</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="formAvisoGeral">
-                        <div class="mb-3">
-                            <label for="tituloAvisoGeral" class="form-label">Título</label>
-                            <input type="text" class="form-control" id="tituloAvisoGeral" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="mensagemAvisoGeral" class="form-label">Mensagem</label>
-                            <textarea class="form-control" id="mensagemAvisoGeral" rows="3" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Enviar Aviso</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Vendor JS Files -->
     <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="/vendor/echarts/echarts.min.js"></script>
     <script src="/vendor/quill/quill.min.js"></script>
     <script src="/vendor/simple-datatables/simple-datatables.js"></script>
     <script src="/vendor/tinymce/tinymce.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <!-- Template Main JS File -->
     <script src="/js/users-profile.js"></script>
     <script src="/js/main.js"></script>
     <script>
@@ -525,35 +469,39 @@
                     .catch(error => console.error('Erro ao carregar motoristas:', error));
             }
 
-            let map, marker, motoristaId;
+            let map, marker, motoristaId, updateInterval;
 
             window.localizarMotorista = function (id) {
                 motoristaId = id;
                 fetchLocalizacao();
                 const modal = new bootstrap.Modal(document.getElementById('localizacaoModal'));
                 modal.show();
-                setInterval(fetchLocalizacao, 10000);
+                clearInterval(updateInterval); // Limpa qualquer intervalo existente
+                updateInterval = setInterval(fetchLocalizacao, 5000); // Atualiza a cada 5 segundos
             };
+
+            function initMap() {
+                // Este callback será chamado quando a API do Google Maps for carregada
+            }
 
             function fetchLocalizacao() {
                 fetch(`/api/motoristas/${motoristaId}/localizacao`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.latitude && data.longitude) {
-                            const location = { lat: data.latitude, lng: data.longitude };
                             if (!map) {
                                 map = new google.maps.Map(document.getElementById('map'), {
-                                    center: location,
+                                    center: { lat: data.latitude, lng: data.longitude },
                                     zoom: 13
                                 });
                                 marker = new google.maps.Marker({
-                                    position: location,
+                                    position: { lat: data.latitude, lng: data.longitude },
                                     map: map,
                                     title: 'Localização do Motorista'
                                 });
                             } else {
-                                map.setCenter(location);
-                                marker.setPosition(location);
+                                map.setCenter({ lat: data.latitude, lng: data.longitude });
+                                marker.setPosition({ lat: data.latitude, lng: data.longitude });
                             }
                         } else {
                             alert('Localização não disponível.');
