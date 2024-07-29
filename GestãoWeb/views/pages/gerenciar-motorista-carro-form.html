@@ -24,7 +24,8 @@
     <!-- Template Main CSS File -->
     <link href="/css/style.css" rel="stylesheet">
     <!-- Google Maps API -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&callback=initMap" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&callback=initMap"
+        async defer></script>
 </head>
 
 <body>
@@ -531,7 +532,7 @@
                 fetchLocalizacao();
                 const modal = new bootstrap.Modal(document.getElementById('localizacaoModal'));
                 modal.show();
-                setInterval(fetchLocalizacao, 10000);
+                setInterval(fetchLocalizacao, 5000); // Atualiza a localização a cada 5 segundos
             };
 
             function fetchLocalizacao() {
