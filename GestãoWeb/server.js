@@ -2483,7 +2483,7 @@ app.post('/api/motoristas/escolar/login', async (req, res) => {
 
     try {
         const result = await pool.query(
-            `SELECT me.id, me.nome_completo, me.senha, me.rota_id, r.descricao 
+            `SELECT me.id, me.nome_completo, me.senha, me.rota_id, r.identificador_unico, r.nome_rota, r.escolas_atendidas 
              FROM public.motoristas_escolares me
              LEFT JOIN public.rotas r ON me.rota_id = r.id
              WHERE me.email = $1`,
@@ -2509,7 +2509,9 @@ app.post('/api/motoristas/escolar/login', async (req, res) => {
 
         const rota = motorista.rota_id ? {
             id: motorista.rota_id,
-            descricao: motorista.descricao
+            identificador_unico: motorista.identificador_unico,
+            nome_rota: motorista.nome_rota,
+            escolas_atendidas: motorista.escolas_atendidas
         } : null;
 
         res.status(200).json({
@@ -2524,7 +2526,6 @@ app.post('/api/motoristas/escolar/login', async (req, res) => {
         res.status(500).json({ error: 'Erro ao fazer login.' });
     }
 });
-
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
