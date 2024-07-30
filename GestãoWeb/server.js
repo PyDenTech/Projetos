@@ -2527,6 +2527,29 @@ app.post('/api/motoristas/escolar/login', async (req, res) => {
     }
 });
 
+// Endpoint para buscar a rota gerada
+app.get('/api/rotas/:rotaId/gerada', async (req, res) => {
+    const { rotaId } = req.params;
+
+    try {
+        const result = await pool.query(
+            `SELECT id, ponto_inicial, pontos_parada, ponto_final, distancia_total, tempo_total, data_criacao 
+             FROM public.rotas_geradas 
+             WHERE rota_id = $1`,
+            [rotaId]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Não há traçado cadastrado para esta rota' });
+        }
+
+        res.status(200).json(result.rows[0]);
+    } catch (error) {
+        console.error('Erro ao buscar dados da rota gerada:', error);
+        res.status(500).json({ error: 'Erro ao buscar dados da rota gerada' });
+    }
+});
+
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
 });
