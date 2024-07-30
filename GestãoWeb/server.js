@@ -8,7 +8,6 @@ const bcrypt = require('bcrypt');
 const { Pool } = require('pg');
 const path = require('path');
 const xlsx = require('xlsx');
-const jwt = require('jsonwebtoken');
 const NodeCache = require('node-cache');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
@@ -75,8 +74,6 @@ function ensureLoggedIn(req, res, next) {
         next();
     }
 }
-
-module.exports = ensureLoggedIn;
 
 async function emailExiste(email) {
     const query = 'SELECT COUNT(*) FROM usuarios WHERE email = $1';
@@ -2456,6 +2453,67 @@ app.post('/api/loginMotoristasAdministrativos', async (req, res) => {
     } catch (error) {
         console.error('Erro no login:', error);
         res.status(500).send('Erro ao processar o login');
+    }
+});
+
+/* API'S PARA APLICATIVO DE TRANSPORTE ESCOLAR*/
+
+// Endpoint de cadastro
+app.post('/api/motoristas/escolar/cadastrar', async (req, res) => {
+    const { nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha } = req.body;
+
+    try {
+        const hashedPassword = await bcrypt.hash(senha, saltRounds);
+        const result = await pool.query(
+            'INSERT INTO public.motoristas_escolares (nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha, status, criado_em) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id',
+            [nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, hashedPassword, 'ativo', new Date()]
+        );
+
+        const motoristaId = result.rows[0].id;
+        res.status(201).json({ motoristaId });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erro ao cadastrar motorista escolar.' });
+    }
+});
+
+// Endpoint de login
+app.post('/api/motoristas/escolar/login', async (req, res) => {
+    const { email, senha } = req.body;
+
+    try {
+        const result = await pool.query(
+            'SELECT id, nome_completo, senha, rota_id FROM public.motoristas_escolares WHERE email = $1',
+            [email]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(401).json({ error: 'Email ou senha inválidos.' });
+        }
+
+        const motorista = result.rows[0];
+        const validPassword = await bcrypt.compare(senha, motorista.senha);
+
+        if (!validPassword) {
+            return res.status(401).json({ error: 'Email ou senha inválidos.' });
+        }
+
+        req.session.user = {
+            id: motorista.id,
+            nome_completo: motorista.nome_completo,
+            rota_id: motorista.rota_id
+        };
+
+        res.status(200).json({
+            user: {
+                id: motorista.id,
+                nome_completo: motorista.nome_completo,
+                rota_id: motorista.rota_id
+            }
+        });
+    } catch (error) {
+        console.error('Erro ao fazer login:', error);
+        res.status(500).json({ error: 'Erro ao fazer login.' });
     }
 });
 
