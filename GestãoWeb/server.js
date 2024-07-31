@@ -42,7 +42,7 @@ const pool = new Pool({
     connectionTimeoutMillis: process.env.DB_CONNECTION_TIMEOUT
 });
 
-const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 }); // TTL padrão de 300 segundos (5 minutos)
+const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
 
 pool.connect(err => {
     if (err) {
@@ -97,7 +97,7 @@ function isAdmin(req, res, next) {
 const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: process.env.EMAIL_PORT,
-    secure: process.env.EMAIL_SECURE === 'true', // true for 465, false for other ports
+    secure: process.env.EMAIL_SECURE === 'true',
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
@@ -106,45 +106,10 @@ const transporter = nodemailer.createTransport({
 
 function formatNumber(number) {
     if (typeof number !== 'number' || isNaN(number)) {
-        return '0,00'; // Retorna um valor padrão caso o número seja null, undefined ou não seja um número válido
+        return '0,00';
     }
     return number.toFixed(2).replace('.', ',');
 }
-
-
-/* API'S PARA APLICATIVO DE GESTÃO WEB */
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'login.html'));
-});
-
-app.get('/dashboard-escolar', ensureLoggedIn, (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'pages', 'dashboard-escolar.html'));
-});
-
-app.get('/redefinir-senha/:token', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'redefinir-senha.html'));
-});
-
-app.get('/dashboard-adm', ensureLoggedIn, (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'pages', 'dashboard-adm.html'));
-});
-
-app.get('/solicitar-redefinir-senha', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'solicitar-redefinir-senha.html'));
-});
-
-app.get('/redefinir-senha/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'redefinir-senha.html'));
-});
-
-app.get('/politicaprivacidade', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'politica.html'));
-});
-
-app.get('/termos', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'termos.html'));
-});
 
 // Configuração para upload de arquivos em disco
 const storageDisk = multer.diskStorage({
@@ -155,9 +120,6 @@ const storageDisk = multer.diskStorage({
         cb(null, Date.now() + '-' + file.originalname);
     }
 });
-
-// Configuração para upload de arquivos em memória
-const storageMemory = multer.memoryStorage();
 
 const uploadDisk = multer({ storage: storageDisk });
 const uploadMemory = multer({ storage: storageMemory });
