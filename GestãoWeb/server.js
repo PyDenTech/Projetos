@@ -42,7 +42,7 @@ const pool = new Pool({
     connectionTimeoutMillis: process.env.DB_CONNECTION_TIMEOUT
 });
 
-const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 }); // TTL padrão de 300 segundos (5 minutos)
+const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
 
 pool.connect(err => {
     if (err) {
@@ -97,7 +97,7 @@ function isAdmin(req, res, next) {
 const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: process.env.EMAIL_PORT,
-    secure: process.env.EMAIL_SECURE === 'true', // true for 465, false for other ports
+    secure: process.env.EMAIL_SECURE === 'true',
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
@@ -106,10 +106,24 @@ const transporter = nodemailer.createTransport({
 
 function formatNumber(number) {
     if (typeof number !== 'number' || isNaN(number)) {
-        return '0,00'; // Retorna um valor padrão caso o número seja null, undefined ou não seja um número válido
+        return '0,00';
     }
     return number.toFixed(2).replace('.', ',');
 }
+
+const diskStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public/uploads/');
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+
+const uploadDisk = multer({ storage: diskStorage });
+
+const memoryStorage = multer.memoryStorage();
+const uploadMemory = multer({ storage: memoryStorage });
 
 
 /* API'S PARA APLICATIVO DE GESTÃO WEB */
@@ -145,20 +159,6 @@ app.get('/politicaprivacidade', (req, res) => {
 app.get('/termos', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'termos.html'));
 });
-
-const diskStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'public/uploads/');
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + '-' + file.originalname);
-    }
-});
-
-const uploadDisk = multer({ storage: diskStorage });
-
-const memoryStorage = multer.memoryStorage();
-const uploadMemory = multer({ storage: memoryStorage });
 
 app.post('/api/upload-foto-perfil', ensureLoggedIn, uploadDisk.single('foto_perfil'), async (req, res) => {
     if (!req.file) {
@@ -2589,6 +2589,7 @@ app.post('/api/upload-gpx', uploadMemory.single('file'), async (req, res) => {
         res.status(500).json({ error: 'Erro ao salvar arquivo GPX' });
     }
 });
+
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
 });
