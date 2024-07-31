@@ -42,7 +42,7 @@ const pool = new Pool({
     connectionTimeoutMillis: process.env.DB_CONNECTION_TIMEOUT
 });
 
-const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
+const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 }); // TTL padrão de 300 segundos (5 minutos)
 
 pool.connect(err => {
     if (err) {
@@ -97,7 +97,7 @@ function isAdmin(req, res, next) {
 const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: process.env.EMAIL_PORT,
-    secure: process.env.EMAIL_SECURE === 'true',
+    secure: process.env.EMAIL_SECURE === 'true', // true for 465, false for other ports
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
@@ -106,13 +106,47 @@ const transporter = nodemailer.createTransport({
 
 function formatNumber(number) {
     if (typeof number !== 'number' || isNaN(number)) {
-        return '0,00';
+        return '0,00'; // Retorna um valor padrão caso o número seja null, undefined ou não seja um número válido
     }
     return number.toFixed(2).replace('.', ',');
 }
 
-// Configuração para upload de arquivos em disco
-const storageDisk = multer.diskStorage({
+
+/* API'S PARA APLICATIVO DE GESTÃO WEB */
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'login.html'));
+});
+
+app.get('/dashboard-escolar', ensureLoggedIn, (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'pages', 'dashboard-escolar.html'));
+});
+
+app.get('/redefinir-senha/:token', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'redefinir-senha.html'));
+});
+
+app.get('/dashboard-adm', ensureLoggedIn, (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'pages', 'dashboard-adm.html'));
+});
+
+app.get('/solicitar-redefinir-senha', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'solicitar-redefinir-senha.html'));
+});
+
+app.get('/redefinir-senha/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'redefinir-senha.html'));
+});
+
+app.get('/politicaprivacidade', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'politica.html'));
+});
+
+app.get('/termos', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'termos.html'));
+});
+
+const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, 'public/uploads/');
     },
@@ -121,10 +155,9 @@ const storageDisk = multer.diskStorage({
     }
 });
 
-const uploadDisk = multer({ storage: storageDisk });
-const uploadMemory = multer({ storage: storageMemory });
+const upload = multer({ storage: storage });
 
-app.post('/api/upload-foto-perfil', ensureLoggedIn, uploadDisk.single('foto_perfil'), async (req, res) => {
+app.post('/api/upload-foto-perfil', ensureLoggedIn, upload.single('foto_perfil'), async (req, res) => {
     if (!req.file) {
         return res.status(400).send('Nenhum arquivo foi enviado.');
     }
@@ -205,7 +238,7 @@ app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'pages', 'admin.html'));
 });
 
-app.post('/upload-planilha', uploadDisk.single('file'), async (req, res) => {
+app.post('/upload-planilha', upload.single('file'), async (req, res) => {
     const filePath = req.file.path;
     const escolaId = req.body.id_escola;
 
@@ -233,8 +266,10 @@ app.post('/upload-planilha', uploadDisk.single('file'), async (req, res) => {
 
             const formattedNascimento = dt_nascimento ? converterData(dt_nascimento) : null;
 
+            // Se Unidade não estiver definida, usar a escola selecionada no select
             const unidade = Unidade || escolaId;
 
+            // Se unidade for uma string, procurar pelo nome da escola; se for um número, usar como ID da escola
             let id_escola;
             if (isNaN(unidade)) {
                 const escolaResult = await pool.query('SELECT id FROM escolas WHERE LOWER(TRIM(nome)) = $1', [normalizeString(unidade)]);
@@ -2534,7 +2569,7 @@ app.post('/api/salvar-rastreamento', async (req, res) => {
     }
 });
 
-app.post('/api/upload-gpx', uploadMemory.single('file'), async (req, res) => {
+app.post('/api/upload-gpx', upload.single('file'), async (req, res) => {
     const { motoristaId, rotaId } = req.body;
     const file = req.file;
 
@@ -2546,7 +2581,7 @@ app.post('/api/upload-gpx', uploadMemory.single('file'), async (req, res) => {
         const gpxData = file.buffer.toString('utf-8');
         const result = await pool.query(
             'INSERT INTO rastreamentos (motorista_id, rota_id, gpx_data, data) VALUES ($1, $2, $3, NOW()) RETURNING id',
-            [motoristaId.toString(), rotaId.toString(), gpxData]
+            [motoristaId, rotaId, gpxData]
         );
         res.status(201).json({ rastreamentoId: result.rows[0].id });
     } catch (err) {
