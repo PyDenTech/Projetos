@@ -124,6 +124,7 @@ const uploadDisk = multer({ storage: diskStorage });
 
 const memoryStorage = multer.memoryStorage();
 const uploadMemory = multer({ storage: memoryStorage });
+const upload = multer({ storage: diskStorage });
 
 
 /* API'S PARA APLICATIVO DE GESTÃO WEB */
@@ -1652,6 +1653,7 @@ app.post('/api/cadastrar-motorista', upload.fields([
         res.status(500).send('Erro ao cadastrar motorista');
     }
 });
+
 
 app.get('/api/monitores', async (req, res) => {
     try {
