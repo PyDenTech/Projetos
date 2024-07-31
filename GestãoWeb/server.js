@@ -2550,6 +2550,26 @@ app.get('/api/rotas/:rotaId/gerada', async (req, res) => {
     }
 });
 
+// Endpoint para salvar dados de rastreamento
+app.post('/api/salvar-rastreamento', async (req, res) => {
+    const { motoristaId, rotaId, pontos } = req.body;
+  
+    if (!motoristaId || !rotaId || !pontos) {
+      return res.status(400).json({ error: 'Dados incompletos' });
+    }
+  
+    try {
+      const result = await pool.query(
+        'INSERT INTO rastreamentos (motorista_id, rota_id, pontos, data) VALUES ($1, $2, $3, NOW()) RETURNING id',
+        [motoristaId, rotaId, JSON.stringify(pontos)]
+      );
+      res.status(201).json({ rastreamentoId: result.rows[0].id });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Erro ao salvar dados de rastreamento' });
+    }
+  });
+
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
 });
