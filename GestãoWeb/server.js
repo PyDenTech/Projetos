@@ -2461,49 +2461,57 @@ app.post('/api/loginMotoristasAdministrativos', async (req, res) => {
 
 app.post('/api/motoristas_escolares/register', async (req, res) => {
     const {
-      nome_completo,
-      cpf,
-      cnh,
-      tipo_veiculo,
-      placa,
-      empresa,
-      email,
-      senha,
-      status,
-      criado_em,
-      rota_id,
+        nome_completo,
+        cpf,
+        cnh,
+        tipo_veiculo,
+        placa,
+        empresa,
+        email,
+        senha,
+        status,
+        criado_em,
+        rota_id,
     } = req.body;
-  
+
     try {
-      const result = await pool.query(
-        `INSERT INTO motoristas_escolares (nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha, status, criado_em, rota_id)
+        const hashedPassword = await bcrypt.hash(senha, 10);
+        const result = await pool.query(
+            `INSERT INTO motoristas_escolares (nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha, status, criado_em, rota_id)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`,
-        [nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha, status, criado_em, rota_id]
-      );
-      res.status(201).json({ id: result.rows[0].id });
+            [nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, hashedPassword, status, criado_em, rota_id]
+        );
+        res.status(201).json({ id: result.rows[0].id });
     } catch (err) {
-      res.status(500).json({ error: err.message });
+        res.status(500).json({ error: err.message });
     }
-  });
-  
-  app.post('/api/motoristas_escolares/login', async (req, res) => {
+});
+
+app.post('/api/motoristas_escolares/login', async (req, res) => {
     const { email, senha } = req.body;
-  
+
     try {
-      const result = await pool.query(
-        'SELECT * FROM motoristas_escolares WHERE email = $1 AND senha = $2',
-        [email, senha]
-      );
-  
-      if (result.rows.length > 0) {
-        res.status(200).json(result.rows[0]);
-      } else {
-        res.status(401).json({ error: 'Credenciais inválidas' });
-      }
+        const result = await pool.query(
+            'SELECT * FROM motoristas_escolares WHERE email = $1',
+            [email]
+        );
+
+        if (result.rows.length > 0) {
+            const motorista = result.rows[0];
+            const match = await bcrypt.compare(senha, motorista.senha);
+
+            if (match) {
+                res.status(200).json(motorista);
+            } else {
+                res.status(401).json({ error: 'Credenciais inválidas' });
+            }
+        } else {
+            res.status(401).json({ error: 'Credenciais inválidas' });
+        }
     } catch (err) {
-      res.status(500).json({ error: err.message });
+        res.status(500).json({ error: err.message });
     }
-  });
+});
 
 // Endpoint para buscar a rota gerada
 app.get('/api/rotas/:rotaId/gerada', async (req, res) => {
