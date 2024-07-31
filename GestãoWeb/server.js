@@ -1623,7 +1623,8 @@ app.post('/api/cadastrar-monitor', uploadDisk.fields([
     }
 });
 
-app.post('/api/cadastrar-motorista', upload.fields([
+// Definindo a rota para o cadastro de motorista
+app.post('/api/cadastrar-motorista', uploadDisk.fields([
     { name: 'certificadoTransporte', maxCount: 1 },
     { name: 'certificadoEscolar', maxCount: 1 },
     { name: 'documentoCnh', maxCount: 1 }
