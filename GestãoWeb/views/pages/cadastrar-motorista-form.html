@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Cadastrar Monitor Escolar</title>
+    <title>Cadastrar Motorista Escolar</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
     <!-- Favicons -->
@@ -25,15 +26,14 @@
 </head>
 
 <body>
-    <!-- Header, Sidebar e outros elementos da página -->
     <main id="main" class="main">
         <div class="pagetitle">
-            <h1>Cadastrar Monitor Escolar</h1>
+            <h1>Cadastrar Motorista Escolar</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="/dashboard-escolar"><i class="bi bi-house"></i></a></li>
-                    <li class="breadcrumb-item"><a href="/gerenciar-monitores-view">Monitores</a></li>
-                    <li class="breadcrumb-item active">Cadastrar Monitor Escolar</li>
+                    <li class="breadcrumb-item"><a href="/gerenciar-motoristas-view">Motoristas</a></li>
+                    <li class="breadcrumb-item active">Cadastrar Motorista Escolar</li>
                 </ol>
             </nav>
         </div><!-- End Page Title -->
@@ -43,11 +43,12 @@
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">Cadastrar Monitor Escolar</h5>
-                            <form id="monitorForm" enctype="multipart/form-data">
+                            <h5 class="card-title">Cadastrar Motorista Escolar</h5>
+                            <form id="motoristaForm" enctype="multipart/form-data">
                                 <div class="mb-3">
                                     <label for="nomeCompleto" class="form-label">Nome Completo</label>
-                                    <input type="text" class="form-control" id="nomeCompleto" name="nomeCompleto" required>
+                                    <input type="text" class="form-control" id="nomeCompleto" name="nomeCompleto"
+                                        required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="cpf" class="form-label">CPF</label>
@@ -78,16 +79,21 @@
                                     <input type="text" class="form-control" id="placa" name="placa" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="certificadoTransporte" class="form-label">Certificado de Transporte de Passageiros</label>
-                                    <input type="file" class="form-control" id="certificadoTransporte" name="certificadoTransporte" required>
+                                    <label for="certificadoTransporte" class="form-label">Certificado de Transporte de
+                                        Passageiros</label>
+                                    <input type="file" class="form-control" id="certificadoTransporte"
+                                        name="certificadoTransporte" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="certificadoCurso" class="form-label">Certificado de Curso de Transporte Escolar</label>
-                                    <input type="file" class="form-control" id="certificadoCurso" name="certificadoCurso" required>
+                                    <label for="certificadoEscolar" class="form-label">Certificado de Curso de
+                                        Transporte Escolar</label>
+                                    <input type="file" class="form-control" id="certificadoEscolar"
+                                        name="certificadoEscolar" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="documentoCnh" class="form-label">Documento CNH</label>
-                                    <input type="file" class="form-control" id="documentoCnh" name="documentoCnh" required>
+                                    <input type="file" class="form-control" id="documentoCnh" name="documentoCnh"
+                                        required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="email" class="form-label">Email</label>
@@ -107,13 +113,13 @@
         </section>
     </main><!-- End #main -->
 
-    <!-- Footer -->
     <footer id="footer" class="footer">
         <div class="container mt-4">
             <div class="row">
                 <div class="col-md-6">
                     <div class="copyright">
-                        &copy; Direitos Autorais <strong><span>PyDenExpress</span></strong>. Todos os Direitos Reservados
+                        &copy; Direitos Autorais <strong><span>PyDenExpress</span></strong>. Todos os Direitos
+                        Reservados
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -125,22 +131,22 @@
         </div>
     </footer>
 
-    <!-- Vendor JS Files -->
     <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.getElementById('monitorForm').addEventListener('submit', function(event) {
+        document.getElementById('motoristaForm').addEventListener('submit', function (event) {
             event.preventDefault();
             const formData = new FormData(event.target);
-            fetch('/api/cadastrar-monitor', {
+            fetch('/api/cadastrar-motorista', {
                 method: 'POST',
                 body: formData
             }).then(response => response.json()).then(data => {
-                document.getElementById('statusMessage').textContent = 'Monitor cadastrado com sucesso!';
+                document.getElementById('statusMessage').textContent = 'Motorista cadastrado com sucesso!';
                 event.target.reset();
             }).catch(error => {
-                document.getElementById('statusMessage').textContent = 'Erro ao cadastrar monitor.';
+                document.getElementById('statusMessage').textContent = 'Erro ao cadastrar motorista.';
             });
         });
     </script>
 </body>
+
 </html>

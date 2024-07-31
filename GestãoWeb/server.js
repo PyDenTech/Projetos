@@ -1623,7 +1623,6 @@ app.post('/api/cadastrar-monitor', uploadDisk.fields([
     }
 });
 
-// Definindo a rota para o cadastro de motorista
 app.post('/api/cadastrar-motorista', uploadDisk.fields([
     { name: 'certificadoTransporte', maxCount: 1 },
     { name: 'certificadoEscolar', maxCount: 1 },
@@ -1654,7 +1653,6 @@ app.post('/api/cadastrar-motorista', uploadDisk.fields([
         res.status(500).send('Erro ao cadastrar motorista');
     }
 });
-
 
 app.get('/api/monitores', async (req, res) => {
     try {
