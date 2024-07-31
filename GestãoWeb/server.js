@@ -2524,27 +2524,32 @@ app.post('/api/motoristas_escolares/login', async (req, res) => {
 });
 
 // Endpoint para buscar a rota gerada
-app.get('/api/rotas/:rotaId/gerada', async (req, res) => {
-    const { rotaId } = req.params;
-
+app.get('/api/motoristas_escolares/:id/rotas', async (req, res) => {
+    const motoristaId = req.params.id;
+  
+    console.log(`Buscando rotas para o motorista ID: ${motoristaId}`);
+  
     try {
-        const result = await pool.query(
-            `SELECT id, ponto_inicial, pontos_parada, ponto_final, distancia_total, tempo_total, data_criacao 
-             FROM public.rotas_geradas 
-             WHERE rota_id = $1`,
-            [rotaId]
-        );
-
-        if (result.rows.length === 0) {
-            return res.status(404).json({ error: 'Não há traçado cadastrado para esta rota' });
-        }
-
-        res.status(200).json(result.rows[0]);
-    } catch (error) {
-        console.error('Erro ao buscar dados da rota gerada:', error);
-        res.status(500).json({ error: 'Erro ao buscar dados da rota gerada' });
+      const result = await pool.query(
+        `SELECT r.identificador_unico, r.nome_rota, r.escolas_atendidas
+         FROM rotas r
+         JOIN motoristas_escolares m ON r.id = m.rota_id
+         WHERE m.id = $1`,
+        [motoristaId]
+      );
+  
+      if (result.rows.length > 0) {
+        console.log(`Rotas encontradas para o motorista ID: ${motoristaId}`);
+        res.status(200).json(result.rows);
+      } else {
+        console.log(`Nenhuma rota encontrada para o motorista ID: ${motoristaId}`);
+        res.status(404).json({ error: 'Nenhuma rota encontrada' });
+      }
+    } catch (err) {
+      console.error('Erro ao buscar rotas:', err);
+      res.status(500).json({ error: err.message });
     }
-});
+  });
 
 app.post('/api/salvar-rastreamento', async (req, res) => {
     const { motoristaId, rotaId, pontos } = req.body;
