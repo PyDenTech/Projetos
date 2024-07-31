@@ -2550,6 +2550,24 @@ app.get('/api/motoristas_escolares/:id/rotas', async (req, res) => {
     }
 });
 
+app.post('/api/rotas_real', async (req, res) => {
+    const { motorista_id, gpx_data } = req.body;
+
+    console.log('Recebendo dados de rota real:', req.body);
+
+    try {
+        const result = await pool.query(
+            `INSERT INTO rota_real (motorista_id, gpx_data)
+         VALUES ($1, $2) RETURNING id`,
+            [motorista_id, gpx_data]
+        );
+        console.log('Rota real salva com sucesso, ID:', result.rows[0].id);
+        res.status(201).json({ id: result.rows[0].id });
+    } catch (err) {
+        console.error('Erro ao salvar rota real:', err);
+        res.status(500).json({ error: err.message });
+    }
+});
 
 app.post('/api/salvar-rastreamento', async (req, res) => {
     const { motoristaId, rotaId, pontos } = req.body;
