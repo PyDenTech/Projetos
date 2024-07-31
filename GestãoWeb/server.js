@@ -2459,7 +2459,7 @@ app.post('/api/loginMotoristasAdministrativos', async (req, res) => {
 
 /* API'S PARA APLICATIVO DE TRANSPORTE ESCOLAR*/
 
-app.post('/api/cadastrar-motorista', upload.fields([
+/* app.post('/api/cadastrar-motorista', upload.fields([
     { name: 'certificadoTransporte' },
     { name: 'certificadoCurso' },
     { name: 'documentoCnh' }
@@ -2494,7 +2494,7 @@ app.post('/api/cadastrar-motorista', upload.fields([
         console.error('Erro ao cadastrar motorista:', error);
         res.status(500).json({ error: 'Erro ao cadastrar motorista.' });
     }
-});
+}); */
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
