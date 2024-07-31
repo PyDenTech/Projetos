@@ -146,8 +146,7 @@ app.get('/termos', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'termos.html'));
 });
 
-// Configuração para upload de arquivos em disco
-const storageDisk = multer.diskStorage({
+const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, 'public/uploads/');
     },
@@ -156,13 +155,9 @@ const storageDisk = multer.diskStorage({
     }
 });
 
-// Configuração para upload de arquivos em memória
-const storageMemory = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
-const uploadDisk = multer({ storage: storageDisk });
-const uploadMemory = multer({ storage: storageMemory });
-
-app.post('/api/upload-foto-perfil', ensureLoggedIn, uploadDisk.single('foto_perfil'), async (req, res) => {
+app.post('/api/upload-foto-perfil', ensureLoggedIn, upload.single('foto_perfil'), async (req, res) => {
     if (!req.file) {
         return res.status(400).send('Nenhum arquivo foi enviado.');
     }
@@ -243,7 +238,7 @@ app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'pages', 'admin.html'));
 });
 
-app.post('/upload-planilha', uploadDisk.single('file'), async (req, res) => {
+app.post('/upload-planilha', upload.single('file'), async (req, res) => {
     const filePath = req.file.path;
     const escolaId = req.body.id_escola;
 
@@ -271,8 +266,10 @@ app.post('/upload-planilha', uploadDisk.single('file'), async (req, res) => {
 
             const formattedNascimento = dt_nascimento ? converterData(dt_nascimento) : null;
 
+            // Se Unidade não estiver definida, usar a escola selecionada no select
             const unidade = Unidade || escolaId;
 
+            // Se unidade for uma string, procurar pelo nome da escola; se for um número, usar como ID da escola
             let id_escola;
             if (isNaN(unidade)) {
                 const escolaResult = await pool.query('SELECT id FROM escolas WHERE LOWER(TRIM(nome)) = $1', [normalizeString(unidade)]);
@@ -2550,46 +2547,6 @@ app.get('/api/rotas/:rotaId/gerada', async (req, res) => {
     } catch (error) {
         console.error('Erro ao buscar dados da rota gerada:', error);
         res.status(500).json({ error: 'Erro ao buscar dados da rota gerada' });
-    }
-});
-
-app.post('/api/salvar-rastreamento', async (req, res) => {
-    const { motoristaId, rotaId, pontos } = req.body;
-
-    if (!motoristaId || !rotaId || !pontos) {
-        return res.status(400).json({ error: 'Dados incompletos' });
-    }
-
-    try {
-        const result = await pool.query(
-            'INSERT INTO rastreamentos (motorista_id, rota_id, pontos, data) VALUES ($1, $2, $3, NOW()) RETURNING id',
-            [motoristaId, rotaId, JSON.stringify(pontos)]
-        );
-        res.status(201).json({ rastreamentoId: result.rows[0].id });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Erro ao salvar dados de rastreamento' });
-    }
-});
-
-app.post('/api/upload-gpx', uploadMemory.single('file'), async (req, res) => {
-    const { motoristaId, rotaId } = req.body;
-    const file = req.file;
-
-    if (!motoristaId || !rotaId || !file) {
-        return res.status(400).json({ error: 'Dados incompletos' });
-    }
-
-    try {
-        const gpxData = file.buffer.toString('utf-8');
-        const result = await pool.query(
-            'INSERT INTO rastreamentos (motorista_id, rota_id, gpx_data, data) VALUES ($1, $2, $3, NOW()) RETURNING id',
-            [motoristaId.toString(), rotaId.toString(), gpxData]
-        );
-        res.status(201).json({ rastreamentoId: result.rows[0].id });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Erro ao salvar arquivo GPX' });
     }
 });
 
