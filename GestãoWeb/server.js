@@ -2569,6 +2569,32 @@ app.post('/api/rotas_real', async (req, res) => {
     }
 });
 
+app.get('/api/rotas_geradas/:rotaId', async (req, res) => {
+    const rotaId = req.params.rotaId;
+  
+    console.log(`Buscando rota gerada para a rota ID: ${rotaId}`);
+  
+    try {
+      const result = await pool.query(
+        `SELECT ponto_inicial, pontos_parada, ponto_final
+         FROM rotas_geradas
+         WHERE rota_id = $1`,
+        [rotaId]
+      );
+  
+      if (result.rows.length > 0) {
+        console.log(`Rota gerada encontrada para a rota ID: ${rotaId}`);
+        res.status(200).json(result.rows[0]);
+      } else {
+        console.log(`Nenhuma rota gerada encontrada para a rota ID: ${rotaId}`);
+        res.status(404).json({ error: 'Nenhuma rota gerada encontrada' });
+      }
+    } catch (err) {
+      console.error('Erro ao buscar rota gerada:', err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
 app.post('/api/salvar-rastreamento', async (req, res) => {
     const { motoristaId, rotaId, pontos } = req.body;
 
