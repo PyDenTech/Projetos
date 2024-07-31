@@ -2459,74 +2459,51 @@ app.post('/api/loginMotoristasAdministrativos', async (req, res) => {
 
 /* API'S PARA APLICATIVO DE TRANSPORTE ESCOLAR*/
 
-// Endpoint de cadastro
-app.post('/api/motoristas/escolar/cadastrar', async (req, res) => {
-    const { nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha } = req.body;
-
+app.post('/api/motoristas_escolares/register', async (req, res) => {
+    const {
+      nome_completo,
+      cpf,
+      cnh,
+      tipo_veiculo,
+      placa,
+      empresa,
+      email,
+      senha,
+      status,
+      criado_em,
+      rota_id,
+    } = req.body;
+  
     try {
-        const hashedPassword = await bcrypt.hash(senha, saltRounds);
-        const result = await pool.query(
-            'INSERT INTO public.motoristas_escolares (nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha, status, criado_em) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id',
-            [nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, hashedPassword, 'ativo', new Date()]
-        );
-
-        const motoristaId = result.rows[0].id;
-        res.status(201).json({ motoristaId });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Erro ao cadastrar motorista escolar.' });
+      const result = await pool.query(
+        `INSERT INTO motoristas_escolares (nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha, status, criado_em, rota_id)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`,
+        [nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha, status, criado_em, rota_id]
+      );
+      res.status(201).json({ id: result.rows[0].id });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
     }
-});
-
-// Endpoint de login
-app.post('/api/motoristas/escolar/login', async (req, res) => {
+  });
+  
+  app.post('/api/motoristas_escolares/login', async (req, res) => {
     const { email, senha } = req.body;
-
+  
     try {
-        const result = await pool.query(
-            `SELECT me.id, me.nome_completo, me.senha, me.rota_id, r.identificador_unico, r.nome_rota, r.escolas_atendidas 
-             FROM public.motoristas_escolares me
-             LEFT JOIN public.rotas r ON me.rota_id = r.id
-             WHERE me.email = $1`,
-            [email]
-        );
-
-        if (result.rows.length === 0) {
-            return res.status(401).json({ error: 'Email ou senha inválidos.' });
-        }
-
-        const motorista = result.rows[0];
-        const validPassword = await bcrypt.compare(senha, motorista.senha);
-
-        if (!validPassword) {
-            return res.status(401).json({ error: 'Email ou senha inválidos.' });
-        }
-
-        req.session.user = {
-            id: motorista.id,
-            nome_completo: motorista.nome_completo,
-            rota_id: motorista.rota_id
-        };
-
-        const rota = motorista.rota_id ? {
-            id: motorista.rota_id,
-            identificador_unico: motorista.identificador_unico,
-            nome_rota: motorista.nome_rota,
-            escolas_atendidas: motorista.escolas_atendidas
-        } : null;
-
-        res.status(200).json({
-            user: {
-                id: motorista.id,
-                nome_completo: motorista.nome_completo,
-                rota: rota
-            }
-        });
-    } catch (error) {
-        console.error('Erro ao fazer login:', error);
-        res.status(500).json({ error: 'Erro ao fazer login.' });
+      const result = await pool.query(
+        'SELECT * FROM motoristas_escolares WHERE email = $1 AND senha = $2',
+        [email, senha]
+      );
+  
+      if (result.rows.length > 0) {
+        res.status(200).json(result.rows[0]);
+      } else {
+        res.status(401).json({ error: 'Credenciais inválidas' });
+      }
+    } catch (err) {
+      res.status(500).json({ error: err.message });
     }
-});
+  });
 
 // Endpoint para buscar a rota gerada
 app.get('/api/rotas/:rotaId/gerada', async (req, res) => {
@@ -2550,6 +2527,7 @@ app.get('/api/rotas/:rotaId/gerada', async (req, res) => {
         res.status(500).json({ error: 'Erro ao buscar dados da rota gerada' });
     }
 });
+
 app.post('/api/salvar-rastreamento', async (req, res) => {
     const { motoristaId, rotaId, pontos } = req.body;
 
