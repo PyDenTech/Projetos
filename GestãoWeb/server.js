@@ -2523,149 +2523,36 @@ app.post('/api/motoristas_escolares/register', async (req, res) => {
     }
 });
 
-app.post('/api/motoristas_escolares/login', async (req, res) => {
+app.post('/api/loginMotoristasAdministrativos', async (req, res) => {
     const { email, senha } = req.body;
 
-    console.log('Recebendo requisição de login:', req.body);
-
     try {
-        const result = await pool.query(
-            'SELECT * FROM motoristas_escolares WHERE email = $1',
-            [email]
-        );
-
-        if (result.rows.length > 0) {
-            const motorista = result.rows[0];
-            const match = await bcrypt.compare(senha, motorista.senha);
-
-            if (match) {
-                console.log('Login bem-sucedido para o email:', email);
-                res.status(200).json(motorista);
-            } else {
-                console.log('Senha incorreta para o email:', email);
-                res.status(401).json({ error: 'Credenciais inválidas' });
-            }
-        } else {
-            console.log('Email não encontrado:', email);
-            res.status(401).json({ error: 'Credenciais inválidas' });
+        const userQuery = await pool.query('SELECT * FROM motoristas_administrativos WHERE email = $1', [email]);
+        if (userQuery.rows.length === 0) {
+            return res.status(404).send('Usuário não encontrado.');
         }
-    } catch (err) {
-        console.error('Erro ao realizar login:', err);
-        res.status(500).json({ error: err.message });
-    }
-});
 
-app.get('/api/motoristas_escolares/:id/rotas', async (req, res) => {
-    const motoristaId = req.params.id;
+        const user = userQuery.rows[0];
+        const isValidPassword = await bcrypt.compare(senha, user.senha);
 
-    console.log(`Buscando rotas para o motorista ID: ${motoristaId}`);
-
-    try {
-        const result = await pool.query(
-            `SELECT r.identificador_unico, r.nome_rota, r.escolas_atendidas, r.dificuldades_acesso, r.data_cadastro, r.area_urbana, r.horarios_funcionamento
-         FROM rotas r
-         JOIN motoristas_escolares m ON r.id = m.rota_id
-         WHERE m.id = $1`,
-            [motoristaId]
-        );
-
-        if (result.rows.length > 0) {
-            console.log(`Rotas encontradas para o motorista ID: ${motoristaId}`);
-            res.status(200).json(result.rows);
-        } else {
-            console.log(`Nenhuma rota encontrada para o motorista ID: ${motoristaId}`);
-            res.status(404).json({ error: 'Nenhuma rota encontrada' });
+        if (!isValidPassword) {
+            return res.status(401).send('Senha incorreta.');
         }
-    } catch (err) {
-        console.error('Erro ao buscar rotas:', err);
-        res.status(500).json({ error: err.message });
+
+        req.session.user = {
+            id: user.id,
+            nome: user.nome_completo,
+            email: user.email,
+            role: 'motorista_administrativo'
+        };
+
+        res.json({ userId: user.id, nome: user.nome_completo, empresa: user.empresa });
+    } catch (error) {
+        console.error('Erro no login:', error);
+        res.status(500).send('Erro ao processar o login');
     }
 });
 
-app.post('/api/rotas_real', async (req, res) => {
-    const { motorista_id, gpx_data } = req.body;
-
-    console.log('Recebendo dados de rota real:', req.body);
-
-    try {
-        const result = await pool.query(
-            `INSERT INTO rota_real (motorista_id, gpx_data)
-         VALUES ($1, $2) RETURNING id`,
-            [motorista_id, gpx_data]
-        );
-        console.log('Rota real salva com sucesso, ID:', result.rows[0].id);
-        res.status(201).json({ id: result.rows[0].id });
-    } catch (err) {
-        console.error('Erro ao salvar rota real:', err);
-        res.status(500).json({ error: err.message });
-    }
-});
-
-app.get('/api/rotas_geradas/:rotaId', async (req, res) => {
-    const rotaId = req.params.rotaId;
-
-    console.log(`Buscando rota gerada para a rota ID: ${rotaId}`);
-
-    try {
-        const result = await pool.query(
-            `SELECT ponto_inicial, pontos_parada, ponto_final
-         FROM rotas_geradas
-         WHERE rota_id = $1`,
-            [rotaId]
-        );
-
-        if (result.rows.length > 0) {
-            console.log(`Rota gerada encontrada para a rota ID: ${rotaId}`);
-            res.status(200).json(result.rows[0]);
-        } else {
-            console.log(`Nenhuma rota gerada encontrada para a rota ID: ${rotaId}`);
-            res.status(404).json({ error: 'Nenhuma rota gerada encontrada' });
-        }
-    } catch (err) {
-        console.error('Erro ao buscar rota gerada:', err);
-        res.status(500).json({ error: err.message });
-    }
-});
-
-app.post('/api/salvar-rastreamento', async (req, res) => {
-    const { motoristaId, rotaId, pontos } = req.body;
-
-    if (!motoristaId || !rotaId || !pontos) {
-        return res.status(400).json({ error: 'Dados incompletos' });
-    }
-
-    try {
-        const result = await pool.query(
-            'INSERT INTO rastreamentos (motorista_id, rota_id, pontos, data) VALUES ($1, $2, $3, NOW()) RETURNING id',
-            [motoristaId, rotaId, JSON.stringify(pontos)]
-        );
-        res.status(201).json({ rastreamentoId: result.rows[0].id });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Erro ao salvar dados de rastreamento' });
-    }
-});
-
-app.post('/api/upload-gpx', uploadMemory.single('file'), async (req, res) => {
-    const { motoristaId, rotaId } = req.body;
-    const file = req.file;
-
-    if (!motoristaId || !rotaId || !file) {
-        return res.status(400).json({ error: 'Dados incompletos' });
-    }
-
-    try {
-        const gpxData = file.buffer.toString('utf-8');
-        const result = await pool.query(
-            'INSERT INTO rastreamentos (motorista_id, rota_id, gpx_data, data) VALUES ($1, $2, $3, NOW()) RETURNING id',
-            [motoristaId.toString(), rotaId.toString(), gpxData]
-        );
-        res.status(201).json({ rastreamentoId: result.rows[0].id });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Erro ao salvar arquivo GPX' });
-    }
-});
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
