@@ -2474,6 +2474,8 @@ app.post('/api/motoristas_escolares/register', async (req, res) => {
         rota_id,
     } = req.body;
 
+    console.log('Recebendo requisição de cadastro:', req.body);
+
     try {
         const hashedPassword = await bcrypt.hash(senha, 10);
         const result = await pool.query(
@@ -2481,14 +2483,18 @@ app.post('/api/motoristas_escolares/register', async (req, res) => {
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`,
             [nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, hashedPassword, status, criado_em, rota_id]
         );
+        console.log('Cadastro realizado com sucesso, ID:', result.rows[0].id);
         res.status(201).json({ id: result.rows[0].id });
     } catch (err) {
+        console.error('Erro ao cadastrar motorista:', err);
         res.status(500).json({ error: err.message });
     }
 });
 
 app.post('/api/motoristas_escolares/login', async (req, res) => {
     const { email, senha } = req.body;
+
+    console.log('Recebendo requisição de login:', req.body);
 
     try {
         const result = await pool.query(
@@ -2501,14 +2507,18 @@ app.post('/api/motoristas_escolares/login', async (req, res) => {
             const match = await bcrypt.compare(senha, motorista.senha);
 
             if (match) {
+                console.log('Login bem-sucedido para o email:', email);
                 res.status(200).json(motorista);
             } else {
+                console.log('Senha incorreta para o email:', email);
                 res.status(401).json({ error: 'Credenciais inválidas' });
             }
         } else {
+            console.log('Email não encontrado:', email);
             res.status(401).json({ error: 'Credenciais inválidas' });
         }
     } catch (err) {
+        console.error('Erro ao realizar login:', err);
         res.status(500).json({ error: err.message });
     }
 });
