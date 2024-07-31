@@ -2550,25 +2550,45 @@ app.get('/api/rotas/:rotaId/gerada', async (req, res) => {
     }
 });
 
-// Endpoint para salvar dados de rastreamento
 app.post('/api/salvar-rastreamento', async (req, res) => {
     const { motoristaId, rotaId, pontos } = req.body;
-  
+
     if (!motoristaId || !rotaId || !pontos) {
-      return res.status(400).json({ error: 'Dados incompletos' });
+        return res.status(400).json({ error: 'Dados incompletos' });
     }
-  
+
     try {
-      const result = await pool.query(
-        'INSERT INTO rastreamentos (motorista_id, rota_id, pontos, data) VALUES ($1, $2, $3, NOW()) RETURNING id',
-        [motoristaId, rotaId, JSON.stringify(pontos)]
-      );
-      res.status(201).json({ rastreamentoId: result.rows[0].id });
+        const result = await pool.query(
+            'INSERT INTO rastreamentos (motorista_id, rota_id, pontos, data) VALUES ($1, $2, $3, NOW()) RETURNING id',
+            [motoristaId, rotaId, JSON.stringify(pontos)]
+        );
+        res.status(201).json({ rastreamentoId: result.rows[0].id });
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Erro ao salvar dados de rastreamento' });
+        console.error(err);
+        res.status(500).json({ error: 'Erro ao salvar dados de rastreamento' });
     }
-  });
+});
+
+app.post('/api/upload-gpx', upload.single('file'), async (req, res) => {
+    const { motoristaId, rotaId } = req.body;
+    const file = req.file;
+
+    if (!motoristaId || !rotaId || !file) {
+        return res.status(400).json({ error: 'Dados incompletos' });
+    }
+
+    try {
+        const gpxData = file.buffer.toString('utf-8');
+        const result = await pool.query(
+            'INSERT INTO rastreamentos (motorista_id, rota_id, gpx_data, data) VALUES ($1, $2, $3, NOW()) RETURNING id',
+            [motoristaId, rotaId, gpxData]
+        );
+        res.status(201).json({ rastreamentoId: result.rows[0].id });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erro ao salvar arquivo GPX' });
+    }
+});
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
