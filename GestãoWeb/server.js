@@ -1622,6 +1622,37 @@ app.post('/api/cadastrar-monitor', uploadDisk.fields([
     }
 });
 
+app.post('/api/cadastrar-motorista', upload.fields([
+    { name: 'certificadoTransporte', maxCount: 1 },
+    { name: 'certificadoEscolar', maxCount: 1 },
+    { name: 'documentoCnh', maxCount: 1 }
+]), async (req, res) => {
+    const { nomeCompleto, cpf, cnh, empresa, veiculo, placa, email, senha } = req.body;
+
+    const certificadoTransporte = req.files['certificadoTransporte'] ? req.files['certificadoTransporte'][0].filename : null;
+    const certificadoEscolar = req.files['certificadoEscolar'] ? req.files['certificadoEscolar'][0].filename : null;
+    const documentoCnh = req.files['documentoCnh'] ? req.files['documentoCnh'][0].filename : null;
+
+    if (!nomeCompleto || !cpf || !cnh || !empresa || !veiculo || !placa || !certificadoTransporte || !certificadoEscolar || !documentoCnh || !email || !senha) {
+        return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
+    }
+
+    try {
+        const hashedPassword = await bcrypt.hash(senha, 10);
+
+        const client = await pool.connect();
+        const result = await client.query(
+            'INSERT INTO motoristas (nome_completo, cpf, cnh, empresa, veiculo, placa, certificado_transporte, certificado_escolar, documento_cnh, email, senha) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
+            [nomeCompleto, cpf, cnh, empresa, veiculo, placa, certificadoTransporte, certificadoEscolar, documentoCnh, email, hashedPassword]
+        );
+        client.release();
+        res.status(201).json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Erro ao cadastrar motorista');
+    }
+});
+
 app.get('/api/monitores', async (req, res) => {
     try {
         const result = await pool.query('SELECT id, nome_completo, cpf, empresa, doc_rh, doc_monitor, doc_ensino_medio, rotas, data_cadastro FROM monitores');
@@ -2571,29 +2602,29 @@ app.post('/api/rotas_real', async (req, res) => {
 
 app.get('/api/rotas_geradas/:rotaId', async (req, res) => {
     const rotaId = req.params.rotaId;
-  
+
     console.log(`Buscando rota gerada para a rota ID: ${rotaId}`);
-  
+
     try {
-      const result = await pool.query(
-        `SELECT ponto_inicial, pontos_parada, ponto_final
+        const result = await pool.query(
+            `SELECT ponto_inicial, pontos_parada, ponto_final
          FROM rotas_geradas
          WHERE rota_id = $1`,
-        [rotaId]
-      );
-  
-      if (result.rows.length > 0) {
-        console.log(`Rota gerada encontrada para a rota ID: ${rotaId}`);
-        res.status(200).json(result.rows[0]);
-      } else {
-        console.log(`Nenhuma rota gerada encontrada para a rota ID: ${rotaId}`);
-        res.status(404).json({ error: 'Nenhuma rota gerada encontrada' });
-      }
+            [rotaId]
+        );
+
+        if (result.rows.length > 0) {
+            console.log(`Rota gerada encontrada para a rota ID: ${rotaId}`);
+            res.status(200).json(result.rows[0]);
+        } else {
+            console.log(`Nenhuma rota gerada encontrada para a rota ID: ${rotaId}`);
+            res.status(404).json({ error: 'Nenhuma rota gerada encontrada' });
+        }
     } catch (err) {
-      console.error('Erro ao buscar rota gerada:', err);
-      res.status(500).json({ error: err.message });
+        console.error('Erro ao buscar rota gerada:', err);
+        res.status(500).json({ error: err.message });
     }
-  });
+});
 
 app.post('/api/salvar-rastreamento', async (req, res) => {
     const { motoristaId, rotaId, pontos } = req.body;
