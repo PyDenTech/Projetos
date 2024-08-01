@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS rotas_geradas (
 );
 
 
-CREATE TABLE IF NOT EXISTS motoristas_escolares (
+CREATE TABLE IF NOT EXISTS motoristas (
     id SERIAL PRIMARY KEY,
     nome_completo VARCHAR(255) NOT NULL,
     cpf VARCHAR(11) NOT NULL UNIQUE,
@@ -134,7 +134,7 @@ CREATE TABLE IF NOT EXISTS abastecimentos (
     tipo_combustivel VARCHAR(50) NOT NULL,
     quantidade_litros DECIMAL(10, 2) NOT NULL,
     motorista_id INTEGER NOT NULL,
-    FOREIGN KEY (motorista_id) REFERENCES motoristas_escolares(id) ON DELETE CASCADE
+    FOREIGN KEY (motorista_id) REFERENCES motoristas(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS motoristas_administrativos (

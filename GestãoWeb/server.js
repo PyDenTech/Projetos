@@ -606,7 +606,7 @@ app.post('/cadastrar-usuario', async (req, res) => {
         const usuarioId = novoUsuario.rows[0].id;
 
         await pool.query(
-            'INSERT INTO motoristas_escolares (nome, cpf, cnh, empresa, usuario_id) VALUES ($1, $2, $3, $4, $5)',
+            'INSERT INTO motoristas (nome, cpf, cnh, empresa, usuario_id) VALUES ($1, $2, $3, $4, $5)',
             [nome_completo, cpf, cnh, empresa, usuarioId]
         );
 
@@ -2024,8 +2024,8 @@ app.delete('/api/usuarios/:userId', isAdmin, async (req, res) => {
     try {
         await client.query('BEGIN');
 
-        // Excluir de motoristas_escolares primeiro se existir
-        await client.query('DELETE FROM motoristas_escolares WHERE id = $1', [userId]);
+        // Excluir de motoristas primeiro se existir
+        await client.query('DELETE FROM motoristas WHERE id = $1', [userId]);
 
         // Excluir de usuarios
         const result = await client.query('DELETE FROM usuarios WHERE id = $1 RETURNING *', [userId]);
@@ -2081,11 +2081,11 @@ app.post('/api/cadastrar-abastecimento-administrativos', async (req, res) => {
 
 /* API'S PARA APLICATIVO DE TRANSPORTE ESCOLAR E GESTÃO WEB */
 
-app.get('/api/motoristas_escolares', async (req, res) => {
+app.get('/api/motoristas', async (req, res) => {
     try {
         const result = await pool.query(`
         SELECT m.*, r.id AS rota_id, r.nome_rota AS rota_nome
-        FROM motoristas_escolares m
+        FROM motoristas m
         LEFT JOIN rotas r ON m.rota_id = r.id
       `);
         res.status(200).json(result.rows);
@@ -2096,11 +2096,11 @@ app.get('/api/motoristas_escolares', async (req, res) => {
 });
 
 // Endpoint para obter um motorista escolar por ID
-app.get('/api/motoristas_escolares/:id', async (req, res) => {
+app.get('/api/motoristas/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
-        const result = await pool.query('SELECT * FROM motoristas_escolares WHERE id = $1', [id]);
+        const result = await pool.query('SELECT * FROM motoristas WHERE id = $1', [id]);
 
         if (result.rows.length > 0) {
             res.status(200).json(result.rows[0]);
@@ -2113,10 +2113,10 @@ app.get('/api/motoristas_escolares/:id', async (req, res) => {
     }
 });
 
-app.delete('/api/motoristas_escolares/:id', async (req, res) => {
+app.delete('/api/motoristas/:id', async (req, res) => {
     const { id } = req.params;
     try {
-        const result = await pool.query('DELETE FROM motoristas_escolares WHERE id = $1 RETURNING *', [id]);
+        const result = await pool.query('DELETE FROM motoristas WHERE id = $1 RETURNING *', [id]);
         if (result.rows.length > 0) {
             res.status(200).json({ message: 'Motorista excluído com sucesso' });
         } else {
@@ -2127,12 +2127,12 @@ app.delete('/api/motoristas_escolares/:id', async (req, res) => {
     }
 });
 
-app.put('/api/motoristas_escolares/:id', async (req, res) => {
+app.put('/api/motoristas/:id', async (req, res) => {
     const { id } = req.params;
     const { nome_completo, cpf, cnh, empresa, rota_id } = req.body;
     try {
         const result = await pool.query(
-            `UPDATE motoristas_escolares
+            `UPDATE motoristas
          SET nome_completo = $1, cpf = $2, cnh = $3, empresa = $4, rota_id = $5
          WHERE id = $6 RETURNING *`,
             [nome_completo, cpf, cnh, empresa, rota_id, id]
@@ -2147,9 +2147,9 @@ app.put('/api/motoristas_escolares/:id', async (req, res) => {
     }
 });
 
-app.get('/api/motoristas_escolares', async (req, res) => {
+app.get('/api/motoristas', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM motoristas_escolares');
+        const result = await pool.query('SELECT * FROM motoristas');
         res.status(200).json(result.rows);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -2163,7 +2163,7 @@ app.get('/api/rotas/motorista/:motorista_id', async (req, res) => {
         const result = await pool.query(
             `SELECT r.id, r.nome_rota
              FROM rotas r
-             JOIN motoristas_escolares m ON r.id = m.rota_id
+             JOIN motoristas m ON r.id = m.rota_id
              WHERE m.usuario_id = $1`,
             [motorista_id]
         );
@@ -2213,8 +2213,8 @@ app.get('/api/motoristas-abastecimento', async (req, res) => {
     const tipo = req.query.tipo;
 
     let query = 'SELECT id, nome_completo FROM ';
-    if (tipo === 'motoristas_escolares') {
-        query += 'motoristas_escolares';
+    if (tipo === 'motoristas') {
+        query += 'motoristas';
     } else if (tipo === 'motoristas_administrativos') {
         query += 'motoristas_administrativos';
     } else {
@@ -2276,7 +2276,7 @@ app.get('/api/abastecimentos', async (req, res) => {
                    ELSE 'Desconhecido'
                END AS nome_motorista
         FROM abastecimentos a
-        LEFT JOIN motoristas_escolares m ON a.motorista_id = m.id
+        LEFT JOIN motoristas m ON a.motorista_id = m.id
         LEFT JOIN motoristas_administrativos ma ON a.motorista_id = ma.id
         WHERE 1=1
     `;
@@ -2391,7 +2391,7 @@ app.get('/api/motoristas-gerenciar-abastecimento', async (req, res) => {
     try {
         const result = await pool.query(`
             SELECT id, nome_completo 
-            FROM motoristas_escolares
+            FROM motoristas
             UNION
             SELECT id, nome_completo
             FROM motoristas_administrativos
@@ -2491,7 +2491,7 @@ app.post('/api/loginMotoristasAdministrativos', async (req, res) => {
 
 /* API'S PARA APLICATIVO DE TRANSPORTE ESCOLAR*/
 
-app.post('/api/motoristas_escolares/register', async (req, res) => {
+app.post('/api/motoristas/register', async (req, res) => {
     const {
         nome_completo,
         cpf,
@@ -2511,7 +2511,7 @@ app.post('/api/motoristas_escolares/register', async (req, res) => {
     try {
         const hashedPassword = await bcrypt.hash(senha, 10);
         const result = await pool.query(
-            `INSERT INTO motoristas_escolares (nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha, status, criado_em, rota_id)
+            `INSERT INTO motoristas (nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, senha, status, criado_em, rota_id)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`,
             [nome_completo, cpf, cnh, tipo_veiculo, placa, empresa, email, hashedPassword, status, criado_em, rota_id]
         );
