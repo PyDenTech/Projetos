@@ -1756,30 +1756,33 @@ app.post('/api/obterDemandas', async (req, res) => {
 
 app.get('/api/solicitacoes-recentes', async (req, res) => {
     try {
-        const client = await pool.connect();
-        const result = await client.query(`
-            SELECT d.id,
-                   d.origem,
-                   d.destino,
-                   d.data_hora_partida,
-                   d.data_hora_termino_estimado,
-                   d.solicitante,
-                   d.tem_carga,
-                   d.quantidade_passageiros,
-                   d.data_criacao,
-                   dm.motorista_id,
-                   d.status,
-                   d.atraso
-            FROM public.demandas d
-            LEFT JOIN public.demanda_motorista dm ON d.id = dm.demanda_id
-            ORDER BY d.data_criacao DESC
+        const result = await pool.query(`
+            SELECT 
+                d.id,
+                d.origem,
+                d.destino,
+                d.data_hora_partida,
+                d.data_hora_termino_estimado,
+                d.solicitante,
+                d.tem_carga,
+                d.quantidade_passageiros,
+                d.data_criacao,
+                dm.motorista_id,
+                m.nome_completo as motorista_nome,
+                d.status,
+                d.atraso
+            FROM 
+                public.demandas d
+            LEFT JOIN 
+                public.demanda_motorista dm ON d.id = dm.demanda_id
+            LEFT JOIN 
+                public.motoristas_escolares m ON dm.motorista_id = m.id
             LIMIT 10;
         `);
-        client.release();
         res.json(result.rows);
     } catch (err) {
-        console.error(err);
-        res.status(500).send('Erro ao buscar solicitações recentes');
+        console.error('Erro ao carregar solicitações:', err);
+        res.status(500).send('Erro ao carregar solicitações');
     }
 });
 
