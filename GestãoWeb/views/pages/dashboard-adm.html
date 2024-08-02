@@ -57,6 +57,7 @@
     }
   </style>
 
+
   <link href="/css/style.css" rel="stylesheet">
 
 </head>
@@ -421,47 +422,54 @@
             <div class="col-12">
               <div class="card recent-sales overflow-auto">
                 <div class="card-body">
-                  <h5 class="card-title">Solicitações mais Recentes
-                    <button onclick="window.location.href='/cadastrar-demandas';" class="btn btn-primary btn-sm ms-2">
-                      <i class="bi bi-plus"></i> Nova Solicitação
-                    </button>
-                  </h5>
-                  <div class="d-flex justify-content-between">
+                  <h5 class="card-title">Solicitações mais Recentes <button
+                      onclick="window.location.href='/cadastrar-demandas';" class="btn btn-primary btn-sm ms-2"><i
+                        class="bi bi-plus"></i> Nova Solicitação</button></h5>
+                  <div class="d-flex justify-content-between mb-3">
                     <div>
-                      <label for="maxDemandas">Mostrar:</label>
-                      <select id="maxDemandas" class="form-select form-select-sm"
+                      <label for="itemsPerPage" class="form-label">Exibir:</label>
+                      <select id="itemsPerPage" class="form-select form-select-sm"
                         style="width: auto; display: inline-block;">
-                        <option value="5">5</option>
-                        <option value="10" selected>10</option>
+                        <option value="10">10</option>
                         <option value="20">20</option>
                         <option value="50">50</option>
                       </select>
                     </div>
-                    <div id="paginationControls" class="d-flex">
-                      <!-- Paginação será gerada dinamicamente aqui -->
+                    <div>
+                      <span id="totalSolicitacoes" class="mt-3"></span>
                     </div>
                   </div>
-                  <table class="table table-borderless">
-                    <thead>
-                      <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Origem</th>
-                        <th scope="col">Destino</th>
-                        <th scope="col">Data Partida</th>
-                        <th scope="col">Data Término</th>
-                        <th scope="col">Solicitante</th>
-                        <th scope="col">Carga</th>
-                        <th scope="col">Passageiros</th>
-                        <th scope="col">Data Criação</th>
-                        <th scope="col">Motorista</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Atraso</th>
-                      </tr>
-                    </thead>
-                    <tbody id="solicitacoesRecentes">
-                      <!-- Dados das solicitações -->
-                    </tbody>
-                  </table>
+                  <div class="table-responsive">
+                    <table class="table table-borderless">
+                      <thead>
+                        <tr>
+                          <th scope="col">#</th>
+                          <th scope="col">Origem</th>
+                          <th scope="col">Destino</th>
+                          <th scope="col">Data Partida</th>
+                          <th scope="col">Data Término</th>
+                          <th scope="col">Solicitante</th>
+                          <th scope="col">Carga</th>
+                          <th scope="col">Passageiros</th>
+                          <th scope="col">Data Criação</th>
+                          <th scope="col">Motorista</th>
+                          <th scope="col">Status</th>
+                          <th scope="col">Atraso</th>
+                        </tr>
+                      </thead>
+                      <tbody id="solicitacoesRecentes">
+                        <!-- Dados das solicitações -->
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="pagination-container mt-3">
+                    <nav aria-label="Page navigation">
+                      <ul class="pagination justify-content-center">
+                        <!-- Paginação será adicionada dinamicamente aqui -->
+                      </ul>
+                    </nav>
+                  </div>
+                  <div id="loading" style="display:none;">Carregando...</div>
                 </div>
               </div>
             </div>
@@ -765,21 +773,26 @@
   <script src="/js/users-profile.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      const maxDemandasSelect = document.getElementById('maxDemandas');
-      maxDemandasSelect.addEventListener('change', fetchSolicitacoesRecentes);
-
+      const tableBody = document.getElementById('solicitacoesRecentes');
+      const loading = document.getElementById('loading');
+      const totalSolicitacoesSpan = document.getElementById('totalSolicitacoes');
+      const itemsPerPageSelect = document.getElementById('itemsPerPage');
+      const paginationContainer = document.querySelector('.pagination');
       let currentPage = 1;
+      let itemsPerPage = parseInt(itemsPerPageSelect.value);
 
-      function fetchSolicitacoesRecentes() {
-        const maxDemandas = maxDemandasSelect.value;
-        fetch(`/api/solicitacoes-recentes?limit=${maxDemandas}&page=${currentPage}`)
+      function fetchSolicitacoesRecentes(page = 1) {
+        tableBody.innerHTML = '';
+        loading.style.display = 'block';
+
+        fetch(`/api/solicitacoes-recentes?page=${page}&limit=${itemsPerPage}`)
           .then(response => response.json())
           .then(data => {
-            const solicitacoesTableBody = document.getElementById('solicitacoesRecentes');
-            solicitacoesTableBody.innerHTML = '';
+            const { solicitacoes, totalSolicitacoes } = data;
 
-            data.forEach((solicitacao, index) => {
+            solicitacoes.forEach((solicitacao) => {
               const statusClass = getStatusClass(solicitacao.status);
+              const motoristaNome = solicitacao.motorista_nome || 'Não atribuído';
               const row = document.createElement('tr');
               row.innerHTML = `
                         <th scope="row"><a href="#">#${solicitacao.id}</a></th>
@@ -791,16 +804,18 @@
                         <td>${solicitacao.tem_carga ? 'Sim' : 'Não'}</td>
                         <td>${solicitacao.quantidade_passageiros}</td>
                         <td>${new Date(solicitacao.data_criacao).toLocaleString()}</td>
-                        <td>${solicitacao.motorista_nome || 'Não atribuído'}</td>
+                        <td>${motoristaNome}</td>
                         <td><span class="badge ${statusClass}">${solicitacao.status}</span></td>
                         <td>${solicitacao.atraso ? 'Sim' : 'Não'}</td>
                     `;
-              solicitacoesTableBody.appendChild(row);
+              tableBody.appendChild(row);
             });
 
-            updatePaginationControls(data.totalPages);
+            totalSolicitacoesSpan.textContent = `Total de solicitações: ${totalSolicitacoes}`;
+            renderPagination(totalSolicitacoes);
           })
-          .catch(error => console.error('Erro ao carregar solicitações:', error));
+          .catch(error => console.error('Erro ao carregar solicitações:', error))
+          .finally(() => loading.style.display = 'none');
       }
 
       function getStatusClass(status) {
@@ -818,28 +833,31 @@
         }
       }
 
-      function updatePaginationControls(totalPages) {
-        const paginationControls = document.getElementById('paginationControls');
-        paginationControls.innerHTML = '';
+      function renderPagination(totalSolicitacoes) {
+        paginationContainer.innerHTML = '';
+        const pageCount = Math.ceil(totalSolicitacoes / itemsPerPage);
 
-        for (let i = 1; i <= totalPages; i++) {
-          const pageButton = document.createElement('button');
-          pageButton.classList.add('btn', 'btn-sm', 'btn-light');
-          pageButton.textContent = i;
-          if (i === currentPage) {
-            pageButton.classList.add('active');
-          }
-          pageButton.addEventListener('click', () => {
+        for (let i = 1; i <= pageCount; i++) {
+          const li = document.createElement('li');
+          li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+          li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+          li.addEventListener('click', (e) => {
+            e.preventDefault();
             currentPage = i;
-            fetchSolicitacoesRecentes();
+            fetchSolicitacoesRecentes(currentPage);
           });
-          paginationControls.appendChild(pageButton);
+          paginationContainer.appendChild(li);
         }
       }
 
-      fetchSolicitacoesRecentes();
-    });
+      itemsPerPageSelect.addEventListener('change', function () {
+        itemsPerPage = parseInt(this.value);
+        currentPage = 1;
+        fetchSolicitacoesRecentes(currentPage);
+      });
 
+      fetchSolicitacoesRecentes(currentPage);
+    });
   </script>
 </body>
 
