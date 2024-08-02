@@ -475,7 +475,7 @@
             fetchMotoristas();
 
             function fetchMotoristas() {
-                fetch('/api/motoristas')
+                fetch('/api/motoristas_escolares')
                     .then(response => response.json())
                     .then(data => {
                         console.log('Motoristas recebidos:', data); // Adicione este log
@@ -510,7 +510,7 @@
             }
 
             window.editarMotorista = function (motoristaId) {
-                fetch(`/api/motoristas/${motoristaId}`)
+                fetch(`/api/motoristas_escolares/${motoristaId}`)
                     .then(response => {
                         if (!response.ok) {
                             throw new Error('Motorista não encontrado.');
@@ -535,7 +535,7 @@
                 const motoristaId = document.getElementById('editMotoristaId').value;
                 const formData = new FormData(document.getElementById('editForm'));
 
-                fetch(`/api/motoristas/${motoristaId}`, {
+                fetch(`/api/motoristas_escolares/${motoristaId}`, {
                     method: 'PUT',
                     body: JSON.stringify(Object.fromEntries(formData)),
                     headers: {
@@ -554,7 +554,7 @@
 
             window.excluirMotorista = function (motoristaId) {
                 if (confirm('Tem certeza que deseja excluir este motorista?')) {
-                    fetch(`/api/motoristas/${motoristaId}`, {
+                    fetch(`/api/motoristas_escolares/${motoristaId}`, {
                         method: 'DELETE'
                     })
                         .then(response => {
