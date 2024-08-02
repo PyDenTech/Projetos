@@ -1598,7 +1598,6 @@ app.get('/api/motoristas', async (req, res) => {
     }
 });
 
-
 app.post('/api/cadastrar-monitor', uploadDisk.fields([
     { name: 'docRH', maxCount: 1 },
     { name: 'docMonitor', maxCount: 1 },

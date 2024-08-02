@@ -505,7 +505,7 @@
             fetchMotoristas();
 
             function fetchMotoristas() {
-                fetch('/api/motoristas')
+                fetch('/api/motoristas_escolares/')
                     .then(response => response.json())
                     .then(data => {
                         console.log('Motoristas recebidos:', data);
