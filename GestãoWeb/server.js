@@ -1768,8 +1768,8 @@ app.get('/api/solicitacoes-recentes', async (req, res) => {
                    d.quantidade_passageiros,
                    d.data_criacao,
                    dm.motorista_id,
-                   dm.status,
-                   dm.atraso
+                   d.status,
+                   d.atraso
             FROM public.demandas d
             LEFT JOIN public.demanda_motorista dm ON d.id = dm.demanda_id
             ORDER BY d.data_criacao DESC
@@ -1782,7 +1782,6 @@ app.get('/api/solicitacoes-recentes', async (req, res) => {
         res.status(500).send('Erro ao buscar solicitações recentes');
     }
 });
-
 
 app.post('/api/demandasPendentes', async (req, res) => {
     const { motorista_id } = req.body;
