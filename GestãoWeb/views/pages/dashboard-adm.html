@@ -29,6 +29,34 @@
   <link href="/vendor/simple-datatables/style.css" rel="stylesheet">
 
   <!-- Template Main CSS File -->
+  <style>
+    .badge {
+      padding: 0.5em 0.75em;
+      border-radius: 0.25rem;
+      font-size: 0.875em;
+    }
+
+    .badge-primary {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .badge-success {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .badge-warning {
+      background-color: #ffc107;
+      color: black;
+    }
+
+    .badge-danger {
+      background-color: #dc3545;
+      color: white;
+    }
+  </style>
+
   <link href="/css/style.css" rel="stylesheet">
 
 </head>
@@ -729,6 +757,7 @@
             solicitacoesTableBody.innerHTML = '';
 
             data.forEach((solicitacao, index) => {
+              const statusClass = getStatusClass(solicitacao.status);
               const row = document.createElement('tr');
               row.innerHTML = `
                         <th scope="row"><a href="#">#${solicitacao.id}</a></th>
@@ -741,7 +770,7 @@
                         <td>${solicitacao.quantidade_passageiros}</td>
                         <td>${new Date(solicitacao.data_criacao).toLocaleString()}</td>
                         <td>${solicitacao.motorista_id || 'Não atribuído'}</td>
-                        <td>${solicitacao.status}</td>
+                        <td><span class="badge ${statusClass}">${solicitacao.status}</span></td>
                         <td>${solicitacao.atraso ? 'Sim' : 'Não'}</td>
                     `;
               solicitacoesTableBody.appendChild(row);
@@ -749,7 +778,23 @@
           })
           .catch(error => console.error('Erro ao carregar solicitações:', error));
       }
+
+      function getStatusClass(status) {
+        switch (status) {
+          case 'Em andamento':
+            return 'badge-primary';
+          case 'Concluida':
+            return 'badge-success';
+          case 'Pendente':
+            return 'badge-warning';
+          case 'Rejeitada':
+            return 'badge-danger';
+          default:
+            return '';
+        }
+      }
     });
+
   </script>
 </body>
 
