@@ -1766,7 +1766,7 @@ app.get('/api/solicitacoes-recentes', async (req, res) => {
 
         // Consultar as solicitações com paginação
         const result = await pool.query(`
-            SELECT d.id, d.origem, d.destino, d.data_hora_partida, d.data_hora_termino_estimado, d.solicitante, d.tem_carga, d.quantidade_passageiros, d.data_criacao, d.status, d.atraso, m.nome AS motorista_nome
+            SELECT d.id, d.origem, d.destino, d.data_hora_partida, d.data_hora_termino_estimado, d.solicitante, d.tem_carga, d.quantidade_passageiros, d.data_criacao, d.status, d.atraso, m.nome_completo AS motorista_nome
             FROM demandas d
             LEFT JOIN demanda_motorista dm ON d.id = dm.demanda_id
             LEFT JOIN motoristas_administrativos m ON dm.motorista_id = m.id
