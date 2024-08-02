@@ -1586,11 +1586,7 @@ app.get('/api/escolas', async (req, res) => {
 
 app.get('/api/motoristas', async (req, res) => {
     try {
-        const result = await pool.query(`
-            SELECT id, nome_completo, cpf, cnh, empresa, veiculo, placa, certificado_transporte, 
-                   certificado_escolar, documento_cnh, rota_id, rota_nome
-            FROM motoristas_administrativos
-        `);
+        const result = await pool.query('SELECT id, nome_completo AS nome, cpf, cnh, status FROM motoristas_administrativos');
         res.json(result.rows);
     } catch (error) {
         console.error('Erro ao buscar motoristas:', error);
@@ -2088,7 +2084,7 @@ app.post('/api/cadastrar-abastecimento-administrativos', async (req, res) => {
 app.get('/api/motoristas_escolares', async (req, res) => {
     try {
         const result = await pool.query(`
-        SELECT m.*, r.id AS rota_id, r.nome_rota AS rota_nome
+        SELECT m.id, m.nome_completo, m.cpf, m.cnh, m.empresa, m.veiculo, m.placa, m.certificado_transporte, m.certificado_escolar, m.documento_cnh, r.id AS rota_id, r.nome_rota AS rota_nome
         FROM motoristas_escolares m
         LEFT JOIN rotas r ON m.rota_id = r.id
       `);
