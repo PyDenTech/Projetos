@@ -392,68 +392,32 @@
             <!-- Solicitações Recentes -->
             <div class="col-12">
               <div class="card recent-sales overflow-auto">
-
                 <div class="card-body">
                   <h5 class="card-title">Solicitações mais Recentes <button
-                      onclick="window.location.href='/cadastrar-demandas';"
-                      class="btn btn-primary btn-sm ms-2"><i class="bi bi-plus"></i> Nova Solicitação</button></h5>
-                      
-                      <table class="table table-borderless">
-                        <thead>
+                      onclick="window.location.href='/cadastrar-demandas';" class="btn btn-primary btn-sm ms-2"><i
+                        class="bi bi-plus"></i> Nova Solicitação</button></h5>
+                  <table class="table table-borderless">
+                    <thead>
                       <tr>
                         <th scope="col">#</th>
-                        <th scope="col">Requerente</th>
-                        <th scope="col">Descrição da Solicitação</th>
-                        <th scope="col">Data</th>
+                        <th scope="col">Origem</th>
+                        <th scope="col">Destino</th>
+                        <th scope="col">Data Partida</th>
+                        <th scope="col">Data Término</th>
+                        <th scope="col">Solicitante</th>
+                        <th scope="col">Carga</th>
+                        <th scope="col">Passageiros</th>
+                        <th scope="col">Data Criação</th>
                         <th scope="col">Motorista</th>
                         <th scope="col">Status</th>
+                        <th scope="col">Atraso</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      <tr>
-                        <th scope="row"><a href="#">#2457</a></th>
-                        <td>Gabinete</td>
-                        <td scope="row">Viagem à Marabá</td>
-                        <td>01/01/2021</td>
-                        <td>Thalisson</td>
-                        <td><span class="badge bg-primary">Em andamento</span></td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#">#2457</a></th>
-                        <td>Pedagógico</td>
-                        <td scope="row">Viagem à Marabá</td>
-                        <td>01/01/2021</td>
-                        <td>Diego</td>
-                        <td><span class="badge bg-success">Concluida</span></td>
-                      <tr>
-                        <th scope="row"><a href="#">#2147</a></th>
-                        <td>Pedagógico</td>
-                        <td scope="row">Solicitação de Transporte</td>
-                        <td>05/01/2021</td>
-                        <td>Ronaldo</td>
-                        <td><span class="badge bg-warning">Pendente</span></td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#">#2049</a></th>
-                        <td>Escola Carlos Henrique</td>
-                        <td scope="row">Transporte de Material</td>
-                        <td>10/01/2021</td>
-                        <td> - </td>
-                        <td><span class="badge bg-danger">Rejeitada</span></td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#">#2644</a></th>
-                        <td>Setor de Tecnologia</td>
-                        <td scope="row">Pedido de Transporte</td>
-                        <td>15/01/2021</td>
-                        <td>Gilcivaldo</td>
-                        <td><span class="badge bg-success">Concluida</span></td>
-                      </tr>
+                    <tbody id="solicitacoesRecentes">
+                      <!-- Dados das solicitações -->
                     </tbody>
                   </table>
-
                 </div>
-
               </div>
             </div><!-- Fim de Solicitações Recentes -->
 
@@ -753,6 +717,40 @@
   <!-- Template Main JS File -->
   <script src="/js/main.js"></script>
   <script src="/js/users-profile.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      fetchSolicitacoesRecentes();
+
+      function fetchSolicitacoesRecentes() {
+        fetch('/api/solicitacoes-recentes')
+          .then(response => response.json())
+          .then(data => {
+            const solicitacoesTableBody = document.getElementById('solicitacoesRecentes');
+            solicitacoesTableBody.innerHTML = '';
+
+            data.forEach((solicitacao, index) => {
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                        <th scope="row"><a href="#">#${solicitacao.id}</a></th>
+                        <td>${solicitacao.origem}</td>
+                        <td>${solicitacao.destino}</td>
+                        <td>${new Date(solicitacao.data_hora_partida).toLocaleString()}</td>
+                        <td>${new Date(solicitacao.data_hora_termino_estimado).toLocaleString()}</td>
+                        <td>${solicitacao.solicitante}</td>
+                        <td>${solicitacao.tem_carga ? 'Sim' : 'Não'}</td>
+                        <td>${solicitacao.quantidade_passageiros}</td>
+                        <td>${new Date(solicitacao.data_criacao).toLocaleString()}</td>
+                        <td>${solicitacao.motorista_id || 'Não atribuído'}</td>
+                        <td>${solicitacao.status}</td>
+                        <td>${solicitacao.atraso ? 'Sim' : 'Não'}</td>
+                    `;
+              solicitacoesTableBody.appendChild(row);
+            });
+          })
+          .catch(error => console.error('Erro ao carregar solicitações:', error));
+      }
+    });
+  </script>
 </body>
 
 </html>
