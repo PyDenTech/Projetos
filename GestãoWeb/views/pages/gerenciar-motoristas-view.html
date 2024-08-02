@@ -503,9 +503,9 @@
                                 <td>${motorista.empresa}</td>
                                 <td>${motorista.veiculo}</td>
                                 <td>${motorista.placa}</td>
-                                <td><a href="#" onclick="viewDocument('path/to/documents/${motorista.certificado_transporte}')">Ver</a></td>
-                                <td><a href="#" onclick="viewDocument('path/to/documents/${motorista.certificado_escolar}')">Ver</a></td>
-                                <td><a href="#" onclick="viewDocument('path/to/documents/${motorista.documento_cnh}')">Ver</a></td>
+                                <td><a href="#" onclick="viewDocument('/uploads/${motorista.certificado_transporte}')">${motorista.certificado_transporte}</a></td>
+                                <td><a href="#" onclick="viewDocument('/uploads/${motorista.certificado_escolar}')">${motorista.certificado_escolar}</a></td>
+                                <td><a href="#" onclick="viewDocument('/uploads/${motorista.documento_cnh}')">${motorista.documento_cnh}</a></td>
                                 <td>${motorista.rota_id}</td>
                                 <td>${motorista.rota_nome || 'N/A'}</td>
                                 <td>
