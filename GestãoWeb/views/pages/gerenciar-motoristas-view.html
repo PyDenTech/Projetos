@@ -592,7 +592,6 @@
                     .catch(error => console.error('Erro ao salvar dados do motorista:', error));
             };
 
-
             window.excluirMotorista = function (motoristaId) {
                 if (confirm('Tem certeza que deseja excluir este motorista?')) {
                     fetch(`/api/motoristas_escolares/${motoristaId}`, {
