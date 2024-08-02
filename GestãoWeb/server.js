@@ -1783,6 +1783,23 @@ app.get('/api/solicitacoes-recentes', async (req, res) => {
     }
 });
 
+app.get('/api/motoristas-mais-ativos', async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT m.id, m.nome_completo, SUM(e.horas_trabalhadas) AS total_horas_trabalhadas
+            FROM expediente e
+            LEFT JOIN motoristas_administrativos m ON e.motorista_id = m.id
+            GROUP BY m.id, m.nome_completo
+            ORDER BY total_horas_trabalhadas DESC
+            LIMIT 10;
+        `);
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Erro ao carregar motoristas mais ativos:', err);
+        res.status(500).send('Erro ao carregar motoristas mais ativos');
+    }
+});
+
 app.post('/api/demandasPendentes', async (req, res) => {
     const { motorista_id } = req.body;
 

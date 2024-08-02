@@ -488,116 +488,18 @@
                       <tr>
                         <th scope="col">#</th>
                         <th scope="col">Nome do Motorista</th>
-                        <th scope="col">Rotas Realizadas</th>
-                        <th scope="col">Km Percorridos</th>
+                        <th scope="col">Horas Trabalhadas</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      <tr>
-                        <th scope="row">1</th>
-                        <td>Carlos Silva</td>
-                        <td class="fw-bold">150</td>
-                        <td>1200 Km</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">2</th>
-                        <td>Maria Fernandes</td>
-                        <td class="fw-bold">145</td>
-                        <td>1150 Km</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">3</th>
-                        <td>João Pereira</td>
-                        <td class="fw-bold">140</td>
-                        <td>1100 Km</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">4</th>
-                        <td>Ana Júlia</td>
-                        <td class="fw-bold">135</td>
-                        <td>1050 Km</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">5</th>
-                        <td>Ricardo Gomes</td>
-                        <td class="fw-bold">130</td>
-                        <td>1000 Km</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">6</th>
-                        <td>Roberto Carlos</td>
-                        <td class="fw-bold">125</td>
-                        <td>950 Km</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">7</th>
-                        <td>Luciana Alves</td>
-                        <td class="fw-bold">120</td>
-                        <td>900 Km</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">8</th>
-                        <td>Felipe Neto</td>
-                        <td class="fw-bold">115</td>
-                        <td>870 Km</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">9</th>
-                        <td>Sandra Moraes</td>
-                        <td class="fw-bold">110</td>
-                        <td>850 Km</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">10</th>
-                        <td>Gustavo Lima</td>
-                        <td class="fw-bold">105</td>
-                        <td>820 Km</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">11</th>
-                        <td>Patrícia Rocha</td>
-                        <td class="fw-bold">100</td>
-                        <td>790 Km</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">12</th>
-                        <td>Fernando Dias</td>
-                        <td class="fw-bold">95</td>
-                        <td>760 Km</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">13</th>
-                        <td>Juliana Martins</td>
-                        <td class="fw-bold">90</td>
-                        <td>730 Km</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">14</th>
-                        <td>Antonio Banderas</td>
-                        <td class="fw-bold">85</td>
-                        <td>700 Km</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">15</th>
-                        <td>Marcia Andrade</td>
-                        <td class="fw-bold">80</td>
-                        <td>670 Km</td>
-                      </tr>
-                      <tr>
-                        <th scope="row">16</th>
-                        <td>Luiz Henrique</td>
-                        <td class="fw-bold">75</td>
-                        <td>640 Km</td>
-                      </tr>
+                    <tbody id="motoristasMaisAtivos">
+                      <!-- Dados dos motoristas mais ativos -->
                     </tbody>
                   </table>
-
                 </div>
 
               </div>
-            </div><!-- Fim de Motoristas Mais Ativos -->
-
-
+            </div>
+            <!-- Fim de Motoristas Mais Ativos -->
           </div>
         </div><!-- End Left side columns -->
 
@@ -719,6 +621,32 @@
                       ]
                     }]
                   });
+                });
+              </script>
+              <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                  const tableBody = document.getElementById('motoristasMaisAtivos');
+
+                  function fetchMotoristasMaisAtivos() {
+                    fetch('/api/motoristas-mais-ativos')
+                      .then(response => response.json())
+                      .then(data => {
+                        tableBody.innerHTML = '';
+
+                        data.forEach((motorista, index) => {
+                          const row = document.createElement('tr');
+                          row.innerHTML = `
+                            <th scope="row">${index + 1}</th>
+                            <td>${motorista.nome_completo}</td>
+                            <td>${motorista.total_horas_trabalhadas} horas</td>
+                          `;
+                          tableBody.appendChild(row);
+                        });
+                      })
+                      .catch(error => console.error('Erro ao carregar motoristas mais ativos:', error));
+                  }
+
+                  fetchMotoristasMaisAtivos();
                 });
               </script>
 
