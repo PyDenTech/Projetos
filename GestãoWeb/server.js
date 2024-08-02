@@ -1755,36 +1755,34 @@ app.post('/api/obterDemandas', async (req, res) => {
 });
 
 app.get('/api/solicitacoes-recentes', async (req, res) => {
+    const limit = parseInt(req.query.limit) || 10; // Número padrão de itens por página
+    const page = parseInt(req.query.page) || 1; // Página padrão
+    const offset = (page - 1) * limit;
+
     try {
+        // Consultar o número total de solicitações
+        const totalResult = await pool.query('SELECT COUNT(*) FROM demandas');
+        const totalSolicitacoes = parseInt(totalResult.rows[0].count);
+
+        // Consultar as solicitações com paginação
         const result = await pool.query(`
-            SELECT 
-                d.id,
-                d.origem,
-                d.destino,
-                d.data_hora_partida,
-                d.data_hora_termino_estimado,
-                d.solicitante,
-                d.tem_carga,
-                d.quantidade_passageiros,
-                d.data_criacao,
-                dm.motorista_id,
-                m.nome_completo as motorista_nome,
-                d.status,
-                d.atraso
-            FROM 
-                public.demandas d
-            LEFT JOIN 
-                public.demanda_motorista dm ON d.id = dm.demanda_id
-            LEFT JOIN 
-                public.motoristas_escolares m ON dm.motorista_id = m.id
-            LIMIT 10;
-        `);
-        res.json(result.rows);
+            SELECT d.id, d.origem, d.destino, d.data_hora_partida, d.data_hora_termino_estimado, d.solicitante, d.tem_carga, d.quantidade_passageiros, d.data_criacao, d.status, d.atraso, m.nome AS motorista_nome
+            FROM demandas d
+            LEFT JOIN demanda_motorista dm ON d.id = dm.demanda_id
+            LEFT JOIN motoristas m ON dm.motorista_id = m.id
+            LIMIT $1 OFFSET $2;
+        `, [limit, offset]);
+
+        res.json({
+            solicitacoes: result.rows,
+            totalSolicitacoes
+        });
     } catch (err) {
         console.error('Erro ao carregar solicitações:', err);
         res.status(500).send('Erro ao carregar solicitações');
     }
 });
+
 
 app.post('/api/demandasPendentes', async (req, res) => {
     const { motorista_id } = req.body;
