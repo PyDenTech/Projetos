@@ -181,20 +181,3 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
-
-document.addEventListener('DOMContentLoaded', function () {
-    // Função para buscar e exibir a contagem de escolas
-    function carregarContagemEscolas() {
-        fetch('/api/contar-escolas')
-            .then(response => response.json())
-            .then(data => {
-                const escolasAtendidasElement = document.getElementById('escolasAtendidas');
-                escolasAtendidasElement.textContent = data.count;
-            })
-            .catch(error => console.error('Erro ao buscar contagem de escolas:', error));
-    }
-
-    // Carregar a contagem de escolas ao carregar a página
-    carregarContagemEscolas();
-});
-
