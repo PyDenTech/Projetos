@@ -500,6 +500,42 @@
               </div>
             </div>
             <!-- Fim de Motoristas Mais Ativos -->
+
+            <script>
+              document.addEventListener('DOMContentLoaded', function () {
+                const tableBody = document.getElementById('motoristasMaisAtivos');
+
+                function fetchMotoristasMaisAtivos() {
+                  fetch('/api/motoristas-mais-ativos')
+                    .then(response => response.json())
+                    .then(data => {
+                      tableBody.innerHTML = '';
+
+                      data.forEach((motorista, index) => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+              <th scope="row">${index + 1}</th>
+              <td>${motorista.nome_completo}</td>
+              <td>${secondsToHMS(motorista.total_horas_trabalhadas)}</td>
+            `;
+                        tableBody.appendChild(row);
+                      });
+                    })
+                    .catch(error => console.error('Erro ao carregar motoristas mais ativos:', error));
+                }
+
+                fetchMotoristasMaisAtivos();
+              });
+
+              function secondsToHMS(seconds) {
+                const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+                const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+                const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+                return `${h}:${m}:${s}`;
+              }
+            </script>
+
+
           </div>
         </div><!-- End Left side columns -->
 
@@ -621,32 +657,6 @@
                       ]
                     }]
                   });
-                });
-              </script>
-              <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                  const tableBody = document.getElementById('motoristasMaisAtivos');
-
-                  function fetchMotoristasMaisAtivos() {
-                    fetch('/api/motoristas-mais-ativos')
-                      .then(response => response.json())
-                      .then(data => {
-                        tableBody.innerHTML = '';
-
-                        data.forEach((motorista, index) => {
-                          const row = document.createElement('tr');
-                          row.innerHTML = `
-                            <th scope="row">${index + 1}</th>
-                            <td>${motorista.nome_completo}</td>
-                            <td>${motorista.total_horas_trabalhadas} horas</td>
-                          `;
-                          tableBody.appendChild(row);
-                        });
-                      })
-                      .catch(error => console.error('Erro ao carregar motoristas mais ativos:', error));
-                  }
-
-                  fetchMotoristasMaisAtivos();
                 });
               </script>
 

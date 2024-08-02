@@ -1786,7 +1786,10 @@ app.get('/api/solicitacoes-recentes', async (req, res) => {
 app.get('/api/motoristas-mais-ativos', async (req, res) => {
     try {
         const result = await pool.query(`
-            SELECT m.id, m.nome_completo, SUM(e.horas_trabalhadas) AS total_horas_trabalhadas
+            SELECT m.id, m.nome_completo,
+                SUM(
+                    EXTRACT(EPOCH FROM (e.horas_trabalhadas - e.horas_almoco))
+                ) AS total_horas_trabalhadas
             FROM expediente e
             LEFT JOIN motoristas_administrativos m ON e.motorista_id = m.id
             GROUP BY m.id, m.nome_completo
@@ -1799,6 +1802,7 @@ app.get('/api/motoristas-mais-ativos', async (req, res) => {
         res.status(500).send('Erro ao carregar motoristas mais ativos');
     }
 });
+
 
 app.post('/api/demandasPendentes', async (req, res) => {
     const { motorista_id } = req.body;
