@@ -1754,6 +1754,36 @@ app.post('/api/obterDemandas', async (req, res) => {
     }
 });
 
+app.get('/api/solicitacoes-recentes', async (req, res) => {
+    try {
+        const client = await pool.connect();
+        const result = await client.query(`
+            SELECT d.id,
+                   d.origem,
+                   d.destino,
+                   d.data_hora_partida,
+                   d.data_hora_termino_estimado,
+                   d.solicitante,
+                   d.tem_carga,
+                   d.quantidade_passageiros,
+                   d.data_criacao,
+                   dm.motorista_id,
+                   dm.status,
+                   dm.atraso
+            FROM public.demandas d
+            LEFT JOIN public.demanda_motorista dm ON d.id = dm.demanda_id
+            ORDER BY d.data_criacao DESC
+            LIMIT 10;
+        `);
+        client.release();
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Erro ao buscar solicitações recentes');
+    }
+});
+
+
 app.post('/api/demandasPendentes', async (req, res) => {
     const { motorista_id } = req.body;
 
