@@ -379,6 +379,7 @@
                 </div>
             </div>
         </section>
+
         <!-- Modal de Edição de Motorista -->
         <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -418,7 +419,8 @@
                                 <input type="text" class="form-control" id="editPlaca" name="placa" required>
                             </div>
                             <div class="mb-3">
-                                <label for="editCertificadoTransporte" class="form-label">Certificado de Transporte</label>
+                                <label for="editCertificadoTransporte" class="form-label">Certificado de
+                                    Transporte</label>
                                 <input type="text" class="form-control" id="editCertificadoTransporte"
                                     name="certificado_transporte" required>
                             </div>
@@ -450,7 +452,8 @@
         </div>
 
         <!-- Modal de Visualização de Documento -->
-        <div class="modal fade" id="documentModal" tabindex="-1" aria-labelledby="documentModalLabel" aria-hidden="true">
+        <div class="modal fade" id="documentModal" tabindex="-1" aria-labelledby="documentModalLabel"
+            aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -500,9 +503,9 @@
                                 <td>${motorista.empresa}</td>
                                 <td>${motorista.veiculo}</td>
                                 <td>${motorista.placa}</td>
-                                <td><a href="path/to/documents/${motorista.certificado_transporte}" target="_blank" download>Baixar</a></td>
-                                <td><a href="path/to/documents/${motorista.certificado_escolar}" target="_blank" download>Baixar</a></td>
-                                <td><a href="path/to/documents/${motorista.documento_cnh}" target="_blank" download>Baixar</a></td>
+                                <td><a href="#" onclick="viewDocument('path/to/documents/${motorista.certificado_transporte}')">Ver</a></td>
+                                <td><a href="#" onclick="viewDocument('path/to/documents/${motorista.certificado_escolar}')">Ver</a></td>
+                                <td><a href="#" onclick="viewDocument('path/to/documents/${motorista.documento_cnh}')">Ver</a></td>
                                 <td>${motorista.rota_id}</td>
                                 <td>${motorista.rota_nome || 'N/A'}</td>
                                 <td>
