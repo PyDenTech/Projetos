@@ -481,6 +481,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             fetchMotoristas();
+            fetchRotas();
 
             function fetchMotoristas() {
                 fetch('/api/motoristas_escolares')
@@ -520,6 +521,22 @@
                         document.getElementById('statusMessage').textContent = `Total de motoristas: ${quantidadeMotoristas}`;
                     })
                     .catch(error => console.error('Erro ao carregar motoristas:', error));
+            }
+
+            function fetchRotas() {
+                fetch('/api/rotas')
+                    .then(response => response.json())
+                    .then(data => {
+                        const rotaSelect = document.getElementById('editRota');
+                        rotaSelect.innerHTML = '<option value="">Selecione uma rota</option>';
+                        data.forEach(rota => {
+                            const option = document.createElement('option');
+                            option.value = rota.id;
+                            option.textContent = rota.nome_rota;
+                            rotaSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Erro ao carregar rotas:', error));
             }
 
             window.editarMotorista = function (motoristaId) {
