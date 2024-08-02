@@ -1586,13 +1586,18 @@ app.get('/api/escolas', async (req, res) => {
 
 app.get('/api/motoristas', async (req, res) => {
     try {
-        const result = await pool.query('SELECT id, nome_completo AS nome, cpf, cnh, status FROM motoristas_administrativos');
+        const result = await pool.query(`
+            SELECT id, nome_completo, cpf, cnh, empresa, veiculo, placa, certificado_transporte, 
+                   certificado_escolar, documento_cnh, rota_id, rota_nome
+            FROM motoristas_administrativos
+        `);
         res.json(result.rows);
     } catch (error) {
         console.error('Erro ao buscar motoristas:', error);
         res.status(500).json({ error: 'Erro ao buscar motoristas' });
     }
 });
+
 
 app.post('/api/cadastrar-monitor', uploadDisk.fields([
     { name: 'docRH', maxCount: 1 },

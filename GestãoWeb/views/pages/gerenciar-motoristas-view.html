@@ -382,6 +382,11 @@
                                             <th>CPF <span class="bi bi-arrow-down-up"></span></th>
                                             <th>CNH <span class="bi bi-arrow-down-up"></span></th>
                                             <th>Empresa <span class="bi bi-arrow-down-up"></span></th>
+                                            <th>Veículo <span class="bi bi-arrow-down-up"></span></th>
+                                            <th>Placa <span class="bi bi-arrow-down-up"></span></th>
+                                            <th>Certificado Transporte <span class="bi bi-arrow-down-up"></span></th>
+                                            <th>Certificado Escolar <span class="bi bi-arrow-down-up"></span></th>
+                                            <th>Documento CNH <span class="bi bi-arrow-down-up"></span></th>
                                             <th>Id da Rota <span class="bi bi-arrow-down-up"></span></th>
                                             <th>Nome da Rota <span class="bi bi-arrow-down-up"></span></th>
                                             <th>Ações</th>
@@ -391,6 +396,7 @@
                                         <!-- Dados dos motoristas -->
                                     </tbody>
                                 </table>
+
                             </div>
                             <div id="statusMessage" class="mt-3"></div>
                         </div>
@@ -416,6 +422,30 @@
                                 <label for="editCpf" class="form-label">CPF</label>
                                 <input type="text" class="form-control" id="editCpf" name="cpf" required>
                             </div>
+                            <div class="mb-3">
+                                <label for="editVeiculo" class="form-label">Veículo</label>
+                                <input type="text" class="form-control" id="editVeiculo" name="veiculo" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editPlaca" class="form-label">Placa</label>
+                                <input type="text" class="form-control" id="editPlaca" name="placa" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editCertificadoTransporte" class="form-label">Certificado Transporte</label>
+                                <input type="text" class="form-control" id="editCertificadoTransporte"
+                                    name="certificado_transporte" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editCertificadoEscolar" class="form-label">Certificado Escolar</label>
+                                <input type="text" class="form-control" id="editCertificadoEscolar"
+                                    name="certificado_escolar" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editDocumentoCnh" class="form-label">Documento CNH</label>
+                                <input type="text" class="form-control" id="editDocumentoCnh" name="documento_cnh"
+                                    required>
+                            </div>
+
                             <div class="mb-3">
                                 <label for="editCnh" class="form-label">CNH</label>
                                 <input type="text" class="form-control" id="editCnh" name="cnh" required>
@@ -478,7 +508,7 @@
                 fetch('/api/motoristas')
                     .then(response => response.json())
                     .then(data => {
-                        console.log('Motoristas recebidos:', data); // Adicione este log
+                        console.log('Motoristas recebidos:', data);
                         if (!Array.isArray(data)) {
                             throw new Error('Resposta não é um array');
                         }
@@ -488,18 +518,23 @@
                         data.forEach((motorista, index) => {
                             const row = document.createElement('tr');
                             row.innerHTML = `
-                                <td>${index + 1}</td>
-                                <td>${motorista.nome_completo}</td>
-                                <td>${motorista.cpf}</td>
-                                <td>${motorista.cnh}</td>
-                                <td>${motorista.empresa}</td>
-                                <td>${motorista.rota_id}</td>
-                                <td>${motorista.rota_nome || 'N/A'}</td>
-                                <td>
-                                    <button class="btn btn-primary btn-sm" onclick="editarMotorista(${motorista.id})">Editar</button>
-                                    <button class="btn btn-danger btn-sm" onclick="excluirMotorista(${motorista.id})">Excluir</button>
-                                </td>
-                            `;
+                    <td>${index + 1}</td>
+                    <td>${motorista.nome_completo}</td>
+                    <td>${motorista.cpf}</td>
+                    <td>${motorista.cnh}</td>
+                    <td>${motorista.empresa}</td>
+                    <td>${motorista.veiculo}</td>
+                    <td>${motorista.placa}</td>
+                    <td>${motorista.certificado_transporte}</td>
+                    <td>${motorista.certificado_escolar}</td>
+                    <td>${motorista.documento_cnh}</td>
+                    <td>${motorista.rota_id}</td>
+                    <td>${motorista.rota_nome || 'N/A'}</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" onclick="editarMotorista(${motorista.id})">Editar</button>
+                        <button class="btn btn-danger btn-sm" onclick="excluirMotorista(${motorista.id})">Excluir</button>
+                    </td>
+                `;
                             motoristasTableBody.appendChild(row);
                         });
 
@@ -524,6 +559,11 @@
                         document.getElementById('editCnh').value = data.cnh;
                         document.getElementById('editEmpresa').value = data.empresa;
                         document.getElementById('editRota').value = data.rota_id;
+                        document.getElementById('editVeiculo').value = data.veiculo;
+                        document.getElementById('editPlaca').value = data.placa;
+                        document.getElementById('editCertificadoTransporte').value = data.certificado_transporte;
+                        document.getElementById('editCertificadoEscolar').value = data.certificado_escolar;
+                        document.getElementById('editDocumentoCnh').value = data.documento_cnh;
 
                         const editModal = new bootstrap.Modal(document.getElementById('editModal'));
                         editModal.show();
@@ -551,6 +591,7 @@
                     })
                     .catch(error => console.error('Erro ao salvar dados do motorista:', error));
             };
+
 
             window.excluirMotorista = function (motoristaId) {
                 if (confirm('Tem certeza que deseja excluir este motorista?')) {
