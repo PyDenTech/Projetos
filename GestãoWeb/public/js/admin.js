@@ -171,7 +171,6 @@ document.getElementById('municipioSelect').addEventListener('change', function (
     filtrarUsuariosPorMunicipio(this.value);
 });
 
-
 document.getElementById('cadastrarBtn').addEventListener('click', async () => {
     const nomeBairro = document.getElementById('nomeBairro').value;
 
