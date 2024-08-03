@@ -20,8 +20,10 @@ function carregarUsuarios() {
                         <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
                         <option value="gestor" ${user.role === 'gestor' ? 'selected' : ''}>Gestor</option>
                         <option value="agente" ${user.role === 'agente' ? 'selected' : ''}>Agente</option>
+                        <option value="fornecedor" ${user.role === 'fornecedor' ? 'selected' : ''}>Fornecedor</option>
                         <option value="motorista" ${user.role === 'motorista' ? 'selected' : ''}>Motorista</option>
                         <option value="monitor" ${user.role === 'monitor' ? 'selected' : ''}>Monitor</option>
+                        <option value="visitante" ${user.role === 'visitante' ? 'selected' : ''}>Visitante</option>
                     </select>
                 </td>
                 <td>
@@ -78,6 +80,7 @@ function excluirUsuario(userId) {
             });
     }
 }
+
 function alterarCargo(userId, novoCargo) {
     fetch(`/api/usuarios/${userId}/cargo`, {
         method: 'POST',
