@@ -14,16 +14,12 @@
 
     <!-- Google Fonts -->
     <link href="https://fonts.gstatic.com" rel="preconnect">
-    <link
-        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i" rel="stylesheet">
 
     <!-- Vendor CSS Files -->
     <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
     <link href="/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <link href="/vendor/quill/quill.snow.css" rel="stylesheet">
-    <link href="/vendor/quill/quill.bubble.css" rel="stylesheet">
     <link href="/vendor/remixicon/remixicon.css" rel="stylesheet">
     <link href="/vendor/simple-datatables/style.css" rel="stylesheet">
 
@@ -35,7 +31,6 @@
 
     <!-- ======= Header ======= -->
     <header id="header" class="header fixed-top d-flex align-items-center">
-
         <i class="bi bi-list toggle-sidebar-btn"></i>
         <div class="d-flex align-items-center justify-content-between">
             <a href="/dashboard-adm" class="logo d-flex align-items-center">
@@ -45,10 +40,8 @@
 
         <nav class="header-nav ms-auto">
             <ul class="d-flex align-items-center">
-
                 <li class="nav-item dropdown pe-3">
-                    <a id="profile-link" class="nav-link nav-profile d-flex align-items-center pe-0" href="#"
-                        data-bs-toggle="dropdown">
+                    <a id="profile-link" class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
                         <img id="profile-image" src="/img/user.png" alt="Foto de Perfil" class="rounded-circle">
                         <span id="usuarioNome" class="d-none d-md-block dropdown-toggle ps-2"></span>
                     </a><!-- End Profile Image Icon -->
@@ -63,7 +56,6 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-
                         <li>
                             <a class="dropdown-item d-flex align-items-center" href="/users-profile">
                                 <i class="bi bi-gear"></i>
@@ -73,7 +65,6 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-
                         <li>
                             <a class="dropdown-item d-flex align-items-center" href="/faq">
                                 <i class="bi bi-question-circle"></i>
@@ -83,7 +74,6 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-
                         <li>
                             <a class="dropdown-item d-flex align-items-center" href="#" id="logout-link">
                                 <i class="bi bi-box-arrow-right"></i>
@@ -92,43 +82,21 @@
                         </li>
                     </ul><!-- End Profile Dropdown Items -->
                 </li><!-- End Profile Nav -->
-
             </ul>
         </nav><!-- End Icons Navigation -->
-
     </header><!-- End Header -->
 
     <!-- ======= Sidebar ======= -->
     <aside id="sidebar" class="sidebar">
-
         <ul class="sidebar-nav" id="sidebar-nav">
             <li class="nav-heading">Administração</li>
             <li class="nav-item">
-                <a class="nav-link" href="#usuarios" id="usuarios-tab" data-bs-toggle="tab" role="tab" aria-controls="usuarios" aria-selected="true">
+                <a class="nav-link active" href="#usuarios" id="usuarios-tab" data-bs-toggle="tab" role="tab" aria-controls="usuarios" aria-selected="true">
                     <i class="bi bi-person"></i>
                     <span>Usuários</span>
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#cadastros" id="cadastros-tab" data-bs-toggle="tab" role="tab" aria-controls="cadastros" aria-selected="false">
-                    <i class="bi bi-pencil-square"></i>
-                    <span>Cadastros</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#relatorios" id="relatorios-tab" data-bs-toggle="tab" role="tab" aria-controls="relatorios" aria-selected="false">
-                    <i class="bi bi-clipboard-data"></i>
-                    <span>Relatórios</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#graficos" id="graficos-tab" data-bs-toggle="tab" role="tab" aria-controls="graficos" aria-selected="false">
-                    <i class="bi bi-bar-chart"></i>
-                    <span>Gráficos</span>
-                </a>
-            </li>
         </ul>
-
     </aside><!-- End Sidebar-->
 
     <main id="main" class="main">
@@ -149,21 +117,6 @@
                         <div class="tab-pane fade show active" id="usuarios" role="tabpanel" aria-labelledby="usuarios-tab">
                             <div class="card">
                                 <div class="card-body">
-                                    <h5 class="card-title">Usuários por Localização</h5>
-                                    <div class="row mb-3">
-                                        <div class="col-md-4">
-                                            <select class="form-control" id="estadoSelect" onchange="carregarMunicipios(this.value)">
-                                                <option>Selecione um Estado</option>
-                                                <!-- Estados carregados dinamicamente -->
-                                            </select>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <select class="form-control" id="municipioSelect" onchange="filtrarUsuariosPorMunicipio(this.value)">
-                                                <option>Selecione um Município</option>
-                                                <!-- Municípios carregados dinamicamente -->
-                                            </select>
-                                        </div>
-                                    </div>
                                     <h5 class="card-title">Usuários que Solicitaram Cadastro</h5>
                                     <table class="table table-striped">
                                         <thead class="thead-dark">
@@ -183,76 +136,6 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="tab-pane fade" id="cadastros" role="tabpanel" aria-labelledby="cadastros-tab">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Cadastro de Zonas</h5>
-                                    <form id="zonaForm">
-                                        <div class="form-group">
-                                            <label for="nomeBairro">Nome do Bairro:</label>
-                                            <input type="text" class="form-control" id="nomeBairro" placeholder="Digite o nome do bairro" required>
-                                        </div>
-                                    </form>
-                                    <button type="button" class="btn btn-primary mt-3" id="cadastrarBtn">Cadastrar</button>
-                                    <h5 class="card-title mt-4">Gerenciar Zoneamentos</h5>
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>ID</th>
-                                                    <th>Bairro</th>
-                                                    <th>Ações</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="bairrosTableBody">
-                                                <!-- Conteúdo dinâmico -->
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Modal para Editar Bairro -->
-                            <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="editModalLabel">Editar Bairro</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <form id="editBairroForm">
-                                                <div class="form-group">
-                                                    <label for="editNomeBairro">Nome do Bairro:</label>
-                                                    <input type="text" class="form-control" id="editNomeBairro" required>
-                                                </div>
-                                            </form>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                                            <button type="button" class="btn btn-primary" id="salvarEdicaoBtn">Salvar</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="relatorios" role="tabpanel" aria-labelledby="relatorios-tab">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Relatórios</h5>
-                                    <p>Conteúdo da aba de Relatórios.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="graficos" role="tabpanel" aria-labelledby="graficos-tab">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Gráficos</h5>
-                                    <p>Conteúdo da aba de Gráficos.</p>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -267,8 +150,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="copyright">
-                                &copy; Direitos Autorais <strong><span>PyDenExpress</span></strong>. Todos os Direitos
-                                Reservados
+                                &copy; Direitos Autorais <strong><span>PyDenExpress</span></strong>. Todos os Direitos Reservados
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -284,50 +166,13 @@
 
     <!-- Vendor JS Files -->
     <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="/vendor/quill/quill.min.js"></script>
     <script src="/vendor/simple-datatables/simple-datatables.js"></script>
-    <script src="/vendor/tinymce/tinymce.min.js"></script>
 
     <!-- Template Main JS File -->
     <script src="/js/main.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             carregarUsuarios();
-            carregarEstados();
-            carregarBairros();
-            
-            document.getElementById('cadastrarBtn').addEventListener('click', async () => {
-                const nomeBairro = document.getElementById('nomeBairro').value;
-
-                try {
-                    const response = await fetch('/api/cadastrar-bairro', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ nomeBairro }),
-                    });
-
-                    if (response.ok) {
-                        alert('Bairro cadastrado com sucesso!');
-                        document.getElementById('zonaForm').reset();
-                    } else {
-                        const errorData = await response.json();
-                        alert(`Erro ao cadastrar bairro: ${errorData.error}`);
-                    }
-                } catch (error) {
-                    console.error('Erro ao enviar dados:', error);
-                    alert('Erro ao cadastrar bairro. Tente novamente mais tarde.');
-                }
-            });
-
-            document.getElementById('estadoSelect').addEventListener('change', function () {
-                carregarMunicipios(this.value);
-            });
-
-            document.getElementById('municipioSelect').addEventListener('change', function () {
-                filtrarUsuariosPorMunicipio(this.value);
-            });
 
             document.getElementById('salvarEdicaoBtn').addEventListener('click', () => {
                 const id = document.getElementById('editModal').getAttribute('data-id');
@@ -398,7 +243,7 @@
                 })
                 .then(data => {
                     alert(data.message);
-                    location.reload(); // Recarrega a página para atualizar os dados da tabela
+                    carregarUsuarios(); // Recarrega a tabela de usuários para atualizar os dados
                 })
                 .catch(error => {
                     console.error('Erro ao alterar status do usuário:', error);
@@ -417,7 +262,7 @@
                     })
                     .then(data => {
                         alert(data.message);
-                        location.reload(); // Recarrega a página para atualizar os dados da tabela
+                        carregarUsuarios(); // Recarrega a tabela de usuários para atualizar os dados
                     })
                     .catch(error => {
                         console.error('Erro ao excluir usuário:', error);
@@ -438,106 +283,10 @@
                 .then(data => {
                     alert(data.message);
                     if (data.success) {
-                        location.reload(); // Recarrega para atualizar os dados da tabela
+                        carregarUsuarios(); // Recarrega a tabela de usuários para atualizar os dados
                     }
                 })
                 .catch(error => console.error('Erro ao alterar o cargo do usuário:', error));
-        }
-
-        function carregarEstados() {
-            fetch('/estados')
-                .then(response => response.json())
-                .then(data => {
-                    const select = document.getElementById('estadoSelect');
-                    select.innerHTML = '<option>Selecione um Estado</option>';
-                    data.forEach(estado => {
-                        const option = document.createElement('option');
-                        option.value = estado.codigo_uf;
-                        option.textContent = estado.nome;
-                        select.appendChild(option);
-                    });
-                })
-                .catch(error => console.error('Erro ao buscar estados:', error));
-        }
-
-        function carregarMunicipios(codigoEstado) {
-            fetch(`/municipios/${codigoEstado}`)
-                .then(response => response.json())
-                .then(data => {
-                    const select = document.getElementById('municipioSelect');
-                    select.innerHTML = '<option>Selecione um Município</option>';
-                    data.forEach(municipio => {
-                        const option = document.createElement('option');
-                        option.value = municipio.codigo_ibge;
-                        option.textContent = municipio.nome;
-                        select.appendChild(option);
-                    });
-                })
-                .catch(error => console.error('Erro ao buscar municípios:', error));
-        }
-
-        function filtrarUsuariosPorMunicipio(codigoMunicipio) {
-            fetch(`/usuarios/${codigoMunicipio}`)
-                .then(response => response.json())
-                .then(data => {
-                    const tbody = document.getElementById('userTableBody');
-                    tbody.innerHTML = '';
-                    data.forEach(usuario => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${usuario.id}</td>
-                            <td>${usuario.nome}</td>
-                            <td>${usuario.email}</td>
-                            <td>${usuario.status}</td>
-                            <td>${usuario.cargo}</td>
-                            <td><button class="btn btn-primary btn-sm">Ações</button></td>
-                        `;
-                        tbody.appendChild(row);
-                    });
-                })
-                .catch(error => console.error('Erro ao buscar usuários:', error));
-        }
-
-        function carregarBairros() {
-            fetch('/api/bairros')
-                .then(response => response.json())
-                .then(data => {
-                    const tableBody = document.getElementById('bairrosTableBody');
-                    tableBody.innerHTML = '';
-                    data.forEach(bairro => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${bairro.id}</td>
-                            <td>${bairro.nome}</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" onclick="editarBairro(${bairro.id}, '${bairro.nome}')">Editar</button>
-                                <button class="btn btn-danger btn-sm" onclick="excluirBairro(${bairro.id})">Excluir</button>
-                            </td>
-                        `;
-                        tableBody.appendChild(row);
-                    });
-                })
-                .catch(error => console.error('Erro ao carregar bairros:', error));
-        }
-
-        function editarBairro(id, nome) {
-            $('#editModal').modal('show');
-            document.getElementById('editNomeBairro').value = nome;
-            document.getElementById('editModal').setAttribute('data-id', id);
-        }
-
-        function excluirBairro(id) {
-            if (confirm('Tem certeza que deseja excluir este bairro?')) {
-                fetch(`/api/excluir-bairro/${id}`, {
-                    method: 'DELETE'
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert('Bairro excluído com sucesso!');
-                        carregarBairros();
-                    })
-                    .catch(error => console.error('Erro ao excluir bairro:', error));
-            }
         }
     </script>
 </body>
