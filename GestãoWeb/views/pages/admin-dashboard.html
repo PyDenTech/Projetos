@@ -171,27 +171,6 @@
     <!-- Template Main JS File -->
     <script src="/js/main.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            carregarUsuarios();
-
-            document.getElementById('salvarEdicaoBtn').addEventListener('click', () => {
-                const id = document.getElementById('editModal').getAttribute('data-id');
-                const novoNome = document.getElementById('editNomeBairro').value;
-                fetch(`/api/editar-bairro/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nomeBairro: novoNome })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert('Bairro editado com sucesso!');
-                        $('#editModal').modal('hide');
-                        carregarBairros();
-                    })
-                    .catch(error => console.error('Erro ao editar bairro:', error));
-            });
-        });
-
         function carregarUsuarios() {
             fetch('/api/usuarios-pendentes')
                 .then(response => response.json())
