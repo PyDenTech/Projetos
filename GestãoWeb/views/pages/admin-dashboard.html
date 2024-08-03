@@ -171,6 +171,11 @@
     <!-- Template Main JS File -->
     <script src="/js/main.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            carregarUsuarios();
+
+        });
+
         function carregarUsuarios() {
             fetch('/api/usuarios-pendentes')
                 .then(response => response.json())
