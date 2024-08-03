@@ -474,14 +474,28 @@
           console.log(`${key}: ${value}`);
         }
 
-        fetch('/api/registroMotoristasAdministrativos', {
+        const jsonData = {
+          nome_completo: formData.get('nomeCompleto'),
+          cpf: formData.get('cpf'),
+          cnh: formData.get('cnh'),
+          empresa: formData.get('empresa'),
+          tipo_veiculo: formData.get('tipoVeiculo'),
+          modelo: formData.get('modelo'),
+          placa: formData.get('placa'),
+          email: formData.get('email'),
+          password: formData.get('senha')
+        };
+
+        fetch('https://semedcanaadoscarajas.pydenexpress.com/api/registroMotoristasAdministrativos', {
           method: 'POST',
-          body: formData
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(jsonData)
         })
           .then(response => {
             if (!response.ok) {
               return response.json().then(data => {
-                // Log detalhado da resposta de erro
                 console.error('Erro ao cadastrar motorista:', data);
                 throw new Error(data.error || 'Erro ao cadastrar motorista.');
               });
@@ -498,6 +512,7 @@
           });
       });
     });
+
   </script>
 </body>
 
