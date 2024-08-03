@@ -14,7 +14,9 @@
 
     <!-- Google Fonts -->
     <link href="https://fonts.gstatic.com" rel="preconnect">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i"
+        rel="stylesheet">
 
     <!-- Vendor CSS Files -->
     <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -30,8 +32,10 @@
 </head>
 
 <body>
+
     <!-- ======= Header ======= -->
     <header id="header" class="header fixed-top d-flex align-items-center">
+
         <i class="bi bi-list toggle-sidebar-btn"></i>
         <div class="d-flex align-items-center justify-content-between">
             <a href="/dashboard-adm" class="logo d-flex align-items-center">
@@ -41,60 +45,90 @@
 
         <nav class="header-nav ms-auto">
             <ul class="d-flex align-items-center">
+
                 <li class="nav-item dropdown pe-3">
-                    <a id="profile-link" class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
+                    <a id="profile-link" class="nav-link nav-profile d-flex align-items-center pe-0" href="#"
+                        data-bs-toggle="dropdown">
                         <img id="profile-image" src="/img/user.png" alt="Foto de Perfil" class="rounded-circle">
                         <span id="usuarioNome" class="d-none d-md-block dropdown-toggle ps-2"></span>
                     </a><!-- End Profile Image Icon -->
 
                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-                        <li><a class="dropdown-item d-flex align-items-center" href="/users-profile"><i class="bi bi-person"></i><span>Meu Perfil</span></a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item d-flex align-items-center" href="/users-profile"><i class="bi bi-gear"></i><span>Configurações de Conta</span></a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item d-flex align-items-center" href="/faq"><i class="bi bi-question-circle"></i><span>Ajuda</span></a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item d-flex align-items-center" href="#" id="logout-link"><i class="bi bi-box-arrow-right"></i><span>Sair</span></a></li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="/users-profile">
+                                <i class="bi bi-person"></i>
+                                <span>Meu Perfil</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="/users-profile">
+                                <i class="bi bi-gear"></i>
+                                <span>Configurações de Conta</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="/faq">
+                                <i class="bi bi-question-circle"></i>
+                                <span>Ajuda</span>
+                            </a>
+                        </li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="#" id="logout-link">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Sair</span>
+                            </a>
+                        </li>
                     </ul><!-- End Profile Dropdown Items -->
                 </li><!-- End Profile Nav -->
+
             </ul>
         </nav><!-- End Icons Navigation -->
+
     </header><!-- End Header -->
 
     <!-- ======= Sidebar ======= -->
     <aside id="sidebar" class="sidebar">
+
         <ul class="sidebar-nav" id="sidebar-nav">
             <li class="nav-heading">Administração</li>
             <li class="nav-item">
-                <a class="nav-link active" href="#usuarios" data-bs-toggle="tab">
-                    <i class="bi bi-person"></i><span>Usuários</span>
+                <a class="nav-link" href="#usuarios" id="usuarios-tab" data-bs-toggle="tab" role="tab" aria-controls="usuarios" aria-selected="true">
+                    <i class="bi bi-person"></i>
+                    <span>Usuários</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#cadastros-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-pencil-square"></i><span>Cadastros</span><i class="bi bi-chevron-down ms-auto"></i>
+                <a class="nav-link" href="#cadastros" id="cadastros-tab" data-bs-toggle="tab" role="tab" aria-controls="cadastros" aria-selected="false">
+                    <i class="bi bi-pencil-square"></i>
+                    <span>Cadastros</span>
                 </a>
-                <ul id="cadastros-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li><a href="#cadastros" data-bs-toggle="tab"><i class="bi bi-folder-plus"></i><span>Gerenciar Bairros</span></a></li>
-                </ul>
             </li>
             <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#relatorios-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-clipboard-data"></i><span>Relatórios</span><i class="bi bi-chevron-down ms-auto"></i>
+                <a class="nav-link" href="#relatorios" id="relatorios-tab" data-bs-toggle="tab" role="tab" aria-controls="relatorios" aria-selected="false">
+                    <i class="bi bi-clipboard-data"></i>
+                    <span>Relatórios</span>
                 </a>
-                <ul id="relatorios-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li><a href="#relatorios" data-bs-toggle="tab"><i class="bi bi-graph-up"></i><span>Visualizar Relatórios</span></a></li>
-                </ul>
             </li>
             <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#graficos-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-bar-chart"></i><span>Gráficos</span><i class="bi bi-chevron-down ms-auto"></i>
+                <a class="nav-link" href="#graficos" id="graficos-tab" data-bs-toggle="tab" role="tab" aria-controls="graficos" aria-selected="false">
+                    <i class="bi bi-bar-chart"></i>
+                    <span>Gráficos</span>
                 </a>
-                <ul id="graficos-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li><a href="#graficos" data-bs-toggle="tab"><i class="bi bi-pie-chart"></i><span>Visualizar Gráficos</span></a></li>
-                </ul>
             </li>
         </ul>
+
     </aside><!-- End Sidebar-->
 
     <main id="main" class="main">
@@ -149,7 +183,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="tab-pane fade" id="cadastros" role="tabpanel" aria-labelledby="bairros-tab">
+                        <div class="tab-pane fade" id="cadastros" role="tabpanel" aria-labelledby="cadastros-tab">
                             <div class="card">
                                 <div class="card-body">
                                     <h5 class="card-title">Cadastro de Zonas</h5>
@@ -233,7 +267,8 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="copyright">
-                                &copy; Direitos Autorais <strong><span>PyDenExpress</span></strong>. Todos os Direitos Reservados
+                                &copy; Direitos Autorais <strong><span>PyDenExpress</span></strong>. Todos os Direitos
+                                Reservados
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -254,13 +289,62 @@
     <script src="/vendor/tinymce/tinymce.min.js"></script>
 
     <!-- Template Main JS File -->
-    <script src="/js/users-profile.js"></script>
     <script src="/js/main.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             carregarUsuarios();
-            carregarBairros();
             carregarEstados();
+            carregarBairros();
+            
+            document.getElementById('cadastrarBtn').addEventListener('click', async () => {
+                const nomeBairro = document.getElementById('nomeBairro').value;
+
+                try {
+                    const response = await fetch('/api/cadastrar-bairro', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ nomeBairro }),
+                    });
+
+                    if (response.ok) {
+                        alert('Bairro cadastrado com sucesso!');
+                        document.getElementById('zonaForm').reset();
+                    } else {
+                        const errorData = await response.json();
+                        alert(`Erro ao cadastrar bairro: ${errorData.error}`);
+                    }
+                } catch (error) {
+                    console.error('Erro ao enviar dados:', error);
+                    alert('Erro ao cadastrar bairro. Tente novamente mais tarde.');
+                }
+            });
+
+            document.getElementById('estadoSelect').addEventListener('change', function () {
+                carregarMunicipios(this.value);
+            });
+
+            document.getElementById('municipioSelect').addEventListener('change', function () {
+                filtrarUsuariosPorMunicipio(this.value);
+            });
+
+            document.getElementById('salvarEdicaoBtn').addEventListener('click', () => {
+                const id = document.getElementById('editModal').getAttribute('data-id');
+                const novoNome = document.getElementById('editNomeBairro').value;
+                fetch(`/api/editar-bairro/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nomeBairro: novoNome })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert('Bairro editado com sucesso!');
+                        $('#editModal').modal('hide');
+                        carregarBairros();
+                    })
+                    .catch(error => console.error('Erro ao editar bairro:', error));
+            });
         });
 
         function carregarUsuarios() {
@@ -439,21 +523,7 @@
         function editarBairro(id, nome) {
             $('#editModal').modal('show');
             document.getElementById('editNomeBairro').value = nome;
-            document.getElementById('salvarEdicaoBtn').onclick = () => {
-                const novoNome = document.getElementById('editNomeBairro').value;
-                fetch(`/api/editar-bairro/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nomeBairro: novoNome })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert('Bairro editado com sucesso!');
-                        $('#editModal').modal('hide');
-                        carregarBairros();
-                    })
-                    .catch(error => console.error('Erro ao editar bairro:', error));
-            };
+            document.getElementById('editModal').setAttribute('data-id', id);
         }
 
         function excluirBairro(id) {
@@ -471,4 +541,5 @@
         }
     </script>
 </body>
+
 </html>
