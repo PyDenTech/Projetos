@@ -14,9 +14,7 @@
 
     <!-- Google Fonts -->
     <link href="https://fonts.gstatic.com" rel="preconnect">
-    <link
-        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i" rel="stylesheet">
 
     <!-- Vendor CSS Files -->
     <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -32,10 +30,8 @@
 </head>
 
 <body>
-
     <!-- ======= Header ======= -->
     <header id="header" class="header fixed-top d-flex align-items-center">
-
         <i class="bi bi-list toggle-sidebar-btn"></i>
         <div class="d-flex align-items-center justify-content-between">
             <a href="/dashboard-adm" class="logo d-flex align-items-center">
@@ -45,119 +41,60 @@
 
         <nav class="header-nav ms-auto">
             <ul class="d-flex align-items-center">
-
                 <li class="nav-item dropdown pe-3">
-                    <a id="profile-link" class="nav-link nav-profile d-flex align-items-center pe-0" href="#"
-                        data-bs-toggle="dropdown">
+                    <a id="profile-link" class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
                         <img id="profile-image" src="/img/user.png" alt="Foto de Perfil" class="rounded-circle">
                         <span id="usuarioNome" class="d-none d-md-block dropdown-toggle ps-2"></span>
                     </a><!-- End Profile Image Icon -->
 
                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center" href="/users-profile">
-                                <i class="bi bi-person"></i>
-                                <span>Meu Perfil</span>
-                            </a>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center" href="/users-profile">
-                                <i class="bi bi-gear"></i>
-                                <span>Configurações de Conta</span>
-                            </a>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center" href="/faq">
-                                <i class="bi bi-question-circle"></i>
-                                <span>Ajuda</span>
-                            </a>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center" href="#" id="logout-link">
-                                <i class="bi bi-box-arrow-right"></i>
-                                <span>Sair</span>
-                            </a>
-                        </li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="/users-profile"><i class="bi bi-person"></i><span>Meu Perfil</span></a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="/users-profile"><i class="bi bi-gear"></i><span>Configurações de Conta</span></a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="/faq"><i class="bi bi-question-circle"></i><span>Ajuda</span></a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item d-flex align-items-center" href="#" id="logout-link"><i class="bi bi-box-arrow-right"></i><span>Sair</span></a></li>
                     </ul><!-- End Profile Dropdown Items -->
                 </li><!-- End Profile Nav -->
-
             </ul>
         </nav><!-- End Icons Navigation -->
-
     </header><!-- End Header -->
 
     <!-- ======= Sidebar ======= -->
     <aside id="sidebar" class="sidebar">
-
         <ul class="sidebar-nav" id="sidebar-nav">
             <li class="nav-heading">Administração</li>
             <li class="nav-item">
-                <a class="nav-link" data-bs-target="#usuarios-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-person"></i><span>Usuários</span><i class="bi bi-chevron-down ms-auto"></i>
+                <a class="nav-link active" href="#usuarios" data-bs-toggle="tab">
+                    <i class="bi bi-person"></i><span>Usuários</span>
                 </a>
-                <ul id="usuarios-nav" class="nav-content collapse show" data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="#usuarios" class="nav-link active" id="usuarios-tab" data-bs-toggle="tab" role="tab"
-                            aria-controls="usuarios" aria-selected="true">
-                            <i class="bi bi-people"></i><span>Gerenciar Usuários</span>
-                        </a>
-                    </li>
-                </ul>
             </li>
             <li class="nav-item">
                 <a class="nav-link collapsed" data-bs-target="#cadastros-nav" data-bs-toggle="collapse" href="#">
                     <i class="bi bi-pencil-square"></i><span>Cadastros</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
-                <ul id="cadastros-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="#cadastros" class="nav-link" id="bairros-tab" data-bs-toggle="tab" role="tab"
-                            aria-controls="cadastros" aria-selected="false">
-                            <i class="bi bi-folder-plus"></i><span>Bairros</span>
-                        </a>
-                    </li>
+                <ul id="cadastros-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li><a href="#cadastros" data-bs-toggle="tab"><i class="bi bi-folder-plus"></i><span>Gerenciar Bairros</span></a></li>
                 </ul>
             </li>
             <li class="nav-item">
                 <a class="nav-link collapsed" data-bs-target="#relatorios-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-clipboard-data"></i><span>Relatórios</span><i
-                        class="bi bi-chevron-down ms-auto"></i>
+                    <i class="bi bi-clipboard-data"></i><span>Relatórios</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
-                <ul id="relatorios-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="#relatorios" class="nav-link" id="relatorios-tab" data-bs-toggle="tab" role="tab"
-                            aria-controls="relatorios" aria-selected="false">
-                            <i class="bi bi-graph-up"></i><span>Visualizar Relatórios</span>
-                        </a>
-                    </li>
+                <ul id="relatorios-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li><a href="#relatorios" data-bs-toggle="tab"><i class="bi bi-graph-up"></i><span>Visualizar Relatórios</span></a></li>
                 </ul>
             </li>
             <li class="nav-item">
                 <a class="nav-link collapsed" data-bs-target="#graficos-nav" data-bs-toggle="collapse" href="#">
                     <i class="bi bi-bar-chart"></i><span>Gráficos</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
-                <ul id="graficos-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="#graficos" class="nav-link" id="graficos-tab" data-bs-toggle="tab" role="tab"
-                            aria-controls="graficos" aria-selected="false">
-                            <i class="bi bi-pie-chart"></i><span>Visualizar Gráficos</span>
-                        </a>
-                    </li>
+                <ul id="graficos-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li><a href="#graficos" data-bs-toggle="tab"><i class="bi bi-pie-chart"></i><span>Visualizar Gráficos</span></a></li>
                 </ul>
             </li>
         </ul>
-
     </aside><!-- End Sidebar-->
 
     <main id="main" class="main">
@@ -175,22 +112,19 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="tab-content" id="adminTabContent">
-                        <div class="tab-pane fade show active" id="usuarios" role="tabpanel"
-                            aria-labelledby="usuarios-tab">
+                        <div class="tab-pane fade show active" id="usuarios" role="tabpanel" aria-labelledby="usuarios-tab">
                             <div class="card">
                                 <div class="card-body">
                                     <h5 class="card-title">Usuários por Localização</h5>
                                     <div class="row mb-3">
                                         <div class="col-md-4">
-                                            <select class="form-control" id="estadoSelect"
-                                                onchange="carregarMunicipios(this.value)">
+                                            <select class="form-control" id="estadoSelect" onchange="carregarMunicipios(this.value)">
                                                 <option>Selecione um Estado</option>
                                                 <!-- Estados carregados dinamicamente -->
                                             </select>
                                         </div>
                                         <div class="col-md-4">
-                                            <select class="form-control" id="municipioSelect"
-                                                onchange="filtrarUsuariosPorMunicipio(this.value)">
+                                            <select class="form-control" id="municipioSelect" onchange="filtrarUsuariosPorMunicipio(this.value)">
                                                 <option>Selecione um Município</option>
                                                 <!-- Municípios carregados dinamicamente -->
                                             </select>
@@ -222,12 +156,10 @@
                                     <form id="zonaForm">
                                         <div class="form-group">
                                             <label for="nomeBairro">Nome do Bairro:</label>
-                                            <input type="text" class="form-control" id="nomeBairro"
-                                                placeholder="Digite o nome do bairro" required>
+                                            <input type="text" class="form-control" id="nomeBairro" placeholder="Digite o nome do bairro" required>
                                         </div>
                                     </form>
-                                    <button type="button" class="btn btn-primary mt-3"
-                                        id="cadastrarBtn">Cadastrar</button>
+                                    <button type="button" class="btn btn-primary mt-3" id="cadastrarBtn">Cadastrar</button>
                                     <h5 class="card-title mt-4">Gerenciar Zoneamentos</h5>
                                     <div class="table-responsive">
                                         <table class="table table-bordered">
@@ -246,8 +178,7 @@
                                 </div>
                             </div>
                             <!-- Modal para Editar Bairro -->
-                            <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel"
-                                aria-hidden="true">
+                            <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <div class="modal-header">
@@ -260,16 +191,13 @@
                                             <form id="editBairroForm">
                                                 <div class="form-group">
                                                     <label for="editNomeBairro">Nome do Bairro:</label>
-                                                    <input type="text" class="form-control" id="editNomeBairro"
-                                                        required>
+                                                    <input type="text" class="form-control" id="editNomeBairro" required>
                                                 </div>
                                             </form>
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary"
-                                                data-dismiss="modal">Cancelar</button>
-                                            <button type="button" class="btn btn-primary"
-                                                id="salvarEdicaoBtn">Salvar</button>
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                            <button type="button" class="btn btn-primary" id="salvarEdicaoBtn">Salvar</button>
                                         </div>
                                     </div>
                                 </div>
@@ -305,8 +233,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="copyright">
-                                &copy; Direitos Autorais <strong><span>PyDenExpress</span></strong>. Todos os Direitos
-                                Reservados
+                                &copy; Direitos Autorais <strong><span>PyDenExpress</span></strong>. Todos os Direitos Reservados
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -318,8 +245,7 @@
                 </div>
     </footer><!-- Fim do Rodapé -->
 
-    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-            class="bi bi-arrow-up-short"></i></a>
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
     <!-- Vendor JS Files -->
     <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -330,7 +256,219 @@
     <!-- Template Main JS File -->
     <script src="/js/users-profile.js"></script>
     <script src="/js/main.js"></script>
-    <script src="/js/admin.js"></script>
-</body>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            carregarUsuarios();
+            carregarBairros();
+            carregarEstados();
+        });
 
+        function carregarUsuarios() {
+            fetch('/api/usuarios-pendentes')
+                .then(response => response.json())
+                .then(users => {
+                    const tableBody = document.getElementById('userTableBody');
+                    tableBody.innerHTML = ''; // Clear table before reloading
+                    users.forEach(user => {
+                        const row = `<tr>
+                            <td>${user.id}</td>
+                            <td>${user.nome}</td>
+                            <td>${user.email}</td>
+                            <td>${user.init ? 'Ativo' : 'Pendente'}</td>
+                            <td>
+                                <select class="form-control" onchange="alterarCargo(${user.id}, this.value)">
+                                    <option value="">Selecionar Cargo</option>
+                                    <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                                    <option value="gestor" ${user.role === 'gestor' ? 'selected' : ''}>Gestor</option>
+                                    <option value="agente" ${user.role === 'agente' ? 'selected' : ''}>Agente</option>
+                                    <option value="fornecedor" ${user.role === 'fornecedor' ? 'selected' : ''}>Fornecedor</option>
+                                    <option value="motorista" ${user.role === 'motorista' ? 'selected' : ''}>Motorista</option>
+                                    <option value="monitor" ${user.role === 'monitor' ? 'selected' : ''}>Monitor</option>
+                                    <option value="visitante" ${user.role === 'visitante' ? 'selected' : ''}>Visitante</option>
+                                </select>
+                            </td>
+                            <td>
+                                ${!user.init ? `<button class="btn btn-success btn-sm" onclick="alterarStatus(${user.id}, true)">Aprovar</button>` : `<button class="btn btn-warning btn-sm" onclick="alterarStatus(${user.id}, false)">Rejeitar</button>`}
+                                <button class="btn btn-danger btn-sm" onclick="excluirUsuario(${user.id})">Excluir</button>
+                            </td>
+                        </tr>`;
+                        tableBody.innerHTML += row;
+                    });
+                })
+                .catch(error => console.error('Erro ao buscar usuários:', error));
+        }
+
+        function alterarStatus(userId, status) {
+            fetch(`/api/usuarios/${userId}/status`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ init: status })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert(data.message);
+                    location.reload(); // Recarrega a página para atualizar os dados da tabela
+                })
+                .catch(error => {
+                    console.error('Erro ao alterar status do usuário:', error);
+                    alert('Erro ao processar a solicitação.');
+                });
+        }
+
+        function excluirUsuario(userId) {
+            if (confirm("Tem certeza que deseja excluir este usuário?")) {
+                fetch(`/api/usuarios/${userId}`, { method: 'DELETE' })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        alert(data.message);
+                        location.reload(); // Recarrega a página para atualizar os dados da tabela
+                    })
+                    .catch(error => {
+                        console.error('Erro ao excluir usuário:', error);
+                        alert('Erro ao processar a solicitação.');
+                    });
+            }
+        }
+
+        function alterarCargo(userId, novoCargo) {
+            fetch(`/api/usuarios/${userId}/cargo`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ role: novoCargo })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    if (data.success) {
+                        location.reload(); // Recarrega para atualizar os dados da tabela
+                    }
+                })
+                .catch(error => console.error('Erro ao alterar o cargo do usuário:', error));
+        }
+
+        function carregarEstados() {
+            fetch('/estados')
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById('estadoSelect');
+                    select.innerHTML = '<option>Selecione um Estado</option>';
+                    data.forEach(estado => {
+                        const option = document.createElement('option');
+                        option.value = estado.codigo_uf;
+                        option.textContent = estado.nome;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Erro ao buscar estados:', error));
+        }
+
+        function carregarMunicipios(codigoEstado) {
+            fetch(`/municipios/${codigoEstado}`)
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById('municipioSelect');
+                    select.innerHTML = '<option>Selecione um Município</option>';
+                    data.forEach(municipio => {
+                        const option = document.createElement('option');
+                        option.value = municipio.codigo_ibge;
+                        option.textContent = municipio.nome;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Erro ao buscar municípios:', error));
+        }
+
+        function filtrarUsuariosPorMunicipio(codigoMunicipio) {
+            fetch(`/usuarios/${codigoMunicipio}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('userTableBody');
+                    tbody.innerHTML = '';
+                    data.forEach(usuario => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${usuario.id}</td>
+                            <td>${usuario.nome}</td>
+                            <td>${usuario.email}</td>
+                            <td>${usuario.status}</td>
+                            <td>${usuario.cargo}</td>
+                            <td><button class="btn btn-primary btn-sm">Ações</button></td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Erro ao buscar usuários:', error));
+        }
+
+        function carregarBairros() {
+            fetch('/api/bairros')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('bairrosTableBody');
+                    tableBody.innerHTML = '';
+                    data.forEach(bairro => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${bairro.id}</td>
+                            <td>${bairro.nome}</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm" onclick="editarBairro(${bairro.id}, '${bairro.nome}')">Editar</button>
+                                <button class="btn btn-danger btn-sm" onclick="excluirBairro(${bairro.id})">Excluir</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar bairros:', error));
+        }
+
+        function editarBairro(id, nome) {
+            $('#editModal').modal('show');
+            document.getElementById('editNomeBairro').value = nome;
+            document.getElementById('salvarEdicaoBtn').onclick = () => {
+                const novoNome = document.getElementById('editNomeBairro').value;
+                fetch(`/api/editar-bairro/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nomeBairro: novoNome })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert('Bairro editado com sucesso!');
+                        $('#editModal').modal('hide');
+                        carregarBairros();
+                    })
+                    .catch(error => console.error('Erro ao editar bairro:', error));
+            };
+        }
+
+        function excluirBairro(id) {
+            if (confirm('Tem certeza que deseja excluir este bairro?')) {
+                fetch(`/api/excluir-bairro/${id}`, {
+                    method: 'DELETE'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert('Bairro excluído com sucesso!');
+                        carregarBairros();
+                    })
+                    .catch(error => console.error('Erro ao excluir bairro:', error));
+            }
+        }
+    </script>
+</body>
 </html>
