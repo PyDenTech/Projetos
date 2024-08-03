@@ -6,9 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard de Administração</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap4.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap4.min.js"></script>
     <link rel="stylesheet" href="/css/admin-dashboard.css">
 </head>
 
@@ -97,7 +100,7 @@
                                     <div class="card-body">
                                         <h5 class="card-title">Gerenciar Zoneamentos</h5>
                                         <div class="table-responsive">
-                                            <table class="table table-bordered">
+                                            <table id="bairrosTable" class="table table-bordered">
                                                 <thead>
                                                     <tr>
                                                         <th>ID</th>
@@ -155,6 +158,43 @@
         </div>
     </main>
     <script src="/js/admin.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#bairrosTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.11.3/i18n/Portuguese-Brasil.json"
+                },
+                "pageLength": 10,
+                "lengthMenu": [10, 25, 50, 100]
+            });
+        });
+
+        // Função para carregar bairros
+        function carregarBairros() {
+            fetch('/api/bairros')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('bairrosTableBody');
+                    tableBody.innerHTML = '';
+                    data.forEach(bairro => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${bairro.id}</td>
+                            <td>${bairro.nome}</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm" onclick="editarBairro(${bairro.id}, '${bairro.nome}')">Editar</button>
+                                <button class="btn btn-danger btn-sm" onclick="excluirBairro(${bairro.id})">Excluir</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar bairros:', error));
+        }
+
+        // Carregar bairros ao carregar a página
+        document.addEventListener('DOMContentLoaded', carregarBairros);
+    </script>
 </body>
 
 </html>
