@@ -169,9 +169,6 @@ app.get('/redefinir-senha/:token', (req, res) => {
 app.get('/dashboard-adm', ensureLoggedIn, (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'pages', 'dashboard-adm.html'));
 });
-app.get('/cadastrar-bairros-form', ensureLoggedIn, (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'pages', 'cadastrar-bairros-form.html'));
-});
 
 app.get('/solicitar-redefinir-senha', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'solicitar-redefinir-senha.html'));
