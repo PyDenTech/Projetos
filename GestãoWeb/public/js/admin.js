@@ -1,19 +1,15 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Adicionar eventos aos selects
+    carregarUsuarios();
+    carregarEstados();
+    carregarBairros();
+
+    document.getElementById('cadastrarBtn').addEventListener('click', cadastrarBairro);
     document.getElementById('estadoSelect').addEventListener('change', function () {
         carregarMunicipios(this.value);
     });
-
     document.getElementById('municipioSelect').addEventListener('change', function () {
         filtrarUsuariosPorMunicipio(this.value);
     });
-
-    document.getElementById('cadastrarBtn').addEventListener('click', cadastrarBairro);
-
-    // Carregar dados iniciais
-    carregarEstados();
-    carregarUsuarios();
-    carregarBairros();
 });
 
 function carregarUsuarios() {
@@ -24,27 +20,27 @@ function carregarUsuarios() {
             tableBody.innerHTML = ''; // Clear table before reloading
             users.forEach(user => {
                 const row = `<tr>
-                    <td>${user.id}</td>
-                    <td>${user.nome}</td>
-                    <td>${user.email}</td>
-                    <td>${user.init ? 'Ativo' : 'Pendente'}</td>
-                    <td>
-                        <select class="form-control" onchange="alterarCargo(${user.id}, this.value)">
-                            <option value="">Selecionar Cargo</option>
-                            <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
-                            <option value="gestor" ${user.role === 'gestor' ? 'selected' : ''}>Gestor</option>
-                            <option value="agente" ${user.role === 'agente' ? 'selected' : ''}>Agente</option>
-                            <option value="fornecedor" ${user.role === 'fornecedor' ? 'selected' : ''}>Fornecedor</option>
-                            <option value="motorista" ${user.role === 'motorista' ? 'selected' : ''}>Motorista</option>
-                            <option value="monitor" ${user.role === 'monitor' ? 'selected' : ''}>Monitor</option>
-                            <option value="visitante" ${user.role === 'visitante' ? 'selected' : ''}>Visitante</option>
-                        </select>
-                    </td>
-                    <td>
-                        ${!user.init ? `<button class="btn btn-success btn-sm" onclick="alterarStatus(${user.id}, true)">Aprovar</button>` : `<button class="btn btn-warning btn-sm" onclick="alterarStatus(${user.id}, false)">Rejeitar</button>`}
-                        <button class="btn btn-danger btn-sm" onclick="excluirUsuario(${user.id})">Excluir</button>
-                    </td>
-                </tr>`;
+                <td>${user.id}</td>
+                <td>${user.nome}</td>
+                <td>${user.email}</td>
+                <td>${user.init ? 'Ativo' : 'Pendente'}</td>
+                <td>
+                    <select class="form-control" onchange="alterarCargo(${user.id}, this.value)">
+                        <option value="">Selecionar Cargo</option>
+                        <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                        <option value="gestor" ${user.role === 'gestor' ? 'selected' : ''}>Gestor</option>
+                        <option value="agente" ${user.role === 'agente' ? 'selected' : ''}>Agente</option>
+                        <option value="fornecedor" ${user.role === 'fornecedor' ? 'selected' : ''}>Fornecedor</option>
+                        <option value="motorista" ${user.role === 'motorista' ? 'selected' : ''}>Motorista</option>
+                        <option value="monitor" ${user.role === 'monitor' ? 'selected' : ''}>Monitor</option>
+                        <option value="visitante" ${user.role === 'visitante' ? 'selected' : ''}>Visitante</option>
+                    </select>
+                </td>
+                <td>
+                    ${!user.init ? `<button class="btn btn-success btn-sm" onclick="alterarStatus(${user.id}, true)">Aprovar</button>` : `<button class="btn btn-warning btn-sm" onclick="alterarStatus(${user.id}, false)">Rejeitar</button>`}
+                    <button class="btn btn-danger btn-sm" onclick="excluirUsuario(${user.id})">Excluir</button>
+                </td>
+            </tr>`;
                 tableBody.innerHTML += row;
             });
         })
@@ -167,29 +163,30 @@ function filtrarUsuariosPorMunicipio(codigoMunicipio) {
         .catch(error => console.error('Erro ao buscar usuários:', error));
 }
 
-async function cadastrarBairro() {
+function cadastrarBairro() {
     const nomeBairro = document.getElementById('nomeBairro').value;
 
-    try {
-        const response = await fetch('/api/cadastrar-bairro', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ nomeBairro }),
+    fetch('/api/cadastrar-bairro', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ nomeBairro }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Bairro cadastrado com sucesso!');
+                document.getElementById('zonaForm').reset();
+                carregarBairros();
+            } else {
+                alert(`Erro ao cadastrar bairro: ${data.error}`);
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao cadastrar bairro:', error);
+            alert('Erro ao cadastrar bairro. Tente novamente mais tarde.');
         });
-
-        if (response.ok) {
-            alert('Bairro cadastrado com sucesso!');
-            document.getElementById('zonaForm').reset();
-        } else {
-            const errorData = await response.json();
-            alert(`Erro ao cadastrar bairro: ${errorData.error}`);
-        }
-    } catch (error) {
-        console.error('Erro ao enviar dados:', error);
-        alert('Erro ao cadastrar bairro. Tente novamente mais tarde.');
-    }
 }
 
 function carregarBairros() {
@@ -236,9 +233,7 @@ function editarBairro(id, nome) {
 
 function excluirBairro(id) {
     if (confirm('Tem certeza que deseja excluir este bairro?')) {
-        fetch(`/api/excluir-bairro/${id}`, {
-            method: 'DELETE'
-        })
+        fetch(`/api/excluir-bairro/${id}`, { method: 'DELETE' })
             .then(response => response.json())
             .then(data => {
                 alert('Bairro excluído com sucesso!');

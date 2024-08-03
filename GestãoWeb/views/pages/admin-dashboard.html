@@ -104,16 +104,10 @@
         <ul class="sidebar-nav" id="sidebar-nav">
             <li class="nav-heading">Administração</li>
             <li class="nav-item">
-                <a class="nav-link" href="/dashboard-adm">
-                    <i class="bi bi-speedometer"></i>
-                    <span>Painel de Controle</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#usuarios-nav" data-bs-toggle="collapse" href="#">
+                <a class="nav-link" data-bs-target="#usuarios-nav" data-bs-toggle="collapse" href="#">
                     <i class="bi bi-person"></i><span>Usuários</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
-                <ul id="usuarios-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                <ul id="usuarios-nav" class="nav-content collapse show" data-bs-parent="#sidebar-nav">
                     <li>
                         <a href="#usuarios" class="nav-link active" id="usuarios-tab" data-bs-toggle="tab" role="tab"
                             aria-controls="usuarios" aria-selected="true">
@@ -126,11 +120,11 @@
                 <a class="nav-link collapsed" data-bs-target="#cadastros-nav" data-bs-toggle="collapse" href="#">
                     <i class="bi bi-pencil-square"></i><span>Cadastros</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
-                <ul id="cadastros-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                <ul id="cadastros-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
                     <li>
-                        <a href="#cadastros" class="nav-link" id="cadastros-tab" data-bs-toggle="tab" role="tab"
+                        <a href="#cadastros" class="nav-link" id="bairros-tab" data-bs-toggle="tab" role="tab"
                             aria-controls="cadastros" aria-selected="false">
-                            <i class="bi bi-folder-plus"></i><span>Gerenciar Cadastros</span>
+                            <i class="bi bi-folder-plus"></i><span>Bairros</span>
                         </a>
                     </li>
                 </ul>
@@ -140,7 +134,7 @@
                     <i class="bi bi-clipboard-data"></i><span>Relatórios</span><i
                         class="bi bi-chevron-down ms-auto"></i>
                 </a>
-                <ul id="relatorios-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                <ul id="relatorios-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
                     <li>
                         <a href="#relatorios" class="nav-link" id="relatorios-tab" data-bs-toggle="tab" role="tab"
                             aria-controls="relatorios" aria-selected="false">
@@ -153,7 +147,7 @@
                 <a class="nav-link collapsed" data-bs-target="#graficos-nav" data-bs-toggle="collapse" href="#">
                     <i class="bi bi-bar-chart"></i><span>Gráficos</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
-                <ul id="graficos-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                <ul id="graficos-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
                     <li>
                         <a href="#graficos" class="nav-link" id="graficos-tab" data-bs-toggle="tab" role="tab"
                             aria-controls="graficos" aria-selected="false">
@@ -221,7 +215,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="tab-pane fade" id="cadastros" role="tabpanel" aria-labelledby="cadastros-tab">
+                        <div class="tab-pane fade" id="cadastros" role="tabpanel" aria-labelledby="bairros-tab">
                             <div class="card">
                                 <div class="card-body">
                                     <h5 class="card-title">Cadastro de Zonas</h5>
