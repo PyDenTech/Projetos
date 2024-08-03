@@ -75,6 +75,31 @@ function ensureLoggedIn(req, res, next) {
     }
 }
 
+function ensureRole(roles) {
+    return function (req, res, next) {
+        if (req.session.user && roles.includes(req.session.user.role)) {
+            next();
+        } else {
+            res.send(`
+                <!DOCTYPE html>
+                <html lang="pt-br">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Redirecionando...</title>
+                </head>
+                <body>
+                    <script>
+                        alert('Você não tem permissão para acessar esta página.');
+                        window.location.href = '/dashboard-escolar';
+                    </script>
+                </body>
+                </html>
+            `);
+        }
+    }
+}
+
 async function emailExiste(email) {
     const query = 'SELECT COUNT(*) FROM usuarios WHERE email = $1';
     try {
@@ -202,21 +227,20 @@ async function sendMail(to, subject, text) {
     }
 }
 
+
+
 const pages = [
     'cadastrar-aluno-form',
     'admin-dashboard',
     'importar-aluno-form',
     'gerenciar-alunos-view',
     'cadastrar-escolas-form',
-    'cadastrar-pontos',
     'gerenciar-escolas-view',
     'vizualizar-escolas-map',
     'cadastrar-fornecedores-form',
     'cadastrar-rotas-form',
     'desenhar-rotas-map',
     'visualizar-rotas',
-    'cadastrar-zona-form',
-    'gerenciar-zona-view',
     'check-list-view',
     'cadastrar-demandas',
     'gerenciar-motorista-carro-form',
@@ -232,8 +256,36 @@ const pages = [
     'cadastrar-motorista-carro-form'
 ];
 
+const pageRoles = {
+    'cadastrar-aluno-form': ['admin', 'gestor'],
+    'admin-dashboard': ['admin'],
+    'importar-aluno-form': ['admin', 'gestor', 'agente'],
+    'gerenciar-alunos-view': ['admin', 'gestor', 'agente'],
+    'cadastrar-escolas-form': ['admin', 'gestor', 'agente'],
+    'gerenciar-escolas-view': ['admin', 'gestor'],
+    'vizualizar-escolas-map': ['admin', 'gestor', 'agente'],
+    'cadastrar-fornecedores-form': ['admin', 'gestor', 'agente'],
+    'cadastrar-rotas-form': ['admin', 'gestor', 'agente'],
+    'desenhar-rotas-map': ['admin', 'gestor'],
+    'visualizar-rotas': ['admin', 'gestor', 'agente'],
+    'check-list-view': ['admin', 'gestor', 'agente'],
+    'cadastrar-demandas': ['admin', 'gestor', 'agente'],
+    'gerenciar-motorista-carro-form': ['admin', 'gestor', 'agente'],
+    'faq': ['admin', 'gestor', 'agente', 'fornecedor', 'motorista', 'monitor', 'visitante'],
+    'users-profile': ['admin', 'gestor', 'agente', 'fornecedor', 'motorista', 'monitor'],
+    'gerenciar-motoristas-view': ['admin', 'gestor', 'agente'],
+    'cadastrar-abastecimento-view': ['admin', 'gestor', 'agente'],
+    'gerenciar-abastecimento-view': ['admin', 'gestor', 'agente'],
+    'cadastrar-monitores-form': ['admin', 'gestor', 'fornecedor'],
+    'gerenciar-monitores-view': ['admin', 'gestor'],
+    'gerenciar-fornecedores-view': ['admin', 'gestor'],
+    'cadastrar-motorista-form': ['admin', 'gestor', 'fornecedor'],
+    'cadastrar-motorista-carro-form': ['admin', 'gestor', 'agente']
+};
+
 pages.forEach(page => {
-    app.get(`/${page}`, ensureLoggedIn, (req, res) => {
+    const roles = pageRoles[page] || ['visitante'];
+    app.get(`/${page}`, ensureLoggedIn, ensureRole(roles), (req, res) => {
         res.sendFile(path.join(__dirname, 'views', 'pages', `${page}.html`));
     });
 });
@@ -472,7 +524,7 @@ app.post('/api/loginWeb', async (req, res) => {
             id: user.id,
             nome: user.nome,
             email: user.email,
-            role: 'web'
+            role: user.role
         };
 
         res.json({ message: "Login successful", redirectUrl: '/dashboard-escolar' });
@@ -2602,7 +2654,6 @@ app.post('/api/loginMotoristasAdministrativos', async (req, res) => {
         res.status(500).send('Erro ao processar o login');
     }
 });
-
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
