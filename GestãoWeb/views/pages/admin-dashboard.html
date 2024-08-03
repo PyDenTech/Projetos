@@ -6,15 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard de Administração</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <link href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="/css/admin-dashboard.css">
-
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
-    <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap4.min.js"></script>
+    <link rel="stylesheet" href="/css/admin-dashboard.css">
 </head>
 
 <body>
@@ -23,21 +21,56 @@
             <h2>Dashboard de Administração</h2>
             <ul class="nav nav-tabs" id="adminTab" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link active" id="usuarios-tab" data-toggle="tab" href="#usuarios" role="tab" aria-controls="usuarios" aria-selected="true">Usuários</a>
+                    <a class="nav-link active" id="usuarios-tab" data-toggle="tab" href="#usuarios" role="tab"
+                        aria-controls="usuarios" aria-selected="true">Usuários</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="cadastros-tab" data-toggle="tab" href="#cadastros" role="tab" aria-controls="cadastros" aria-selected="false">Cadastros</a>
+                    <a class="nav-link" id="cadastros-tab" data-toggle="tab" href="#cadastros" role="tab"
+                        aria-controls="cadastros" aria-selected="false">Cadastros</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="relatorios-tab" data-toggle="tab" href="#relatorios" role="tab" aria-controls="relatorios" aria-selected="false">Relatórios</a>
+                    <a class="nav-link" id="relatorios-tab" data-toggle="tab" href="#relatorios" role="tab"
+                        aria-controls="relatorios" aria-selected="false">Relatórios</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" id="graficos-tab" data-toggle="tab" href="#graficos" role="tab" aria-controls="graficos" aria-selected="false">Gráficos</a>
+                    <a class="nav-link" id="graficos-tab" data-toggle="tab" href="#graficos" role="tab"
+                        aria-controls="graficos" aria-selected="false">Gráficos</a>
                 </li>
             </ul>
             <div class="tab-content" id="adminTabContent">
                 <div class="tab-pane fade show active" id="usuarios" role="tabpanel" aria-labelledby="usuarios-tab">
-                    <!-- Conteúdo da aba de Usuários -->
+                    <h3>Usuários por Localização</h3>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <select class="form-control" id="estadoSelect" onchange="carregarMunicipios(this.value)">
+                                <option>Selecione um Estado</option>
+                                <!-- Estados carregados dinamicamente -->
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-control" id="municipioSelect"
+                                onchange="filtrarUsuariosPorMunicipio(this.value)">
+                                <option>Selecione um Município</option>
+                                <!-- Municípios carregados dinamicamente -->
+                            </select>
+                        </div>
+                    </div>
+                    <h3>Usuários que Solicitaram Cadastro</h3>
+                    <table class="table table-striped">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Cargo</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody">
+                            <!-- Os usuários serão carregados aqui via JavaScript -->
+                        </tbody>
+                    </table>
                 </div>
                 <div class="tab-pane fade" id="cadastros" role="tabpanel" aria-labelledby="cadastros-tab">
                     <h3>Cadastros</h3>
@@ -50,7 +83,8 @@
                                         <form id="zonaForm">
                                             <div class="form-group">
                                                 <label for="nomeBairro">Nome do Bairro:</label>
-                                                <input type="text" class="form-control" id="nomeBairro" placeholder="Digite o nome do bairro" required>
+                                                <input type="text" class="form-control" id="nomeBairro"
+                                                    placeholder="Digite o nome do bairro" required>
                                             </div>
                                         </form>
                                     </div>
@@ -66,7 +100,7 @@
                                     <div class="card-body">
                                         <h5 class="card-title">Gerenciar Zoneamentos</h5>
                                         <div class="table-responsive">
-                                            <table class="table table-bordered" id="bairrosTable">
+                                            <table id="bairrosTable" class="table table-bordered">
                                                 <thead>
                                                     <tr>
                                                         <th>ID</th>
@@ -85,7 +119,8 @@
                         </div>
                     </section>
                     <!-- Modal para Editar Bairro -->
-                    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+                    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel"
+                        aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -103,7 +138,8 @@
                                     </form>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                    <button type="button" class="btn btn-secondary"
+                                        data-dismiss="modal">Cancelar</button>
                                     <button type="button" class="btn btn-primary" id="salvarEdicaoBtn">Salvar</button>
                                 </div>
                             </div>
@@ -122,6 +158,43 @@
         </div>
     </main>
     <script src="/js/admin.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#bairrosTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.11.3/i18n/Portuguese-Brasil.json"
+                },
+                "pageLength": 10,
+                "lengthMenu": [10, 25, 50, 100]
+            });
+        });
+
+        // Função para carregar bairros
+        function carregarBairros() {
+            fetch('/api/bairros')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('bairrosTableBody');
+                    tableBody.innerHTML = '';
+                    data.forEach(bairro => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${bairro.id}</td>
+                            <td>${bairro.nome}</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm" onclick="editarBairro(${bairro.id}, '${bairro.nome}')">Editar</button>
+                                <button class="btn btn-danger btn-sm" onclick="excluirBairro(${bairro.id})">Excluir</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar bairros:', error));
+        }
+
+        // Carregar bairros ao carregar a página
+        document.addEventListener('DOMContentLoaded', carregarBairros);
+    </script>
 </body>
 
 </html>
