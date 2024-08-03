@@ -1,5 +1,19 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // Adicionar eventos aos selects
+    document.getElementById('estadoSelect').addEventListener('change', function () {
+        carregarMunicipios(this.value);
+    });
+
+    document.getElementById('municipioSelect').addEventListener('change', function () {
+        filtrarUsuariosPorMunicipio(this.value);
+    });
+
+    document.getElementById('cadastrarBtn').addEventListener('click', cadastrarBairro);
+
+    // Carregar dados iniciais
+    carregarEstados();
     carregarUsuarios();
+    carregarBairros();
 });
 
 function carregarUsuarios() {
@@ -10,27 +24,27 @@ function carregarUsuarios() {
             tableBody.innerHTML = ''; // Clear table before reloading
             users.forEach(user => {
                 const row = `<tr>
-                <td>${user.id}</td>
-                <td>${user.nome}</td>
-                <td>${user.email}</td>
-                <td>${user.init ? 'Ativo' : 'Pendente'}</td>
-                <td>
-                    <select class="form-control" onchange="alterarCargo(${user.id}, this.value)">
-                        <option value="">Selecionar Cargo</option>
-                        <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
-                        <option value="gestor" ${user.role === 'gestor' ? 'selected' : ''}>Gestor</option>
-                        <option value="agente" ${user.role === 'agente' ? 'selected' : ''}>Agente</option>
-                        <option value="fornecedor" ${user.role === 'fornecedor' ? 'selected' : ''}>Fornecedor</option>
-                        <option value="motorista" ${user.role === 'motorista' ? 'selected' : ''}>Motorista</option>
-                        <option value="monitor" ${user.role === 'monitor' ? 'selected' : ''}>Monitor</option>
-                        <option value="visitante" ${user.role === 'visitante' ? 'selected' : ''}>Visitante</option>
-                    </select>
-                </td>
-                <td>
-                    ${!user.init ? `<button class="btn btn-success btn-sm" onclick="alterarStatus(${user.id}, true)">Aprovar</button>` : `<button class="btn btn-warning btn-sm" onclick="alterarStatus(${user.id}, false)">Rejeitar</button>`}
-                    <button class="btn btn-danger btn-sm" onclick="excluirUsuario(${user.id})">Excluir</button>
-                </td>
-            </tr>`;
+                    <td>${user.id}</td>
+                    <td>${user.nome}</td>
+                    <td>${user.email}</td>
+                    <td>${user.init ? 'Ativo' : 'Pendente'}</td>
+                    <td>
+                        <select class="form-control" onchange="alterarCargo(${user.id}, this.value)">
+                            <option value="">Selecionar Cargo</option>
+                            <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                            <option value="gestor" ${user.role === 'gestor' ? 'selected' : ''}>Gestor</option>
+                            <option value="agente" ${user.role === 'agente' ? 'selected' : ''}>Agente</option>
+                            <option value="fornecedor" ${user.role === 'fornecedor' ? 'selected' : ''}>Fornecedor</option>
+                            <option value="motorista" ${user.role === 'motorista' ? 'selected' : ''}>Motorista</option>
+                            <option value="monitor" ${user.role === 'monitor' ? 'selected' : ''}>Monitor</option>
+                            <option value="visitante" ${user.role === 'visitante' ? 'selected' : ''}>Visitante</option>
+                        </select>
+                    </td>
+                    <td>
+                        ${!user.init ? `<button class="btn btn-success btn-sm" onclick="alterarStatus(${user.id}, true)">Aprovar</button>` : `<button class="btn btn-warning btn-sm" onclick="alterarStatus(${user.id}, false)">Rejeitar</button>`}
+                        <button class="btn btn-danger btn-sm" onclick="excluirUsuario(${user.id})">Excluir</button>
+                    </td>
+                </tr>`;
                 tableBody.innerHTML += row;
             });
         })
@@ -99,10 +113,6 @@ function alterarCargo(userId, novoCargo) {
         .catch(error => console.error('Erro ao alterar o cargo do usuário:', error));
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-    carregarEstados();
-});
-
 function carregarEstados() {
     fetch('/estados')
         .then(response => response.json())
@@ -119,7 +129,6 @@ function carregarEstados() {
         .catch(error => console.error('Erro ao buscar estados:', error));
 }
 
-// Função para carregar municípios baseado no estado selecionado
 function carregarMunicipios(codigoEstado) {
     fetch(`/municipios/${codigoEstado}`)
         .then(response => response.json())
@@ -136,7 +145,6 @@ function carregarMunicipios(codigoEstado) {
         .catch(error => console.error('Erro ao buscar municípios:', error));
 }
 
-// Função para filtrar usuários por município
 function filtrarUsuariosPorMunicipio(codigoMunicipio) {
     fetch(`/usuarios/${codigoMunicipio}`)
         .then(response => response.json())
@@ -159,19 +167,7 @@ function filtrarUsuariosPorMunicipio(codigoMunicipio) {
         .catch(error => console.error('Erro ao buscar usuários:', error));
 }
 
-// Carregar os estados ao carregar a página
-carregarEstados();
-
-// Adicionar eventos aos selects
-document.getElementById('estadoSelect').addEventListener('change', function () {
-    carregarMunicipios(this.value);
-});
-
-document.getElementById('municipioSelect').addEventListener('change', function () {
-    filtrarUsuariosPorMunicipio(this.value);
-});
-
-document.getElementById('cadastrarBtn').addEventListener('click', async () => {
+async function cadastrarBairro() {
     const nomeBairro = document.getElementById('nomeBairro').value;
 
     try {
@@ -194,7 +190,7 @@ document.getElementById('cadastrarBtn').addEventListener('click', async () => {
         console.error('Erro ao enviar dados:', error);
         alert('Erro ao cadastrar bairro. Tente novamente mais tarde.');
     }
-});
+}
 
 function carregarBairros() {
     fetch('/api/bairros')
@@ -218,7 +214,6 @@ function carregarBairros() {
         .catch(error => console.error('Erro ao carregar bairros:', error));
 }
 
-// Editar bairro
 function editarBairro(id, nome) {
     $('#editModal').modal('show');
     document.getElementById('editNomeBairro').value = nome;
@@ -239,7 +234,6 @@ function editarBairro(id, nome) {
     };
 }
 
-// Excluir bairro
 function excluirBairro(id) {
     if (confirm('Tem certeza que deseja excluir este bairro?')) {
         fetch(`/api/excluir-bairro/${id}`, {
@@ -253,6 +247,3 @@ function excluirBairro(id) {
             .catch(error => console.error('Erro ao excluir bairro:', error));
     }
 }
-
-// Carregar bairros ao carregar a página
-document.addEventListener('DOMContentLoaded', carregarBairros);
