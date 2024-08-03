@@ -253,7 +253,8 @@ const pages = [
     'gerenciar-monitores-view',
     'gerenciar-fornecedores-view',
     'cadastrar-motorista-form',
-    'cadastrar-motorista-carro-form'
+    'cadastrar-motorista-carro-form',
+    'cadastrar-bairros-form'
 ];
 
 const pageRoles = {
