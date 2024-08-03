@@ -100,6 +100,23 @@
                     <span>Usuários</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#cadastros" id="cadastros-tab" data-bs-toggle="collapse"
+                    aria-expanded="false">
+                    <i class="bi bi-pencil-square"></i>
+                    <span>Cadastros</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="cadastros-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a href="#bairros" id="bairros-tab" data-bs-toggle="tab" role="tab" aria-controls="bairros"
+                            aria-selected="false">
+                            <i class="bi bi-building"></i>
+                            <span>Bairros</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
         </ul>
     </aside><!-- End Sidebar-->
 
@@ -138,6 +155,66 @@
                                             <!-- Os usuários serão carregados aqui via JavaScript -->
                                         </tbody>
                                     </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="bairros" role="tabpanel" aria-labelledby="bairros-tab">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Cadastro de Zonas</h5>
+                                    <form id="zonaForm">
+                                        <div class="form-group">
+                                            <label for="nomeBairro">Nome do Bairro:</label>
+                                            <input type="text" class="form-control" id="nomeBairro"
+                                                placeholder="Digite o nome do bairro" required>
+                                        </div>
+                                    </form>
+                                    <button type="button" class="btn btn-primary mt-3"
+                                        id="cadastrarBtn">Cadastrar</button>
+                                    <h5 class="card-title mt-4">Gerenciar Zoneamentos</h5>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Bairro</th>
+                                                    <th>Ações</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="bairrosTableBody">
+                                                <!-- Conteúdo dinâmico -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Modal para Editar Bairro -->
+                            <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="editModalLabel">Editar Bairro</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form id="editBairroForm">
+                                                <div class="form-group">
+                                                    <label for="editNomeBairro">Nome do Bairro:</label>
+                                                    <input type="text" class="form-control" id="editNomeBairro"
+                                                        required>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-dismiss="modal">Cancelar</button>
+                                            <button type="button" class="btn btn-primary"
+                                                id="salvarEdicaoBtn">Salvar</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -180,6 +257,50 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             carregarUsuarios();
+            carregarBairros();
+
+            document.getElementById('cadastrarBtn').addEventListener('click', async () => {
+                const nomeBairro = document.getElementById('nomeBairro').value;
+
+                try {
+                    const response = await fetch('/api/cadastrar-bairro', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ nomeBairro }),
+                    });
+
+                    if (response.ok) {
+                        alert('Bairro cadastrado com sucesso!');
+                        document.getElementById('zonaForm').reset();
+                        carregarBairros();
+                    } else {
+                        const errorData = await response.json();
+                        alert(`Erro ao cadastrar bairro: ${errorData.error}`);
+                    }
+                } catch (error) {
+                    console.error('Erro ao enviar dados:', error);
+                    alert('Erro ao cadastrar bairro. Tente novamente mais tarde.');
+                }
+            });
+
+            document.getElementById('salvarEdicaoBtn').addEventListener('click', () => {
+                const id = document.getElementById('editModal').getAttribute('data-id');
+                const novoNome = document.getElementById('editNomeBairro').value;
+                fetch(`/api/editar-bairro/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nomeBairro: novoNome })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert('Bairro editado com sucesso!');
+                        $('#editModal').modal('hide');
+                        carregarBairros();
+                    })
+                    .catch(error => console.error('Erro ao editar bairro:', error));
+            });
         });
 
         function carregarUsuarios() {
@@ -277,6 +398,48 @@
                     }
                 })
                 .catch(error => console.error('Erro ao alterar o cargo do usuário:', error));
+        }
+
+        function carregarBairros() {
+            fetch('/api/bairros')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('bairrosTableBody');
+                    tableBody.innerHTML = '';
+                    data.forEach(bairro => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${bairro.id}</td>
+                            <td>${bairro.nome}</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm" onclick="editarBairro(${bairro.id}, '${bairro.nome}')">Editar</button>
+                                <button class="btn btn-danger btn-sm" onclick="excluirBairro(${bairro.id})">Excluir</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar bairros:', error));
+        }
+
+        function editarBairro(id, nome) {
+            $('#editModal').modal('show');
+            document.getElementById('editNomeBairro').value = nome;
+            document.getElementById('editModal').setAttribute('data-id', id);
+        }
+
+        function excluirBairro(id) {
+            if (confirm('Tem certeza que deseja excluir este bairro?')) {
+                fetch(`/api/excluir-bairro/${id}`, {
+                    method: 'DELETE'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert('Bairro excluído com sucesso!');
+                        carregarBairros();
+                    })
+                    .catch(error => console.error('Erro ao excluir bairro:', error));
+            }
         }
     </script>
 </body>
