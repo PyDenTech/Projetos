@@ -55,8 +55,62 @@
       background-color: #dc3545;
       color: white;
     }
-  </style>
 
+    /* Estilização das tabelas */
+    .table {
+      background-color: #fff;
+      border-collapse: separate;
+      border-spacing: 0;
+      width: 100%;
+      margin-bottom: 1rem;
+      color: #212529;
+    }
+
+    .table th,
+    .table td {
+      vertical-align: middle;
+      padding: 0.75rem;
+      border-top: 1px solid #dee2e6;
+    }
+
+    .table thead th {
+      vertical-align: bottom;
+      border-bottom: 2px solid #dee2e6;
+      background-color: #f8f9fa;
+    }
+
+    .table tbody tr:hover {
+      background-color: #f1f3f5;
+    }
+
+    .pagination-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .pagination {
+      margin-bottom: 0;
+    }
+
+    .page-item.active .page-link {
+      background-color: #007bff;
+      border-color: #007bff;
+    }
+
+    .page-link {
+      color: #007bff;
+    }
+
+    .page-link:hover {
+      color: #0056b3;
+    }
+
+    .page-link:focus {
+      box-shadow: none;
+    }
+  </style>
 
   <link href="/css/style.css" rel="stylesheet">
 
@@ -401,11 +455,11 @@
   <main id="main" class="main">
 
     <div class="pagetitle">
-      <h1>Controle Transprote Administrativo <i class="bi bi-car-front"></i></h1>
+      <h1>Controle Transporte Administrativo <i class="bi bi-car-front"></i></h1>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="/dashboard-escolar"><i class="bi bi-house"></i></a></li>
-          <li class="breadcrumb-item active">Controle Transprote Administrativo</li>
+          <li class="breadcrumb-item active">Controle Transporte Administrativo</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
