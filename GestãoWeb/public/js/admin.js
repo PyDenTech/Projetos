@@ -1,19 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
     carregarUsuarios();
-    carregarEstados();
-    carregarBairros();
-    $('#bairrosTable').DataTable({
-        "pageLength": 10,
-        "lengthMenu": [10, 25, 50, 100],
-        "order": [[0, "asc"]],
-        "columnDefs": [
-            { "orderable": true, "targets": [0, 1] }, // Habilitar ordenação nas colunas ID e Bairro
-            { "orderable": false, "targets": [2] }   // Desabilitar ordenação na coluna Ações
-        ],
-        "language": {
-            "url": "//cdn.datatables.net/plug-ins/1.11.3/i18n/Portuguese-Brasil.json"
-        }
-    });
 });
 
 function carregarUsuarios() {
@@ -92,7 +78,6 @@ function excluirUsuario(userId) {
             });
     }
 }
-
 function alterarCargo(userId, novoCargo) {
     fetch(`/api/usuarios/${userId}/cargo`, {
         method: 'POST',
@@ -111,6 +96,10 @@ function alterarCargo(userId, novoCargo) {
         .catch(error => console.error('Erro ao alterar o cargo do usuário:', error));
 }
 
+document.addEventListener('DOMContentLoaded', function () {
+    carregarEstados();
+});
+
 function carregarEstados() {
     fetch('/estados')
         .then(response => response.json())
@@ -127,6 +116,7 @@ function carregarEstados() {
         .catch(error => console.error('Erro ao buscar estados:', error));
 }
 
+// Função para carregar municípios baseado no estado selecionado
 function carregarMunicipios(codigoEstado) {
     fetch(`/municipios/${codigoEstado}`)
         .then(response => response.json())
@@ -143,6 +133,7 @@ function carregarMunicipios(codigoEstado) {
         .catch(error => console.error('Erro ao buscar municípios:', error));
 }
 
+// Função para filtrar usuários por município
 function filtrarUsuariosPorMunicipio(codigoMunicipio) {
     fetch(`/usuarios/${codigoMunicipio}`)
         .then(response => response.json())
@@ -165,6 +156,19 @@ function filtrarUsuariosPorMunicipio(codigoMunicipio) {
         .catch(error => console.error('Erro ao buscar usuários:', error));
 }
 
+// Carregar os estados ao carregar a página
+carregarEstados();
+
+// Adicionar eventos aos selects
+document.getElementById('estadoSelect').addEventListener('change', function () {
+    carregarMunicipios(this.value);
+});
+
+document.getElementById('municipioSelect').addEventListener('change', function () {
+    filtrarUsuariosPorMunicipio(this.value);
+});
+
+
 document.getElementById('cadastrarBtn').addEventListener('click', async () => {
     const nomeBairro = document.getElementById('nomeBairro').value;
 
@@ -180,7 +184,6 @@ document.getElementById('cadastrarBtn').addEventListener('click', async () => {
         if (response.ok) {
             alert('Bairro cadastrado com sucesso!');
             document.getElementById('zonaForm').reset();
-            carregarBairros(); // Atualiza a tabela de bairros
         } else {
             const errorData = await response.json();
             alert(`Erro ao cadastrar bairro: ${errorData.error}`);
@@ -209,11 +212,11 @@ function carregarBairros() {
                 `;
                 tableBody.appendChild(row);
             });
-            $('#bairrosTable').DataTable().draw(); // Atualiza a tabela após carregar os dados
         })
         .catch(error => console.error('Erro ao carregar bairros:', error));
 }
 
+// Editar bairro
 function editarBairro(id, nome) {
     $('#editModal').modal('show');
     document.getElementById('editNomeBairro').value = nome;
@@ -234,6 +237,7 @@ function editarBairro(id, nome) {
     };
 }
 
+// Excluir bairro
 function excluirBairro(id) {
     if (confirm('Tem certeza que deseja excluir este bairro?')) {
         fetch(`/api/excluir-bairro/${id}`, {
@@ -248,6 +252,5 @@ function excluirBairro(id) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-    carregarBairros();
-});
+// Carregar bairros ao carregar a página
+document.addEventListener('DOMContentLoaded', carregarBairros);
