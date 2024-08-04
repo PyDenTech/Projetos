@@ -2668,16 +2668,22 @@ app.post('/api/loginMotoristasEscolares', async (req, res) => {
 
     try {
         const query = `
-        SELECT id, nome_completo AS nome
+        SELECT id, nome_completo AS nome, senha
         FROM public.motoristas_escolares
-        WHERE email = $1 AND senha = $2
+        WHERE email = $1
         LIMIT 1
       `;
-        const values = [email, senha];
+        const values = [email];
         const result = await pool.query(query, values);
 
         if (result.rows.length > 0) {
-            res.json(result.rows[0]);
+            const user = result.rows[0];
+            const match = await bcrypt.compare(senha, user.senha);
+            if (match) {
+                res.json({ id: user.id, nome: user.nome });
+            } else {
+                res.status(401).json({ message: 'Credenciais inválidas' });
+            }
         } else {
             res.status(401).json({ message: 'Credenciais inválidas' });
         }
