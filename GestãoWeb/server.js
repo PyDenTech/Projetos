@@ -2661,33 +2661,28 @@ app.post('/api/motoristas_escolares/register', async (req, res) => {
     }
 });
 
-app.post('/api/loginMotoristasAdministrativos', async (req, res) => {
+
+app.post('/api/loginMotoristasEscolares', async (req, res) => {
     const { email, senha } = req.body;
 
     try {
-        const userQuery = await pool.query('SELECT * FROM motoristas_administrativos WHERE email = $1', [email]);
-        if (userQuery.rows.length === 0) {
-            return res.status(404).send('Usuário não encontrado.');
+        const query = `
+        SELECT id, nome_completo AS nome
+        FROM public.motoristas_escolares
+        WHERE email = $1 AND senha = $2
+        LIMIT 1
+      `;
+        const values = [email, senha];
+        const result = await pool.query(query, values);
+
+        if (result.rows.length > 0) {
+            res.json(result.rows[0]);
+        } else {
+            res.status(401).json({ message: 'Credenciais inválidas' });
         }
-
-        const user = userQuery.rows[0];
-        const isValidPassword = await bcrypt.compare(senha, user.senha);
-
-        if (!isValidPassword) {
-            return res.status(401).send('Senha incorreta.');
-        }
-
-        req.session.user = {
-            id: user.id,
-            nome: user.nome_completo,
-            email: user.email,
-            role: 'motorista_administrativo'
-        };
-
-        res.json({ userId: user.id, nome: user.nome_completo, empresa: user.empresa });
-    } catch (error) {
-        console.error('Erro no login:', error);
-        res.status(500).send('Erro ao processar o login');
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Erro no servidor' });
     }
 });
 
