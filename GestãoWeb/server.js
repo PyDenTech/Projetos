@@ -2661,9 +2661,10 @@ app.post('/api/motoristas_escolares/register', async (req, res) => {
     }
 });
 
-
 app.post('/api/loginMotoristasEscolares', async (req, res) => {
     const { email, senha } = req.body;
+
+    console.log('Tentativa de login com:', email, senha);  // Adiciona log para depuração
 
     try {
         const query = `
