@@ -2085,13 +2085,26 @@ app.delete('/api/motoristas/:id', async (req, res) => {
     try {
         const client = await pool.connect();
         try {
-            const result = await client.query('DELETE FROM motoristas_administrativos WHERE id = $1 RETURNING *', [motoristaId]);
-            if (result.rowCount === 0) {
+            await client.query('BEGIN'); // Inicia uma transação
+
+            // Exclui todos os registros da tabela expediente relacionados ao motorista
+            const deleteExpedienteResult = await client.query('DELETE FROM expediente WHERE motorista_id = $1', [motoristaId]);
+            console.log(`Excluídos ${deleteExpedienteResult.rowCount} registros da tabela expediente relacionados ao motorista com ID: ${motoristaId}`);
+
+            // Exclui o motorista da tabela motoristas_administrativos
+            const deleteMotoristaResult = await client.query('DELETE FROM motoristas_administrativos WHERE id = $1 RETURNING *', [motoristaId]);
+            if (deleteMotoristaResult.rowCount === 0) {
                 console.log(`Motorista com ID: ${motoristaId} não encontrado.`);
+                await client.query('ROLLBACK'); // Desfaz a transação
                 return res.status(404).json({ message: 'Motorista não encontrado.' });
             }
+
+            await client.query('COMMIT'); // Confirma a transação
             console.log(`Motorista com ID: ${motoristaId} excluído com sucesso.`);
             res.json({ message: 'Motorista excluído com sucesso.' });
+        } catch (error) {
+            await client.query('ROLLBACK'); // Desfaz a transação em caso de erro
+            throw error;
         } finally {
             client.release();
         }
