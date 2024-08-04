@@ -2078,14 +2078,17 @@ app.get('/api/motoristas/:id/localizacao', async (req, res) => {
     }
 });
 
-app.delete('/api/motoristas/:id/localizacao', (req, res) => {
-    const motoristaId = parseInt(req.params.id);
-    const motoristaIndex = motoristas.findIndex(m => m.id === motoristaId);
-    if (motoristaIndex !== -1) {
-        motoristas.splice(motoristaIndex, 1);
-        res.status(204).send(); // No Content
-    } else {
-        res.status(404).send('Motorista não encontrado');
+app.delete('/api/motoristas/:id', async (req, res) => {
+    const motoristaId = req.params.id;
+    try {
+        const result = await pool.query('DELETE FROM motoristas_administrativos WHERE id = $1 RETURNING *', [motoristaId]);
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Motorista não encontrado.' });
+        }
+        res.json({ message: 'Motorista excluído com sucesso.' });
+    } catch (error) {
+        console.error('Erro ao excluir motorista:', error);
+        res.status(500).json({ message: 'Erro ao excluir motorista.' });
     }
 });
 

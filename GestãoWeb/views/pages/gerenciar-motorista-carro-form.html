@@ -565,7 +565,10 @@
             window.excluirMotorista = function (motoristaId) {
                 if (confirm('Tem certeza que deseja excluir este motorista?')) {
                     fetch(`/api/motoristas/${motoristaId}`, {
-                        method: 'DELETE'
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
                     })
                         .then(response => {
                             if (!response.ok) {
@@ -580,6 +583,7 @@
                         .catch(error => console.error('Erro ao excluir motorista:', error));
                 }
             };
+
 
             window.abrirModalAvisoEspecifico = function (id) {
                 document.getElementById('destinatarioAvisoEspecifico').value = id;
