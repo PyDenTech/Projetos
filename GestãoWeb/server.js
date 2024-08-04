@@ -2078,6 +2078,17 @@ app.get('/api/motoristas/:id/localizacao', async (req, res) => {
     }
 });
 
+app.delete('/api/motoristas/:id/localizacao', (req, res) => {
+    const motoristaId = parseInt(req.params.id);
+    const motoristaIndex = motoristas.findIndex(m => m.id === motoristaId);
+    if (motoristaIndex !== -1) {
+        motoristas.splice(motoristaIndex, 1);
+        res.status(204).send(); // No Content
+    } else {
+        res.status(404).send('Motorista não encontrado');
+    }
+});
+
 app.post('/api/avisos', async (req, res) => {
     const { titulo, mensagem, destinatario } = req.body;
 
