@@ -31,7 +31,6 @@ const INSTANCE_ID = '3D363C45E2820081F63472B70F2FFCF9';
 const TOKEN = '4B9583F1D7B1FAA4ACF4A1B0';
 const CLIENT_TOKEN = 'Fd71010f216234a139e51574825ca357fS';
 const Z_API_URL = `https://api.z-api.io/instances/${INSTANCE_ID}/token/${TOKEN}/send-option-list`;
-const Z_API_URL_MESSAGE = `https://api.z-api.io/instances/${INSTANCE_ID}/token/${TOKEN}/send-message`;
 
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -2740,21 +2739,16 @@ app.post('/webhook', async (req, res) => {
         return;
     }
 
-    // Verificar a seleção do menu principal
-    if (text.includes('1')) {
-        // Usuário selecionou "Pais, Responsáveis e Alunos"
-        await sendSubMenu(phone);
-    } else {
-        // Enviar a mensagem de menu principal com opções para qualquer mensagem recebida
-        await sendMainMenu(phone);
-    }
+    // Enviar a mensagem de menu principal com opções para qualquer mensagem recebida
+    await sendMainMenu(phone);
 
     res.sendStatus(200);
 });
 
+
 const sendMainMenu = async (phone) => {
     try {
-        await axios.post(Z_API_URL_OPTION_LIST, {
+        await axios.post(Z_API_URL, {
             phone,
             message: 'Olá! 👋\nBem-vindo ao sistema de autoatendimento do Setor de Transporte Escolar. 🚍\n\nEscolha uma das opções abaixo para continuar:',
             optionList: {
@@ -2778,32 +2772,18 @@ const sendMainMenu = async (phone) => {
     }
 };
 
-const sendSubMenu = async (phone) => {
+const sendMessage = async (phone, message) => {
+    const Z_API_MESSAGE_URL = `https://api.z-api.io/instances/${INSTANCE_ID}/token/${TOKEN}/send-message`;
     try {
-        await axios.post(Z_API_URL_OPTION_LIST, {
+        await axios.post(Z_API_MESSAGE_URL, {
             phone,
-            message: 'Você escolheu a opção Pais, Responsáveis e Alunos. Por favor, escolha uma das opções abaixo:',
-            optionList: {
-                title: 'Opções para Pais, Responsáveis e Alunos',
-                buttonLabel: 'Abrir lista de opções',
-                options: [
-                    { id: '1', title: 'Informações sobre Rotas', description: 'Detalhes sobre os horários e paradas dos ônibus escolares.' },
-                    { id: '2', title: 'Solicitar Concessão de Transporte', description: 'Processo para solicitar o serviço de transporte escolar para um aluno.' },
-                    { id: '3', title: 'Status Atual do Transporte', description: 'Verificar se o transporte escolar está em operação no dia específico.' },
-                    { id: '4', title: 'Relatar Problema ou Ocorrência', description: 'Relatar problemas ou ocorrências relacionadas ao transporte escolar.' },
-                    { id: '5', title: 'Contato com o Coordenador de Transporte', description: 'Informações de contato para falar diretamente com o coordenador de transporte escolar.' }
-                ]
-            }
-        }, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Client-Token': CLIENT_TOKEN
-            }
+            message
         });
     } catch (error) {
-        console.error('Error sending sub menu:', error);
+        console.error('Error sending message:', error);
     }
 };
+
 
 
 
