@@ -2743,15 +2743,33 @@ app.post('/webhook', async (req, res) => {
     }
 
     // Verificar a resposta do usuário e enviar a próxima mensagem apropriada
-    if (text === '1') {
-        await sendSubMenuPaisResponsaveisAlunos(phone);
-    } else if (text === '2' || text === '3' || text === '4') {
-        // Se for uma resposta direta, pode-se enviar a opção principal novamente ou um submenu específico
-        // Aqui, por simplicidade, estamos apenas reenviando o menu principal
-        await sendMainMenu(phone);
-    } else {
-        // Para qualquer outra mensagem, enviar o menu principal
-        await sendMainMenu(phone);
+    switch (text) {
+        case '1':
+            await sendSubMenuPaisResponsaveisAlunos(phone);
+            break;
+        case '1_1':
+            await sendMessage(phone, 'Aqui estão as informações sobre rotas...');
+            break;
+        case '1_2':
+            await sendMessage(phone, 'Para solicitar a concessão de transporte, forneça as informações...');
+            break;
+        case '1_3':
+            await sendMessage(phone, 'O status atual do transporte é...');
+            break;
+        case '1_4':
+            await sendMessage(phone, 'Descreva o problema ou ocorrência...');
+            break;
+        case '1_5':
+            await sendMessage(phone, 'Para contatar o coordenador de transporte, ligue para...');
+            break;
+        case '2':
+        case '3':
+        case '4':
+            await sendMainMenu(phone);
+            break;
+        default:
+            await sendMainMenu(phone);
+            break;
     }
 
     res.sendStatus(200);
@@ -2792,11 +2810,11 @@ const sendSubMenuPaisResponsaveisAlunos = async (phone) => {
                 title: 'Opções para Pais, Responsáveis e Alunos',
                 buttonLabel: 'Abrir lista de opções',
                 options: [
-                    { id: '1', title: 'Informações sobre Rotas', description: 'Detalhes sobre os horários e paradas dos ônibus escolares.' },
-                    { id: '2', title: 'Solicitar Concessão de Transporte', description: 'Processo para solicitar o serviço de transporte escolar para um aluno.' },
-                    { id: '3', title: 'Status Atual do Transporte', description: 'Verificar se o transporte escolar está em operação no dia específico.' },
-                    { id: '4', title: 'Relatar Problema ou Ocorrência', description: 'Relatar problemas ou ocorrências relacionadas ao transporte escolar.' },
-                    { id: '5', title: 'Contato com o Coordenador de Transporte', description: 'Informações de contato para falar diretamente com o coordenador de transporte escolar.' }
+                    { id: '1_1', title: 'Informações sobre Rotas', description: 'Detalhes sobre os horários e paradas dos ônibus escolares.' },
+                    { id: '1_2', title: 'Solicitar Concessão de Transporte', description: 'Processo para solicitar o serviço de transporte escolar para um aluno.' },
+                    { id: '1_3', title: 'Status Atual do Transporte', description: 'Verificar se o transporte escolar está em operação no dia específico.' },
+                    { id: '1_4', title: 'Relatar Problema ou Ocorrência', description: 'Relatar problemas ou ocorrências relacionadas ao transporte escolar.' },
+                    { id: '1_5', title: 'Contato com o Coordenador de Transporte', description: 'Informações de contato para falar diretamente com o coordenador de transporte escolar.' }
                 ]
             }
         }, {
