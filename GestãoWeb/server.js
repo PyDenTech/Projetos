@@ -2742,8 +2742,17 @@ app.post('/webhook', async (req, res) => {
         return;
     }
 
-    // Enviar a mensagem de menu principal com opções para qualquer mensagem recebida
-    await sendMainMenu(phone);
+    // Verificar a resposta do usuário e enviar a próxima mensagem apropriada
+    if (text === '1') {
+        await sendSubMenuPaisResponsaveisAlunos(phone);
+    } else if (text === '2' || text === '3' || text === '4') {
+        // Se for uma resposta direta, pode-se enviar a opção principal novamente ou um submenu específico
+        // Aqui, por simplicidade, estamos apenas reenviando o menu principal
+        await sendMainMenu(phone);
+    } else {
+        // Para qualquer outra mensagem, enviar o menu principal
+        await sendMainMenu(phone);
+    }
 
     res.sendStatus(200);
 });
@@ -2811,8 +2820,6 @@ const sendMessage = async (phone, message) => {
         console.error('Error sending message:', error);
     }
 };
-
-
 
 
 
