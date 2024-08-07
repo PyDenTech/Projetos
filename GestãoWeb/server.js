@@ -2742,14 +2742,8 @@ app.post('/webhook', async (req, res) => {
         return;
     }
 
-    // Verificar a resposta do usuário e enviar a próxima mensagem apropriada
-    if (text === '1') {
-        await sendSubMenuPaisResponsaveisAlunos(phone);
-    } else if (text.toLowerCase().includes('oi') || text.toLowerCase().includes('olá')) {
-        await sendMainMenu(phone);
-    } else {
-        await sendMainMenu(phone);
-    }
+    // Enviar a mensagem de menu principal com opções para qualquer mensagem recebida
+    await sendMainMenu(phone);
 
     res.sendStatus(200);
 });
