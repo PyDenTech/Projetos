@@ -31,6 +31,8 @@ const INSTANCE_ID = '3D363C45E2820081F63472B70F2FFCF9';
 const TOKEN = '4B9583F1D7B1FAA4ACF4A1B0';
 const CLIENT_TOKEN = 'Fd71010f216234a139e51574825ca357fS';
 const Z_API_URL = `https://api.z-api.io/instances/${INSTANCE_ID}/token/${TOKEN}/send-option-list`;
+const Z_API_MESSAGE_URL = `https://api.z-api.io/instances/${INSTANCE_ID}/token/${TOKEN}/send-message`;
+
 
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -2727,6 +2729,7 @@ app.post('/api/loginMotoristasEscolares', async (req, res) => {
 
 // BOT DO SETOR DE TRANSPORTE
 
+
 app.post('/webhook', async (req, res) => {
     const { phone, text, isGroup } = req.body;
 
@@ -2805,7 +2808,6 @@ const sendSubMenuPaisResponsaveisAlunos = async (phone) => {
 };
 
 const sendMessage = async (phone, message) => {
-    const Z_API_MESSAGE_URL = `https://api.z-api.io/instances/${INSTANCE_ID}/token/${TOKEN}/send-message`;
     try {
         await axios.post(Z_API_MESSAGE_URL, {
             phone,
