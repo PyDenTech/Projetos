@@ -2739,12 +2739,15 @@ app.post('/webhook', async (req, res) => {
         return;
     }
 
-    // Enviar a mensagem de menu principal com opções para qualquer mensagem recebida
-    await sendMainMenu(phone);
+    // Verificar a resposta do usuário e enviar a próxima mensagem apropriada
+    if (text === '1') {
+        await sendSubMenuPaisResponsaveisAlunos(phone);
+    } else {
+        await sendMainMenu(phone);
+    }
 
     res.sendStatus(200);
 });
-
 
 const sendMainMenu = async (phone) => {
     try {
@@ -2769,6 +2772,33 @@ const sendMainMenu = async (phone) => {
         });
     } catch (error) {
         console.error('Error sending main menu:', error);
+    }
+};
+
+const sendSubMenuPaisResponsaveisAlunos = async (phone) => {
+    try {
+        await axios.post(Z_API_URL, {
+            phone,
+            message: 'Você escolheu a opção Pais, Responsáveis e Alunos. Por favor, escolha uma das opções abaixo:',
+            optionList: {
+                title: 'Opções para Pais, Responsáveis e Alunos',
+                buttonLabel: 'Abrir lista de opções',
+                options: [
+                    { id: '1', title: 'Informações sobre Rotas', description: 'Detalhes sobre os horários e paradas dos ônibus escolares.' },
+                    { id: '2', title: 'Solicitar Concessão de Transporte', description: 'Processo para solicitar o serviço de transporte escolar para um aluno.' },
+                    { id: '3', title: 'Status Atual do Transporte', description: 'Verificar se o transporte escolar está em operação no dia específico.' },
+                    { id: '4', title: 'Relatar Problema ou Ocorrência', description: 'Relatar problemas ou ocorrências relacionadas ao transporte escolar.' },
+                    { id: '5', title: 'Contato com o Coordenador de Transporte', description: 'Informações de contato para falar diretamente com o coordenador de transporte escolar.' }
+                ]
+            }
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Client-Token': CLIENT_TOKEN
+            }
+        });
+    } catch (error) {
+        console.error('Error sending sub menu:', error);
     }
 };
 
