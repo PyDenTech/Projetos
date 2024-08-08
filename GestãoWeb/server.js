@@ -2729,6 +2729,24 @@ app.post('/api/loginMotoristasEscolares', async (req, res) => {
 
 // BOT DO SETOR DE TRANSPORTE
 
+app.get('/aluno', async (req, res) => {
+    const id_matricula = req.query.id_matricula; // Captura o ID de matrícula da query string
+
+    try {
+        const query = 'SELECT nome, dt_nascimento, serie, turma, endereco FROM alunos WHERE id_matricula = $1';
+        const result = await pool.query(query, [id_matricula]);
+
+        if (result.rows.length > 0) {
+            res.status(200).json(result.rows[0]);
+        } else {
+            res.status(404).send('Aluno não encontrado');
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Erro ao buscar dados do aluno');
+    }
+});
+
 app.get('/consultar-ponto', async (req, res) => {
     const id_matricula = req.query.id_matricula; // Captura o ID de matrícula da query string
 
