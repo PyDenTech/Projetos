@@ -2732,17 +2732,21 @@ app.post('/api/loginMotoristasEscolares', async (req, res) => {
 app.get('/aluno', async (req, res) => {
     const id_matricula = req.query.id_matricula; // Captura o ID de matrícula da query string
 
+    console.log(`Requisição recebida para ID de matrícula: ${id_matricula}`); // Log da requisição
+
     try {
         const query = 'SELECT nome, dt_nascimento, serie, turma, endereco FROM alunos WHERE id_matricula = $1';
         const result = await pool.query(query, [id_matricula]);
 
         if (result.rows.length > 0) {
+            console.log('Dados do aluno:', result.rows[0]); // Log dos dados retornados
             res.status(200).json(result.rows[0]);
         } else {
-            res.status(404).send('Aluno não encontrado');
+            console.log('Aluno não encontrado'); // Log de erro
+            res.status(404).json({ error: 'Aluno não encontrado' });
         }
     } catch (error) {
-        console.error(error);
+        console.error('Erro ao buscar dados do aluno:', error); // Log de erro
         res.status(500).send('Erro ao buscar dados do aluno');
     }
 });
