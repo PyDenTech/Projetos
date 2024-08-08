@@ -2729,127 +2729,32 @@ app.post('/api/loginMotoristasEscolares', async (req, res) => {
 
 // BOT DO SETOR DE TRANSPORTE
 
+app.get('/consultar-ponto', async (req, res) => {
+    const id_matricula = req.query.id_matricula; // Captura o ID de matrícula da query string
 
-app.post('/webhook', async (req, res) => {
-    const { phone, text, isGroup } = req.body;
+    try {
+        const query = 'SELECT * FROM alunos WHERE id_matricula = $1';
+        const result = await pool.query(query, [id_matricula]);
 
-    console.log('Webhook received:', req.body);
+        if (result.rows.length > 0) {
+            // Supondo que você tenha uma tabela de pontos de parada relacionada ao aluno
+            const aluno = result.rows[0];
+            const pontoQuery = 'SELECT * FROM pontos_parada WHERE id_aluno = $1';
+            const pontoResult = await pool.query(pontoQuery, [aluno.id]);
 
-    // Verificar se a mensagem é de um grupo
-    if (isGroup) {
-        console.log('Mensagem de grupo recebida, ignorando...');
-        res.sendStatus(200);
-        return;
+            if (pontoResult.rows.length > 0) {
+                res.status(200).json(pontoResult.rows[0]);
+            } else {
+                res.status(404).send('Ponto de parada não encontrado para este aluno');
+            }
+        } else {
+            res.status(404).send('Aluno não encontrado');
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Erro ao buscar ponto de parada');
     }
-
-    // Verificar a resposta do usuário e enviar a próxima mensagem apropriada
-    switch (text) {
-        case '1':
-            await sendSubMenuPaisResponsaveisAlunos(phone);
-            break;
-        case '1_1':
-            await sendMessage(phone, 'Aqui estão as informações sobre rotas...');
-            break;
-        case '1_2':
-            await sendMessage(phone, 'Para solicitar a concessão de transporte, forneça as informações...');
-            break;
-        case '1_3':
-            await sendMessage(phone, 'O status atual do transporte é...');
-            break;
-        case '1_4':
-            await sendMessage(phone, 'Descreva o problema ou ocorrência...');
-            break;
-        case '1_5':
-            await sendMessage(phone, 'Para contatar o coordenador de transporte, ligue para...');
-            break;
-        case '2':
-        case '3':
-        case '4':
-            await sendMainMenu(phone);
-            break;
-        default:
-            await sendMainMenu(phone);
-            break;
-    }
-
-    res.sendStatus(200);
 });
-
-const sendMainMenu = async (phone) => {
-    try {
-        await axios.post(Z_API_URL, {
-            phone,
-            message: 'Olá! 👋\nBem-vindo ao sistema de autoatendimento do Setor de Transporte Escolar. 🚍\n\nEscolha uma das opções abaixo para continuar:',
-            optionList: {
-                title: 'Menu Principal',
-                buttonLabel: 'Abrir lista de opções',
-                options: [
-                    { id: '1', title: 'Pais, Responsáveis e Alunos', description: 'Informações para Pais, Responsáveis e Alunos' },
-                    { id: '2', title: 'Servidores SEMED', description: 'Informações para Servidores SEMED' },
-                    { id: '3', title: 'Servidores Escola', description: 'Informações para Servidores Escola' },
-                    { id: '4', title: 'Fornecedores', description: 'Informações para Fornecedores' }
-                ]
-            }
-        }, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Client-Token': CLIENT_TOKEN
-            }
-        });
-    } catch (error) {
-        console.error('Error sending main menu:', error);
-    }
-};
-
-const sendSubMenuPaisResponsaveisAlunos = async (phone) => {
-    try {
-        await axios.post(Z_API_URL, {
-            phone,
-            message: 'Você escolheu a opção Pais, Responsáveis e Alunos. Por favor, escolha uma das opções abaixo:',
-            optionList: {
-                title: 'Opções para Pais, Responsáveis e Alunos',
-                buttonLabel: 'Abrir lista de opções',
-                options: [
-                    { id: '1_1', title: 'Informações sobre Rotas', description: 'Detalhes sobre os horários e paradas dos ônibus escolares.' },
-                    { id: '1_2', title: 'Solicitar Concessão de Transporte', description: 'Processo para solicitar o serviço de transporte escolar para um aluno.' },
-                    { id: '1_3', title: 'Status Atual do Transporte', description: 'Verificar se o transporte escolar está em operação no dia específico.' },
-                    { id: '1_4', title: 'Relatar Problema ou Ocorrência', description: 'Relatar problemas ou ocorrências relacionadas ao transporte escolar.' },
-                    { id: '1_5', title: 'Contato com o Coordenador de Transporte', description: 'Informações de contato para falar diretamente com o coordenador de transporte escolar.' }
-                ]
-            }
-        }, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Client-Token': CLIENT_TOKEN
-            }
-        });
-    } catch (error) {
-        console.error('Error sending sub menu:', error);
-    }
-};
-
-const sendMessage = async (phone, message) => {
-    try {
-        await axios.post(Z_API_MESSAGE_URL, {
-            phone,
-            message
-        });
-    } catch (error) {
-        console.error('Error sending message:', error);
-    }
-};
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
