@@ -2785,7 +2785,32 @@ app.get('/consultar-ponto', async (req, res) => {
     }
 });
 
+app.post('/consulta-aluno', async (req, res) => {
+    const idMatricula = req.body.id_matricula;
 
+    try {
+        const query = 'SELECT nome, dt_nascimento, endereco FROM alunos WHERE id_matricula = $1';
+        const values = [idMatricula];
+        const result = await client.query(query, values);
+
+        if (result.rows.length > 0) {
+            const aluno = result.rows[0];
+            res.json({
+                status: 'success',
+                aluno: {
+                    nome: aluno.nome,
+                    dt_nascimento: aluno.dt_nascimento,
+                    endereco: aluno.endereco,
+                }
+            });
+        } else {
+            res.json({ status: 'not_found', message: 'Aluno não encontrado.' });
+        }
+    } catch (error) {
+        console.error('Erro ao consultar aluno:', error);
+        res.status(500).json({ status: 'error', message: 'Erro interno do servidor.' });
+    }
+});
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
