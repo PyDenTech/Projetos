@@ -2739,8 +2739,15 @@ app.get('/aluno', async (req, res) => {
         const result = await pool.query(query, [id_matricula]);
 
         if (result.rows.length > 0) {
-            console.log('Dados do aluno:', result.rows[0]); // Log dos dados retornados
-            res.status(200).json(result.rows[0]);
+            const aluno = result.rows[0];
+            console.log(`Dados do aluno:
+                ID de matrícula: ${id_matricula}
+                Nome: ${aluno.nome}
+                Data de Nascimento: ${aluno.dt_nascimento}
+                Série: ${aluno.serie}
+                Turma: ${aluno.turma}
+                Endereço: ${aluno.endereco}`); // Log dos dados detalhados do aluno
+            res.status(200).json(aluno);
         } else {
             console.log('Aluno não encontrado'); // Log de erro
             res.status(404).json({ error: 'Aluno não encontrado' });
