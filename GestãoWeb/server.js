@@ -10,6 +10,7 @@ const path = require('path');
 const xlsx = require('xlsx');
 const axios = require('axios');
 const NodeCache = require('node-cache');
+const { format } = require('date-fns');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const app = express();
@@ -2729,80 +2730,23 @@ app.post('/api/loginMotoristasEscolares', async (req, res) => {
 
 // BOT DO SETOR DE TRANSPORTE
 
-app.get('/aluno', async (req, res) => {
-    const id_matricula = req.query.id_matricula; // Captura o ID de matrícula da query string
-
-    console.log(`Requisição recebida para ID de matrícula: ${id_matricula}`); // Log da requisição
-
-    try {
-        const query = 'SELECT nome, dt_nascimento, serie, turma, endereco FROM alunos WHERE id_matricula = $1';
-        const result = await pool.query(query, [id_matricula]);
-
-        if (result.rows.length > 0) {
-            const aluno = result.rows[0];
-            console.log(`Dados do aluno:
-                ID de matrícula: ${id_matricula}
-                Nome: ${aluno.nome}
-                Data de Nascimento: ${aluno.dt_nascimento}
-                Série: ${aluno.serie}
-                Turma: ${aluno.turma}
-                Endereço: ${aluno.endereco}`); // Log dos dados detalhados do aluno
-            res.status(200).json(aluno);
-        } else {
-            console.log('Aluno não encontrado'); // Log de erro
-            res.status(404).json({ error: 'Aluno não encontrado' });
-        }
-    } catch (error) {
-        console.error('Erro ao buscar dados do aluno:', error); // Log de erro
-        res.status(500).send('Erro ao buscar dados do aluno');
-    }
-});
-
-app.get('/consultar-ponto', async (req, res) => {
-    const id_matricula = req.query.id_matricula; // Captura o ID de matrícula da query string
-
-    try {
-        const query = 'SELECT * FROM alunos WHERE id_matricula = $1';
-        const result = await pool.query(query, [id_matricula]);
-
-        if (result.rows.length > 0) {
-            // Supondo que você tenha uma tabela de pontos de parada relacionada ao aluno
-            const aluno = result.rows[0];
-            const pontoQuery = 'SELECT * FROM pontos_parada WHERE id_aluno = $1';
-            const pontoResult = await pool.query(pontoQuery, [aluno.id]);
-
-            if (pontoResult.rows.length > 0) {
-                res.status(200).json(pontoResult.rows[0]);
-            } else {
-                res.status(404).send('Ponto de parada não encontrado para este aluno');
-            }
-        } else {
-            res.status(404).send('Aluno não encontrado');
-        }
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Erro ao buscar ponto de parada');
-    }
-});
-
 app.post('/consulta-aluno', async (req, res) => {
     const idMatricula = req.body.id_matricula;
-
-    console.log('ID de Matrícula Recebido:', idMatricula); // Adicione este log
 
     try {
         const query = 'SELECT nome, dt_nascimento, endereco FROM alunos WHERE id_matricula = $1';
         const values = [idMatricula];
-
         const result = await pool.query(query, values);
 
         if (result.rows.length > 0) {
             const aluno = result.rows[0];
+            const formattedDate = format(new Date(aluno.dt_nascimento), 'dd-MM-yyyy');
+
             res.json({
                 status: 'success',
                 aluno: {
                     nome: aluno.nome,
-                    dt_nascimento: aluno.dt_nascimento,
+                    dt_nascimento: formattedDate,
                     endereco: aluno.endereco,
                 }
             });
