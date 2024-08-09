@@ -2788,6 +2788,8 @@ app.get('/consultar-ponto', async (req, res) => {
 app.post('/consulta-aluno', async (req, res) => {
     const idMatricula = req.body.id_matricula;
 
+    console.log('ID de Matrícula Recebido:', idMatricula); // Adicione este log
+
     try {
         const query = 'SELECT nome, dt_nascimento, endereco FROM alunos WHERE id_matricula = $1';
         const values = [idMatricula];
