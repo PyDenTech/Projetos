@@ -2793,7 +2793,8 @@ app.post('/consulta-aluno', async (req, res) => {
     try {
         const query = 'SELECT nome, dt_nascimento, endereco FROM alunos WHERE id_matricula = $1';
         const values = [idMatricula];
-        const result = await client.query(query, values);
+
+        const result = await pool.query(query, values);
 
         if (result.rows.length > 0) {
             const aluno = result.rows[0];
