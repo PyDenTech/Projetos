@@ -451,64 +451,6 @@
         </div>
     </div>
 
-    <!-- Modal para Editar Motorista -->
-    <div class="modal fade" id="modalEditarMotorista" tabindex="-1" aria-labelledby="modalEditarMotoristaLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalEditarMotoristaLabel">Editar Motorista</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="formEditarMotorista">
-                        <input type="hidden" id="editMotoristaId">
-                        <div class="mb-3">
-                            <label for="editNomeCompleto" class="form-label">Nome Completo</label>
-                            <input type="text" class="form-control" id="editNomeCompleto" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editCpf" class="form-label">CPF</label>
-                            <input type="text" class="form-control" id="editCpf" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editCnh" class="form-label">CNH</label>
-                            <input type="text" class="form-control" id="editCnh" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editEmail" class="form-label">E-mail</label>
-                            <input type="email" class="form-control" id="editEmail" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editEmpresa" class="form-label">Empresa</label>
-                            <input type="text" class="form-control" id="editEmpresa" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editTipoVeiculo" class="form-label">Tipo de Veículo</label>
-                            <input type="text" class="form-control" id="editTipoVeiculo" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editModelo" class="form-label">Modelo</label>
-                            <input type="text" class="form-control" id="editModelo" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editPlaca" class="form-label">Placa</label>
-                            <input type="text" class="form-control" id="editPlaca" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editStatus" class="form-label">Status</label>
-                            <select class="form-select" id="editStatus" required>
-                                <option value="em serviço">Em Serviço</option>
-                                <option value="fora de serviço">Fora de Serviço</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Modal para Aviso Geral -->
     <div class="modal fade" id="modalAvisoGeral" tabindex="-1" aria-labelledby="modalAvisoGeralLabel"
         aria-hidden="true">
@@ -559,24 +501,21 @@
                         data.forEach((motorista, index) => {
                             const row = document.createElement('tr');
                             row.innerHTML = `
-                            <td>${index + 1}</td>
-                            <td>${motorista.nome}</td>
-                            <td>${motorista.cpf}</td>
-                            <td>${motorista.cnh}</td>
-                            <td>${motorista.status}</td>
-                            <td>
-                                <button class="btn btn-primary btn-sm" onclick="localizarMotorista(${motorista.id})">
-                                    <i class="bi bi-geo-alt"></i> Localizar
-                                </button>
-                                <button class="btn btn-warning btn-sm" onclick="abrirModalEdicao(${motorista.id})">
-                                    <i class="bi bi-pencil-square"></i> Editar
-                                </button>
-                                <button class="btn btn-danger btn-sm" onclick="excluirMotorista(${motorista.id})">Excluir</button>
-                                <button class="btn btn-warning btn-sm" onclick="abrirModalAvisoEspecifico(${motorista.id})">
-                                    <i class="bi bi-megaphone"></i> Aviso
-                                </button>
-                            </td>
-                        `;
+                                <td>${index + 1}</td>
+                                <td>${motorista.nome}</td>
+                                <td>${motorista.cpf}</td>
+                                <td>${motorista.cnh}</td>
+                                <td>${motorista.status}</td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" onclick="localizarMotorista(${motorista.id})">
+                                        <i class="bi bi-geo-alt"></i> Localizar
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="excluirMotorista(${motorista.id})">Excluir</button>
+                                    <button class="btn btn-warning btn-sm" onclick="abrirModalAvisoEspecifico(${motorista.id})">
+                                        <i class="bi bi-megaphone"></i> Aviso
+                                    </button>
+                                </td>
+                            `;
                             motoristasTableBody.appendChild(row);
                         });
 
@@ -645,68 +584,6 @@
                 }
             };
 
-            window.abrirModalEdicao = function (id) {
-                motoristaId = id;
-                fetch(`/api/motoristas/${id}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById('editNome').value = data.nome_completo;
-                        document.getElementById('editCPF').value = data.cpf;
-                        document.getElementById('editCNH').value = data.cnh;
-                        document.getElementById('editEmail').value = data.email;
-                        document.getElementById('editEmpresa').value = data.empresa;
-                        document.getElementById('editTipoVeiculo').value = data.tipo_veiculo;
-                        document.getElementById('editModelo').value = data.modelo;
-                        document.getElementById('editPlaca').value = data.placa;
-                        document.getElementById('editStatus').value = data.status;
-
-                        const modal = new bootstrap.Modal(document.getElementById('editModal'));
-                        modal.show();
-                    })
-                    .catch(error => console.error('Erro ao carregar dados do motorista:', error));
-            };
-
-            document.getElementById('formEdicaoMotorista').addEventListener('submit', function (e) {
-                e.preventDefault();
-
-                const nome_completo = document.getElementById('editNome').value;
-                const cpf = document.getElementById('editCPF').value;
-                const cnh = document.getElementById('editCNH').value;
-                const email = document.getElementById('editEmail').value;
-                const empresa = document.getElementById('editEmpresa').value;
-                const tipo_veiculo = document.getElementById('editTipoVeiculo').value;
-                const modelo = document.getElementById('editModelo').value;
-                const placa = document.getElementById('editPlaca').value;
-                const status = document.getElementById('editStatus').value;
-
-                const motoristaData = {
-                    nome_completo,
-                    cpf,
-                    cnh,
-                    email,
-                    empresa,
-                    tipo_veiculo,
-                    modelo,
-                    placa,
-                    status
-                };
-
-                fetch(`/api/editarmotoristasadm/${motoristaId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(motoristaData)
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert('Motorista atualizado com sucesso.');
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
-                        modal.hide();
-                        fetchMotoristas();
-                    })
-                    .catch(error => console.error('Erro ao atualizar motorista:', error));
-            });
 
             window.abrirModalAvisoEspecifico = function (id) {
                 document.getElementById('destinatarioAvisoEspecifico').value = id;
@@ -779,6 +656,7 @@
                 while (tBody.firstChild) {
                     tBody.removeChild(tBody.firstChild);
                 }
+
                 tBody.append(...sortedRows);
 
                 table.querySelectorAll('th').forEach(th => th.classList.remove('th-sort-asc', 'th-sort-desc'));
@@ -797,8 +675,6 @@
             });
         });
     </script>
-
-
 </body>
 
 </html>
