@@ -1691,7 +1691,7 @@ app.post('/api/cadastrar-motorista', uploadDisk.fields([
     const certificadoEscolar = req.files['certificadoEscolar'] ? req.files['certificadoEscolar'][0].filename : null;
     const documentoCnh = req.files['documentoCnh'] ? req.files['documentoCnh'][0].filename : null;
 
-    if (!nomeCompleto || !cpf || !cnh || !empresa || !veiculo || !placa || !certificadoTransporte || !certificadoEscolar || !documentoCnh || !email || !senha) {
+    if (!nomeCompleto || !cpf || !cnh || !empresa || !veiculo || !placa || !certificadoTransporte || !certificadoEscolar || !documentoCnh) {
         return res.status(400).json({ error: 'Todos os campos são obrigatórios' });
     }
 
