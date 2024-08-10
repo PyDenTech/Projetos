@@ -495,25 +495,28 @@
                         motoristasTableBody.innerHTML = '';
 
                         data.forEach((motorista, index) => {
+                            const rotaIds = motorista.rotas.map(rota => rota.id).join(', ');  // Extrair IDs das rotas
+                            const rotaNomes = motorista.rotas.map(rota => rota.nome_rota).join(', ');  // Extrair nomes das rotas
+
                             const row = document.createElement('tr');
                             row.innerHTML = `
-                                <td>${index + 1}</td>
-                                <td>${motorista.nome_completo}</td>
-                                <td>${motorista.cpf}</td>
-                                <td>${motorista.cnh}</td>
-                                <td>${motorista.empresa}</td>
-                                <td>${motorista.veiculo}</td>
-                                <td>${motorista.placa}</td>
-                                <td><a href="#" onclick="viewDocument('/uploads/${motorista.certificado_transporte}')">${motorista.certificado_transporte}</a></td>
-                                <td><a href="#" onclick="viewDocument('/uploads/${motorista.certificado_escolar}')">${motorista.certificado_escolar}</a></td>
-                                <td><a href="#" onclick="viewDocument('/uploads/${motorista.documento_cnh}')">${motorista.documento_cnh}</a></td>
-                                <td>${motorista.rota_id}</td>
-                                <td>${motorista.rota_nome || 'N/A'}</td>
-                                <td>
-                                    <button class="btn btn-primary btn-sm" onclick="editarMotorista(${motorista.id})">Editar</button>
-                                    <button class="btn btn-danger btn-sm" onclick="excluirMotorista(${motorista.id})">Excluir</button>
-                                </td>
-                            `;
+                    <td>${index + 1}</td>
+                    <td>${motorista.nome_completo}</td>
+                    <td>${motorista.cpf}</td>
+                    <td>${motorista.cnh}</td>
+                    <td>${motorista.empresa}</td>
+                    <td>${motorista.veiculo}</td>
+                    <td>${motorista.placa}</td>
+                    <td><a href="#" onclick="viewDocument('/uploads/${motorista.certificado_transporte}')">${motorista.certificado_transporte}</a></td>
+                    <td><a href="#" onclick="viewDocument('/uploads/${motorista.certificado_escolar}')">${motorista.certificado_escolar}</a></td>
+                    <td><a href="#" onclick="viewDocument('/uploads/${motorista.documento_cnh}')">${motorista.documento_cnh}</a></td>
+                    <td>${rotaIds}</td>  <!-- Exibir IDs das rotas -->
+                    <td>${rotaNomes || 'N/A'}</td>  <!-- Exibir nomes das rotas -->
+                    <td>
+                        <button class="btn btn-primary btn-sm" onclick="editarMotorista(${motorista.id})">Editar</button>
+                        <button class="btn btn-danger btn-sm" onclick="excluirMotorista(${motorista.id})">Excluir</button>
+                    </td>
+                `;
                             motoristasTableBody.appendChild(row);
                         });
 
@@ -522,6 +525,7 @@
                     })
                     .catch(error => console.error('Erro ao carregar motoristas:', error));
             }
+
 
             function fetchRotas() {
                 fetch('/api/rotas')
