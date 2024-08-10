@@ -2132,6 +2132,23 @@ app.put('/api/motoristas/:id', (req, res) => {
 });
 
 
+app.get('/api/motoristas/:id', (req, res) => {
+    const id = req.params.id;
+
+    pool.query('SELECT * FROM motoristas_administrativos WHERE id = $1', [id])
+        .then(result => {
+            if (result.rows.length === 0) {
+                return res.status(404).json({ message: 'Motorista não encontrado.' });
+            }
+            res.status(200).json(result.rows[0]);
+        })
+        .catch(error => {
+            console.error('Erro ao carregar motorista:', error);
+            res.status(500).json({ message: 'Erro ao carregar motorista.' });
+        });
+});
+
+
 app.delete('/api/motoristas/:id', async (req, res) => {
     const motoristaId = req.params.id;
     console.log(`Tentando excluir motorista com ID: ${motoristaId}`);
