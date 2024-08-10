@@ -2302,10 +2302,19 @@ app.get('/api/motoristas_escolares/:id', async (req, res) => {
     const { id } = req.params;
 
     try {
-        const result = await pool.query('SELECT * FROM motoristas_escolares WHERE id = $1', [id]);
+        const motoristaResult = await pool.query('SELECT * FROM motoristas_escolares WHERE id = $1', [id]);
 
-        if (result.rows.length > 0) {
-            res.status(200).json(result.rows[0]);
+        if (motoristaResult.rows.length > 0) {
+            const motorista = motoristaResult.rows[0];
+
+            // Buscar as rotas associadas a esse motorista
+            const rotasResult = await pool.query('SELECT rota_id FROM motorista_rotas WHERE motorista_id = $1', [id]);
+            const rotaIds = rotasResult.rows.map(row => row.rota_id);
+
+            res.status(200).json({
+                ...motorista,
+                rotas: rotaIds
+            });
         } else {
             res.status(404).json({ message: 'Motorista não encontrado' });
         }
@@ -2314,6 +2323,7 @@ app.get('/api/motoristas_escolares/:id', async (req, res) => {
         res.status(500).json({ message: 'Erro ao processar a solicitação' });
     }
 });
+
 
 app.delete('/api/motoristas_escolares/:id', async (req, res) => {
     const { id } = req.params;
@@ -2331,20 +2341,47 @@ app.delete('/api/motoristas_escolares/:id', async (req, res) => {
 
 app.put('/api/motoristas_escolares/:id', async (req, res) => {
     const { id } = req.params;
-    const { nome_completo, cpf, cnh, empresa, rota_id } = req.body;
+    const { nome_completo, cpf, cnh, empresa, rota_ids } = req.body; // rota_ids é agora um array
+
     try {
-        const result = await pool.query(
-            `UPDATE motoristas_escolares
-         SET nome_completo = $1, cpf = $2, cnh = $3, empresa = $4, rota_id = $5
-         WHERE id = $6 RETURNING *`,
-            [nome_completo, cpf, cnh, empresa, rota_id, id]
-        );
-        if (result.rows.length > 0) {
-            res.status(200).json(result.rows[0]);
-        } else {
-            res.status(404).json({ message: 'Motorista não encontrado' });
+        const client = await pool.connect();
+        try {
+            await client.query('BEGIN');
+
+            // Atualizar os dados do motorista
+            const result = await client.query(
+                `UPDATE motoristas_escolares
+                 SET nome_completo = $1, cpf = $2, cnh = $3, empresa = $4
+                 WHERE id = $5 RETURNING *`,
+                [nome_completo, cpf, cnh, empresa, id]
+            );
+
+            if (result.rows.length > 0) {
+                // Remover as associações antigas
+                await client.query('DELETE FROM motorista_rotas WHERE motorista_id = $1', [id]);
+
+                // Adicionar as novas associações
+                for (const rotaId of rota_ids) {
+                    await client.query(
+                        'INSERT INTO motorista_rotas (motorista_id, rota_id) VALUES ($1, $2)',
+                        [id, rotaId]
+                    );
+                }
+
+                await client.query('COMMIT');
+                res.status(200).json(result.rows[0]);
+            } else {
+                await client.query('ROLLBACK');
+                res.status(404).json({ message: 'Motorista não encontrado' });
+            }
+        } catch (err) {
+            await client.query('ROLLBACK');
+            throw err;
+        } finally {
+            client.release();
         }
     } catch (err) {
+        console.error('Erro ao atualizar motorista:', err);
         res.status(500).json({ error: err.message });
     }
 });
