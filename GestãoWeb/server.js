@@ -2283,19 +2283,6 @@ app.post('/api/cadastrar-abastecimento-administrativos', async (req, res) => {
 
 /* API'S PARA APLICATIVO DE TRANSPORTE ESCOLAR E GESTÃO WEB */
 
-app.get('/api/motoristas_escolares', async (req, res) => {
-    try {
-        const result = await pool.query(`
-        SELECT m.id, m.nome_completo, m.cpf, m.cnh, m.empresa, m.veiculo, m.placa, m.certificado_transporte, m.certificado_escolar, m.documento_cnh, r.id AS rota_id, r.nome_rota AS rota_nome
-        FROM motoristas_escolares m
-        LEFT JOIN rotas r ON m.rota_id = r.id
-      `);
-        res.status(200).json(result.rows);
-    } catch (error) {
-        console.error('Erro ao buscar motoristas:', error);
-        res.status(500).json({ error: 'Erro ao processar a solicitação' });
-    }
-});
 
 // Endpoint para obter um motorista escolar por ID
 app.get('/api/motoristas_escolares/:id', async (req, res) => {
@@ -2382,12 +2369,36 @@ app.put('/api/motoristas_escolares/:id', async (req, res) => {
 
 app.get('/api/motoristas_escolares', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM motoristas_escolares');
+        const result = await pool.query(`
+        SELECT 
+            m.id, 
+            m.nome_completo, 
+            m.cpf, 
+            m.cnh, 
+            m.empresa, 
+            m.veiculo, 
+            m.placa, 
+            m.certificado_transporte, 
+            m.certificado_escolar, 
+            m.documento_cnh, 
+            array_agg(r.id) AS rota_ids, 
+            array_agg(r.nome_rota) AS rota_nomes
+        FROM 
+            motoristas_escolares m
+        LEFT JOIN 
+            motorista_rotas mr ON m.id = mr.motorista_id
+        LEFT JOIN 
+            rotas r ON mr.rota_id = r.id
+        GROUP BY 
+            m.id
+      `);
         res.status(200).json(result.rows);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+    } catch (error) {
+        console.error('Erro ao buscar motoristas:', error);
+        res.status(500).json({ error: 'Erro ao processar a solicitação' });
     }
 });
+
 
 app.get('/api/rotas/motorista/:motorista_id', async (req, res) => {
     const { motorista_id } = req.params;
