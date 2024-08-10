@@ -274,7 +274,7 @@ const pageRoles = {
     'importar-aluno-form': ['admin', 'gestor', 'agente'],
     'gerenciar-alunos-view': ['admin', 'gestor', 'agente'],
     'cadastrar-escolas-form': ['admin', 'gestor', 'agente'],
-    'gerenciar-escolas-view': ['admin', 'gestor'],
+    'gerenciar-escolas-view': ['admin', 'gestor', 'agente'],
     'vizualizar-escolas-map': ['admin', 'gestor', 'agente'],
     'cadastrar-fornecedores-form': ['admin', 'gestor', 'agente'],
     'cadastrar-rotas-form': ['admin', 'gestor', 'agente'],
@@ -291,7 +291,7 @@ const pageRoles = {
     'cadastrar-monitores-form': ['admin', 'gestor', 'fornecedor'],
     'gerenciar-monitores-view': ['admin', 'gestor'],
     'gerenciar-fornecedores-view': ['admin', 'gestor'],
-    'cadastrar-motorista-form': ['admin', 'gestor', 'fornecedor'],
+    'cadastrar-motorista-form': ['admin', 'gestor', 'fornecedor', 'agente'],
     'cadastrar-motorista-carro-form': ['admin', 'gestor', 'agente']
 };
 
