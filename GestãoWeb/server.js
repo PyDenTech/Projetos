@@ -2090,33 +2090,31 @@ app.get('/api/motoristas/:id/localizacao', async (req, res) => {
     }
 });
 
-app.put('/api/editarmotoristasadm/:id', async (req, res) => {
-    const { id } = req.params;
+app.put('/api/motoristas-administrativos/:id', async (req, res) => {
+    const id = req.params.id;
     const { nome_completo, cpf, cnh, email, empresa, tipo_veiculo, modelo, placa, status } = req.body;
 
     try {
         const query = `
-            UPDATE motoristas_administrativos 
-            SET nome_completo = $1, cpf = $2, cnh = $3, email = $4, empresa = $5, 
-                tipo_veiculo = $6, modelo = $7, placa = $8, status = $9 
+            UPDATE motoristas_administrativos
+            SET nome_completo = $1, cpf = $2, cnh = $3, email = $4, empresa = $5, tipo_veiculo = $6, modelo = $7, placa = $8, status = $9
             WHERE id = $10
-            RETURNING *;
+            RETURNING *
         `;
-
         const values = [nome_completo, cpf, cnh, email, empresa, tipo_veiculo, modelo, placa, status, id];
-
         const result = await pool.query(query, values);
 
-        if (result.rows.length === 0) {
-            return res.status(404).json({ message: 'Motorista não encontrado' });
+        if (result.rows.length > 0) {
+            res.status(200).json({ message: 'Motorista atualizado com sucesso.', motorista: result.rows[0] });
+        } else {
+            res.status(404).json({ message: 'Motorista não encontrado.' });
         }
-
-        res.json({ message: 'Motorista atualizado com sucesso', motorista: result.rows[0] });
     } catch (error) {
         console.error('Erro ao atualizar motorista:', error);
-        res.status(500).json({ message: 'Erro ao atualizar motorista' });
+        res.status(500).json({ message: 'Erro ao atualizar motorista.' });
     }
 });
+
 
 app.delete('/api/motoristas/:id', async (req, res) => {
     const motoristaId = req.params.id;

@@ -477,6 +477,64 @@
         </div>
     </div>
 
+    <!-- Modal para Edição de Motorista -->
+    <div class="modal fade" id="modalEditarMotorista" tabindex="-1" aria-labelledby="modalEditarMotoristaLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEditarMotoristaLabel">Editar Motorista</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEditarMotorista">
+                        <input type="hidden" id="editMotoristaId">
+                        <div class="mb-3">
+                            <label for="editNomeCompleto" class="form-label">Nome Completo</label>
+                            <input type="text" class="form-control" id="editNomeCompleto" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editCpf" class="form-label">CPF</label>
+                            <input type="text" class="form-control" id="editCpf" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editCnh" class="form-label">CNH</label>
+                            <input type="text" class="form-control" id="editCnh" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="editEmail" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editEmpresa" class="form-label">Empresa</label>
+                            <input type="text" class="form-control" id="editEmpresa" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editTipoVeiculo" class="form-label">Tipo de Veículo</label>
+                            <input type="text" class="form-control" id="editTipoVeiculo" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editModelo" class="form-label">Modelo</label>
+                            <input type="text" class="form-control" id="editModelo" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPlaca" class="form-label">Placa</label>
+                            <input type="text" class="form-control" id="editPlaca" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editStatus" class="form-label">Status</label>
+                            <select class="form-select" id="editStatus" required>
+                                <option value="em serviço">Em Serviço</option>
+                                <option value="fora de serviço">Fora de Serviço</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Vendor JS Files -->
     <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="/vendor/echarts/echarts.min.js"></script>
@@ -513,6 +571,9 @@
                                     <button class="btn btn-danger btn-sm" onclick="excluirMotorista(${motorista.id})">Excluir</button>
                                     <button class="btn btn-warning btn-sm" onclick="abrirModalAvisoEspecifico(${motorista.id})">
                                         <i class="bi bi-megaphone"></i> Aviso
+                                    </button>
+                                    <button class="btn btn-info btn-sm" onclick="abrirModalEditarMotorista(${motorista.id})">
+                                        <i class="bi bi-pencil-square"></i> Editar
                                     </button>
                                 </td>
                             `;
@@ -584,7 +645,6 @@
                 }
             };
 
-
             window.abrirModalAvisoEspecifico = function (id) {
                 document.getElementById('destinatarioAvisoEspecifico').value = id;
                 const modal = new bootstrap.Modal(document.getElementById('modalAvisoEspecifico'));
@@ -596,49 +656,68 @@
                 modal.show();
             };
 
-            document.getElementById('formAvisoEspecifico').addEventListener('submit', function (e) {
+            window.abrirModalEditarMotorista = function (id) {
+                fetch(`/api/motoristas/${id}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('editMotoristaId').value = data.id;
+                        document.getElementById('editNomeCompleto').value = data.nome_completo;
+                        document.getElementById('editCpf').value = data.cpf;
+                        document.getElementById('editCnh').value = data.cnh;
+                        document.getElementById('editEmail').value = data.email;
+                        document.getElementById('editEmpresa').value = data.empresa;
+                        document.getElementById('editTipoVeiculo').value = data.tipo_veiculo;
+                        document.getElementById('editModelo').value = data.modelo;
+                        document.getElementById('editPlaca').value = data.placa;
+                        document.getElementById('editStatus').value = data.status;
+
+                        const modal = new bootstrap.Modal(document.getElementById('modalEditarMotorista'));
+                        modal.show();
+                    })
+                    .catch(error => console.error('Erro ao carregar dados do motorista:', error));
+            };
+
+            document.getElementById('formEditarMotorista').addEventListener('submit', function (e) {
                 e.preventDefault();
 
-                const titulo = document.getElementById('tituloAvisoEspecifico').value;
-                const mensagem = document.getElementById('mensagemAvisoEspecifico').value;
-                const destinatario = document.getElementById('destinatarioAvisoEspecifico').value;
+                const id = document.getElementById('editMotoristaId').value;
+                const nome_completo = document.getElementById('editNomeCompleto').value;
+                const cpf = document.getElementById('editCpf').value;
+                const cnh = document.getElementById('editCnh').value;
+                const email = document.getElementById('editEmail').value;
+                const empresa = document.getElementById('editEmpresa').value;
+                const tipo_veiculo = document.getElementById('editTipoVeiculo').value;
+                const modelo = document.getElementById('editModelo').value;
+                const placa = document.getElementById('editPlaca').value;
+                const status = document.getElementById('editStatus').value;
 
-                fetch('/api/avisos', {
-                    method: 'POST',
+                const data = {
+                    nome_completo,
+                    cpf,
+                    cnh,
+                    email,
+                    empresa,
+                    tipo_veiculo,
+                    modelo,
+                    placa,
+                    status
+                };
+
+                fetch(`/api/motoristas/${id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(data),
                     headers: {
                         'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ titulo, mensagem, destinatario })
+                    }
                 })
                     .then(response => response.json())
                     .then(data => {
-                        alert(data.message);
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalAvisoEspecifico'));
+                        alert('Motorista atualizado com sucesso.');
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalEditarMotorista'));
                         modal.hide();
+                        fetchMotoristas();
                     })
-                    .catch(error => console.error('Erro ao enviar aviso:', error));
-            });
-
-            document.getElementById('formAvisoGeral').addEventListener('submit', function (e) {
-                e.preventDefault();
-
-                const titulo = document.getElementById('tituloAvisoGeral').value;
-                const mensagem = document.getElementById('mensagemAvisoGeral').value;
-
-                fetch('/api/avisos', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ titulo, mensagem, destinatario: 'geral' })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert(data.message);
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalAvisoGeral'));
-                        modal.hide();
-                    })
-                    .catch(error => console.error('Erro ao enviar aviso:', error));
+                    .catch(error => console.error('Erro ao atualizar motorista:', error));
             });
 
             function sortTableByColumn(table, column, asc = true) {
