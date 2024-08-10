@@ -2397,6 +2397,16 @@ app.put('/api/motoristas_escolares/:id', async (req, res) => {
     }
 });
 
+
+app.get('/api/motoristas_escolares', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM motoristas_escolares');
+        res.status(200).json(result.rows);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.get('/api/rotas/motorista/:motorista_id', async (req, res) => {
     const { motorista_id } = req.params;
     try {
