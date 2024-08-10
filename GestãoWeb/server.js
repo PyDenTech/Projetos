@@ -2286,9 +2286,27 @@ app.post('/api/cadastrar-abastecimento-administrativos', async (req, res) => {
 app.get('/api/motoristas_escolares', async (req, res) => {
     try {
         const result = await pool.query(`
-        SELECT m.id, m.nome_completo, m.cpf, m.cnh, m.empresa, m.veiculo, m.placa, m.certificado_transporte, m.certificado_escolar, m.documento_cnh, r.id AS rota_id, r.nome_rota AS rota_nome
-        FROM motoristas_escolares m
-        LEFT JOIN rotas r ON m.rota_id = r.id
+        SELECT 
+            m.id, 
+            m.nome_completo, 
+            m.cpf, 
+            m.cnh, 
+            m.empresa, 
+            m.veiculo, 
+            m.placa, 
+            m.certificado_transporte, 
+            m.certificado_escolar, 
+            m.documento_cnh, 
+            array_agg(r.id) AS rota_ids, 
+            array_agg(r.nome_rota) AS rota_nomes
+        FROM 
+            motoristas_escolares m
+        LEFT JOIN 
+            motorista_rotas mr ON m.id = mr.motorista_id
+        LEFT JOIN 
+            rotas r ON mr.rota_id = r.id
+        GROUP BY 
+            m.id
       `);
         res.status(200).json(result.rows);
     } catch (error) {
@@ -2375,16 +2393,6 @@ app.put('/api/motoristas_escolares/:id', async (req, res) => {
         }
     } catch (err) {
         console.error('Erro ao atualizar motorista:', err);
-        res.status(500).json({ error: err.message });
-    }
-});
-
-
-app.get('/api/motoristas_escolares', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT * FROM motoristas_escolares');
-        res.status(200).json(result.rows);
-    } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
