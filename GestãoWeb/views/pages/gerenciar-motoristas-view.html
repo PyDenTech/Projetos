@@ -435,8 +435,8 @@
                                     required>
                             </div>
                             <div class="mb-3">
-                                <label for="editRota" class="form-label">Rota</label>
-                                <select class="form-select" id="editRota" name="rota_id" required>
+                                <label for="editRota" class="form-label">Rota(s)</label>
+                                <select class="form-select" id="editRota" name="rota_ids[]" multiple required>
                                     <!-- Options dinâmicas -->
                                 </select>
                             </div>
@@ -558,7 +558,20 @@
                         document.getElementById('editCertificadoTransporte').value = data.certificado_transporte;
                         document.getElementById('editCertificadoEscolar').value = data.certificado_escolar;
                         document.getElementById('editDocumentoCnh').value = data.documento_cnh;
-                        document.getElementById('editRota').value = data.rota_id;
+
+                        const editRotaSelect = document.getElementById('editRota');
+                        // Limpa seleções anteriores
+                        for (let i = 0; i < editRotaSelect.options.length; i++) {
+                            editRotaSelect.options[i].selected = false;
+                        }
+                        // Marca as rotas selecionadas
+                        data.rotas.forEach(rotaId => {
+                            for (let i = 0; i < editRotaSelect.options.length; i++) {
+                                if (editRotaSelect.options[i].value == rotaId) {
+                                    editRotaSelect.options[i].selected = true;
+                                }
+                            }
+                        });
 
                         const editModal = new bootstrap.Modal(document.getElementById('editModal'));
                         editModal.show();
@@ -566,13 +579,21 @@
                     .catch(error => console.error('Erro ao carregar dados do motorista:', error));
             };
 
+
             window.salvarEdicao = function () {
                 const motoristaId = document.getElementById('editMotoristaId').value;
                 const formData = new FormData(document.getElementById('editForm'));
 
+                // Captura todas as rotas selecionadas
+                const rotaSelect = document.getElementById('editRota');
+                const rotasSelecionadas = Array.from(rotaSelect.selectedOptions).map(option => option.value);
+
+                const motoristaData = Object.fromEntries(formData);
+                motoristaData.rota_ids = rotasSelecionadas;
+
                 fetch(`/api/motoristas_escolares/${motoristaId}`, {
                     method: 'PUT',
-                    body: JSON.stringify(Object.fromEntries(formData)),
+                    body: JSON.stringify(motoristaData),
                     headers: {
                         'Content-Type': 'application/json'
                     }
@@ -586,6 +607,7 @@
                     })
                     .catch(error => console.error('Erro ao salvar dados do motorista:', error));
             };
+
 
             window.excluirMotorista = function (motoristaId) {
                 if (confirm('Tem certeza que deseja excluir este motorista?')) {
