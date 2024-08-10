@@ -26,21 +26,14 @@ app.use(session({
 
 console.log('DATABASE_URL:', process.env.DATABASE_URL);
 
-
-
-const INSTANCE_ID = '3D363C45E2820081F63472B70F2FFCF9';
-const TOKEN = '4B9583F1D7B1FAA4ACF4A1B0';
-const CLIENT_TOKEN = 'Fd71010f216234a139e51574825ca357fS';
-const Z_API_URL = `https://api.z-api.io/instances/${INSTANCE_ID}/token/${TOKEN}/send-option-list`;
-const Z_API_MESSAGE_URL = `https://api.z-api.io/instances/${INSTANCE_ID}/token/${TOKEN}/send-message`;
-
-
-
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 app.use('/docs', express.static(path.join(__dirname, 'public', 'uploads')));
+
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 const saltRounds = 10;
 
