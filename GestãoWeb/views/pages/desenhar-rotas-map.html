@@ -381,7 +381,15 @@
                                         <option value="">Selecione uma rota</option>
                                     </select>
                                 </div>
-                            
+                                <!-- Seletor de Camadas -->
+                                <div
+                                    style="position: absolute; top: 10px; right: 10px; z-index: 1; background-color: white; padding: 10px; border-radius: 4px;">
+                                    <input type="radio" id="streets" name="mapStyle" value="streets-v11" checked>
+                                    <label for="streets">Ruas</label><br>
+                                    <input type="radio" id="satellite" name="mapStyle" value="satellite-v9">
+                                    <label for="satellite">Satélite</label>
+                                </div>
+
                                 <input type="hidden" id="nomeRota" name="nomeRota">
                                 <div id="map" style="height: 500px; margin-bottom: 20px;"></div>
                                 <div class="mb-3">
