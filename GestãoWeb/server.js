@@ -2823,6 +2823,16 @@ app.post('/api/solicitarTransporte', async (req, res) => {
     try {
         const coordenadasString = `${coordenadas_aluno.lat},${coordenadas_aluno.lng}`;
 
+        // Log dos dados que serão enviados ao banco de dados
+        console.log('Dados a serem inseridos:', {
+            nome_responsavel,
+            cpf_responsavel,
+            nome_aluno,
+            cpf_aluno,
+            id_matricula,
+            coordenadas_aluno: coordenadasString
+        });
+
         const result = await pool.query(
             `INSERT INTO solicitacoes_transporte (nome_responsavel, cpf_responsavel, nome_aluno, cpf_aluno, id_matricula, coordenadas_aluno) 
              VALUES ($1, $2, $3, $4, $5, $6) 
@@ -2836,6 +2846,7 @@ app.post('/api/solicitarTransporte', async (req, res) => {
         res.status(500).json({ success: false, message: 'Erro ao processar a solicitação' });
     }
 });
+
 
 
 
