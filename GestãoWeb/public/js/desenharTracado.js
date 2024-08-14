@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        const maxWaypoints = 23;
+        const maxWaypoints = 40;
         const limitedWaypoints = waypoints.slice(0, maxWaypoints);
         const waypointsStr = limitedWaypoints.concat(schoolMarkers.map(marker => marker.getLngLat().toArray())).map(p => p.join(',')).join(';');
 
