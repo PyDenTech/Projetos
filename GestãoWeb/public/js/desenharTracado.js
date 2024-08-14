@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let startPoint, endPoint, waypoints = [], schoolMarkers = [], escolasAtendidas = [];
 
-    // Add map controls
+    // Adicionar controles do mapa
     map.addControl(new mapboxgl.NavigationControl());
 
     const icons = {
@@ -68,46 +68,58 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        const waypointsStr = waypoints.concat(schoolMarkers.map(marker => marker.getLngLat().toArray())).map(p => p.join(',')).join(';');
+        const maxWaypoints = 23;
+        const limitedWaypoints = waypoints.slice(0, maxWaypoints);
+        const waypointsStr = limitedWaypoints.concat(schoolMarkers.map(marker => marker.getLngLat().toArray())).map(p => p.join(',')).join(';');
+
         const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${startPoint[0]},${startPoint[1]};${waypointsStr};${endPoint[0]},${endPoint[1]}?steps=true&geometries=geojson&access_token=${mapboxgl.accessToken}`;
-        const response = await fetch(url);
-        const data = await response.json();
 
-        if (data.routes.length > 0) {
-            const route = data.routes[0];
-            const coordinates = route.geometry.coordinates;
-            const geojson = {
-                type: 'Feature',
-                geometry: {
-                    type: 'LineString',
-                    coordinates: coordinates
-                }
-            };
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
 
-            if (map.getSource('route')) {
-                map.getSource('route').setData(geojson);
-            } else {
-                map.addLayer({
-                    id: 'route',
-                    type: 'line',
-                    source: {
-                        type: 'geojson',
-                        data: geojson
-                    },
-                    layout: {
-                        'line-join': 'round',
-                        'line-cap': 'round'
-                    },
-                    paint: {
-                        'line-color': '#3887be',
-                        'line-width': 5,
-                        'line-opacity': 0.75
+            if (data.routes && data.routes.length > 0) {
+                const route = data.routes[0];
+                const coordinates = route.geometry.coordinates;
+                const geojson = {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'LineString',
+                        coordinates: coordinates
                     }
-                });
-            }
+                };
 
-            document.getElementById('distanciaTotal').value = (route.distance / 1000).toFixed(2);
-            document.getElementById('tempoTotal').value = (route.duration / 60).toFixed(2);
+                if (map.getSource('route')) {
+                    map.getSource('route').setData(geojson);
+                } else {
+                    map.addLayer({
+                        id: 'route',
+                        type: 'line',
+                        source: {
+                            type: 'geojson',
+                            data: geojson
+                        },
+                        layout: {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        paint: {
+                            'line-color': '#3887be',
+                            'line-width': 5,
+                            'line-opacity': 0.75
+                        }
+                    });
+                }
+
+                document.getElementById('distanciaTotal').value = (route.distance / 1000).toFixed(2);
+                document.getElementById('tempoTotal').value = (route.duration / 60).toFixed(2);
+            } else {
+                console.error('Nenhuma rota encontrada:', data);
+                alert('Não foi possível gerar o traçado da rota. Verifique os pontos e tente novamente.');
+            }
+        } catch (error) {
+            console.error('Erro ao gerar rota:', error);
+            alert('Erro ao gerar o traçado da rota. Tente novamente mais tarde.');
         }
     });
 
