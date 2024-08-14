@@ -53,7 +53,8 @@
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
                 center: { lat: -6.530066, lng: -49.851630 }, // Coordenadas de Canaã dos Carajás
-                zoom: 15
+                zoom: 15,
+                mapTypeId: 'satellite' // Define o mapa para iniciar com visualização em satélite
             });
 
             map.addListener('click', function (event) {
