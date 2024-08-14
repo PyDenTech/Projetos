@@ -4,95 +4,129 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Verificar Direito ao Transporte Escolar</title>
-  <!-- Inclua bibliotecas como Bootstrap para facilitar o design do modal -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <title>Matrícula de Aluno</title>
+  <style>
+    /* Estilos básicos para o modal */
+    #modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    #modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+      width: 400px;
+    }
+  </style>
 </head>
 
 <body>
+  <form id="matricula-form">
+    <label>
+      <input type="checkbox" id="transporte-checkbox">
+      Necessita de transporte escolar?
+    </label>
+  </form>
 
-  <div class="container mt-5">
-    <h1>Matrícula de Aluno</h1>
+  <!-- Modal -->
+  <div id="modal">
+    <div id="modal-content">
+      <h2>Verificar Direito ao Transporte Escolar</h2>
+      <label for="endereco">Endereço do Aluno:</label>
+      <input type="text" id="endereco" required><br><br>
 
-    <form>
-      <!-- Outros campos do formulário -->
+      <label for="mapa">Clique no mapa para selecionar a localização:</label>
+      <div id="mapa" style="width: 100%; height: 300px;"></div><br><br>
 
-      <div class="form-group form-check">
-        <input type="checkbox" class="form-check-input" id="checkTransporte" onclick="abrirModal()">
-        <label class="form-check-label" for="checkTransporte">Verificar Direito ao Transporte Escolar</label>
-      </div>
+      <label for="escola">Selecione a Escola:</label>
+      <select id="escola" required></select><br><br>
 
-      <!-- Modal -->
-      <div class="modal fade" id="transporteModal" tabindex="-1" role="dialog" aria-labelledby="transporteModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="transporteModalLabel">Verificar Direito ao Transporte Escolar</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <div class="form-group">
-                <label for="endereco">Endereço:</label>
-                <input type="text" class="form-control" id="endereco">
-              </div>
-              <div class="form-group">
-                <label for="latitude">Latitude:</label>
-                <input type="text" class="form-control" id="latitude">
-              </div>
-              <div class="form-group">
-                <label for="longitude">Longitude:</label>
-                <input type="text" class="form-control" id="longitude">
-              </div>
-              <div class="form-group">
-                <label for="escolaSelect">Selecione a Escola:</label>
-                <select class="form-control" id="escolaSelect"></select>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary" onclick="verificarTransporte()">Verificar</button>
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </form>
+      <button type="button" id="verificar-transporte">Verificar Transporte</button>
+      <button type="button" id="fechar-modal">Fechar</button>
+    </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=SUA_GOOGLE_MAPS_API_KEY&callback=initMap" async
+    defer></script>
   <script>
-    function abrirModal() {
-      $('#transporteModal').modal('show');
-      carregarEscolas();
+    const checkbox = document.getElementById('transporte-checkbox');
+    const modal = document.getElementById('modal');
+    const mapa = document.getElementById('mapa');
+    const escolaSelect = document.getElementById('escola');
+    let alunoLatitude, alunoLongitude;
+
+    // Abrir o modal ao marcar a checkbox
+    checkbox.addEventListener('change', async (event) => {
+      if (event.target.checked) {
+        modal.style.display = 'flex';
+        await carregarEscolas();
+      }
+    });
+
+    // Fechar o modal
+    document.getElementById('fechar-modal').addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+
+    // Inicializar o mapa e pegar as coordenadas clicadas
+    function initMap() {
+      const map = new google.maps.Map(mapa, {
+        center: { lat: -3.4653, lng: -62.2159 }, // Centralizar no Brasil
+        zoom: 5,
+      });
+
+      map.addListener('click', (event) => {
+        alunoLatitude = event.latLng.lat();
+        alunoLongitude = event.latLng.lng();
+        alert(`Coordenadas selecionadas: Latitude: ${alunoLatitude}, Longitude: ${alunoLongitude}`);
+      });
     }
 
-    function carregarEscolas() {
-      $.get('/api/escolass', function (data) {
-        const escolaSelect = $('#escolaSelect');
-        escolaSelect.empty();
-        data.forEach(escola => {
-          escolaSelect.append(new Option(escola.nome, escola.id));
+    // Carregar as escolas do banco de dados no select
+    async function carregarEscolas() {
+      try {
+        const response = await axios.get('/api/escolas');
+        response.data.forEach(escola => {
+          const option = document.createElement('option');
+          option.value = escola.id;
+          option.textContent = escola.nome;
+          escolaSelect.appendChild(option);
         });
-      });
+      } catch (error) {
+        console.error('Erro ao carregar escolas:', error);
+      }
     }
 
-    function verificarTransporte() {
-      const endereco = $('#endereco').val();
-      const latitude = $('#latitude').val();
-      const longitude = $('#longitude').val();
-      const escola_id = $('#escolaSelect').val();
+    // Verificar se o aluno tem direito ao transporte
+    document.getElementById('verificar-transporte').addEventListener('click', async () => {
+      const endereco = document.getElementById('endereco').value;
+      const escolaId = escolaSelect.value;
 
-      $.get(`/api/verificar-direito-transporte?endereco=${endereco}&latitude=${latitude}&longitude=${longitude}&escola_id=${escola_id}`, function (data) {
-        alert(data.mensagem);
-      });
-    }
+      try {
+        const response = await axios.get('/api/verificar-direito-transporte', {
+          params: {
+            endereco: endereco,
+            latitude: alunoLatitude,
+            longitude: alunoLongitude,
+            escola_id: escolaId
+          }
+        });
+
+        alert(response.data.mensagem);
+      } catch (error) {
+        console.error('Erro ao verificar direito ao transporte:', error);
+      }
+    });
   </script>
-
-  <!-- Inclua os scripts do Bootstrap -->
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
 
 </html>
