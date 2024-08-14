@@ -2815,12 +2815,19 @@ app.post('/api/loginMotoristasEscolares', async (req, res) => {
 app.post('/api/solicitarTransporte', async (req, res) => {
     const { nome_responsavel, cpf_responsavel, nome_aluno, cpf_aluno, id_matricula, coordenadas_aluno } = req.body;
 
+    // Verificação para garantir que as coordenadas estão presentes
+    if (!coordenadas_aluno || !coordenadas_aluno.lat || !coordenadas_aluno.lng) {
+        return res.status(400).json({ success: false, message: 'Coordenadas do aluno são inválidas ou não foram fornecidas.' });
+    }
+
     try {
+        const coordenadasString = `${coordenadas_aluno.lat},${coordenadas_aluno.lng}`;
+
         const result = await pool.query(
             `INSERT INTO solicitacoes_transporte (nome_responsavel, cpf_responsavel, nome_aluno, cpf_aluno, id_matricula, coordenadas_aluno) 
-             VALUES ($1, $2, $3, $4, $5, ST_GeomFromText($6, 4326)) 
+             VALUES ($1, $2, $3, $4, $5, $6) 
              RETURNING id`,
-            [nome_responsavel, cpf_responsavel, nome_aluno, cpf_aluno, id_matricula, `POINT(${coordenadas_aluno.lng} ${coordenadas_aluno.lat})`]
+            [nome_responsavel, cpf_responsavel, nome_aluno, cpf_aluno, id_matricula, coordenadasString]
         );
 
         res.status(201).json({ success: true, id: result.rows[0].id });
