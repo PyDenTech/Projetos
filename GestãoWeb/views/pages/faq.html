@@ -4,121 +4,161 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Verificação de Transporte Escolar</title>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <title>Verificar Direito ao Transporte Escolar</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
 </head>
 
 <body>
+  <form id="matricula-form">
+    <label>
+      <input type="checkbox" id="check-transporte"> Verificar direito ao transporte escolar
+    </label>
+  </form>
 
-  <div class="container mt-5">
-    <h2>Verificação de Direito ao Transporte Escolar</h2>
+  <!-- Modal -->
+  <div id="transporte-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Verificar Transporte Escolar</h2>
+      <form id="transporte-form">
+        <label for="endereco">Endereço:</label>
+        <input type="text" id="endereco" name="endereco" required>
 
-    <form id="verificacaoTransporteForm">
-      <div class="form-group">
-        <label for="endereco">Endereço do Aluno:</label>
-        <input type="text" class="form-control" id="endereco" placeholder="Digite o endereço do aluno">
-      </div>
+        <label for="latitude">Latitude:</label>
+        <input type="text" id="latitude" name="latitude" required>
 
-      <div class="form-group">
+        <label for="longitude">Longitude:</label>
+        <input type="text" id="longitude" name="longitude" required>
+
         <label for="escola">Selecione a Escola:</label>
-        <select class="form-control" id="escola">
-          <!-- As opções de escolas serão carregadas dinamicamente -->
+        <select id="escola" name="escola" required>
+          <!-- As opções de escolas serão preenchidas dinamicamente -->
         </select>
-      </div>
 
-      <div class="form-check">
-        <input type="checkbox" class="form-check-input" id="verificarDireito">
-        <label class="form-check-label" for="verificarDireito">Verificar se o aluno tem direito ao transporte
-          escolar</label>
-      </div>
-
-      <!-- Modal -->
-      <div class="modal fade" id="verificacaoModal" tabindex="-1" role="dialog" aria-labelledby="verificacaoModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="verificacaoModalLabel">Verificação de Direito ao Transporte Escolar</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <p>Calculando distância...</p>
-              <p id="resultadoVerificacao"></p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </form>
+        <button type="submit">Verificar</button>
+      </form>
+      <div id="resultado"></div>
+    </div>
   </div>
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
   <script>
-    $(document).ready(function () {
-      // Carregar as escolas dinamicamente
-      $.ajax({
-        url: '/api/escolas-nomes',
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({ ids: [1, 2, 3] }), // IDs de exemplo, substitua pelos IDs necessários
-        success: function (response) {
-          const escolaSelect = $('#escola');
-          response.forEach(escola => {
-            escolaSelect.append(new Option(escola.nome, JSON.stringify({ id: escola.id, latitude: escola.latitude, longitude: escola.longitude })));
-          });
-        },
-        error: function () {
-          alert('Erro ao carregar as escolas');
+    document.addEventListener('DOMContentLoaded', function () {
+      const modal = document.getElementById('transporte-modal');
+      const checkTransporte = document.getElementById('check-transporte');
+      const closeBtn = document.querySelector('.close');
+      const transporteForm = document.getElementById('transporte-form');
+      const resultadoDiv = document.getElementById('resultado');
+      const escolaSelect = document.getElementById('escola');
+
+      // Quando a checkbox é marcada, o modal é aberto
+      checkTransporte.addEventListener('change', function () {
+        if (this.checked) {
+          abrirModal();
+          carregarEscolas();
         }
       });
 
-      $('#verificarDireito').on('change', function () {
-        if (this.checked) {
-          // Abrir o modal
-          $('#verificacaoModal').modal('show');
+      // Fecha o modal ao clicar no "x"
+      closeBtn.addEventListener('click', fecharModal);
 
-          // Pegar os valores do formulário
-          const endereco = $('#endereco').val();
-          const escolaSelecionada = JSON.parse($('#escola').val());
-          const escolaLatitude = escolaSelecionada.latitude;
-          const escolaLongitude = escolaSelecionada.longitude;
+      // Fecha o modal ao clicar fora dele
+      window.addEventListener('click', function (event) {
+        if (event.target == modal) {
+          fecharModal();
+        }
+      });
 
-          // Use um geocoding service aqui se precisar pegar as coordenadas a partir do endereço
-          const latitudeAluno = -6.476478;  // Substitua por coordenadas reais
-          const longitudeAluno = -48.478548;  // Substitua por coordenadas reais
+      // Função para abrir o modal
+      function abrirModal() {
+        modal.style.display = 'block';
+      }
 
-          // Fazer a requisição à API
-          $.ajax({
-            url: `https://semedcanaadoscarajas.pydenexpress.com/api/verificar-direito-transporte`,
-            method: 'GET',
-            data: {
-              endereco: endereco,
-              latitude: latitudeAluno,
-              longitude: longitudeAluno,
-              escola_id: escolaSelecionada.id
-            },
-            success: function (response) {
-              $('#resultadoVerificacao').text(response.mensagem);
-            },
-            error: function () {
-              $('#resultadoVerificacao').text('Erro ao verificar direito ao transporte escolar.');
-            }
+      // Função para fechar o modal
+      function fecharModal() {
+        modal.style.display = 'none';
+      }
+
+      // Função para carregar as escolas do banco de dados e preencher o select
+      async function carregarEscolas() {
+        try {
+          const response = await fetch('https://semedcanaadoscarajas.pydenexpress.com/api/escolas-nomes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ids: [] }) // Ajuste conforme necessário para o backend
           });
-        } else {
-          // Fechar o modal se desmarcado
-          $('#verificacaoModal').modal('hide');
+
+          const escolas = await response.json();
+          escolaSelect.innerHTML = ''; // Limpar opções anteriores
+          escolas.forEach(escola => {
+            const option = document.createElement('option');
+            option.value = escola.id;
+            option.textContent = escola.nome;
+            escolaSelect.appendChild(option);
+          });
+        } catch (error) {
+          console.error('Erro ao carregar as escolas:', error);
+        }
+      }
+
+      // Submissão do formulário para verificar direito ao transporte
+      transporteForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const endereco = document.getElementById('endereco').value;
+        const latitude = document.getElementById('latitude').value;
+        const longitude = document.getElementById('longitude').value;
+        const escolaId = escolaSelect.value;
+
+        try {
+          const response = await fetch(`https://semedcanaadoscarajas.pydenexpress.com/api/verificar-direito-transporte?endereco=${endereco}&latitude=${latitude}&longitude=${longitude}&escola_id=${escolaId}`);
+          const resultado = await response.json();
+
+          resultadoDiv.textContent = resultado.mensagem;
+        } catch (error) {
+          console.error('Erro ao verificar direito ao transporte:', error);
+          resultadoDiv.textContent = 'Erro ao verificar direito ao transporte.';
         }
       });
     });
   </script>
-
 </body>
 
 </html>
