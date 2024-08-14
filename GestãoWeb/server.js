@@ -1640,7 +1640,7 @@ app.get('/api/escolas', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-  
+
 
 app.get('/api/motoristas', async (req, res) => {
     try {
@@ -2854,9 +2854,9 @@ app.get('/api/verificar-direito-transporte', async (req, res) => {
     const { endereco, latitude, longitude, escola_id } = req.query;
 
     try {
-        // Buscar as coordenadas da escola no banco de dados
+        // Buscar as coordenadas da escola no banco de dados usando o Pool
         const query = 'SELECT latitude, longitude FROM escolas WHERE id = $1';
-        const result = await client.query(query, [escola_id]);
+        const result = await pool.query(query, [escola_id]);
 
         if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Escola não encontrada.' });
@@ -2888,7 +2888,6 @@ app.get('/api/verificar-direito-transporte', async (req, res) => {
         res.status(500).json({ error: 'Erro ao processar a solicitação.' });
     }
 });
-
 
 
 
