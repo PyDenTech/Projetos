@@ -2812,7 +2812,23 @@ app.post('/api/loginMotoristasEscolares', async (req, res) => {
 
 
 
+app.post('/api/solicitarTransporte', async (req, res) => {
+    const { nome_responsavel, cpf_responsavel, nome_aluno, cpf_aluno, id_matricula, coordenadas_aluno } = req.body;
 
+    try {
+        const result = await pool.query(
+            `INSERT INTO solicitacoes_transporte (nome_responsavel, cpf_responsavel, nome_aluno, cpf_aluno, id_matricula, coordenadas_aluno) 
+             VALUES ($1, $2, $3, $4, $5, ST_GeomFromText($6, 4326)) 
+             RETURNING id`,
+            [nome_responsavel, cpf_responsavel, nome_aluno, cpf_aluno, id_matricula, `POINT(${coordenadas_aluno.lng} ${coordenadas_aluno.lat})`]
+        );
+
+        res.status(201).json({ success: true, id: result.rows[0].id });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ success: false, message: 'Erro ao processar a solicitação' });
+    }
+});
 
 
 
