@@ -70,7 +70,7 @@
     }
 
     function carregarEscolas() {
-      $.get('/api/escolas', function (data) {
+      $.get('/api/escolass', function (data) {
         const escolaSelect = $('#escolaSelect');
         escolaSelect.empty();
         data.forEach(escola => {
