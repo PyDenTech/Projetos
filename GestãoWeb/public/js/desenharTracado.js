@@ -1,11 +1,20 @@
 mapboxgl.accessToken = 'pk.eyJ1IjoiZGFuaWxvbW9yYWlzIiwiYSI6ImNsdzZocmJ5eDFqenoyanFzenBoMTc4c28ifQ._RiYYX1oIBe7_MBpTyYWxQ';
 
 document.addEventListener("DOMContentLoaded", function () {
+    let mapStyle = 'mapbox://styles/mapbox/streets-v11';
+
     const map = new mapboxgl.Map({
         container: 'map',
-        style: 'mapbox://styles/mapbox/streets-v11',
+        style: mapStyle,
         center: [-49.851645, -6.530057], // Coordenadas de Canaã dos Carajás
         zoom: 12
+    });
+
+    // Alternar entre estilos de mapa
+    document.querySelectorAll('input[name="mapStyle"]').forEach((input) => {
+        input.addEventListener('change', function () {
+            map.setStyle(`mapbox://styles/mapbox/${this.value}`);
+        });
     });
 
     let startPoint, endPoint, waypoints = [], schoolMarkers = [], escolasAtendidas = [];
