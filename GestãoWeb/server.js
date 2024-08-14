@@ -2849,6 +2849,44 @@ app.post('/api/solicitarTransporte', async (req, res) => {
 
 
 
+app.get('/api/verificar-direito-transporte', async (req, res) => {
+    const { endereco, latitude, longitude, escola_id } = req.query;
+
+    try {
+        // Buscar as coordenadas da escola no banco de dados
+        const query = 'SELECT latitude, longitude FROM escolas WHERE id = $1';
+        const result = await client.query(query, [escola_id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Escola não encontrada.' });
+        }
+
+        const escolaCoords = result.rows[0];
+        const escolaLatitude = escolaCoords.latitude;
+        const escolaLongitude = escolaCoords.longitude;
+
+        // Construir a URL da API do Google Maps Directions
+        const directionsUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${latitude},${longitude}&destination=${escolaLatitude},${escolaLongitude}&mode=walking&key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M`;
+
+        // Chamar a API do Google Maps Directions
+        const response = await axios.get(directionsUrl);
+        const distanceInMeters = response.data.routes[0].legs[0].distance.value;
+
+        // Verificar se o aluno tem direito ao transporte
+        const distanceInKilometers = distanceInMeters / 1000;
+        const temDireito = distanceInKilometers >= 2;
+
+        // Enviar a resposta
+        res.json({
+            direitoTransporte: temDireito,
+            mensagem: temDireito ? 'O aluno tem direito ao transporte escolar.' : 'O aluno não tem direito ao transporte escolar.',
+        });
+
+    } catch (error) {
+        console.error('Erro ao verificar direito ao transporte:', error);
+        res.status(500).json({ error: 'Erro ao processar a solicitação.' });
+    }
+});
 
 
 
