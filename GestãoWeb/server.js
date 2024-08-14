@@ -1640,18 +1640,6 @@ app.get('/api/escolas', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-
-app.get('/api/escolass', async (req, res) => {
-    try {
-      const query = 'SELECT id, nome, latitude, longitude FROM escolas';
-      const result = await client.query(query);
-  
-      res.json(result.rows);
-    } catch (error) {
-      console.error('Erro ao buscar escolas:', error);
-      res.status(500).json({ error: 'Erro ao buscar escolas.' });
-    }
-  });
   
 
 app.get('/api/motoristas', async (req, res) => {
