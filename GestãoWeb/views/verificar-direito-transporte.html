@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificar Direito ao Transporte Escolar</title>
+    <!-- Inclua o link para a API do Google Maps -->
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&libraries=places"></script>
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <form id="matricula-form">
+        <label>
+            <input type="checkbox" id="transporte-checkbox"> Verificar direito ao transporte escolar
+        </label>
+    </form>
+
+    <!-- Modal -->
+    <div id="transporte-modal" style="display: none;">
+        <h2>Verificar Direito ao Transporte</h2>
+
+        <label for="cep">CEP do Aluno:</label>
+        <input type="text" id="cep" placeholder="Digite o CEP">
+        <button id="buscar-endereco">Buscar Endereço</button>
+
+        <label for="endereco">Endereço do Aluno:</label>
+        <input type="text" id="endereco" placeholder="Endereço será preenchido automaticamente" readonly>
+        <button id="buscar-coordenadas">Buscar Coordenadas</button>
+
+        <div id="map"></div>
+
+        <label for="escola">Escolha a Escola:</label>
+        <select id="escola"></select>
+
+        <button id="verificar-direito">Verificar Direito ao Transporte</button>
+    </div>
+
+    <script>
+        // Inicializa o mapa
+        let map, marker;
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: -23.55052, lng: -46.633308 }, // Ponto inicial, pode ser ajustado
+                zoom: 15
+            });
+
+            map.addListener('click', function (event) {
+                placeMarker(event.latLng);
+            });
+        }
+
+        function placeMarker(location) {
+            if (marker) {
+                marker.setPosition(location);
+            } else {
+                marker = new google.maps.Marker({
+                    position: location,
+                    map: map
+                });
+            }
+        }
+
+        // Função para buscar endereço com base no CEP
+        document.getElementById('buscar-endereco').addEventListener('click', async function () {
+            const cep = document.getElementById('cep').value;
+            const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+            const data = await response.json();
+
+            if (data.erro) {
+                alert('CEP não encontrado.');
+            } else {
+                const endereco = `${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
+                document.getElementById('endereco').value = endereco;
+            }
+        });
+
+        // Função para buscar coordenadas com base no endereço
+        document.getElementById('buscar-coordenadas').addEventListener('click', function () {
+            const geocoder = new google.maps.Geocoder();
+            const endereco = document.getElementById('endereco').value;
+
+            geocoder.geocode({ 'address': endereco }, function (results, status) {
+                if (status === 'OK') {
+                    map.setCenter(results[0].geometry.location);
+                    placeMarker(results[0].geometry.location);
+                } else {
+                    alert('Erro ao buscar coordenadas: ' + status);
+                }
+            });
+        });
+
+        // Mostrar o modal quando a caixa de seleção for marcada
+        document.getElementById('transporte-checkbox').addEventListener('change', function () {
+            const modal = document.getElementById('transporte-modal');
+            modal.style.display = this.checked ? 'block' : 'none';
+        });
+
+        // Buscar escolas e preencher o select
+        async function carregarEscolas() {
+            const response = await fetch('/api/escolas');
+            const escolas = await response.json();
+            const selectEscola = document.getElementById('escola');
+
+            escolas.forEach(escola => {
+                const option = document.createElement('option');
+                option.value = escola.id;
+                option.text = escola.nome;
+                selectEscola.appendChild(option);
+            });
+        }
+
+        carregarEscolas();
+
+        // Verificar o direito ao transporte
+        document.getElementById('verificar-direito').addEventListener('click', async function () {
+            const escolaId = document.getElementById('escola').value;
+            const alunoLat = marker.getPosition().lat();
+            const alunoLng = marker.getPosition().lng();
+
+            const response = await fetch(`/api/verificar-direito-transporte?latitude=${alunoLat}&longitude=${alunoLng}&escola_id=${escolaId}`);
+            const data = await response.json();
+
+            alert(data.mensagem);
+        });
+
+        // Inicializa o mapa quando a página for carregada
+        window.onload = initMap;
+    </script>
+
+</body>
+
+</html>

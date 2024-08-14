@@ -170,6 +170,9 @@ app.get('/dashboard-escolar', ensureLoggedIn, (req, res) => {
 app.get('/redefinir-senha/:token', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'redefinir-senha.html'));
 });
+app.get('/verificar-direito-transporte', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'verificar-direito-transporte.html'));
+});
 
 app.get('/dashboard-adm', ensureLoggedIn, (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'pages', 'dashboard-adm.html'));
