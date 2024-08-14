@@ -2813,7 +2813,7 @@ app.post('/api/loginMotoristasEscolares', async (req, res) => {
 
 
 app.post('/api/solicitarTransporte', async (req, res) => {
-    const { nome_responsavel, cpf_responsavel, nome_aluno, cpf_aluno, id_matricula, coordenadas_aluno } = req.body;
+    const { nome_responsavel, cpf_responsavel, nome_aluno, id_matricula, coordenadas_aluno } = req.body;
 
     // Verificação para garantir que as coordenadas estão presentes
     if (!coordenadas_aluno || !coordenadas_aluno.lat || !coordenadas_aluno.lng) {
@@ -2828,16 +2828,15 @@ app.post('/api/solicitarTransporte', async (req, res) => {
             nome_responsavel,
             cpf_responsavel,
             nome_aluno,
-            cpf_aluno,
             id_matricula,
             coordenadas_aluno: coordenadasString
         });
 
         const result = await pool.query(
-            `INSERT INTO solicitacoes_transporte (nome_responsavel, cpf_responsavel, nome_aluno, cpf_aluno, id_matricula, coordenadas_aluno) 
-             VALUES ($1, $2, $3, $4, $5, $6) 
+            `INSERT INTO solicitacoes_transporte (nome_responsavel, cpf_responsavel, nome_aluno, id_matricula, coordenadas_aluno) 
+             VALUES ($1, $2, $3, $4, $5) 
              RETURNING id`,
-            [nome_responsavel, cpf_responsavel, nome_aluno, cpf_aluno, id_matricula, coordenadasString]
+            [nome_responsavel, cpf_responsavel, nome_aluno, id_matricula, coordenadasString]
         );
 
         res.status(201).json({ success: true, id: result.rows[0].id });
