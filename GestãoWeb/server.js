@@ -2901,17 +2901,25 @@ app.get('/api/verificar-direito-transporte', async (req, res) => {
 app.post('/api/verificar-id', async (req, res) => {
     const { id_aluno } = req.body;
 
+    console.log('ID recebido:', id_aluno);  // Log do ID recebido
+
     if (!id_aluno) {
+        console.log('ID do aluno não foi fornecido');
         return res.status(400).json({ status: 'fail', message: 'ID do aluno não fornecido' });
     }
 
     try {
         const query = 'SELECT id FROM public.alunos WHERE id = $1';
+        console.log('Consulta SQL:', query);  // Log da consulta SQL
         const result = await pool.query(query, [id_aluno]);
 
+        console.log('Resultado da consulta:', result.rows);  // Log do resultado da consulta
+
         if (result.rows.length > 0) {
+            console.log('ID encontrado:', result.rows[0].id);
             res.status(200).json({ status: 'success', message: 'ID encontrado' });
         } else {
+            console.log('ID não encontrado');
             res.status(404).json({ status: 'fail', message: 'ID não encontrado' });
         }
     } catch (error) {
