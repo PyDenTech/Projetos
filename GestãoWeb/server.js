@@ -47,6 +47,10 @@ const pool = new Pool({
     connectionTimeoutMillis: process.env.DB_CONNECTION_TIMEOUT
 });
 
+const clientToken = 'Ff25ccdc6945c49999ce8db432de3b16eS';
+const instanceId = '3D3B90E209EA20234F3ECA2329418A04';
+const zApiToken = '1FD71FFF110E5D6A1C5C7EEA';
+
 const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
 
 pool.connect(err => {
@@ -2928,6 +2932,71 @@ app.post('/consulta-aluno', async (req, res) => {
         res.status(500).json({ status: 'error', message: 'Erro interno do servidor.' });
     }
 });
+
+
+
+
+
+
+const sendButtonListMessage = async (phoneNumber) => {
+    try {
+      const response = await axios.post(
+        `https://api.z-api.io/instances/${instanceId}/token/${zApiToken}/send-button-list`,
+        {
+          phone: phoneNumber,
+          message: "Por favor, selecione uma das opções para se identificar:",
+          buttonList: {
+            buttons: [
+              {
+                id: "1",
+                label: "Pais, Responsáveis ou Alunos"
+              },
+              {
+                id: "2",
+                label: "Servidores SEMED"
+              },
+              {
+                id: "3",
+                label: "Servidores Escola"
+              },
+              {
+                id: "4",
+                label: "Fornecedores"
+              }
+            ]
+          }
+        },
+        {
+          headers: {
+            'Client-Token': clientToken,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+  
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao enviar mensagem com botões:', error.response?.data || error.message);
+      throw error;
+    }
+  };
+  
+  // Endpoint para receber mensagens (você precisa configurar um webhook no Z API para isso)
+  app.post('/webhook', async (req, res) => {
+    const { fromMe, isGroup, chatId } = req.body;
+  
+    // Verifica se a mensagem não é de um grupo e não foi enviada pelo próprio sistema
+    if (!fromMe && !isGroup) {
+      try {
+        await sendButtonListMessage(chatId);
+        res.status(200).send('Mensagem com botões enviada');
+      } catch (error) {
+        res.status(500).send('Erro ao enviar mensagem com botões');
+      }
+    } else {
+      res.status(200).send('Mensagem ignorada');
+    }
+  });
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
