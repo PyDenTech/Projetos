@@ -2909,7 +2909,7 @@ app.post('/api/verificar-id', async (req, res) => {
     }
 
     try {
-        const query = 'SELECT id FROM public.alunos WHERE id = $1';
+        const query = 'SELECT id FROM alunos WHERE id = $1';
         console.log('Consulta SQL:', query);  // Log da consulta SQL
         const result = await pool.query(query, [id_aluno]);
 
