@@ -2957,14 +2957,23 @@ app.post('/api/armazenar-solicitacao', async (req, res) => {
         endereco_responsavel,
         contato_responsavel,
         laudo_medico,
-        latitude,
-        longitude
+        localizacao
     } = req.body;
 
-    console.log('Coordenadas Recebidas:', latitude, longitude);
+    console.log('Dados de Localização Recebidos:', localizacao);
+
+    // Extraia coordenadas da mensagem de localização
+    let latitude, longitude;
+    if (localizacao && localizacao.Location) {
+        latitude = localizacao.Location.Latitude;
+        longitude = localizacao.Location.Longitude;
+        console.log('Coordenadas Extraídas:', latitude, longitude);
+    } else {
+        console.log('Nenhuma coordenada encontrada.');
+    }
 
     const laudoMedicoBoolean = laudo_medico.toLowerCase() === 'sim';
-    const localizacao = `${latitude}, ${longitude}`;
+    const localizacaoStr = latitude && longitude ? `${latitude}, ${longitude}` : null;
 
     try {
         const query = `
@@ -2985,7 +2994,7 @@ app.post('/api/armazenar-solicitacao', async (req, res) => {
             endereco_responsavel,
             contato_responsavel,
             laudoMedicoBoolean,
-            localizacao
+            localizacaoStr // Aqui inserimos as coordenadas extraídas
         ];
 
         await pool.query(query, values);
@@ -2995,6 +3004,7 @@ app.post('/api/armazenar-solicitacao', async (req, res) => {
         res.status(500).json({ status: 'error', message: 'Erro ao armazenar a solicitação' });
     }
 });
+
 
 
 app.use((req, res, next) => {
