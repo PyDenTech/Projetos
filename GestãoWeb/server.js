@@ -2949,7 +2949,6 @@ app.post('/api/verificar-id', async (req, res) => {
     }
 });
 
-// Rota para armazenar a solicitação
 app.post('/api/armazenar-solicitacao', async (req, res) => {
     const {
         id_matricula,
@@ -2961,17 +2960,19 @@ app.post('/api/armazenar-solicitacao', async (req, res) => {
         localizacao
     } = req.body;
 
-    // Log das informações recebidas
-    console.log('Dados recebidos:');
-    console.log('ID de Matrícula:', id_matricula);
-    console.log('Nome do Responsável:', nome_responsavel);
-    console.log('CPF do Responsável:', cpf_responsavel);
-    console.log('Endereço do Responsável:', endereco_responsavel);
-    console.log('Contato do Responsável:', contato_responsavel);
-    console.log('Laudo Médico:', laudo_medico);
-    console.log('Localização:', localizacao);
+    console.log('Link de Localização Recebido:', localizacao);
 
-    // Converter "Sim" ou "Nao" para TRUE ou FALSE
+    // Extrair coordenadas do link do Google Maps
+    let coordenadas = '';
+    const regex = /google\.com\/maps\?q=(-?\d+\.\d+),(-?\d+\.\d+)/;
+    const match = localizacao.match(regex);
+    if (match) {
+        coordenadas = `${match[1]}, ${match[2]}`;
+        console.log('Coordenadas extraídas:', coordenadas);
+    } else {
+        console.log('Nenhuma coordenada encontrada no link de localização.');
+    }
+
     const laudoMedicoBoolean = laudo_medico.toLowerCase() === 'sim';
 
     try {
@@ -2992,8 +2993,8 @@ app.post('/api/armazenar-solicitacao', async (req, res) => {
             cpf_responsavel,
             endereco_responsavel,
             contato_responsavel,
-            laudoMedicoBoolean, 
-            localizacao // Aqui estamos enviando o valor da localização
+            laudoMedicoBoolean,
+            coordenadas // Aqui estamos inserindo as coordenadas extraídas
         ];
 
         await pool.query(query, values);
@@ -3003,6 +3004,7 @@ app.post('/api/armazenar-solicitacao', async (req, res) => {
         res.status(500).json({ status: 'error', message: 'Erro ao armazenar a solicitação' });
     }
 });
+
 
 
 app.use((req, res, next) => {
