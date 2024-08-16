@@ -3005,6 +3005,27 @@ app.post('/api/armazenar-solicitacao', async (req, res) => {
     }
 });
 
+app.post('/api/extrair-coordenadas', (req, res) => {
+    const { localizacao } = req.body;
+
+    console.log('Link de Localização Recebido:', localizacao);
+
+    // Extrair coordenadas do link do Google Maps
+    let coordenadas = '';
+    const regex = /google\.com\/maps\?q=(-?\d+\.\d+),(-?\d+\.\d+)/;
+    const match = localizacao.match(regex);
+    if (match) {
+        coordenadas = {
+            latitude: match[1],
+            longitude: match[2]
+        };
+        console.log('Coordenadas extraídas:', coordenadas);
+        res.status(200).json(coordenadas);
+    } else {
+        console.log('Nenhuma coordenada encontrada no link de localização.');
+        res.status(400).json({ error: 'Link de localização inválido' });
+    }
+});
 
 
 app.use((req, res, next) => {
