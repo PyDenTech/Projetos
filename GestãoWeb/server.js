@@ -2949,6 +2949,48 @@ app.post('/api/verificar-id', async (req, res) => {
     }
 });
 
+// Rota para armazenar a solicitação
+app.post('/api/armazenar-solicitacao', async (req, res) => {
+    const {
+        id_matricula,
+        nome_responsavel,
+        cpf_responsavel,
+        endereco_responsavel,
+        contato_responsavel,
+        laudo_medico,
+        localizacao
+    } = req.body;
+
+    try {
+        const query = `
+            INSERT INTO solicitacoes_transporte (
+                id_matricula,
+                nome_responsavel,
+                cpf_responsavel,
+                endereco_responsavel,
+                contato_responsavel,
+                laudo_medico,
+                localizacao
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+        `;
+        const values = [
+            id_matricula,
+            nome_responsavel,
+            cpf_responsavel,
+            endereco_responsavel,
+            contato_responsavel,
+            laudo_medico,
+            localizacao
+        ];
+
+        await pool.query(query, values);
+        res.status(200).json({ status: 'success', message: 'Solicitação armazenada com sucesso' });
+    } catch (error) {
+        console.error('Erro ao armazenar a solicitação:', error);
+        res.status(500).json({ status: 'error', message: 'Erro ao armazenar a solicitação' });
+    }
+});
+
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
 });
