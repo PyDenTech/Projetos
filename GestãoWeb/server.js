@@ -150,6 +150,16 @@ const diskStorage = multer.diskStorage({
     }
 });
 
+
+// Função para formatar a data no formato dd/mm/aaaa
+function formatDate(date) {
+    const d = new Date(date);
+    const day = (`0${d.getDate()}`).slice(-2);
+    const month = (`0${d.getMonth() + 1}`).slice(-2);
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+}
+
 const uploadDisk = multer({ storage: diskStorage });
 
 const memoryStorage = multer.memoryStorage();
@@ -2918,13 +2928,14 @@ app.post('/api/verificar-id', async (req, res) => {
 
         if (result.rows.length > 0) {
             const aluno = result.rows[0];
+            const formattedDate = formatDate(aluno.dt_nascimento);  // Formatar a data de nascimento
             console.log('ID de matrícula encontrado:', aluno.id_matricula);
             res.status(200).json({
                 status: 'success',
                 message: 'ID de matrícula encontrado',
                 data: {
                     nome: aluno.nome,
-                    dt_nascimento: aluno.dt_nascimento,
+                    dt_nascimento: formattedDate,
                     endereco: aluno.endereco
                 }
             });
@@ -2937,8 +2948,6 @@ app.post('/api/verificar-id', async (req, res) => {
         res.status(500).json({ status: 'error', message: 'Erro no servidor' });
     }
 });
-
-
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
