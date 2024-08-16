@@ -2962,9 +2962,9 @@ app.post('/api/armazenar-solicitacao', async (req, res) => {
 
     console.log('Link de Localização Recebido:', localizacao);
 
-    // Extrair coordenadas do link do Google Maps
+    // Nova regex para capturar coordenadas de um link do Google Maps
     let coordenadas = '';
-    const regex = /google\.com\/maps\?q=(-?\d+\.\d+),(-?\d+\.\d+)/;
+    const regex = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
     const match = localizacao.match(regex);
     if (match) {
         coordenadas = `${match[1]}, ${match[2]}`;
@@ -2994,7 +2994,7 @@ app.post('/api/armazenar-solicitacao', async (req, res) => {
             endereco_responsavel,
             contato_responsavel,
             laudoMedicoBoolean,
-            coordenadas // Inserir as coordenadas extraídas na coluna de localização
+            coordenadas // Inserir as coordenadas extraídas
         ];
 
         await pool.query(query, values);
@@ -3010,9 +3010,9 @@ app.post('/api/extrair-coordenadas', (req, res) => {
 
     console.log('Link de Localização Recebido:', localizacao);
 
-    // Extrair coordenadas do link do Google Maps
+    // Nova regex para capturar coordenadas de um link do Google Maps
     let coordenadas = '';
-    const regex = /google\.com\/maps\?q=(-?\d+\.\d+),(-?\d+\.\d+)/;
+    const regex = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
     const match = localizacao.match(regex);
     if (match) {
         coordenadas = {
@@ -3026,7 +3026,6 @@ app.post('/api/extrair-coordenadas', (req, res) => {
         res.status(400).json({ error: 'Link de localização inválido' });
     }
 });
-
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
