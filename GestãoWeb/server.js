@@ -2957,23 +2957,14 @@ app.post('/api/armazenar-solicitacao', async (req, res) => {
         endereco_responsavel,
         contato_responsavel,
         laudo_medico,
-        localizacao
+        latitude,
+        longitude
     } = req.body;
 
-    console.log('Link de Localização Recebido:', localizacao);
-
-    // Nova regex para capturar coordenadas de um link do Google Maps
-    let coordenadas = '';
-    const regex = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
-    const match = localizacao.match(regex);
-    if (match) {
-        coordenadas = `${match[1]}, ${match[2]}`;
-        console.log('Coordenadas extraídas:', coordenadas);
-    } else {
-        console.log('Nenhuma coordenada encontrada no link de localização.');
-    }
+    console.log('Coordenadas Recebidas:', latitude, longitude);
 
     const laudoMedicoBoolean = laudo_medico.toLowerCase() === 'sim';
+    const localizacao = `${latitude}, ${longitude}`;
 
     try {
         const query = `
@@ -2994,7 +2985,7 @@ app.post('/api/armazenar-solicitacao', async (req, res) => {
             endereco_responsavel,
             contato_responsavel,
             laudoMedicoBoolean,
-            coordenadas // Inserir as coordenadas extraídas
+            localizacao
         ];
 
         await pool.query(query, values);
@@ -3005,27 +2996,6 @@ app.post('/api/armazenar-solicitacao', async (req, res) => {
     }
 });
 
-app.post('/api/extrair-coordenadas', (req, res) => {
-    const { localizacao } = req.body;
-
-    console.log('Link de Localização Recebido:', localizacao);
-
-    // Nova regex para capturar coordenadas de um link do Google Maps
-    let coordenadas = '';
-    const regex = /@(-?\d+\.\d+),(-?\d+\.\d+)/;
-    const match = localizacao.match(regex);
-    if (match) {
-        coordenadas = {
-            latitude: match[1],
-            longitude: match[2]
-        };
-        console.log('Coordenadas extraídas:', coordenadas);
-        res.status(200).json(coordenadas);
-    } else {
-        console.log('Nenhuma coordenada encontrada no link de localização.');
-        res.status(400).json({ error: 'Link de localização inválido' });
-    }
-});
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
