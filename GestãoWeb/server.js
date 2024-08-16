@@ -2909,15 +2909,25 @@ app.post('/api/verificar-id', async (req, res) => {
     }
 
     try {
-        const query = 'SELECT id_matricula FROM public.alunos WHERE id_matricula = $1';
+        // Consulta SQL para buscar as informações do aluno
+        const query = 'SELECT id_matricula, nome, dt_nascimento, endereco FROM public.alunos WHERE id_matricula = $1';
         console.log('Consulta SQL:', query);  // Log da consulta SQL
         const result = await pool.query(query, [id_aluno]);
 
         console.log('Resultado da consulta:', result.rows);  // Log do resultado da consulta
 
         if (result.rows.length > 0) {
-            console.log('ID de matrícula encontrado:', result.rows[0].id_matricula);
-            res.status(200).json({ status: 'success', message: 'ID de matrícula encontrado' });
+            const aluno = result.rows[0];
+            console.log('ID de matrícula encontrado:', aluno.id_matricula);
+            res.status(200).json({
+                status: 'success',
+                message: 'ID de matrícula encontrado',
+                data: {
+                    nome: aluno.nome,
+                    dt_nascimento: aluno.dt_nascimento,
+                    endereco: aluno.endereco
+                }
+            });
         } else {
             console.log('ID de matrícula não encontrado');
             res.status(404).json({ status: 'fail', message: 'ID de matrícula não encontrado' });
@@ -2927,6 +2937,7 @@ app.post('/api/verificar-id', async (req, res) => {
         res.status(500).json({ status: 'error', message: 'Erro no servidor' });
     }
 });
+
 
 
 app.use((req, res, next) => {
