@@ -2961,6 +2961,9 @@ app.post('/api/armazenar-solicitacao', async (req, res) => {
         localizacao
     } = req.body;
 
+    // Converter "Sim" ou "Nao" para TRUE ou FALSE
+    const laudoMedicoBoolean = laudo_medico.toLowerCase() === 'sim';
+
     try {
         const query = `
             INSERT INTO solicitacoes_transporte (
@@ -2979,7 +2982,7 @@ app.post('/api/armazenar-solicitacao', async (req, res) => {
             cpf_responsavel,
             endereco_responsavel,
             contato_responsavel,
-            laudo_medico,
+            laudoMedicoBoolean, // Aqui estamos enviando o valor booleano
             localizacao
         ];
 
@@ -2990,6 +2993,7 @@ app.post('/api/armazenar-solicitacao', async (req, res) => {
         res.status(500).json({ status: 'error', message: 'Erro ao armazenar a solicitação' });
     }
 });
+
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
