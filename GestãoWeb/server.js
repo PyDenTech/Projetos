@@ -3005,22 +3005,6 @@ app.post('/api/armazenar-solicitacao', async (req, res) => {
     }
 });
 
-app.post('/api/capturar-coordenadas', (req, res) => {
-    console.log('Dados Recebidos:', req.body);
-
-    const { Latitude, Longitude } = req.body;
-
-    if (Latitude && Longitude) {
-        console.log(`Coordenadas Recebidas: Latitude ${Latitude}, Longitude ${Longitude}`);
-        // Agora você pode salvar essas coordenadas no banco de dados ou fazer outro processamento
-    } else {
-        console.log('Nenhuma coordenada encontrada.');
-    }
-
-    res.status(200).send('Coordenadas capturadas com sucesso');
-});
-
-
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
 });
