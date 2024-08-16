@@ -2961,6 +2961,16 @@ app.post('/api/armazenar-solicitacao', async (req, res) => {
         localizacao
     } = req.body;
 
+    // Log das informações recebidas
+    console.log('Dados recebidos:');
+    console.log('ID de Matrícula:', id_matricula);
+    console.log('Nome do Responsável:', nome_responsavel);
+    console.log('CPF do Responsável:', cpf_responsavel);
+    console.log('Endereço do Responsável:', endereco_responsavel);
+    console.log('Contato do Responsável:', contato_responsavel);
+    console.log('Laudo Médico:', laudo_medico);
+    console.log('Localização:', localizacao);
+
     // Converter "Sim" ou "Nao" para TRUE ou FALSE
     const laudoMedicoBoolean = laudo_medico.toLowerCase() === 'sim';
 
@@ -2982,8 +2992,8 @@ app.post('/api/armazenar-solicitacao', async (req, res) => {
             cpf_responsavel,
             endereco_responsavel,
             contato_responsavel,
-            laudoMedicoBoolean, // Aqui estamos enviando o valor booleano
-            localizacao
+            laudoMedicoBoolean, 
+            localizacao // Aqui estamos enviando o valor da localização
         ];
 
         await pool.query(query, values);
