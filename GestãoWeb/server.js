@@ -2994,7 +2994,7 @@ app.post('/api/armazenar-solicitacao', async (req, res) => {
             endereco_responsavel,
             contato_responsavel,
             laudoMedicoBoolean,
-            coordenadas // Aqui estamos inserindo as coordenadas extraídas
+            coordenadas // Inserir as coordenadas extraídas na coluna de localização
         ];
 
         await pool.query(query, values);
