@@ -699,12 +699,12 @@
                         if (status === google.maps.DirectionsStatus.OK) {
                             directionsRenderer.setDirections(result);
 
-                            // Certificando que os valores são números antes de usar toFixed
-                            const tempoTotal = data.tempo_total ? data.tempo_total.toFixed(2) : 'N/A';
-                            const distanciaTotal = data.distancia_total ? data.distancia_total.toFixed(2) : 'N/A';
+                            // Certificando que os valores são números e convertendo se necessário
+                            const tempoTotal = parseFloat(data.tempo_total);
+                            const distanciaTotal = parseFloat(data.distancia_total);
 
-                            document.getElementById('tempoTotal').textContent = tempoTotal;
-                            document.getElementById('distanciaTotal').textContent = distanciaTotal;
+                            document.getElementById('tempoTotal').textContent = !isNaN(tempoTotal) ? tempoTotal.toFixed(2) : 'N/A';
+                            document.getElementById('distanciaTotal').textContent = !isNaN(distanciaTotal) ? distanciaTotal.toFixed(2) : 'N/A';
                         } else {
                             console.error('Erro ao buscar direções:', status);
                             alert('Erro ao buscar direções. Tente novamente mais tarde.');
