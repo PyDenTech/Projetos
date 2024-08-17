@@ -698,8 +698,9 @@
                     directionsService.route(request, (result, status) => {
                         if (status === google.maps.DirectionsStatus.OK) {
                             directionsRenderer.setDirections(result);
-                            document.getElementById('tempoTotal').textContent = (result.routes[0].legs.reduce((total, leg) => total + leg.duration.value, 0) / 60).toFixed(2);
-                            document.getElementById('distanciaTotal').textContent = (result.routes[0].legs.reduce((total, leg) => total + leg.distance.value, 0) / 1000).toFixed(2);
+                            // Use os valores do banco de dados para exibir no modal
+                            document.getElementById('tempoTotal').textContent = data.tempo_total.toFixed(2);
+                            document.getElementById('distanciaTotal').textContent = data.distancia_total.toFixed(2);
                         } else {
                             console.error('Erro ao buscar direções:', status);
                             alert('Erro ao buscar direções. Tente novamente mais tarde.');
