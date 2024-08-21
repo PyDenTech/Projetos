@@ -2952,61 +2952,34 @@ app.post('/api/verificar-id', async (req, res) => {
     }
 });
 
-app.post('/api/armazenar-solicitacao', async (req, res) => {
-    const {
-        id_matricula,
-        nome_responsavel,
-        cpf_responsavel,
-        endereco_responsavel,
-        contato_responsavel,
-        laudo_medico,
-        localizacao
-    } = req.body;
+app.post('/api/solicitar-rota', async (req, res) => {
+    const { nome_responsavel, cpf_responsavel, cep, numero, endereco, latitude, longitude, comprovante_endereco, id_matricula_aluno, deficiencia, laudo_deficiencia, id_escola } = req.body;
 
-    console.log('Dados de Localização Recebidos:', localizacao);
-
-    // Extraia coordenadas da mensagem de localização
-    let latitude, longitude;
-    if (localizacao && localizacao.Location) {
-        latitude = localizacao.Location.Latitude;
-        longitude = localizacao.Location.Longitude;
-        console.log('Coordenadas Extraídas:', latitude, longitude);
-    } else {
-        console.log('Nenhuma coordenada encontrada.');
+    // Validação dos dados recebidos
+    if (!nome_responsavel || !cpf_responsavel || !cep || !numero || !endereco || !latitude || !longitude || !id_matricula_aluno || !deficiencia || !id_escola) {
+        return res.status(400).json({ error: 'Todos os campos obrigatórios devem ser preenchidos.' });
     }
-
-    const laudoMedicoBoolean = laudo_medico.toLowerCase() === 'sim';
-    const localizacaoStr = latitude && longitude ? `${latitude}, ${longitude}` : null;
 
     try {
+        // Inserir a solicitação de rota no banco de dados
         const query = `
-            INSERT INTO solicitacoes_transporte (
-                id_matricula,
-                nome_responsavel,
-                cpf_responsavel,
-                endereco_responsavel,
-                contato_responsavel,
-                laudo_medico,
-                localizacao
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+            INSERT INTO solicitacoes_rota (nome_responsavel, cpf_responsavel, cep, numero, endereco, latitude, longitude, comprovante_endereco, id_matricula_aluno, deficiencia, laudo_deficiencia, id_escola)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+            RETURNING id
         `;
-        const values = [
-            id_matricula,
-            nome_responsavel,
-            cpf_responsavel,
-            endereco_responsavel,
-            contato_responsavel,
-            laudoMedicoBoolean,
-            localizacaoStr
-        ];
+        const values = [nome_responsavel, cpf_responsavel, cep, numero, endereco, latitude, longitude, comprovante_endereco, id_matricula_aluno, deficiencia, laudo_deficiencia, id_escola];
+        const result = await pool.query(query, values);
 
-        await pool.query(query, values);
-        res.status(200).json({ status: 'success', message: 'Solicitação armazenada com sucesso' });
+        res.status(201).json({
+            message: 'Solicitação de rota enviada com sucesso.',
+            solicitacao_id: result.rows[0].id
+        });
     } catch (error) {
-        console.error('Erro ao armazenar a solicitação:', error);
-        res.status(500).json({ status: 'error', message: 'Erro ao armazenar a solicitação' });
+        console.error('Erro ao enviar solicitação de rota:', error);
+        res.status(500).json({ error: 'Erro ao processar a solicitação.' });
     }
 });
+
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
