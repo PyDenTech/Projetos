@@ -106,8 +106,8 @@
                                     </div>
                                 </div>
                                 <div id="map" class="mt-3"></div>
-                                <input id="longitude" name="longitude">
-                                <input id="latitude" name="latitude">
+                                <input id="longitude" name="longitude" type="hidden">
+                                <input id="latitude" name="latitude" type="hidden">
 
                                 <div class="mb-3">
                                     <label for="comprovanteEndereco" class="form-label">Comprovante de Endereço</label>
@@ -277,6 +277,30 @@
             } catch (error) {
                 console.error('Erro ao verificar direito ao transporte:', error);
                 alert('Erro ao verificar direito ao transporte. Tente novamente mais tarde.');
+            }
+        });
+
+        // Envia a solicitação
+        document.getElementById('solicitacao-form').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            try {
+                const response = await fetch('/api/enviar-solicitacao', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.sucesso) {
+                    alert('Solicitação enviada com sucesso!');
+                    document.getElementById('solicitacao-form').reset();
+                } else {
+                    alert('Erro ao enviar a solicitação. Tente novamente mais tarde.');
+                }
+            } catch (error) {
+                console.error('Erro ao enviar a solicitação:', error);
+                alert('Erro ao enviar a solicitação. Tente novamente mais tarde.');
             }
         });
 
