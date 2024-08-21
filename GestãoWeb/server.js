@@ -2953,21 +2953,21 @@ app.post('/api/verificar-id', async (req, res) => {
 });
 
 app.post('/api/solicitar-rota', async (req, res) => {
-    const { nome_responsavel, cpf_responsavel, cep, numero, endereco, latitude, longitude, comprovante_endereco, id_matricula_aluno, deficiencia, laudo_deficiencia, id_escola } = req.body;
+    const { nome_responsavel, cpf_responsavel, cep, numero, endereco, latitude, longitude, comprovante_endereco, id_matricula_aluno, deficiencia, laudo_deficiencia, escola_id } = req.body;
 
     // Validação dos dados recebidos
-    if (!nome_responsavel || !cpf_responsavel || !cep || !numero || !endereco || !latitude || !longitude || !id_matricula_aluno || !deficiencia || !id_escola) {
+    if (!nome_responsavel || !cpf_responsavel || !cep || !numero || !endereco || !latitude || !longitude || !id_matricula_aluno || !deficiencia || !escola_id) {
         return res.status(400).json({ error: 'Todos os campos obrigatórios devem ser preenchidos.' });
     }
 
     try {
         // Inserir a solicitação de rota no banco de dados
         const query = `
-            INSERT INTO solicitacoes_rota (nome_responsavel, cpf_responsavel, cep, numero, endereco, latitude, longitude, comprovante_endereco, id_matricula_aluno, deficiencia, laudo_deficiencia, id_escola)
+            INSERT INTO solicitacoes_rota (nome_responsavel, cpf_responsavel, cep, numero, endereco, latitude, longitude, comprovante_endereco, id_matricula_aluno, deficiencia, laudo_deficiencia, escola_id)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
             RETURNING id
         `;
-        const values = [nome_responsavel, cpf_responsavel, cep, numero, endereco, latitude, longitude, comprovante_endereco, id_matricula_aluno, deficiencia, laudo_deficiencia, id_escola];
+        const values = [nome_responsavel, cpf_responsavel, cep, numero, endereco, latitude, longitude, comprovante_endereco, id_matricula_aluno, deficiencia, laudo_deficiencia, escola_id];
         const result = await pool.query(query, values);
 
         res.status(201).json({
