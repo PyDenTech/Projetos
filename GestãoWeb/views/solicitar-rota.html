@@ -24,7 +24,8 @@
     <!-- Template Main CSS File -->
     <link href="/css/style.css" rel="stylesheet">
     <!-- Google Maps API -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&libraries=places"></script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&libraries=places"></script>
     <style>
         #map {
             height: 400px;
@@ -91,6 +92,22 @@
                                     <input type="text" class="form-control" id="idMatriculaAluno"
                                         name="id_matricula_aluno" required>
                                 </div>
+                                <div class="mb-3">
+                                    <label class="form-label">O dependente possui algum laudo de alguma deficiência que
+                                        o impeça de caminhar?</label><br>
+                                    <input type="radio" id="deficienciaSim" name="deficiencia" value="sim"
+                                        onclick="mostrarUpload(true)" required> Sim
+                                    <input type="radio" id="deficienciaNao" name="deficiencia" value="nao"
+                                        onclick="mostrarUpload(false)" required> Não
+                                </div>
+
+                                <!-- Campo para upload do laudo, que será mostrado se "Sim" for selecionado -->
+                                <div class="mb-3" id="uploadLaudo" style="display: none;">
+                                    <label for="laudoDeficiencia" class="form-label">Upload do Laudo</label>
+                                    <input type="file" class="form-control" id="laudoDeficiencia"
+                                        name="laudo_deficiencia" accept="image/*">
+                                </div>
+
                                 <div class="mb-3">
                                     <label for="escolaSelect" class="form-label">Selecione a Escola</label>
                                     <select class="form-select" id="escolaSelect" name="id_escola" required>
