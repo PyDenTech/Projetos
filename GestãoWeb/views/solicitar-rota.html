@@ -87,23 +87,28 @@
                                     <input type="text" class="form-control" id="cpfResponsavel" name="cpf_responsavel"
                                         required>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="cep" class="form-label">CEP</label>
-                                    <input type="text" class="form-control" id="cep" name="cep" required>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label for="cep" class="form-label">CEP</label>
+                                        <input type="text" class="form-control" id="cep" name="cep" required>
+                                        <button type="button" id="buscar-endereco" class="btn btn-secondary mt-2">Buscar
+                                            Endereço</button>
+                                        <a href="https://portalcanaa.com.br/ceps/ceps-do-centro-canaa-dos-carajas/"
+                                            target="_blank" class="d-block mt-2">Não sei meu CEP</a>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="numero" class="form-label">Número</label>
+                                        <input type="text" class="form-control" id="numero" name="numero" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="endereco" class="form-label">Endereço</label>
+                                        <input type="text" class="form-control" id="endereco" name="endereco" readonly>
+                                        <button type="button" id="buscar-coordenadas"
+                                            class="btn btn-secondary mt-2">Buscar
+                                            Coordenadas</button>
+                                    </div>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="numero" class="form-label">Número</label>
-                                    <input type="text" class="form-control" id="numero" name="numero" required>
-                                    <button type="button" id="buscar-endereco" class="btn btn-secondary mt-2">Buscar
-                                        Endereço</button>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="endereco" class="form-label">Endereço</label>
-                                    <input type="text" class="form-control" id="endereco" name="endereco" readonly>
-                                    <button type="button" id="buscar-coordenadas" class="btn btn-secondary mt-2"
-                                        disabled>Buscar Coordenadas</button>
-                                </div>
-                                <div id="map"></div>
+                                <div id="map" class="mt-3"></div>
                                 <input type="hidden" id="latitude" name="latitude">
                                 <input type="hidden" id="longitude" name="longitude">
 
@@ -191,15 +196,12 @@
 
         function mostrarUpload(exibir) {
             const uploadDiv = document.getElementById('uploadLaudo');
-            uploadDiv.style.display = exibir ? 'block' : 'none';
+            if (exibir) {
+                uploadDiv.style.display = 'block';
+            } else {
+                uploadDiv.style.display = 'none';
+            }
         }
-
-        // Habilita o botão "Buscar Coordenadas" apenas se o campo CEP estiver preenchido
-        document.getElementById('cep').addEventListener('input', function () {
-            const cep = document.getElementById('cep').value.trim();
-            const botaoCoordenadas = document.getElementById('buscar-coordenadas');
-            botaoCoordenadas.disabled = cep === '';
-        });
 
         // Função para buscar endereço com base no CEP
         document.getElementById('buscar-endereco').addEventListener('click', async function () {
@@ -212,25 +214,6 @@
             } else {
                 alert('Endereço não encontrado para o CEP informado.');
             }
-        });
-
-        // Função para buscar coordenadas e exibir no mapa
-        document.getElementById('buscar-coordenadas').addEventListener('click', function () {
-            const endereco = document.getElementById('endereco').value;
-            const geocoder = new google.maps.Geocoder();
-
-            geocoder.geocode({ 'address': endereco }, function (results, status) {
-                if (status === 'OK') {
-                    const location = results[0].geometry.location;
-                    map.setCenter(location);
-                    map.setZoom(25); // Aproxima o zoom para 5
-                    placeMarker(location);
-                    document.getElementById('latitude').value = location.lat();
-                    document.getElementById('longitude').value = location.lng();
-                } else {
-                    alert('Geocode falhou devido a: ' + status);
-                }
-            });
         });
 
         // Carrega escolas via API
@@ -246,7 +229,6 @@
 
         initMap();
     </script>
-
 </body>
 
 </html>
