@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Solicitar Concessão de Rota</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+    <!-- Favicons -->
+    <link href="/img/favicon.png" rel="icon">
+    <link href="/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <!-- Google Fonts -->
+    <link href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i" rel="stylesheet">
+    <!-- Vendor CSS Files -->
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="/vendor/simple-datatables/style.css" rel="stylesheet">
+    <!-- Template Main CSS File -->
+    <link href="/css/style.css" rel="stylesheet">
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ======= Sidebar ======= -->
+    <aside id="sidebar" class="sidebar">
+        <ul class="sidebar-nav" id="sidebar-nav">
+            <li class="nav-heading">Transporte Escolar</li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <i class="bi bi-truck"></i>
+                    <span>Solicitar Concessão de Rota</span>
+                </a>
+            </li>
+        </ul>
+    </aside><!-- End Sidebar-->
+
+    <main id="main" class="main">
+        <div class="pagetitle">
+            <h1>Solicitar Concessão de Rota</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/dashboard-escolar"><i class="bi bi-house"></i></a></li>
+                    <li class="breadcrumb-item active">Solicitar Concessão de Rota</li>
+                </ol>
+            </nav>
+        </div><!-- End Page Title -->
+
+        <section class="section">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Formulário de Solicitação</h5>
+
+                            <form id="solicitacao-form">
+                                <div class="mb-3">
+                                    <label for="nomeResponsavel" class="form-label">Nome Completo do Responsável</label>
+                                    <input type="text" class="form-control" id="nomeResponsavel" name="nome_responsavel"
+                                        required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="cpfResponsavel" class="form-label">CPF do Responsável</label>
+                                    <input type="text" class="form-control" id="cpfResponsavel" name="cpf_responsavel"
+                                        required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="endereco" class="form-label">Endereço</label>
+                                    <input type="text" class="form-control" id="endereco" name="endereco" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="comprovanteEndereco" class="form-label">Comprovante de Endereço</label>
+                                    <input type="file" class="form-control" id="comprovanteEndereco"
+                                        name="comprovante_endereco" accept="image/*">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="idMatriculaAluno" class="form-label">ID de Matrícula do Aluno</label>
+                                    <input type="text" class="form-control" id="idMatriculaAluno"
+                                        name="id_matricula_aluno" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="escolaSelect" class="form-label">Selecione a Escola</label>
+                                    <select class="form-select" id="escolaSelect" name="id_escola" required>
+                                        <option value="">Selecione uma Escola</option>
+                                        <!-- Options dinâmicas -->
+                                    </select>
+                                </div>
+                                <div id="map"></div>
+                                <input type="hidden" id="latitude" name="latitude">
+                                <input type="hidden" id="longitude" name="longitude">
+                                <button type="submit" class="btn btn-primary mt-3">Enviar Solicitação</button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main><!-- End #main -->
+
+    <!-- Vendor JS Files -->
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/vendor/echarts/echarts.min.js"></script>
+    <script src="/vendor/quill/quill.min.js"></script>
+    <script src="/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="/vendor/tinymce/tinymce.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <!-- Template Main JS File -->
+    <script src="/js/main.js"></script>
+
+    <script>
+        // Inicializa o mapa
+        let map, marker;
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: -6.530066, lng: -49.851630 },
+                zoom: 15,
+                mapTypeId: 'satellite'
+            });
+
+            map.addListener('click', function (event) {
+                placeMarker(event.latLng);
+                document.getElementById('latitude').value = event.latLng.lat();
+                document.getElementById('longitude').value = event.latLng.lng();
+            });
+        }
+
+        function placeMarker(location) {
+            if (marker) {
+                marker.setPosition(location);
+            } else {
+                marker = new google.maps.Marker({
+                    position: location,
+                    map: map
+                });
+            }
+        }
+
+        // Carrega escolas no select
+        async function carregarEscolas() {
+            const response = await fetch('/api/escolas');
+            const escolas = await response.json();
+            const escolaSelect = document.getElementById('escolaSelect');
+
+            escolas.forEach(escola => {
+                const option = document.createElement('option');
+                option.value = escola.id;
+                option.textContent = escola.nome;
+                escolaSelect.appendChild(option);
+            });
+        }
+
+        carregarEscolas();
+        initMap();
+    </script>
+</body>
+
+</html>
