@@ -223,7 +223,7 @@
                 if (status === 'OK') {
                     const location = results[0].geometry.location;
                     map.setCenter(location);
-                    map.setZoom(5); // Aproxima o zoom para 5
+                    map.setZoom(25); // Aproxima o zoom para 5
                     placeMarker(location);
                     document.getElementById('latitude').value = location.lat();
                     document.getElementById('longitude').value = location.lng();
