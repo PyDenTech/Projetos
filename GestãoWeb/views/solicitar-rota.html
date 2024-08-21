@@ -146,7 +146,8 @@
 
                                 <button type="button" id="verificar-direito" class="btn btn-primary mt-3">Verificar
                                     Direito ao Transporte</button>
-                                <button type="submit" class="btn btn-primary mt-3">Enviar Solicitação</button>
+                                <button type="submit" class="btn btn-primary mt-3" id="enviar-solicitacao"
+                                    style="display: none;">Enviar Solicitação</button>
                             </form>
 
                         </div>
@@ -247,6 +248,39 @@
                     select.append($('<option></option>').attr('value', entry.id).text(entry.nome));
                 });
             });
+        });
+
+        // Verifica o direito ao transporte
+        document.getElementById('verificar-direito').addEventListener('click', async function () {
+            const latitude = document.getElementById('latitude').value;
+            const longitude = document.getElementById('longitude').value;
+            const escola_id = document.getElementById('escolaSelect').value;
+            const deficiencia = document.querySelector('input[name="deficiencia"]:checked').value;
+
+            if (!latitude || !longitude || !escola_id) {
+                alert('Por favor, preencha todas as informações necessárias.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/verificar-direito-transporte?endereco=${document.getElementById('endereco').value}&latitude=${latitude}&longitude=${longitude}&escola_id=${escola_id}`);
+                const data = await response.json();
+
+                if (data.direitoTransporte) {
+                    document.getElementById('enviar-solicitacao').style.display = 'block';
+                    alert(data.mensagem);
+                } else {
+                    document.getElementById('enviar-solicitacao').style.display = deficiencia === 'sim' ? 'block' : 'none';
+                    if (deficiencia === 'nao') {
+                        alert('Não é possível fazer a solicitação pois a distância é inferior a 2 km.');
+                    } else {
+                        alert('A distância é inferior a 2 km, será solicitado uma avaliação pelo Centro Viver e Conviver para atendimento com o Transporte Escolar Especial.');
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao verificar direito ao transporte:', error);
+                alert('Erro ao verificar direito ao transporte. Tente novamente mais tarde.');
+            }
         });
 
         initMap();
