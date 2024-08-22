@@ -203,8 +203,12 @@ app.get('/politicaprivacidade', (req, res) => {
 app.get('/termos', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'termos.html'));
 });
+
 app.get('/solicitar-rota', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'solicitar-rota.html'));
+});
+app.get('/faq', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'faq.html'));
 });
 
 app.post('/api/upload-foto-perfil', ensureLoggedIn, uploadDisk.single('foto_perfil'), async (req, res) => {
@@ -265,7 +269,6 @@ const pages = [
     'check-list-view',
     'cadastrar-demandas',
     'gerenciar-motorista-carro-form',
-    'faq',
     'users-profile',
     'gerenciar-motoristas-view',
     'cadastrar-abastecimento-view',
