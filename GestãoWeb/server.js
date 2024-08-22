@@ -2952,33 +2952,58 @@ app.post('/api/verificar-id', async (req, res) => {
     }
 });
 
-app.post('/api/solicitar-rota', async (req, res) => {
-    const { nome_responsavel, cpf_responsavel, cep, numero, endereco, latitude, longitude, comprovante_endereco, id_matricula_aluno, deficiencia, laudo_deficiencia, escola_id } = req.body;
-
-    // Validação dos dados recebidos
-    if (!nome_responsavel || !cpf_responsavel || !cep || !numero || !endereco || !latitude || !longitude || !id_matricula_aluno || !deficiencia || !escola_id) {
-        return res.status(400).json({ error: 'Todos os campos obrigatórios devem ser preenchidos.' });
-    }
-
+app.post('/api/enviar-solicitacao', upload.fields([
+    { name: 'comprovante_endereco', maxCount: 1 },
+    { name: 'laudo_deficiencia', maxCount: 1 }
+]), async (req, res) => {
     try {
-        // Inserir a solicitação de rota no banco de dados
+        const {
+            nome_responsavel,
+            cpf_responsavel,
+            cep,
+            numero,
+            endereco,
+            latitude,
+            longitude,
+            id_matricula_aluno,
+            deficiencia,
+            escola_id
+        } = req.body;
+
+        const comprovanteEnderecoPath = req.files['comprovante_endereco'] ? req.files['comprovante_endereco'][0].path : null;
+        const laudoDeficienciaPath = req.files['laudo_deficiencia'] ? req.files['laudo_deficiencia'][0].path : null;
+
+        // Inserir os dados no banco de dados
         const query = `
-            INSERT INTO solicitacoes_rota (nome_responsavel, cpf_responsavel, cep, numero, endereco, latitude, longitude, comprovante_endereco, id_matricula_aluno, deficiencia, laudo_deficiencia, escola_id)
+            INSERT INTO solicitacoes_rota 
+            (nome_responsavel, cpf_responsavel, cep, numero, endereco, latitude, longitude, id_matricula_aluno, deficiencia, escola_id, comprovante_endereco, laudo_deficiencia)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-            RETURNING id
+            RETURNING id;
         `;
-        const values = [nome_responsavel, cpf_responsavel, cep, numero, endereco, latitude, longitude, comprovante_endereco, id_matricula_aluno, deficiencia, laudo_deficiencia, escola_id];
+        const values = [
+            nome_responsavel,
+            cpf_responsavel,
+            cep,
+            numero,
+            endereco,
+            latitude,
+            longitude,
+            id_matricula_aluno,
+            deficiencia,
+            escola_id,
+            comprovanteEnderecoPath,
+            laudoDeficienciaPath
+        ];
+
         const result = await pool.query(query, values);
 
-        res.status(201).json({
-            message: 'Solicitação de rota enviada com sucesso.',
-            solicitacao_id: result.rows[0].id
-        });
+        res.status(200).json({ message: 'Solicitação enviada com sucesso!', id: result.rows[0].id });
     } catch (error) {
-        console.error('Erro ao enviar solicitação de rota:', error);
-        res.status(500).json({ error: 'Erro ao processar a solicitação.' });
+        console.error('Erro ao enviar a solicitação:', error);
+        res.status(500).json({ message: 'Erro ao enviar a solicitação. Tente novamente mais tarde.' });
     }
 });
+
 
 
 app.use((req, res, next) => {
