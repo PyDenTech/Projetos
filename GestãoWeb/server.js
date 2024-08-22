@@ -2997,7 +2997,7 @@ app.post('/api/enviar-solicitacao', upload.fields([
 
         const result = await pool.query(query, values);
 
-        res.status(200).json({ message: 'Solicitação enviada com sucesso!', id: result.rows[0].id });
+        res.status(200).json({ sucesso: true, message: 'Solicitação enviada com sucesso!', id: result.rows[0].id });
     } catch (error) {
         console.error('Erro ao enviar a solicitação:', error);
         res.status(500).json({ message: 'Erro ao enviar a solicitação. Tente novamente mais tarde.' });
