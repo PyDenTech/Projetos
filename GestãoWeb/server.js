@@ -208,7 +208,7 @@ app.get('/solicitar-rota', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'solicitar-rota.html'));
 });
 app.get('/faq', (req, res) => {
-    res.sendFile(path.join(__dirname, 'views', 'faq.html'));
+    res.sendFile(path.join(__dirname, 'views', 'pages', 'faq.html'));
 });
 
 app.post('/api/upload-foto-perfil', ensureLoggedIn, uploadDisk.single('foto_perfil'), async (req, res) => {
