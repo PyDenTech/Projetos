@@ -141,8 +141,10 @@
                                     </select>
                                 </div>
 
-                                <button type="button" id="enviar-solicitacao" class="btn btn-primary mt-3">Enviar
-                                    Solicitação</button>
+                                <button type="button" id="verificar-direito" class="btn btn-primary mt-3">Verificar
+                                    Direito ao Transporte</button>
+                                <button type="submit" class="btn btn-primary mt-3" id="enviar-solicitacao"
+                                    style="display: none;">Enviar Solicitação</button>
                             </form>
 
                         </div>
@@ -178,6 +180,7 @@
                 document.getElementById('longitude').value = event.latLng.lng();
             });
         }
+
         function placeMarker(location) {
             if (marker) {
                 marker.setPosition(location);
@@ -235,6 +238,7 @@
 
         // Carrega escolas via API
         $(document).ready(function () {
+            // Substitua a URL abaixo pela URL correta para sua API que retorna as escolas
             $.getJSON("/api/escolas", function (data) {
                 var select = $("#escolaSelect");
                 $.each(data, function (key, entry) {
@@ -243,23 +247,56 @@
             });
         });
 
-        // Envia a solicitação de rota
-        document.getElementById('enviar-solicitacao').addEventListener('click', async function () {
-            const formData = new FormData(document.getElementById('solicitacao-form'));
+        // Verifica o direito ao transporte
+        document.getElementById('verificar-direito').addEventListener('click', async function () {
+            const latitude = document.getElementById('latitude').value;
+            const longitude = document.getElementById('longitude').value;
+            const escola_id = document.getElementById('escolaSelect').value;
+            const deficiencia = document.querySelector('input[name="deficiencia"]:checked').value;
+
+            if (!latitude || !longitude || !escola_id) {
+                alert('Por favor, preencha todas as informações necessárias.');
+                return;
+            }
 
             try {
-                const response = await fetch('/api/solicitar-rota', {
+                const response = await fetch(`/api/verificar-direito-transporte?endereco=${document.getElementById('endereco').value}&latitude=${latitude}&longitude=${longitude}&escola_id=${escola_id}`);
+                const data = await response.json();
+
+                if (data.direitoTransporte) {
+                    document.getElementById('enviar-solicitacao').style.display = 'block';
+                    alert(data.mensagem);
+                } else {
+                    document.getElementById('enviar-solicitacao').style.display = deficiencia === 'sim' ? 'block' : 'none';
+                    if (deficiencia === 'nao') {
+                        alert('Não é possível fazer a solicitação pois a distância é inferior a 2 km.');
+                    } else {
+                        alert('A distância é inferior a 2 km, mas devido ao fato do dependente ter um laudo, será solicitado uma avaliação pelo Centro Viver e Conviver para atendimento com o Transporte Escolar Especial.');
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao verificar direito ao transporte:', error);
+                alert('Erro ao verificar direito ao transporte. Tente novamente mais tarde.');
+            }
+        });
+
+        // Envia a solicitação
+        document.getElementById('solicitacao-form').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            try {
+                const response = await fetch('/api/enviar-solicitacao', {
                     method: 'POST',
                     body: formData
                 });
+                const data = await response.json();
 
-                if (response.ok) {
-                    const result = await response.json();
-                    alert(result.message);
-                    // Limpar o formulário, se necessário
+                if (data.sucesso) {
+                    alert('Solicitação enviada com sucesso!');
+                    document.getElementById('solicitacao-form').reset();
                 } else {
-                    const errorResult = await response.json();
-                    alert('Erro ao enviar a solicitação: ' + errorResult.error);
+                    alert('Erro ao enviar a solicitação. Tente novamente mais tarde.');
                 }
             } catch (error) {
                 console.error('Erro ao enviar a solicitação:', error);
