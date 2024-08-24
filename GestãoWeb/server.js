@@ -2910,6 +2910,8 @@ app.get('/api/verificar-direito-transporte', async (req, res) => {
 
 
 app.post('/api/enviar-feedback', async (req, res) => {
+    console.log('Corpo da requisição:', req.body); // Adicione isso para depuração
+
     const { nome, mensagem } = req.body;
 
     try {
@@ -2923,6 +2925,7 @@ app.post('/api/enviar-feedback', async (req, res) => {
         res.status(500).json({ message: 'Erro ao enviar o feedback. Tente novamente mais tarde.' });
     }
 });
+
 
 
 // BOT DO SETOR DE TRANSPORTE
