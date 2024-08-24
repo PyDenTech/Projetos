@@ -2909,7 +2909,20 @@ app.get('/api/verificar-direito-transporte', async (req, res) => {
 });
 
 
+app.post('/api/enviar-feedback', async (req, res) => {
+    const { nome, mensagem } = req.body;
 
+    try {
+        const query = 'INSERT INTO feedback (nome, mensagem) VALUES ($1, $2)';
+        const values = [nome, mensagem];
+        await pool.query(query, values);
+
+        res.status(200).json({ message: 'Feedback enviado com sucesso!' });
+    } catch (error) {
+        console.error('Erro ao enviar o feedback:', error);
+        res.status(500).json({ message: 'Erro ao enviar o feedback. Tente novamente mais tarde.' });
+    }
+});
 
 
 // BOT DO SETOR DE TRANSPORTE
