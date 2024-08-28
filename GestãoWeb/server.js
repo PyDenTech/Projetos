@@ -2977,6 +2977,7 @@ app.post('/api/enviar-solicitacao', upload.fields([
         const {
             nome_responsavel,
             cpf_responsavel,
+            celular_responsavel,
             cep,
             numero,
             endereco,
@@ -2993,13 +2994,14 @@ app.post('/api/enviar-solicitacao', upload.fields([
         // Inserir os dados no banco de dados
         const query = `
             INSERT INTO solicitacoes_rota 
-            (nome_responsavel, cpf_responsavel, cep, numero, endereco, latitude, longitude, id_matricula_aluno, deficiencia, escola_id, comprovante_endereco, laudo_deficiencia)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+            (nome_responsavel, cpf_responsavel, celular_responsavel, cep, numero, endereco, latitude, longitude, id_matricula_aluno, deficiencia, escola_id, comprovante_endereco, laudo_deficiencia)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
             RETURNING id;
         `;
         const values = [
             nome_responsavel,
             cpf_responsavel,
+            celular_responsavel,
             cep,
             numero,
             endereco,
@@ -3014,13 +3016,12 @@ app.post('/api/enviar-solicitacao', upload.fields([
 
         const result = await pool.query(query, values);
 
-        res.status(200).json({ sucesso: true, message: 'Solicitação enviada com sucesso!', id: result.rows[0].id });
+        res.status(200).json({ message: 'Solicitação enviada com sucesso!', id: result.rows[0].id });
     } catch (error) {
         console.error('Erro ao enviar a solicitação:', error);
         res.status(500).json({ message: 'Erro ao enviar a solicitação. Tente novamente mais tarde.' });
     }
 });
-
 
 
 app.use((req, res, next) => {

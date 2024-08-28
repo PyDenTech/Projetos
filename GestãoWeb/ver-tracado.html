@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizar Traçado GPX</title>
+    <style>
+        #map {
+            height: 85vh;
+            width: 100%;
+        }
+
+        #controls {
+            margin: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        input[type="file"] {
+            margin-right: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="controls">
+        <input type="file" id="fileInput" accept=".gpx">
+        <button id="loadGPX">Carregar GPX</button>
+    </div>
+    <div id="map"></div>
+
+    <!-- Biblioteca GPXParser -->
+    <script src="https://cdn.jsdelivr.net/npm/gpxparser@0.4.0/gpxparser.min.js"></script>
+
+    <!-- API do Google Maps -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&callback=initMap"
+        async defer></script>
+
+    <!-- Script principal -->
+    <script>
+        let map;
+        let polyline;
+        let path = [];
+
+        // Função de inicialização do mapa
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: -6.530080, lng: -49.851571 },
+                zoom: 15
+            });
+
+            polyline = new google.maps.Polyline({
+                map: map,
+                path: path,
+                strokeColor: '#FF0000',
+                strokeOpacity: 1.0,
+                strokeWeight: 2
+            });
+        }
+
+        // Função para carregar e processar o arquivo GPX
+        function loadGPX() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Por favor, selecione um arquivo GPX.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const gpxData = e.target.result;
+                parseGPX(gpxData);
+            };
+            reader.readAsText(file);
+        }
+
+        // Função para analisar e processar o GPX
+        function parseGPX(gpxData) {
+            if (typeof GPXParser === 'undefined') {
+                alert('Biblioteca GPXParser não carregada.');
+                return;
+            }
+
+            try {
+                const gpxParser = new GPXParser();
+                gpxParser.parseGPS(gpxData);
+
+                const tracks = gpxParser.getTracks();
+                if (tracks.length > 0) {
+                    const track = tracks[0];
+                    path = track.points.map(point => new google.maps.LatLng(point.lat, point.lon));
+                    polyline.setPath(path);
+                    map.fitBounds(getBounds(path));
+                } else {
+                    alert('Nenhum traçado encontrado no arquivo GPX.');
+                }
+            } catch (error) {
+                console.error('Erro ao processar o GPX:', error);
+                alert('Erro ao processar o arquivo GPX.');
+            }
+        }
+
+        // Função para obter os limites do traçado
+        function getBounds(path) {
+            const bounds = new google.maps.LatLngBounds();
+            path.forEach(point => bounds.extend(point));
+            return bounds;
+        }
+
+        document.getElementById('loadGPX').addEventListener('click', loadGPX);
+    </script>
+</body>
+
+</html>

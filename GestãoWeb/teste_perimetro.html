@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Zoneamentos</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&libraries=drawing"></script>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h1>Gerenciamento de Zoneamentos</h1>
+        <form id="zoneamento-form">
+            <div class="form-group">
+                <label for="zoneamento-name">Nome do Zoneamento</label>
+                <input type="text" class="form-control" id="zoneamento-name" required>
+            </div>
+            <div class="form-group">
+                <label for="escola-select">Escolha a Escola</label>
+                <select class="form-control" id="escola-select" required>
+                    <!-- Options will be populated by JavaScript -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="color-picker">Escolha a Cor</label>
+                <input type="color" class="form-control" id="color-picker" value="#ff0000">
+            </div>
+            <button type="submit" class="btn btn-primary">Salvar Zoneamento</button>
+        </form>
+        <div id="map" class="mt-4" style="height: 500px;"></div>
+    </div>
+
+    <script>
+        let map;
+        let drawingManager;
+        let selectedShape;
+        const shapes = [];
+        const zoneamentoForm = document.getElementById('zoneamento-form');
+        const escolaSelect = document.getElementById('escola-select');
+        const colorPicker = document.getElementById('color-picker');
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: -6.530080, lng: -49.851571 },
+                zoom: 15,
+                mapTypeId: 'terrain'
+            });
+
+            drawingManager = new google.maps.drawing.DrawingManager({
+                drawingMode: google.maps.drawing.OverlayType.POLYGON,
+                drawingControl: true,
+                drawingControlOptions: {
+                    position: google.maps.ControlPosition.TOP_CENTER,
+                    drawingModes: ['polygon']
+                },
+                polygonOptions: {
+                    editable: true,
+                    strokeColor: colorPicker.value,
+                    fillColor: colorPicker.value,
+                    fillOpacity: 0.35
+                }
+            });
+            drawingManager.setMap(map);
+
+            google.maps.event.addListener(drawingManager, 'overlaycomplete', function (event) {
+                if (event.type === google.maps.drawing.OverlayType.POLYGON) {
+                    const polygon = event.overlay;
+                    shapes.push(polygon);
+                    google.maps.event.addListener(polygon, 'click', function () {
+                        setSelection(polygon);
+                    });
+                    setSelection(polygon);
+                }
+            });
+
+            colorPicker.addEventListener('input', function () {
+                if (selectedShape) {
+                    selectedShape.setOptions({
+                        strokeColor: colorPicker.value,
+                        fillColor: colorPicker.value
+                    });
+                }
+            });
+        }
+
+        function setSelection(shape) {
+            if (selectedShape) {
+                selectedShape.setEditable(false);
+            }
+            selectedShape = shape;
+            selectedShape.setEditable(true);
+            selectedShape.setOptions({
+                strokeColor: colorPicker.value,
+                fillColor: colorPicker.value
+            });
+        }
+
+        zoneamentoForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const name = document.getElementById('zoneamento-name').value;
+            const escolaId = escolaSelect.value;
+            const coordinates = selectedShape.getPath().getArray().map(latLng => ({
+                lat: latLng.lat(),
+                lng: latLng.lng()
+            }));
+
+            fetch('/api/zoneamentos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, escolaId, coordinates })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Zoneamento salvo com sucesso!');
+                    selectedShape.setMap(null);
+                    shapes.length = 0;
+                    zoneamentoForm.reset();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+
+        // Fetch schools and populate the select dropdown
+        fetch('/api/escolas')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(escola => {
+                    const option = document.createElement('option');
+                    option.value = escola.id;
+                    option.textContent = escola.name;
+                    escolaSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching schools:', error);
+            });
+
+        window.onload = initMap;
+
+    </script>
+</body>
+
+</html>
