@@ -151,20 +151,6 @@
                                 <button type="submit" class="btn btn-primary mt-3" id="enviar-solicitacao"
                                     style="display: none;">Enviar Solicitação</button>
                             </form>
-                            <div id="spinner-container" class="spinner center" style="display: none;">
-                                <div class="spinner-blade"></div>
-                                <div class="spinner-blade"></div>
-                                <div class="spinner-blade"></div>
-                                <div class="spinner-blade"></div>
-                                <div class="spinner-blade"></div>
-                                <div class="spinner-blade"></div>
-                                <div class="spinner-blade"></div>
-                                <div class="spinner-blade"></div>
-                                <div class="spinner-blade"></div>
-                                <div class="spinner-blade"></div>
-                                <div class="spinner-blade"></div>
-                                <div class="spinner-blade"></div>
-                            </div>
 
                         </div>
                     </div>
@@ -179,99 +165,154 @@
     <script src="/vendor/quill/quill.min.js"></script>
     <script src="/vendor/simple-datatables/simple-datatables.js"></script>
     <script src="/vendor/tinymce/tinymce.min.js"></script>
-    <script src="/vendor/php-email-form/validate.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <!-- Template Main JS File -->
     <script src="/js/main.js"></script>
 
     <script>
-        let map;
-        let marker;
-
+        // Inicializa o mapa
+        let map, marker;
         function initMap() {
-            const center = { lat: -6.530080, lng: -49.851571 };
-            map = new google.maps.Map(document.getElementById("map"), {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: -6.530066, lng: -49.851630 },
                 zoom: 15,
-                center: center,
+                mapTypeId: 'satellite'
             });
 
-            marker = new google.maps.Marker({
-                position: center,
-                map: map,
-                draggable: true,
-            });
-
-            google.maps.event.addListener(marker, 'dragend', function (event) {
-                document.getElementById('latitude').value = event.latLng.lat();
-                document.getElementById('longitude').value = event.latLng.lng();
-            });
-
-            map.addListener('click', (event) => {
-                marker.setPosition(event.latLng);
+            map.addListener('click', function (event) {
+                placeMarker(event.latLng);
                 document.getElementById('latitude').value = event.latLng.lat();
                 document.getElementById('longitude').value = event.latLng.lng();
             });
         }
 
-        document.getElementById('buscar-endereco').addEventListener('click', () => {
-            const cep = document.getElementById('cep').value;
-            const numero = document.getElementById('numero').value;
-
-            if (!cep || !numero) {
-                alert('Por favor, preencha o CEP e o Número.');
-                return;
+        function placeMarker(location) {
+            if (marker) {
+                marker.setPosition(location);
+            } else {
+                marker = new google.maps.Marker({
+                    position: location,
+                    map: map
+                });
             }
+        }
 
+        function mostrarUpload(exibir) {
+            const uploadDiv = document.getElementById('uploadLaudo');
+            uploadDiv.style.display = exibir ? 'block' : 'none';
+        }
+
+        // Habilita o botão "Buscar Coordenadas" apenas se o campo CEP estiver preenchido
+        document.getElementById('cep').addEventListener('input', function () {
+            const cep = document.getElementById('cep').value.trim();
+            const botaoCoordenadas = document.getElementById('buscar-coordenadas');
+            botaoCoordenadas.disabled = cep === '';
+        });
+
+        // Função para buscar endereço com base no CEP
+        document.getElementById('buscar-endereco').addEventListener('click', async function () {
+            const cep = document.getElementById('cep').value;
+            const numero = document.getElementById('numero').value; // Obtém o número
+            const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+            const data = await response.json();
+
+            if (data.logradouro) {
+                // Inclui o número no endereço
+                const enderecoCompleto = `${data.logradouro}, ${numero}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
+                document.getElementById('endereco').value = enderecoCompleto;
+            } else {
+                alert('Endereço não encontrado para o CEP informado.');
+            }
+        });
+
+        // Função para buscar coordenadas e exibir no mapa
+        document.getElementById('buscar-coordenadas').addEventListener('click', function () {
+            const endereco = document.getElementById('endereco').value;
             const geocoder = new google.maps.Geocoder();
-            geocoder.geocode({ 'address': `${cep}, ${numero}, Canaã dos Carajás, PA, Brasil` }, function (results, status) {
+
+            geocoder.geocode({ 'address': endereco }, function (results, status) {
                 if (status === 'OK') {
                     const location = results[0].geometry.location;
                     map.setCenter(location);
-                    marker.setPosition(location);
-
-                    document.getElementById('endereco').value = results[0].formatted_address;
+                    map.setZoom(25); // Aproxima o zoom para 25
+                    placeMarker(location);
                     document.getElementById('latitude').value = location.lat();
                     document.getElementById('longitude').value = location.lng();
-
-                    document.getElementById('buscar-coordenadas').disabled = false;
                 } else {
-                    alert('Geocode não foi bem-sucedido: ' + status);
+                    alert('Geocode falhou devido a: ' + status);
                 }
             });
         });
 
-        document.getElementById('buscar-coordenadas').addEventListener('click', () => {
+        // Carrega escolas via API
+        $(document).ready(function () {
+            // Substitua a URL abaixo pela URL correta para sua API que retorna as escolas
+            $.getJSON("/api/escolas", function (data) {
+                var select = $("#escolaSelect");
+                $.each(data, function (key, entry) {
+                    select.append($('<option></option>').attr('value', entry.id).text(entry.nome));
+                });
+            });
+        });
+
+        // Verifica o direito ao transporte
+        document.getElementById('verificar-direito').addEventListener('click', async function () {
             const latitude = document.getElementById('latitude').value;
             const longitude = document.getElementById('longitude').value;
+            const escola_id = document.getElementById('escolaSelect').value;
+            const deficiencia = document.querySelector('input[name="deficiencia"]:checked').value;
 
-            if (latitude && longitude) {
-                const latLng = new google.maps.LatLng(latitude, longitude);
-                map.setCenter(latLng);
-                marker.setPosition(latLng);
-            } else {
-                alert('As coordenadas não foram definidas.');
+            if (!latitude || !longitude || !escola_id) {
+                alert('Por favor, preencha todas as informações necessárias.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/verificar-direito-transporte?endereco=${document.getElementById('endereco').value}&latitude=${latitude}&longitude=${longitude}&escola_id=${escola_id}`);
+                const data = await response.json();
+
+                if (data.direitoTransporte) {
+                    document.getElementById('enviar-solicitacao').style.display = 'block';
+                    alert(data.mensagem);
+                } else {
+                    document.getElementById('enviar-solicitacao').style.display = deficiencia === 'sim' ? 'block' : 'none';
+                    if (deficiencia === 'nao') {
+                        alert('Não é possível fazer a solicitação pois a distância é inferior a 2 km.');
+                    } else {
+                        alert('A distância é inferior a 2 km, mas devido ao fato do dependente ter um laudo, será solicitado uma avaliação pelo Centro Viver e Conviver para atendimento com o Transporte Escolar Especial.');
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao verificar direito ao transporte:', error);
+                alert('Erro ao verificar direito ao transporte. Tente novamente mais tarde.');
             }
         });
 
-        document.getElementById('verificar-direito').addEventListener('click', () => {
-            const form = document.getElementById('solicitacao-form');
-            const formData = new FormData(form);
-            document.getElementById('spinner-container').style.display = 'block';
-            // Simulação da verificação do direito ao transporte
-            setTimeout(() => {
-                alert('Verificação realizada com sucesso. Você tem direito ao transporte.');
-                document.getElementById('enviar-solicitacao').style.display = 'block';
-                document.getElementById('spinner-container').style.display = 'none';
-            }, 2000);
+        // Envia a solicitação
+        document.getElementById('solicitacao-form').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            try {
+                const response = await fetch('/api/enviar-solicitacao', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.sucesso) {
+                    alert('Solicitação enviada com sucesso!');
+                    document.getElementById('solicitacao-form').reset();
+                } else {
+                    alert('Erro ao enviar a solicitação. Tente novamente mais tarde.');
+                }
+            } catch (error) {
+                console.error('Erro ao enviar a solicitação:', error);
+                alert('Erro ao enviar a solicitação. Tente novamente mais tarde.');
+            }
         });
 
-        function mostrarUpload(mostrar) {
-            document.getElementById('uploadLaudo').style.display = mostrar ? 'block' : 'none';
-        }
-
-        // Função para inicializar o mapa ao carregar a página
-        window.onload = function () {
-            initMap();
-        };
+        initMap();
     </script>
 </body>
 
