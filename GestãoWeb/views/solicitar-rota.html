@@ -300,11 +300,11 @@
                 });
                 const data = await response.json();
 
-                if (data.sucesso) {
+                if (response.ok) { // Verifica se o status HTTP foi 200-299
                     alert('Solicitação enviada com sucesso!');
                     document.getElementById('solicitacao-form').reset();
                 } else {
-                    alert('Erro ao enviar a solicitação. Tente novamente mais tarde.');
+                    alert(`Erro ao enviar a solicitação: ${data.message}`);
                 }
             } catch (error) {
                 console.error('Erro ao enviar a solicitação:', error);
