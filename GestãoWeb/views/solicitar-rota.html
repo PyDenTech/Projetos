@@ -311,7 +311,21 @@
                 alert('Erro ao enviar a solicitação. Tente novamente mais tarde.');
             }
         });
+        // Máscara de entrada para CPF e Celular
+        $('#cpfResponsavel').on('input', function () {
+            let cpf = $(this).val().replace(/\D/g, '');
+            cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
+            cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
+            cpf = cpf.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+            $(this).val(cpf);
+        });
 
+        $('#celularResponsavel').on('input', function () {
+            let celular = $(this).val().replace(/\D/g, '');
+            celular = celular.replace(/(\d{2})(\d)/, "($1) $2");
+            celular = celular.replace(/(\d{5})(\d{1,4})$/, "$1-$2");
+            $(this).val(celular);
+        });
         initMap();
     </script>
 </body>
