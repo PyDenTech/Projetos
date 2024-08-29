@@ -172,6 +172,13 @@
     <script>
         // Inicializa o mapa
         let map, marker;
+        function showSpinner() {
+            document.getElementById('spinner-container').style.display = 'inline-block';
+        }
+
+        function hideSpinner() {
+            document.getElementById('spinner-container').style.display = 'none';
+        }
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
                 center: { lat: -6.530066, lng: -49.851630 },
@@ -211,13 +218,14 @@
 
         // Função para buscar endereço com base no CEP
         document.getElementById('buscar-endereco').addEventListener('click', async function () {
+            showSpinner();
             const cep = document.getElementById('cep').value;
-            const numero = document.getElementById('numero').value; // Obtém o número
+            const numero = document.getElementById('numero').value;
             const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
             const data = await response.json();
+            hideSpinner();
 
             if (data.logradouro) {
-                // Inclui o número no endereço
                 const enderecoCompleto = `${data.logradouro}, ${numero}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
                 document.getElementById('endereco').value = enderecoCompleto;
             } else {
@@ -227,14 +235,16 @@
 
         // Função para buscar coordenadas e exibir no mapa
         document.getElementById('buscar-coordenadas').addEventListener('click', function () {
+            showSpinner();
             const endereco = document.getElementById('endereco').value;
             const geocoder = new google.maps.Geocoder();
 
             geocoder.geocode({ 'address': endereco }, function (results, status) {
+                hideSpinner();
                 if (status === 'OK') {
                     const location = results[0].geometry.location;
                     map.setCenter(location);
-                    map.setZoom(25); // Aproxima o zoom para 25
+                    map.setZoom(25);
                     placeMarker(location);
                     document.getElementById('latitude').value = location.lat();
                     document.getElementById('longitude').value = location.lng();
@@ -257,6 +267,7 @@
 
         // Verifica o direito ao transporte
         document.getElementById('verificar-direito').addEventListener('click', async function () {
+            showSpinner();
             const latitude = document.getElementById('latitude').value;
             const longitude = document.getElementById('longitude').value;
             const escola_id = document.getElementById('escolaSelect').value;
@@ -264,30 +275,42 @@
 
             if (!latitude || !longitude || !escola_id) {
                 alert('Por favor, preencha todas as informações necessárias.');
+                hideSpinner();
                 return;
             }
 
             try {
                 const response = await fetch(`/api/verificar-direito-transporte?endereco=${document.getElementById('endereco').value}&latitude=${latitude}&longitude=${longitude}&escola_id=${escola_id}`);
                 const data = await response.json();
+                hideSpinner();
 
                 if (data.direitoTransporte) {
                     document.getElementById('enviar-solicitacao').style.display = 'block';
                     alert(data.mensagem);
                 } else {
                     document.getElementById('enviar-solicitacao').style.display = deficiencia === 'sim' ? 'block' : 'none';
-                    if (deficiencia === 'nao') {
-                        alert('Não é possível fazer a solicitação pois a distância é inferior a 2 km.');
-                    } else {
-                        alert('A distância é inferior a 2 km, mas devido ao fato do dependente ter um laudo, será solicitado uma avaliação pelo Centro Viver e Conviver para atendimento com o Transporte Escolar Especial.');
-                    }
+                    alert(data.mensagem);
                 }
             } catch (error) {
-                console.error('Erro ao verificar direito ao transporte:', error);
-                alert('Erro ao verificar direito ao transporte. Tente novamente mais tarde.');
+                hideSpinner();
+                alert('Ocorreu um erro ao verificar o direito ao transporte.');
             }
         });
+        // Máscara de entrada para CPF e Celular
+        $('#cpfResponsavel').on('input', function () {
+            let cpf = $(this).val().replace(/\D/g, '');
+            cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
+            cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
+            cpf = cpf.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+            $(this).val(cpf);
+        });
 
+        $('#celularResponsavel').on('input', function () {
+            let celular = $(this).val().replace(/\D/g, '');
+            celular = celular.replace(/(\d{2})(\d)/, "($1) $2");
+            celular = celular.replace(/(\d{5})(\d{1,4})$/, "$1-$2");
+            $(this).val(celular);
+        });
         // Envia a solicitação
         document.getElementById('solicitacao-form').addEventListener('submit', async function (event) {
             event.preventDefault();
