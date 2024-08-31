@@ -3023,6 +3023,24 @@ app.post('/api/enviar-solicitacao', upload.fields([
     }
 });
 
+app.post('/consulta_motorista', async (req, res) => {
+    const { cpf } = req.body;
+
+    try {
+        const query = 'SELECT nome_completo, cpf, cnh, empresa, tipo_veiculo, placa FROM motoristas_administrativos WHERE cpf = $1 LIMIT 1';
+        const result = await pool.query(query, [cpf]);
+
+        if (result.rows.length > 0) {
+            const motorista = result.rows[0];
+            res.json(motorista);
+        } else {
+            res.status(404).json({ error: 'Motorista não encontrado' });
+        }
+    } catch (error) {
+        console.error('Erro ao consultar motorista:', error);
+        res.status(500).json({ error: 'Erro ao consultar motorista' });
+    }
+});
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
