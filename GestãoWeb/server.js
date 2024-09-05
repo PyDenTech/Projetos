@@ -2161,7 +2161,6 @@ app.get('/api/motoristas/:id', (req, res) => {
         });
 });
 
-
 app.delete('/api/motoristas/:id', async (req, res) => {
     const motoristaId = req.params.id;
     console.log(`Tentando excluir motorista com ID: ${motoristaId}`);
@@ -2494,7 +2493,6 @@ app.get('/api/motoristas-abastecimento', async (req, res) => {
     }
 });
 
-// Endpoint para cadastrar abastecimento para motoristas escolares
 app.post('/api/cadastrar-abastecimento-escolares', async (req, res) => {
     const {
         reqId,
