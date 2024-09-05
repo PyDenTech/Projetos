@@ -2819,19 +2819,6 @@ app.post('/api/loginMotoristasEscolares', async (req, res) => {
     }
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 app.post('/api/solicitarTransporte', async (req, res) => {
     const { nome_responsavel, cpf_responsavel, nome_aluno, id_matricula, coordenadas_aluno } = req.body;
 
