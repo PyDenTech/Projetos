@@ -120,6 +120,46 @@
                     console.error('Error fetching schools:', error);
                 });
         }
+        function saveAllZoneamentos(event) {
+            event.preventDefault();
+            const zoneamentoData = [];
+
+            zoneamentos.forEach((zoneamento, index) => {
+                const name = document.getElementById(`zoneamento-name-${index}`).value;
+                const escolaId = document.getElementById(`escola-select-${index}`).value;
+                const color = document.getElementById(`color-picker-${index}`).value;
+
+                if (zoneamento.shape) {
+                    const coordinates = zoneamento.shape.getPath().getArray().map(latLng => ({
+                        lat: latLng.lat(),
+                        lng: latLng.lng()
+                    }));
+
+                    zoneamentoData.push({ name, escolaId, color, coordinates });
+                }
+            });
+
+            fetch('/api/zoneamentos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(zoneamentoData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Todos os zoneamentos foram salvos com sucesso!');
+                    shapes.forEach(shape => shape.setMap(null));
+                    shapes.length = 0;
+                    zoneamentoForm.reset();
+                    zoneamentosList.innerHTML = '';
+                    zoneamentos.length = 0;
+                })
+                .catch(error => {
+                    console.error('Erro ao salvar zoneamentos:', error);
+                });
+        }
+
 
         function saveAllZoneamentos(event) {
             event.preventDefault();

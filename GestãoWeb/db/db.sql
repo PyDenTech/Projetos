@@ -151,3 +151,12 @@ CREATE TABLE IF NOT EXISTS motoristas_administrativos (
     status VARCHAR(50) NOT NULL DEFAULT 'fora de serviço',
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS zoneamentos (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,
+    cor VARCHAR(7) NOT NULL, -- Armazena a cor em formato hexadecimal (#RRGGBB)
+    coordenadas JSONB NOT NULL, -- Armazena as coordenadas do polígono como um JSONB
+    escola_id INT REFERENCES escolas(id), -- Chave estrangeira para a tabela 'escolas'
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
