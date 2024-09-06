@@ -213,7 +213,7 @@ app.get('/faq', (req, res) => {
 });
 
 app.get('/cadastrar-bairro', (req, res) => {
-    res.sendFile(path.join(__dirname, 'teste_perimetro.html'));
+    res.sendFile(path.join(__dirname, 'views', 'teste_perimetro.html'));
 });
 
 app.post('/api/upload-foto-perfil', ensureLoggedIn, uploadDisk.single('foto_perfil'), async (req, res) => {
