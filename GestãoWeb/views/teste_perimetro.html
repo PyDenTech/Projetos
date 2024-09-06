@@ -7,8 +7,7 @@
     <title>Gerenciamento de Zoneamentos</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&libraries=drawing"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=drawing"></script>
 </head>
 
 <body>
@@ -79,6 +78,12 @@
             }
             selectedShape = shape;
             selectedShape.setEditable(true);
+
+            // Encontrar o zoneamento correspondente e atualizar sua forma
+            const index = zoneamentos.findIndex(z => z.shape === null);
+            if (index !== -1) {
+                zoneamentos[index].shape = shape;
+            }
         }
 
         function addZoneamentoFields() {
@@ -101,6 +106,17 @@
             `;
             zoneamentosList.appendChild(zoneamentoDiv);
             populateSchoolSelect(`escola-select-${index}`);
+
+            const colorPicker = document.getElementById(`color-picker-${index}`);
+            colorPicker.addEventListener('input', function () {
+                if (zoneamentos[index].shape) {
+                    zoneamentos[index].shape.setOptions({
+                        strokeColor: colorPicker.value,
+                        fillColor: colorPicker.value
+                    });
+                }
+            });
+
             zoneamentos.push({ id: index, shape: null });
         }
 
@@ -117,9 +133,10 @@
                     });
                 })
                 .catch(error => {
-                    console.error('Error fetching schools:', error);
+                    console.error('Erro ao buscar escolas:', error);
                 });
         }
+
         function saveAllZoneamentos(event) {
             event.preventDefault();
             const zoneamentoData = [];
@@ -157,47 +174,6 @@
                 })
                 .catch(error => {
                     console.error('Erro ao salvar zoneamentos:', error);
-                });
-        }
-
-
-        function saveAllZoneamentos(event) {
-            event.preventDefault();
-            const zoneamentoData = [];
-
-            zoneamentos.forEach((zoneamento, index) => {
-                const name = document.getElementById(`zoneamento-name-${index}`).value;
-                const escolaId = document.getElementById(`escola-select-${index}`).value;
-                const color = document.getElementById(`color-picker-${index}`).value;
-
-                if (zoneamento.shape) {
-                    const coordinates = zoneamento.shape.getPath().getArray().map(latLng => ({
-                        lat: latLng.lat(),
-                        lng: latLng.lng()
-                    }));
-
-                    zoneamentoData.push({ name, escolaId, color, coordinates });
-                }
-            });
-
-            fetch('/api/zoneamentos', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(zoneamentoData)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    alert('Todos os zoneamentos foram salvos com sucesso!');
-                    shapes.forEach(shape => shape.setMap(null));
-                    shapes.length = 0;
-                    zoneamentoForm.reset();
-                    zoneamentosList.innerHTML = '';
-                    zoneamentos.length = 0;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
                 });
         }
 
