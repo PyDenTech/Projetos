@@ -1666,20 +1666,30 @@ app.get('/api/escolas', async (req, res) => {
 });
 
 app.post('/api/zoneamentos', async (req, res) => {
-    const { name, escolaId, color, coordinates } = req.body;
+    const zoneamentos = req.body; // Array de zoneamentos
 
     try {
-        const result = await pool.query(
-            'INSERT INTO zoneamentos (nome, cor, coordenadas, escola_id) VALUES ($1, $2, $3, $4) RETURNING *',
-            [name, color, JSON.stringify(coordinates), escolaId]
-        );
+        for (const zoneamento of zoneamentos) {
+            const { name, escolaId, color, coordinates } = zoneamento;
 
-        res.status(201).json({ message: 'Zoneamento salvo com sucesso', zoneamento: result.rows[0] });
+            // Verifica se os dados estão recebendo corretamente
+            if (!name || !escolaId || !color || !coordinates) {
+                return res.status(400).json({ error: 'Dados inválidos recebidos.' });
+            }
+
+            await pool.query(
+                'INSERT INTO zoneamentos (nome, cor, coordenadas, escola_id) VALUES ($1, $2, $3, $4)',
+                [name, color, JSON.stringify(coordinates), escolaId]
+            );
+        }
+
+        res.status(201).json({ message: 'Zoneamentos salvos com sucesso.' });
     } catch (err) {
         console.error('Erro ao salvar o zoneamento:', err);
         res.status(500).json({ error: 'Erro interno no servidor' });
     }
-})
+});
+
 
 
 app.get('/api/motoristas', async (req, res) => {
