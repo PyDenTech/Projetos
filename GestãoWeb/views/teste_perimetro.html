@@ -7,7 +7,8 @@
     <title>Gerenciamento de Zoneamentos</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&libraries=drawing"></script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&libraries=drawing"></script>
 </head>
 
 <body>
@@ -111,7 +112,7 @@
                     data.forEach(escola => {
                         const option = document.createElement('option');
                         option.value = escola.id;
-                        option.textContent = escola.name;
+                        option.textContent = escola.nome; // Corrigido para usar 'nome' ao invés de 'name'
                         select.appendChild(option);
                     });
                 })
