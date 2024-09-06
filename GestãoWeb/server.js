@@ -207,8 +207,13 @@ app.get('/termos', (req, res) => {
 app.get('/solicitar-rota', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'solicitar-rota.html'));
 });
+
 app.get('/faq', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'pages', 'faq.html'));
+});
+
+app.get('/cadastrar-bairro', (req, res) => {
+    res.sendFile(path.join(__dirname, 'teste_perimetro.html'));
 });
 
 app.post('/api/upload-foto-perfil', ensureLoggedIn, uploadDisk.single('foto_perfil'), async (req, res) => {
@@ -2146,7 +2151,7 @@ app.put('/api/motoristas/:id', (req, res) => {
 
 
 app.get('/api/motoristas/:id', (req, res) => {
-    const id = req.params.id;
+    const id = req.params.id; 
 
     pool.query('SELECT * FROM motoristas_administrativos WHERE id = $1', [id])
         .then(result => {

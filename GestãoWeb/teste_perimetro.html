@@ -14,21 +14,11 @@
     <div class="container mt-5">
         <h1>Gerenciamento de Zoneamentos</h1>
         <form id="zoneamento-form">
-            <div class="form-group">
-                <label for="zoneamento-name">Nome do Zoneamento</label>
-                <input type="text" class="form-control" id="zoneamento-name" required>
+            <div id="zoneamentos-list">
+                <!-- Lista de zoneamentos adicionados dinamicamente -->
             </div>
-            <div class="form-group">
-                <label for="escola-select">Escolha a Escola</label>
-                <select class="form-control" id="escola-select" required>
-                    <!-- Options will be populated by JavaScript -->
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="color-picker">Escolha a Cor</label>
-                <input type="color" class="form-control" id="color-picker" value="#ff0000">
-            </div>
-            <button type="submit" class="btn btn-primary">Salvar Zoneamento</button>
+            <button type="button" id="add-zoneamento" class="btn btn-secondary mb-2">Adicionar Zoneamento</button>
+            <button type="submit" class="btn btn-primary">Salvar Todos Zoneamentos</button>
         </form>
         <div id="map" class="mt-4" style="height: 500px;"></div>
     </div>
@@ -38,9 +28,10 @@
         let drawingManager;
         let selectedShape;
         const shapes = [];
+        const zoneamentos = [];
         const zoneamentoForm = document.getElementById('zoneamento-form');
-        const escolaSelect = document.getElementById('escola-select');
-        const colorPicker = document.getElementById('color-picker');
+        const zoneamentosList = document.getElementById('zoneamentos-list');
+        const addZoneamentoBtn = document.getElementById('add-zoneamento');
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
@@ -58,8 +49,6 @@
                 },
                 polygonOptions: {
                     editable: true,
-                    strokeColor: colorPicker.value,
-                    fillColor: colorPicker.value,
                     fillOpacity: 0.35
                 }
             });
@@ -76,14 +65,11 @@
                 }
             });
 
-            colorPicker.addEventListener('input', function () {
-                if (selectedShape) {
-                    selectedShape.setOptions({
-                        strokeColor: colorPicker.value,
-                        fillColor: colorPicker.value
-                    });
-                }
+            addZoneamentoBtn.addEventListener('click', function () {
+                addZoneamentoFields();
             });
+
+            zoneamentoForm.addEventListener('submit', saveAllZoneamentos);
         }
 
         function setSelection(shape) {
@@ -92,57 +78,89 @@
             }
             selectedShape = shape;
             selectedShape.setEditable(true);
-            selectedShape.setOptions({
-                strokeColor: colorPicker.value,
-                fillColor: colorPicker.value
-            });
         }
 
-        zoneamentoForm.addEventListener('submit', function (event) {
+        function addZoneamentoFields() {
+            const index = zoneamentos.length;
+            const zoneamentoDiv = document.createElement('div');
+            zoneamentoDiv.className = 'zoneamento-item mb-3';
+            zoneamentoDiv.innerHTML = `
+                <div class="form-group">
+                    <label for="zoneamento-name-${index}">Nome do Zoneamento</label>
+                    <input type="text" class="form-control zoneamento-name" id="zoneamento-name-${index}" required>
+                </div>
+                <div class="form-group">
+                    <label for="escola-select-${index}">Escolha a Escola</label>
+                    <select class="form-control escola-select" id="escola-select-${index}" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="color-picker-${index}">Escolha a Cor</label>
+                    <input type="color" class="form-control color-picker" id="color-picker-${index}" value="#ff0000">
+                </div>
+            `;
+            zoneamentosList.appendChild(zoneamentoDiv);
+            populateSchoolSelect(`escola-select-${index}`);
+            zoneamentos.push({ id: index, shape: null });
+        }
+
+        function populateSchoolSelect(selectId) {
+            const select = document.getElementById(selectId);
+            fetch('/api/escolas')
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(escola => {
+                        const option = document.createElement('option');
+                        option.value = escola.id;
+                        option.textContent = escola.name;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching schools:', error);
+                });
+        }
+
+        function saveAllZoneamentos(event) {
             event.preventDefault();
-            const name = document.getElementById('zoneamento-name').value;
-            const escolaId = escolaSelect.value;
-            const coordinates = selectedShape.getPath().getArray().map(latLng => ({
-                lat: latLng.lat(),
-                lng: latLng.lng()
-            }));
+            const zoneamentoData = [];
+
+            zoneamentos.forEach((zoneamento, index) => {
+                const name = document.getElementById(`zoneamento-name-${index}`).value;
+                const escolaId = document.getElementById(`escola-select-${index}`).value;
+                const color = document.getElementById(`color-picker-${index}`).value;
+
+                if (zoneamento.shape) {
+                    const coordinates = zoneamento.shape.getPath().getArray().map(latLng => ({
+                        lat: latLng.lat(),
+                        lng: latLng.lng()
+                    }));
+
+                    zoneamentoData.push({ name, escolaId, color, coordinates });
+                }
+            });
 
             fetch('/api/zoneamentos', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ name, escolaId, coordinates })
+                body: JSON.stringify(zoneamentoData)
             })
                 .then(response => response.json())
                 .then(data => {
-                    alert('Zoneamento salvo com sucesso!');
-                    selectedShape.setMap(null);
+                    alert('Todos os zoneamentos foram salvos com sucesso!');
+                    shapes.forEach(shape => shape.setMap(null));
                     shapes.length = 0;
                     zoneamentoForm.reset();
+                    zoneamentosList.innerHTML = '';
+                    zoneamentos.length = 0;
                 })
                 .catch(error => {
                     console.error('Error:', error);
                 });
-        });
-
-        // Fetch schools and populate the select dropdown
-        fetch('/api/escolas')
-            .then(response => response.json())
-            .then(data => {
-                data.forEach(escola => {
-                    const option = document.createElement('option');
-                    option.value = escola.id;
-                    option.textContent = escola.name;
-                    escolaSelect.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching schools:', error);
-            });
+        }
 
         window.onload = initMap;
-
     </script>
 </body>
 
