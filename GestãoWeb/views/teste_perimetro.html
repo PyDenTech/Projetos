@@ -7,8 +7,7 @@
     <title>Cadastro de Zoneamentos</title>
     <!-- Incluindo apenas Bootstrap para evitar conflitos -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&libraries=drawing"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=drawing"></script>
     <style>
         .zoneamento-item {
             opacity: 0;
@@ -19,30 +18,12 @@
             opacity: 1;
         }
 
-        .custom-tooltip {
-            position: absolute;
-            background-color: #333;
-            color: #e8e8e8;
-            padding: 5px 10px;
+        .infowindow-content {
+            font-size: 16px;
+            padding: 5px;
             border-radius: 4px;
-            font-size: 14px;
-            font-weight: 400;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.2s ease-in-out;
-            white-space: nowrap;
-            z-index: 1000;
-        }
-
-        .custom-tooltip::before {
-            content: "";
-            position: absolute;
-            bottom: -5px;
-            left: 50%;
-            transform: translateX(-50%) rotate(45deg);
-            width: 8px;
-            height: 8px;
-            background-color: #333;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            background-color: #ffffff;
         }
     </style>
 </head>
@@ -57,8 +38,7 @@
             <button type="button" id="add-zoneamento" class="btn btn-secondary mb-2">Adicionar Zoneamento</button>
             <button type="submit" class="btn btn-primary">Salvar Todos Zoneamentos</button>
         </form>
-        <div id="map" class="mt-4" style="height: 500px; position: relative;"></div>
-        <div id="tooltip" class="custom-tooltip"></div>
+        <div id="map" class="mt-4" style="height: 500px;"></div>
     </div>
 
     <script>
@@ -70,7 +50,7 @@
         const zoneamentoForm = document.getElementById('zoneamento-form');
         const zoneamentosList = document.getElementById('zoneamentos-list');
         const addZoneamentoBtn = document.getElementById('add-zoneamento');
-        const tooltip = document.getElementById('tooltip');
+        let infoWindow = new google.maps.InfoWindow();
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
@@ -135,13 +115,15 @@
 
                         // Evento de hover para exibir o nome
                         google.maps.event.addListener(polygon, 'mouseover', function (event) {
-                            showTooltip(event.latLng, zoneamento.nome);
+                            infoWindow.setContent(`<div class="infowindow-content">${zoneamento.nome}</div>`);
+                            infoWindow.setPosition(event.latLng);
+                            infoWindow.open(map);
                             polygon.setOptions({ strokeWeight: 3, fillOpacity: 0.5 }); // Aumenta a espessura da borda e a opacidade do preenchimento
                         });
 
                         // Evento para esconder o nome quando o mouse sai de cima
                         google.maps.event.addListener(polygon, 'mouseout', function () {
-                            hideTooltip();
+                            infoWindow.close();
                             polygon.setOptions({ strokeWeight: 1, fillOpacity: 0.35 }); // Reduz a espessura da borda e a opacidade do preenchimento
                         });
 
@@ -152,19 +134,6 @@
                     });
                 })
                 .catch(error => console.error('Erro ao carregar zoneamentos:', error));
-        }
-
-        function showTooltip(latLng, text) {
-            const point = map.getProjection().fromLatLngToContainerPixel(latLng);
-
-            tooltip.style.left = `${point.x}px`;
-            tooltip.style.top = `${point.y}px`;
-            tooltip.style.opacity = 1;
-            tooltip.textContent = text;
-        }
-
-        function hideTooltip() {
-            tooltip.style.opacity = 0;
         }
 
         function setSelection(shape) {
