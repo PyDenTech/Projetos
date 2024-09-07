@@ -1666,26 +1666,46 @@ app.get('/api/escolas', async (req, res) => {
 });
 
 app.post('/api/zoneamentos', async (req, res) => {
-    const zoneamentos = req.body; // Array de zoneamentos
+    const zoneamentos = req.body;
+
+    if (!Array.isArray(zoneamentos) || zoneamentos.length === 0) {
+        return res.status(400).json({ error: 'Nenhum zoneamento foi enviado.' });
+    }
 
     try {
+        const client = await pool.connect();
+        await client.query('BEGIN');
+
         for (const zoneamento of zoneamentos) {
             const { name, color, coordinates } = zoneamento;
 
-            // Verifica se os dados estão recebendo corretamente
             if (!name || !color || !coordinates) {
-                return res.status(400).json({ error: 'Dados inválidos recebidos.' });
+                throw new Error('Dados inválidos recebidos.');
             }
 
-            await pool.query(
+            await client.query(
                 'INSERT INTO zoneamentos (nome, cor, coordenadas) VALUES ($1, $2, $3)',
                 [name, color, JSON.stringify(coordinates)]
             );
         }
 
+        await client.query('COMMIT');
         res.status(201).json({ message: 'Zoneamentos salvos com sucesso.' });
     } catch (err) {
+        await pool.query('ROLLBACK');
         console.error('Erro ao salvar o zoneamento:', err);
+        res.status(500).json({ error: 'Erro interno no servidor' });
+    }
+});
+
+
+// Rota para obter todos os zoneamentos
+app.get('/api/zoneamentos', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT nome, cor, coordenadas FROM zoneamentos');
+        res.json(result.rows);
+    } catch (err) {
+        console.error('Erro ao buscar zoneamentos:', err);
         res.status(500).json({ error: 'Erro interno no servidor' });
     }
 });
