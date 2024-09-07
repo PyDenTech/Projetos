@@ -157,6 +157,6 @@ CREATE TABLE IF NOT EXISTS zoneamentos (
     nome VARCHAR(255) NOT NULL,
     cor VARCHAR(7) NOT NULL, -- Armazena a cor em formato hexadecimal (#RRGGBB)
     coordenadas JSONB NOT NULL, -- Armazena as coordenadas do polígono como um JSONB
-    escola_id INT REFERENCES escolas(id), -- Chave estrangeira para a tabela 'escolas'
     criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
