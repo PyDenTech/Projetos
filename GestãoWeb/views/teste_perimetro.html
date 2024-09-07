@@ -19,52 +19,30 @@
             opacity: 1;
         }
 
-        .tooltip-container {
-            position: relative;
-            font-size: 16px;
-            color: #333;
-            padding: 0.5em 1em;
-            border-radius: 8px;
-            background-color: #ffffff;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-            border: 2px solid #333;
-            display: inline-block;
-            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-            cursor: pointer;
-        }
-
-        .tooltip-container .tooltip {
+        .custom-tooltip {
             position: absolute;
-            top: -45px;
-            left: 50%;
-            transform: translateX(-50%);
+            background-color: #333;
+            color: #e8e8e8;
             padding: 5px 10px;
+            border-radius: 4px;
             font-size: 14px;
             font-weight: 400;
-            color: #e8e8e8;
-            background-color: #333;
-            border-radius: 4px;
-            opacity: 0;
             pointer-events: none;
-            transition: opacity 0.4s cubic-bezier(0.23, 1, 0.32, 1), transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-            box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+            white-space: nowrap;
+            z-index: 1000;
         }
 
-        .tooltip-container .tooltip::before {
+        .custom-tooltip::before {
             content: "";
             position: absolute;
-            top: 100%;
+            bottom: -5px;
             left: 50%;
             transform: translateX(-50%) rotate(45deg);
             width: 8px;
             height: 8px;
             background-color: #333;
-        }
-
-        .tooltip-container:hover .tooltip {
-            opacity: 1;
-            transform: translateX(-50%) translateY(-10px);
-            pointer-events: auto;
         }
     </style>
 </head>
@@ -79,7 +57,8 @@
             <button type="button" id="add-zoneamento" class="btn btn-secondary mb-2">Adicionar Zoneamento</button>
             <button type="submit" class="btn btn-primary">Salvar Todos Zoneamentos</button>
         </form>
-        <div id="map" class="mt-4" style="height: 500px;"></div>
+        <div id="map" class="mt-4" style="height: 500px; position: relative;"></div>
+        <div id="tooltip" class="custom-tooltip"></div>
     </div>
 
     <script>
@@ -91,7 +70,7 @@
         const zoneamentoForm = document.getElementById('zoneamento-form');
         const zoneamentosList = document.getElementById('zoneamentos-list');
         const addZoneamentoBtn = document.getElementById('add-zoneamento');
-        let infoWindow = new google.maps.InfoWindow();
+        const tooltip = document.getElementById('tooltip');
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
@@ -156,16 +135,13 @@
 
                         // Evento de hover para exibir o nome
                         google.maps.event.addListener(polygon, 'mouseover', function (event) {
-                            const tooltipContent = `<div class="tooltip-container">${zoneamento.nome}<span class="tooltip">Nome do Bairro</span></div>`;
-                            infoWindow.setContent(tooltipContent);
-                            infoWindow.setPosition(event.latLng);
-                            infoWindow.open(map);
+                            showTooltip(event.latLng, zoneamento.nome);
                             polygon.setOptions({ strokeWeight: 3, fillOpacity: 0.5 }); // Aumenta a espessura da borda e a opacidade do preenchimento
                         });
 
                         // Evento para esconder o nome quando o mouse sai de cima
                         google.maps.event.addListener(polygon, 'mouseout', function () {
-                            infoWindow.close();
+                            hideTooltip();
                             polygon.setOptions({ strokeWeight: 1, fillOpacity: 0.35 }); // Reduz a espessura da borda e a opacidade do preenchimento
                         });
 
@@ -176,6 +152,27 @@
                     });
                 })
                 .catch(error => console.error('Erro ao carregar zoneamentos:', error));
+        }
+
+        function showTooltip(latLng, text) {
+            const projection = map.getProjection();
+            const point = projection.fromLatLngToPoint(latLng);
+
+            const scale = Math.pow(2, map.getZoom());
+            const worldCoordinate = new google.maps.Point(point.x * scale, point.y * scale);
+            const pixelOffset = new google.maps.Point(
+                Math.floor(worldCoordinate.x - map.getDiv().offsetWidth / 2),
+                Math.floor(worldCoordinate.y - map.getDiv().offsetHeight / 2)
+            );
+
+            tooltip.style.left = `${pixelOffset.x + map.getDiv().offsetWidth / 2}px`;
+            tooltip.style.top = `${pixelOffset.y + map.getDiv().offsetHeight / 2}px`;
+            tooltip.style.opacity = 1;
+            tooltip.textContent = text;
+        }
+
+        function hideTooltip() {
+            tooltip.style.opacity = 0;
         }
 
         function setSelection(shape) {
