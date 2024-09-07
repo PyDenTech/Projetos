@@ -155,18 +155,20 @@
         }
 
         function showTooltip(latLng, text) {
-            const projection = map.getProjection();
-            const point = projection.fromLatLngToPoint(latLng);
-
             const scale = Math.pow(2, map.getZoom());
-            const worldCoordinate = new google.maps.Point(point.x * scale, point.y * scale);
+            const nw = new google.maps.LatLng(
+                map.getBounds().getNorthEast().lat(),
+                map.getBounds().getSouthWest().lng()
+            );
+            const worldCoordinateNW = map.getProjection().fromLatLngToPoint(nw);
+            const worldCoordinate = map.getProjection().fromLatLngToPoint(latLng);
             const pixelOffset = new google.maps.Point(
-                Math.floor(worldCoordinate.x - map.getDiv().offsetWidth / 2),
-                Math.floor(worldCoordinate.y - map.getDiv().offsetHeight / 2)
+                Math.floor((worldCoordinate.x - worldCoordinateNW.x) * scale),
+                Math.floor((worldCoordinate.y - worldCoordinateNW.y) * scale)
             );
 
-            tooltip.style.left = `${pixelOffset.x + map.getDiv().offsetWidth / 2}px`;
-            tooltip.style.top = `${pixelOffset.y + map.getDiv().offsetHeight / 2}px`;
+            tooltip.style.left = `${pixelOffset.x}px`;
+            tooltip.style.top = `${pixelOffset.y}px`;
             tooltip.style.opacity = 1;
             tooltip.textContent = text;
         }
