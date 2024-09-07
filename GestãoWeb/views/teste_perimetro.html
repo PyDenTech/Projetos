@@ -5,8 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de Zoneamentos</title>
-    <!-- Incluindo apenas Bootstrap para evitar conflitos -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Incluindo fontes e estilos -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i" rel="stylesheet">
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="/vendor/quill/quill.snow.css" rel="stylesheet">
+    <link href="/vendor/quill/quill.bubble.css" rel="stylesheet">
+    <link href="/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="/vendor/simple-datatables/style.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
     <script
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&libraries=drawing"></script>
     <style>
@@ -30,29 +38,25 @@
             text-align: center;
         }
     </style>
-    <link href="/css/style.css" rel="stylesheet">
 </head>
 
 <body>
+    <!-- Header -->
     <header id="header" class="header fixed-top d-flex align-items-center">
-
         <i class="bi bi-list toggle-sidebar-btn"></i>
         <div class="d-flex align-items-center justify-content-between">
             <a href="/dashboard-escolar" class="logo d-flex align-items-center">
                 <img src="/img/logo.png" alt="">
             </a>
-        </div><!-- End Logo -->
-
+        </div>
         <nav class="header-nav ms-auto">
             <ul class="d-flex align-items-center">
-
                 <li class="nav-item dropdown pe-3">
                     <a id="profile-link" class="nav-link nav-profile d-flex align-items-center pe-0" href="#"
                         data-bs-toggle="dropdown">
                         <img id="profile-image" src="/img/user.png" alt="Foto de Perfil" class="rounded-circle">
                         <span id="usuarioNome" class="d-none d-md-block dropdown-toggle ps-2"></span>
-                    </a><!-- End Profile Image Icon -->
-
+                    </a>
                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                         <li>
                             <a class="dropdown-item d-flex align-items-center" href="/users-profile">
@@ -63,7 +67,6 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-
                         <li>
                             <a class="dropdown-item d-flex align-items-center" href="/users-profile">
                                 <i class="bi bi-gear"></i>
@@ -73,7 +76,6 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-
                         <li>
                             <a class="dropdown-item d-flex align-items-center" href="/faq">
                                 <i class="bi bi-question-circle"></i>
@@ -83,302 +85,82 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-
                         <li>
                             <a class="dropdown-item d-flex align-items-center" href="#" id="logout-link">
                                 <i class="bi bi-box-arrow-right"></i>
                                 <span>Sair</span>
                             </a>
                         </li>
-                    </ul><!-- End Profile Dropdown Items -->
-                </li><!-- End Profile Nav -->
-
+                    </ul>
+                </li>
             </ul>
-        </nav><!-- End Icons Navigation -->
+        </nav>
+    </header>
 
-    </header><!-- End Header -->
-
-    <!-- ======= Sidebar ======= -->
+    <!-- Sidebar -->
     <aside id="sidebar" class="sidebar">
+        <!-- Adicione o conteúdo da barra lateral aqui, igual ao da página de motorista -->
+    </aside>
 
-        <ul class="sidebar-nav" id="sidebar-nav">
-            <li class="nav-heading">Transporte Escolar</li>
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="/dashboard-escolar">
-                    <i class="bi bi-speedometer2"></i>
-                    <span>Painel de Controle</span>
-                </a>
-            </li>
+    <!-- Main Content -->
+    <main id="main" class="main">
+        <div class="pagetitle">
+            <h1>Cadastro de Zoneamentos</h1>
+            <nav>
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/dashboard-administrativo"><i class="bi bi-house"></i></a></li>
+                    <li class="breadcrumb-item active">Cadastro de Zoneamentos</li>
+                </ol>
+            </nav>
+        </div>
 
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#escolas-nav" data-bs-toggle="collapse" href="#">
-                    <img src="/img/icones/escolas.svg" alt="Escolas"
-                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
-                    <span>Escolas</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="escolas-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="/cadastrar-escolas-form">
-                            <i class="bi bi-house-door"></i><span>Cadastrar</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/gerenciar-escolas-view">
-                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#aluno-nav" data-bs-toggle="collapse" href="#">
-                    <img src="/img/icones/aluno.svg" alt="Censo Escolar"
-                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
-                    <span>Alunos</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="aluno-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="/cadastrar-aluno-form">
-                            <i class="bi bi-person-plus"></i><span>Solicitar Cadastro</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/gerenciar-alunos-view">
-                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/importar-aluno-form">
-                            <i class="bi bi-file-earmark-arrow-up"></i><span>Importar Dados</span>
-                        </a>
-                    </li>
-
-                </ul>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#routs-nav" data-bs-toggle="collapse" href="#">
-                    <img src="/img/icones/rotas.svg" alt="Escolas"
-                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
-                    </i><span>Rotas</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="routs-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="/cadastrar-rotas-form">
-                            <i class="bi bi-plus-square"></i><span>Cadastrar Rota</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/desenhar-rotas-map">
-                            <i class="bi bi-pencil"></i><span>Gerar Rotas</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/visualizar-rotas">
-                            <i class="bi bi-eye"></i><span>Vizualizar Rotas</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#driverbus-nav" data-bs-toggle="collapse" href="#">
-                    <img src="/img/icones/motoristas.svg" alt="Escolas"
-                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
-                    <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="driverbus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="/cadastrar-motorista-form">
-                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/gerenciar-motoristas-view">
-                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/gerar-relatorio-view">
-                            <i class="bi bi-clipboard2-check"></i><span>Relatórios</span>
-                        </a>
-                    </li>
-
-                </ul>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
-                    <img src="/img/icones/monitor-icone-branco.png" alt="Escolas"
-                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
-                    </i><span>Monitores</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="charts-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="/cadastrar-monitores-form">
-                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/gerenciar-monitores-view">
-                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#fornecedores-nav" data-bs-toggle="collapse" href="#">
-                    <img src="/img/icones/fornecedores.svg" alt="Escolas"
-                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
-                    </i><span>Fornecedor</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="fornecedores-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="/cadastrar-fornecedores-form">
-                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/gerenciar-fornecedores-view">
-                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-                        </a>
-                    </li>
-
-                </ul>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#bus-nav" data-bs-toggle="collapse" href="#">
-                    <img src="/img/icones/frotas.svg" alt="Escolas"
-                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
-                    </i><span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="bus-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="/cadastrar-onibus-form">
-                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/gerenciar-onibus-view">
-                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/vizualizar-onibus-map">
-                            <i class="bi bi-eye"></i><span>Vizualizar</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/solicitar-onibus-services">
-                            <i class="bi bi-file-earmark-text"></i><span>Ordem de Serviço</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-
-            <li class="nav-heading">Administrativo</li>
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="dashboard-adm.html">
-                    <i class="bi bi-speedometer"></i>
-                    <span>Painel de Controle</span>
-                </a>
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#car-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-car-front"></i><span>Frota</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="car-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="/cadastrar-carro-form">
-                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/gerenciar-carros-view">
-                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/localizar-carros-map">
-                            <i class="bi bi-geo-alt-fill"></i><span>Localizar</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" data-bs-target="#drivercar-nav" data-bs-toggle="collapse" href="#">
-                    <img src="/img/icones/motoristas.svg" alt="Escolas"
-                        style="width: 20px; height: 20px; margin-right: 5px; color: white;">
-                    <span>Motoristas</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="drivercar-nav" class="nav-content" data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="/cadastrar-motorista-carro-form">
-                            <i class="bi bi-person-plus"></i><span>Cadastrar</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/gerenciar-motorista-carro-form">
-                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#tarefas-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-list-check"></i><span>Tarefas</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="tarefas-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="/cadastrar-demandas">
-                            <i class="bi bi-file-earmark-text"></i><span>Nova Tarefa</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/tasks">
-                            <i class="bi bi-person-plus"></i><span>Gerenciar Tarefas</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-
-            <li class="nav-heading">Controle Financeiro</li>
-            <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#fuel-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-droplet-half"></i><span>Abastecimento</span><i
-                        class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="fuel-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="/cadastrar-abastecimento-view">
-                            <i class="bi bi-file-earmark-text"></i><span>Cadastrar Requisição</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/gerenciar-abastecimento-view">
-                            <i class="bi bi-pencil-square"></i><span>Gerenciar</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-
-        </ul>
-
-    </aside><!-- End Sidebar-->
-    <div class="container mt-5">
-        <h1>Cadastro de Zoneamentos</h1>
-        <form id="zoneamento-form">
-            <div id="zoneamentos-list">
-                <!-- Lista de zoneamentos adicionados dinamicamente -->
+        <section class="section">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Cadastro de Zoneamentos</h5>
+                            <form id="zoneamento-form">
+                                <div id="zoneamentos-list"></div>
+                                <button type="button" id="add-zoneamento" class="btn btn-secondary mb-2">Adicionar
+                                    Zoneamento</button>
+                                <button type="submit" class="btn btn-primary">Salvar Todos Zoneamentos</button>
+                            </form>
+                            <div id="map" class="mt-4" style="height: 500px;"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <button type="button" id="add-zoneamento" class="btn btn-secondary mb-2">Adicionar Zoneamento</button>
-            <button type="submit" class="btn btn-primary">Salvar Todos Zoneamentos</button>
-        </form>
-        <div id="map" class="mt-4" style="height: 500px;"></div>
-    </div>
+        </section>
+    </main>
+
+    <footer id="footer" class="footer">
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="copyright">
+                        &copy; Direitos Autorais <strong><span>PyDenExpress</span></strong>. Todos os Direitos
+                        Reservados
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="credits">
+                        Desenvolvido por <a href="https://danilomorais.netlify.app/">Danilo de Morais</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/vendor/chart.js/chart.umd.js"></script>
+    <script src="/vendor/echarts/echarts.min.js"></script>
+    <script src="/vendor/quill/quill.min.js"></script>
+    <script src="/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="/vendor/tinymce/tinymce.min.js"></script>
+    <script src="/js/main.js"></script>
 
     <script>
         let map;
