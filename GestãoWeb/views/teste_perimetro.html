@@ -7,7 +7,8 @@
     <title>Cadastro de Zoneamentos</title>
     <!-- Incluindo apenas Bootstrap para evitar conflitos -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=drawing"></script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&libraries=drawing"></script>
     <style>
         .zoneamento-item {
             opacity: 0;
@@ -18,12 +19,52 @@
             opacity: 1;
         }
 
-        .infowindow-content {
+        .tooltip-container {
+            position: relative;
             font-size: 16px;
-            padding: 5px;
-            border-radius: 4px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            color: #333;
+            padding: 0.5em 1em;
+            border-radius: 8px;
             background-color: #ffffff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            border: 2px solid #333;
+            display: inline-block;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            cursor: pointer;
+        }
+
+        .tooltip-container .tooltip {
+            position: absolute;
+            top: -45px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 5px 10px;
+            font-size: 14px;
+            font-weight: 400;
+            color: #e8e8e8;
+            background-color: #333;
+            border-radius: 4px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s cubic-bezier(0.23, 1, 0.32, 1), transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
+        }
+
+        .tooltip-container .tooltip::before {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%) rotate(45deg);
+            width: 8px;
+            height: 8px;
+            background-color: #333;
+        }
+
+        .tooltip-container:hover .tooltip {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-10px);
+            pointer-events: auto;
         }
     </style>
 </head>
@@ -115,7 +156,8 @@
 
                         // Evento de hover para exibir o nome
                         google.maps.event.addListener(polygon, 'mouseover', function (event) {
-                            infoWindow.setContent(`<div class="infowindow-content">${zoneamento.nome}</div>`);
+                            const tooltipContent = `<div class="tooltip-container">${zoneamento.nome}<span class="tooltip">Nome do Bairro</span></div>`;
+                            infoWindow.setContent(tooltipContent);
                             infoWindow.setPosition(event.latLng);
                             infoWindow.open(map);
                             polygon.setOptions({ strokeWeight: 3, fillOpacity: 0.5 }); // Aumenta a espessura da borda e a opacidade do preenchimento
