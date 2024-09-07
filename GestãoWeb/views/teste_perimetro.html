@@ -7,7 +7,25 @@
     <title>Cadastro de Zoneamentos</title>
     <!-- Incluindo apenas Bootstrap para evitar conflitos -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&libraries=drawing"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=drawing"></script>
+    <style>
+        .zoneamento-item {
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .zoneamento-item.show {
+            opacity: 1;
+        }
+
+        .infowindow-content {
+            font-size: 16px;
+            padding: 5px;
+            border-radius: 4px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            background-color: #ffffff;
+        }
+    </style>
 </head>
 
 <body>
@@ -32,7 +50,7 @@
         const zoneamentoForm = document.getElementById('zoneamento-form');
         const zoneamentosList = document.getElementById('zoneamentos-list');
         const addZoneamentoBtn = document.getElementById('add-zoneamento');
-        let infoWindow = new google.maps.InfoWindow(); // Criação de uma infowindow para exibir os nomes
+        let infoWindow = new google.maps.InfoWindow();
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
@@ -90,22 +108,28 @@
                             fillColor: zoneamento.cor,
                             editable: false,
                             fillOpacity: 0.35,
+                            strokeWeight: 1,
                             map: map
                         });
                         shapes.push(polygon);
 
                         // Evento de hover para exibir o nome
                         google.maps.event.addListener(polygon, 'mouseover', function (event) {
-                            infoWindow.setContent(`<div style="font-size: 16px; color: ${zoneamento.cor};">${zoneamento.nome}</div>`);
+                            infoWindow.setContent(`<div class="infowindow-content">${zoneamento.nome}</div>`);
                             infoWindow.setPosition(event.latLng);
                             infoWindow.open(map);
-                            polygon.setOptions({ strokeWeight: 3 }); // Aumenta a espessura da borda no hover
+                            polygon.setOptions({ strokeWeight: 3, fillOpacity: 0.5 }); // Aumenta a espessura da borda e a opacidade do preenchimento
                         });
 
                         // Evento para esconder o nome quando o mouse sai de cima
                         google.maps.event.addListener(polygon, 'mouseout', function () {
                             infoWindow.close();
-                            polygon.setOptions({ strokeWeight: 1 }); // Reduz a espessura da borda quando o mouse sai
+                            polygon.setOptions({ strokeWeight: 1, fillOpacity: 0.35 }); // Reduz a espessura da borda e a opacidade do preenchimento
+                        });
+
+                        // Evento de clique para destacar o polígono selecionado
+                        google.maps.event.addListener(polygon, 'click', function () {
+                            setSelection(polygon);
                         });
                     });
                 })
@@ -115,9 +139,11 @@
         function setSelection(shape) {
             if (selectedShape) {
                 selectedShape.setEditable(false);
+                selectedShape.setOptions({ strokeWeight: 1, fillOpacity: 0.35 }); // Restaura o estilo padrão
             }
             selectedShape = shape;
             selectedShape.setEditable(true);
+            selectedShape.setOptions({ strokeWeight: 4, fillOpacity: 0.6 }); // Destaque visual do polígono selecionado
 
             const index = zoneamentos.findIndex(z => z.shape === null);
             if (index !== -1) {
@@ -140,6 +166,7 @@
                 </div>
             `;
             zoneamentosList.appendChild(zoneamentoDiv);
+            setTimeout(() => zoneamentoDiv.classList.add('show'), 100); // Efeito de fade-in
 
             const colorPicker = document.getElementById(`color-picker-${index}`);
             colorPicker.addEventListener('input', function () {
