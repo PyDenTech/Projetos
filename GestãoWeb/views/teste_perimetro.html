@@ -4,15 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciamento de Zoneamentos</title>
+    <title>Cadastro de Zoneamentos</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&libraries=drawing"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=drawing"></script>
 </head>
 
 <body>
     <div class="container mt-5">
-        <h1>Gerenciamento de Zoneamentos</h1>
+        <h1>Cadastro de Zoneamentos</h1>
         <form id="zoneamento-form">
             <div id="zoneamentos-list">
                 <!-- Lista de zoneamentos adicionados dinamicamente -->
@@ -96,16 +96,11 @@
                     <input type="text" class="form-control zoneamento-name" id="zoneamento-name-${index}" required>
                 </div>
                 <div class="form-group">
-                    <label for="escola-select-${index}">Escolha a Escola</label>
-                    <select class="form-control escola-select" id="escola-select-${index}" required></select>
-                </div>
-                <div class="form-group">
                     <label for="color-picker-${index}">Escolha a Cor</label>
                     <input type="color" class="form-control color-picker" id="color-picker-${index}" value="#ff0000">
                 </div>
             `;
             zoneamentosList.appendChild(zoneamentoDiv);
-            populateSchoolSelect(`escola-select-${index}`);
 
             const colorPicker = document.getElementById(`color-picker-${index}`);
             colorPicker.addEventListener('input', function () {
@@ -120,30 +115,12 @@
             zoneamentos.push({ id: index, shape: null });
         }
 
-        function populateSchoolSelect(selectId) {
-            const select = document.getElementById(selectId);
-            fetch('/api/escolas')
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(escola => {
-                        const option = document.createElement('option');
-                        option.value = escola.id;
-                        option.textContent = escola.nome; // Corrigido para usar 'nome' ao invés de 'name'
-                        select.appendChild(option);
-                    });
-                })
-                .catch(error => {
-                    console.error('Erro ao buscar escolas:', error);
-                });
-        }
-
         function saveAllZoneamentos(event) {
             event.preventDefault();
             const zoneamentoData = [];
 
             zoneamentos.forEach((zoneamento, index) => {
                 const name = document.getElementById(`zoneamento-name-${index}`).value;
-                const escolaId = document.getElementById(`escola-select-${index}`).value;
                 const color = document.getElementById(`color-picker-${index}`).value;
 
                 if (zoneamento.shape) {
@@ -158,7 +135,7 @@
                         return;
                     }
 
-                    zoneamentoData.push({ name, escolaId, color, coordinates });
+                    zoneamentoData.push({ name, color, coordinates });
                 }
             });
 

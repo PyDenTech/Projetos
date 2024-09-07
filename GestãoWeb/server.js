@@ -1670,16 +1670,16 @@ app.post('/api/zoneamentos', async (req, res) => {
 
     try {
         for (const zoneamento of zoneamentos) {
-            const { name, escolaId, color, coordinates } = zoneamento;
+            const { name, color, coordinates } = zoneamento;
 
             // Verifica se os dados estão recebendo corretamente
-            if (!name || !escolaId || !color || !coordinates) {
+            if (!name || !color || !coordinates) {
                 return res.status(400).json({ error: 'Dados inválidos recebidos.' });
             }
 
             await pool.query(
-                'INSERT INTO zoneamentos (nome, cor, coordenadas, escola_id) VALUES ($1, $2, $3, $4)',
-                [name, color, JSON.stringify(coordinates), escolaId]
+                'INSERT INTO zoneamentos (nome, cor, coordenadas) VALUES ($1, $2, $3)',
+                [name, color, JSON.stringify(coordinates)]
             );
         }
 
@@ -1689,7 +1689,6 @@ app.post('/api/zoneamentos', async (req, res) => {
         res.status(500).json({ error: 'Erro interno no servidor' });
     }
 });
-
 
 
 app.get('/api/motoristas', async (req, res) => {
@@ -2177,7 +2176,7 @@ app.put('/api/motoristas/:id', (req, res) => {
 
 
 app.get('/api/motoristas/:id', (req, res) => {
-    const id = req.params.id; 
+    const id = req.params.id;
 
     pool.query('SELECT * FROM motoristas_administrativos WHERE id = $1', [id])
         .then(result => {
