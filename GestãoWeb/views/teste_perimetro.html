@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de Zoneamentos</title>
-    <!-- Incluindo apenas Bootstrap para evitar conflitos -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&libraries=drawing"></script>
     <style>
@@ -29,9 +28,9 @@
 
         /* Estilo do conteúdo da janela de informação */
         .info-window-content {
-            font-size: 16px;
+            font-size: 14px; /* Tamanho de fonte ajustado */
             font-weight: bold;
-            padding: 10px;
+            padding: 8px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
             background-color: white;
@@ -40,6 +39,14 @@
 
         .info-window-content:hover {
             transform: scale(1.05);
+        }
+
+        /* Estilo do botão de fechar do InfoWindow */
+        .gm-ui-hover-effect {
+            width: 15px !important; /* Reduz o tamanho do botão de fechar */
+            height: 15px !important;
+            top: 5px !important; /* Ajusta o posicionamento vertical */
+            right: 5px !important; /* Ajusta o posicionamento horizontal */
         }
     </style>
 </head>
