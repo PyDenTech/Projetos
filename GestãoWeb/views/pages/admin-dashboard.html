@@ -9,8 +9,8 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=drawing"></script>
     <link rel="stylesheet" href="/css/admin-dashboard.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=drawing"></script>
     <style>
         /* Animação para o efeito de fade-in */
         .info-window {
@@ -33,6 +33,7 @@
         /* Estilo do conteúdo da janela de informação */
         .info-window-content {
             font-size: 14px;
+            /* Tamanho de fonte ajustado */
             font-weight: bold;
             padding: 8px;
             border-radius: 8px;
@@ -71,29 +72,58 @@
             </ul>
             <div class="tab-content" id="adminTabContent">
                 <div class="tab-pane fade show active" id="usuarios" role="tabpanel" aria-labelledby="usuarios-tab">
-                    <!-- Conteúdo da Aba Usuários -->
                     <h3>Usuários por Localização</h3>
-                    <!-- Conteúdo da seção de usuários -->
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <select class="form-control" id="estadoSelect" onchange="carregarMunicipios(this.value)">
+                                <option>Selecione um Estado</option>
+                                <!-- Estados carregados dinamicamente -->
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-control" id="municipioSelect"
+                                onchange="filtrarUsuariosPorMunicipio(this.value)">
+                                <option>Selecione um Município</option>
+                                <!-- Municípios carregados dinamicamente -->
+                            </select>
+                        </div>
+                    </div>
+                    <h3>Usuários que Solicitaram Cadastro</h3>
+                    <table class="table table-striped">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Cargo</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody">
+                            <!-- Os usuários serão carregados aqui via JavaScript -->
+                        </tbody>
+                    </table>
                 </div>
                 <div class="tab-pane fade" id="cadastros" role="tabpanel" aria-labelledby="cadastros-tab">
                     <h3>Cadastro de Zoneamentos</h3>
-                    <form id="zoneamento-form">
-                        <div id="zoneamentos-list">
-                            <!-- Lista de zoneamentos adicionados dinamicamente -->
-                        </div>
-                        <button type="button" id="add-zoneamento" class="btn btn-secondary mb-2">Adicionar
-                            Zoneamento</button>
-                        <button type="submit" class="btn btn-primary">Salvar Todos Zoneamentos</button>
-                    </form>
-                    <div id="map" class="mt-4" style="height: 500px;"></div>
+                    <div class="container mt-5">
+                        <form id="zoneamento-form">
+                            <div id="zoneamentos-list">
+                                <!-- Lista de zoneamentos adicionados dinamicamente -->
+                            </div>
+                            <button type="button" id="add-zoneamento" class="btn btn-secondary mb-2">Adicionar
+                                Zoneamento</button>
+                            <button type="submit" class="btn btn-primary">Salvar Todos Zoneamentos</button>
+                        </form>
+                        <div id="map" class="mt-4" style="height: 500px;"></div>
+                    </div>
                 </div>
                 <div class="tab-pane fade" id="relatorios" role="tabpanel" aria-labelledby="relatorios-tab">
-                    <!-- Conteúdo da Aba Relatórios -->
                     <h3>Relatórios</h3>
                     <p>Conteúdo da aba de Relatórios.</p>
                 </div>
                 <div class="tab-pane fade" id="graficos" role="tabpanel" aria-labelledby="graficos-tab">
-                    <!-- Conteúdo da Aba Gráficos -->
                     <h3>Gráficos</h3>
                     <p>Conteúdo da aba de Gráficos.</p>
                 </div>
@@ -101,6 +131,7 @@
         </div>
     </main>
 
+    <!-- JavaScript necessário para o funcionamento do mapa -->
     <script>
         let map;
         let drawingManager;
@@ -111,7 +142,7 @@
         const zoneamentosList = document.getElementById('zoneamentos-list');
         const addZoneamentoBtn = document.getElementById('add-zoneamento');
         let infoWindow = new google.maps.InfoWindow({
-            disableAutoPan: true
+            disableAutoPan: true // Impede o infowindow de reposicionar o mapa automaticamente
         });
 
         function initMap() {
@@ -154,6 +185,7 @@
 
             zoneamentoForm.addEventListener('submit', saveAllZoneamentos);
 
+            // Carrega zoneamentos existentes
             loadExistingZoneamentos();
         }
 
@@ -173,6 +205,7 @@
                         });
                         shapes.push(polygon);
 
+                        // Evento de hover para exibir o nome
                         google.maps.event.addListener(polygon, 'mouseover', function (event) {
                             const content = `
                                 <div class="info-window">
@@ -183,12 +216,13 @@
                             infoWindow.setContent(content);
                             infoWindow.setPosition(event.latLng);
                             infoWindow.open(map);
-                            polygon.setOptions({ strokeWeight: 3 });
+                            polygon.setOptions({ strokeWeight: 3 }); // Aumenta a espessura da borda no hover
                         });
 
+                        // Evento para esconder o nome quando o mouse sai de cima
                         google.maps.event.addListener(polygon, 'mouseout', function () {
                             infoWindow.close();
-                            polygon.setOptions({ strokeWeight: 1 });
+                            polygon.setOptions({ strokeWeight: 1 }); // Reduz a espessura da borda quando o mouse sai
                         });
                     });
                 })
@@ -281,7 +315,9 @@
                     zoneamentosList.innerHTML = '';
                     zoneamentos.length = 0;
                 })
-                .catch(error => console.error('Erro ao salvar zoneamentos:', error));
+                .catch(error => {
+                    console.error('Erro ao salvar zoneamentos:', error);
+                });
         }
 
         window.onload = initMap;
