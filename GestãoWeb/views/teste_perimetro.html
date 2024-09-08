@@ -28,7 +28,8 @@
 
         /* Estilo do conteúdo da janela de informação */
         .info-window-content {
-            font-size: 14px; /* Tamanho de fonte ajustado */
+            font-size: 14px;
+            /* Tamanho de fonte ajustado */
             font-weight: bold;
             padding: 8px;
             border-radius: 8px;
@@ -39,14 +40,6 @@
 
         .info-window-content:hover {
             transform: scale(1.05);
-        }
-
-        /* Estilo do botão de fechar do InfoWindow */
-        .gm-ui-hover-effect {
-            width: 15px !important; /* Reduz o tamanho do botão de fechar */
-            height: 15px !important;
-            top: 5px !important; /* Ajusta o posicionamento vertical */
-            right: 5px !important; /* Ajusta o posicionamento horizontal */
         }
     </style>
 </head>
@@ -73,7 +66,9 @@
         const zoneamentoForm = document.getElementById('zoneamento-form');
         const zoneamentosList = document.getElementById('zoneamentos-list');
         const addZoneamentoBtn = document.getElementById('add-zoneamento');
-        let infoWindow = new google.maps.InfoWindow();
+        let infoWindow = new google.maps.InfoWindow({
+            disableAutoPan: true // Impede o infowindow de reposicionar o mapa automaticamente
+        });
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
