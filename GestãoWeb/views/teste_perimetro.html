@@ -7,7 +7,41 @@
     <title>Cadastro de Zoneamentos</title>
     <!-- Incluindo apenas Bootstrap para evitar conflitos -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&libraries=drawing"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=drawing"></script>
+    <style>
+        /* Animação para o efeito de fade-in */
+        .info-window {
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Estilo do conteúdo da janela de informação */
+        .info-window-content {
+            font-size: 16px;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            background-color: white;
+            transition: transform 0.2s ease;
+        }
+
+        .info-window-content:hover {
+            transform: scale(1.05);
+        }
+    </style>
 </head>
 
 <body>
@@ -32,7 +66,7 @@
         const zoneamentoForm = document.getElementById('zoneamento-form');
         const zoneamentosList = document.getElementById('zoneamentos-list');
         const addZoneamentoBtn = document.getElementById('add-zoneamento');
-        let infoWindow = new google.maps.InfoWindow(); // Criação de uma infowindow para exibir os nomes
+        let infoWindow = new google.maps.InfoWindow();
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
@@ -96,7 +130,13 @@
 
                         // Evento de hover para exibir o nome
                         google.maps.event.addListener(polygon, 'mouseover', function (event) {
-                            infoWindow.setContent(`<div style="font-size: 16px; color: ${zoneamento.cor};">${zoneamento.nome}</div>`);
+                            const content = `
+                                <div class="info-window">
+                                    <div class="info-window-content" style="color: ${zoneamento.cor};">
+                                        ${zoneamento.nome}
+                                    </div>
+                                </div>`;
+                            infoWindow.setContent(content);
                             infoWindow.setPosition(event.latLng);
                             infoWindow.open(map);
                             polygon.setOptions({ strokeWeight: 3 }); // Aumenta a espessura da borda no hover
