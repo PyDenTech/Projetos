@@ -9,7 +9,42 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=drawing"></script>
     <link rel="stylesheet" href="/css/admin-dashboard.css">
+    <style>
+        /* Animação para o efeito de fade-in */
+        .info-window {
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Estilo do conteúdo da janela de informação */
+        .info-window-content {
+            font-size: 14px;
+            font-weight: bold;
+            padding: 8px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            background-color: white;
+            transition: transform 0.2s ease;
+        }
+
+        .info-window-content:hover {
+            transform: scale(1.05);
+        }
+    </style>
 </head>
 
 <body>
@@ -36,125 +71,221 @@
             </ul>
             <div class="tab-content" id="adminTabContent">
                 <div class="tab-pane fade show active" id="usuarios" role="tabpanel" aria-labelledby="usuarios-tab">
+                    <!-- Conteúdo da Aba Usuários -->
                     <h3>Usuários por Localização</h3>
-                    <div class="row mb-3">
-                        <div class="col-md-4">
-                            <select class="form-control" id="estadoSelect" onchange="carregarMunicipios(this.value)">
-                                <option>Selecione um Estado</option>
-                                <!-- Estados carregados dinamicamente -->
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <select class="form-control" id="municipioSelect"
-                                onchange="filtrarUsuariosPorMunicipio(this.value)">
-                                <option>Selecione um Município</option>
-                                <!-- Municípios carregados dinamicamente -->
-                            </select>
-                        </div>
-                    </div>
-                    <h3>Usuários que Solicitaram Cadastro</h3>
-                    <table class="table table-striped">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th>ID</th>
-                                <th>Nome</th>
-                                <th>Email</th>
-                                <th>Status</th>
-                                <th>Cargo</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="userTableBody">
-                            <!-- Os usuários serão carregados aqui via JavaScript -->
-                        </tbody>
-                    </table>
+                    <!-- Conteúdo da seção de usuários -->
                 </div>
                 <div class="tab-pane fade" id="cadastros" role="tabpanel" aria-labelledby="cadastros-tab">
-                    <h3>Cadastros</h3>
-                    <section class="section">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Cadastro de Zonas</h5>
-                                        <form id="zonaForm">
-                                            <div class="form-group">
-                                                <label for="nomeBairro">Nome do Bairro:</label>
-                                                <input type="text" class="form-control" id="nomeBairro"
-                                                    placeholder="Digite o nome do bairro" required>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div><br>
-                        <button type="button" class="btn btn-primary" id="cadastrarBtn">Cadastrar</button>
-                    </section>
-                    <section class="section">
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Gerenciar Zoneamentos</h5>
-                                        <div class="table-responsive">
-                                            <table class="table table-bordered">
-                                                <thead>
-                                                    <tr>
-                                                        <th>ID</th>
-                                                        <th>Bairro</th>
-                                                        <th>Ações</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="bairrosTableBody">
-                                                    <!-- Conteúdo dinâmico -->
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                    <h3>Cadastro de Zoneamentos</h3>
+                    <form id="zoneamento-form">
+                        <div id="zoneamentos-list">
+                            <!-- Lista de zoneamentos adicionados dinamicamente -->
                         </div>
-                    </section>
-                    <!-- Modal para Editar Bairro -->
-                    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel"
-                        aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="editModalLabel">Editar Bairro</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <div class="modal-body">
-                                    <form id="editBairroForm">
-                                        <div class="form-group">
-                                            <label for="editNomeBairro">Nome do Bairro:</label>
-                                            <input type="text" class="form-control" id="editNomeBairro" required>
-                                        </div>
-                                    </form>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary"
-                                        data-dismiss="modal">Cancelar</button>
-                                    <button type="button" class="btn btn-primary" id="salvarEdicaoBtn">Salvar</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                        <button type="button" id="add-zoneamento" class="btn btn-secondary mb-2">Adicionar
+                            Zoneamento</button>
+                        <button type="submit" class="btn btn-primary">Salvar Todos Zoneamentos</button>
+                    </form>
+                    <div id="map" class="mt-4" style="height: 500px;"></div>
                 </div>
                 <div class="tab-pane fade" id="relatorios" role="tabpanel" aria-labelledby="relatorios-tab">
+                    <!-- Conteúdo da Aba Relatórios -->
                     <h3>Relatórios</h3>
                     <p>Conteúdo da aba de Relatórios.</p>
                 </div>
                 <div class="tab-pane fade" id="graficos" role="tabpanel" aria-labelledby="graficos-tab">
+                    <!-- Conteúdo da Aba Gráficos -->
                     <h3>Gráficos</h3>
                     <p>Conteúdo da aba de Gráficos.</p>
                 </div>
             </div>
         </div>
     </main>
-    <script src="/js/admin.js"></script>
+
+    <script>
+        let map;
+        let drawingManager;
+        let selectedShape;
+        const shapes = [];
+        const zoneamentos = [];
+        const zoneamentoForm = document.getElementById('zoneamento-form');
+        const zoneamentosList = document.getElementById('zoneamentos-list');
+        const addZoneamentoBtn = document.getElementById('add-zoneamento');
+        let infoWindow = new google.maps.InfoWindow({
+            disableAutoPan: true
+        });
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: -6.530080, lng: -49.851571 },
+                zoom: 15,
+                mapTypeId: 'terrain'
+            });
+
+            drawingManager = new google.maps.drawing.DrawingManager({
+                drawingMode: google.maps.drawing.OverlayType.POLYGON,
+                drawingControl: true,
+                drawingControlOptions: {
+                    position: google.maps.ControlPosition.TOP_CENTER,
+                    drawingModes: ['polygon']
+                },
+                polygonOptions: {
+                    editable: true,
+                    fillOpacity: 0.35
+                }
+            });
+            drawingManager.setMap(map);
+
+            google.maps.event.addListener(drawingManager, 'overlaycomplete', function (event) {
+                if (event.type === google.maps.drawing.OverlayType.POLYGON) {
+                    const polygon = event.overlay;
+                    shapes.push(polygon);
+
+                    google.maps.event.addListener(polygon, 'click', function () {
+                        setSelection(polygon);
+                    });
+
+                    setSelection(polygon);
+                }
+            });
+
+            addZoneamentoBtn.addEventListener('click', function () {
+                addZoneamentoFields();
+            });
+
+            zoneamentoForm.addEventListener('submit', saveAllZoneamentos);
+
+            loadExistingZoneamentos();
+        }
+
+        function loadExistingZoneamentos() {
+            fetch('/api/zoneamentos')
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(zoneamento => {
+                        const coordinates = zoneamento.coordenadas.map(coord => new google.maps.LatLng(coord.lat, coord.lng));
+                        const polygon = new google.maps.Polygon({
+                            paths: coordinates,
+                            strokeColor: zoneamento.cor,
+                            fillColor: zoneamento.cor,
+                            editable: false,
+                            fillOpacity: 0.35,
+                            map: map
+                        });
+                        shapes.push(polygon);
+
+                        google.maps.event.addListener(polygon, 'mouseover', function (event) {
+                            const content = `
+                                <div class="info-window">
+                                    <div class="info-window-content" style="color: ${zoneamento.cor};">
+                                        ${zoneamento.nome}
+                                    </div>
+                                </div>`;
+                            infoWindow.setContent(content);
+                            infoWindow.setPosition(event.latLng);
+                            infoWindow.open(map);
+                            polygon.setOptions({ strokeWeight: 3 });
+                        });
+
+                        google.maps.event.addListener(polygon, 'mouseout', function () {
+                            infoWindow.close();
+                            polygon.setOptions({ strokeWeight: 1 });
+                        });
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar zoneamentos:', error));
+        }
+
+        function setSelection(shape) {
+            if (selectedShape) {
+                selectedShape.setEditable(false);
+            }
+            selectedShape = shape;
+            selectedShape.setEditable(true);
+
+            const index = zoneamentos.findIndex(z => z.shape === null);
+            if (index !== -1) {
+                zoneamentos[index].shape = shape;
+            }
+        }
+
+        function addZoneamentoFields() {
+            const index = zoneamentos.length;
+            const zoneamentoDiv = document.createElement('div');
+            zoneamentoDiv.className = 'zoneamento-item mb-3';
+            zoneamentoDiv.innerHTML = `
+                <div class="form-group">
+                    <label for="zoneamento-name-${index}">Nome do Zoneamento</label>
+                    <input type="text" class="form-control zoneamento-name" id="zoneamento-name-${index}" required>
+                </div>
+                <div class="form-group">
+                    <label for="color-picker-${index}">Escolha a Cor</label>
+                    <input type="color" class="form-control color-picker" id="color-picker-${index}" value="#ff0000">
+                </div>
+            `;
+            zoneamentosList.appendChild(zoneamentoDiv);
+
+            const colorPicker = document.getElementById(`color-picker-${index}`);
+            colorPicker.addEventListener('input', function () {
+                if (zoneamentos[index].shape) {
+                    zoneamentos[index].shape.setOptions({
+                        strokeColor: colorPicker.value,
+                        fillColor: colorPicker.value
+                    });
+                }
+            });
+
+            zoneamentos.push({ id: index, shape: null });
+        }
+
+        function saveAllZoneamentos(event) {
+            event.preventDefault();
+            const zoneamentoData = [];
+
+            zoneamentos.forEach((zoneamento, index) => {
+                const name = document.getElementById(`zoneamento-name-${index}`).value;
+                const color = document.getElementById(`color-picker-${index}`).value;
+
+                if (zoneamento.shape) {
+                    const coordinates = zoneamento.shape.getPath().getArray().map(latLng => ({
+                        lat: latLng.lat(),
+                        lng: latLng.lng()
+                    }));
+
+                    if (!name) {
+                        alert(`Por favor, preencha o nome do zoneamento ${index + 1}.`);
+                        return;
+                    }
+
+                    zoneamentoData.push({ name, color, coordinates });
+                }
+            });
+
+            if (zoneamentoData.length === 0) {
+                alert('Nenhum zoneamento para salvar.');
+                return;
+            }
+
+            fetch('/api/zoneamentos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(zoneamentoData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Todos os zoneamentos foram salvos com sucesso!');
+                    shapes.forEach(shape => shape.setMap(null));
+                    shapes.length = 0;
+                    zoneamentoForm.reset();
+                    zoneamentosList.innerHTML = '';
+                    zoneamentos.length = 0;
+                })
+                .catch(error => console.error('Erro ao salvar zoneamentos:', error));
+        }
+
+        window.onload = initMap;
+    </script>
 </body>
 
 </html>
