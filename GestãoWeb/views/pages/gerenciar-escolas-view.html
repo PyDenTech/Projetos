@@ -716,7 +716,7 @@
 
             // Função para carregar zoneamentos
             function carregarZoneamentos(zoneamentosSelecionados) {
-                fetch('/api/zoneamentos')
+                fetch('/api/bairros')
                     .then(response => response.json())
                     .then(data => {
                         const listaZoneamentos = document.getElementById('listaZoneamentos');
