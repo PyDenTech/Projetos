@@ -892,6 +892,15 @@ app.get('/api/escolas/:id/bairros', async (req, res) => {
         }
 
         const escola = escolaResult.rows[0];
+
+        // Verificar se a escola possui zoneamentos
+        if (!escola.zoneamentos || !Array.isArray(escola.zoneamentos) || escola.zoneamentos.length === 0) {
+            return res.json({
+                bairrosAtendidos: [],
+                bairrosNaoAtendidos: []
+            });
+        }
+
         const bairrosAtendidosIds = escola.zoneamentos.map(z => z.id); // IDs dos bairros atendidos
 
         // Obter a lista de bairros atendidos (presentes em zoneamentos)
@@ -906,9 +915,10 @@ app.get('/api/escolas/:id/bairros', async (req, res) => {
         });
     } catch (error) {
         console.error('Erro ao buscar bairros:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Erro ao buscar bairros' });
     }
 });
+
 
 
 app.put('/api/escolas/:id', async (req, res) => {
