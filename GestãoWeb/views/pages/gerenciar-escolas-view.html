@@ -706,7 +706,8 @@
                         if (escolaAreaUrbanaField) escolaAreaUrbanaField.value = data.area_urbana ? '1' : '0';
 
                         // Carregar zoneamentos e selecionar os atribuídos
-                        carregarZoneamentos(data.zoneamentos ? JSON.parse(data.zoneamentos) : []);
+                        const zoneamentos = data.zoneamentos ? JSON.parse(data.zoneamentos) : [];
+                        carregarZoneamentos(zoneamentos);
 
                         $('#editModal').modal('show');
                     })
@@ -726,8 +727,7 @@
                         listaZoneamentos.innerHTML = '';
                         zoneamentosAtribuidos.innerHTML = '';
 
-                        // Garantir que todos os elementos do array estão definidos como strings
-                        const zoneamentosSelecionadosStr = zoneamentosSelecionados.map(z => z ? z.toString() : '');
+                        const zoneamentosSelecionadosStr = zoneamentosSelecionados.map(z => (z ? z.toString() : ''));
 
                         data.forEach(zoneamento => {
                             const option = document.createElement('option');
