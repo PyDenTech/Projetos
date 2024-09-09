@@ -610,49 +610,58 @@
                     .then(data => {
                         data.forEach(escola => {
                             if (escola.latitude && escola.longitude) {
-                                // Prepare o conteúdo do popup com zoneamentos incluídos
+                                // Prepare o conteúdo do popup sem os polígonos inicialmente
                                 let zoneamentosInfo = escola.zoneamentos_nomes ? escola.zoneamentos_nomes.join(", ") : "Nenhum";
-
                                 let popupContent = `
                         <b>${escola.nome}</b><br>
                         ${escola.logradouro}, ${escola.numero}<br>
                         <b>Zoneamentos:</b> ${zoneamentosInfo}
                     `;
 
-                                // Adicionar marcador no mapa com ícone personalizado e popup com informações da escola e zoneamento
-                                L.marker([escola.latitude, escola.longitude], { icon: schoolIcon }).addTo(map)
+                                // Criar o marcador com ícone personalizado
+                                const marcador = L.marker([escola.latitude, escola.longitude], { icon: schoolIcon }).addTo(map)
                                     .bindPopup(popupContent);
 
-                                // Verificar se há coordenadas de zoneamentos antes de tentar processá-las
-                                if (escola.zoneamentos_coordenadas && Array.isArray(escola.zoneamentos_coordenadas)) {
-                                    escola.zoneamentos_coordenadas.forEach(coordenadasJSON => {
-                                        if (coordenadasJSON && typeof coordenadasJSON === 'string') {
-                                            try {
-                                                const coordenadas = JSON.parse(coordenadasJSON); // Parse JSONB coordenadas
+                                // Adicionar evento de clique ao marcador para exibir zoneamentos
+                                marcador.on('click', function () {
+                                    // Remover todos os polígonos existentes antes de adicionar novos
+                                    map.eachLayer(function (layer) {
+                                        if (layer instanceof L.Polygon) {
+                                            map.removeLayer(layer);
+                                        }
+                                    });
 
-                                                // Verificar se as coordenadas estão no formato esperado
+                                    // Verificar se há coordenadas de zoneamentos antes de tentar processá-las
+                                    if (escola.zoneamentos_coordenadas && Array.isArray(escola.zoneamentos_coordenadas)) {
+                                        escola.zoneamentos_coordenadas.forEach(coordenadasJSON => {
+                                            if (coordenadasJSON && typeof coordenadasJSON === 'string') {
+                                                try {
+                                                    const coordenadas = JSON.parse(coordenadasJSON); // Parse JSONB coordenadas
+
+                                                    // Verificar se as coordenadas estão no formato esperado
+                                                    if (Array.isArray(coordenadas) && coordenadas.length > 0) {
+                                                        const polygonCoords = coordenadas.map(coord => [coord.lat, coord.lng]); // Ajustar conforme necessário
+
+                                                        // Criar o polígono e adicionar ao mapa
+                                                        L.polygon(polygonCoords, { color: 'blue' }).addTo(map);
+                                                    }
+                                                } catch (e) {
+                                                    console.error('Erro ao analisar coordenadas de zoneamento:', e);
+                                                }
+                                            } else if (coordenadasJSON && typeof coordenadasJSON === 'object') {
+                                                // Se o coordenadasJSON for um objeto JavaScript, converta diretamente para coordenadas
+                                                const coordenadas = coordenadasJSON;
+
                                                 if (Array.isArray(coordenadas) && coordenadas.length > 0) {
                                                     const polygonCoords = coordenadas.map(coord => [coord.lat, coord.lng]); // Ajustar conforme necessário
 
                                                     // Criar o polígono e adicionar ao mapa
                                                     L.polygon(polygonCoords, { color: 'blue' }).addTo(map);
                                                 }
-                                            } catch (e) {
-                                                console.error('Erro ao analisar coordenadas de zoneamento:', e);
                                             }
-                                        } else if (coordenadasJSON && typeof coordenadasJSON === 'object') {
-                                            // Se o coordenadasJSON for um objeto JavaScript, converta diretamente para coordenadas
-                                            const coordenadas = coordenadasJSON;
-
-                                            if (Array.isArray(coordenadas) && coordenadas.length > 0) {
-                                                const polygonCoords = coordenadas.map(coord => [coord.lat, coord.lng]); // Ajustar conforme necessário
-
-                                                // Criar o polígono e adicionar ao mapa
-                                                L.polygon(polygonCoords, { color: 'blue' }).addTo(map);
-                                            }
-                                        }
-                                    });
-                                }
+                                        });
+                                    }
+                                });
                             }
                         });
                     })
