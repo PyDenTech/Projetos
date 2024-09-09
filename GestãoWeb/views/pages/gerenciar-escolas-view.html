@@ -748,7 +748,6 @@
                     .catch(error => console.error('Erro ao salvar edição da escola:', error));
             });
 
-
             function excluirEscola(id) {
                 if (confirm('Tem certeza de que deseja excluir esta escola?')) {
                     fetch(`/api/excluir-escola/${id}`, {
