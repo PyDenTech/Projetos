@@ -413,6 +413,7 @@
         </section>
 
         <!-- Modal para Editar Escola -->
+        <!-- Modal para Editar Escola -->
         <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -424,57 +425,36 @@
                     </div>
                     <div class="modal-body">
                         <form id="editEscolaForm">
-                            <!-- Campos de edição -->
-                            <input type="hidden" id="editEscolaId">
-                            <div class="form-group">
-                                <label for="editEscolaNome">Nome:</label>
-                                <input type="text" class="form-control" id="editEscolaNome" required>
+                            <!-- Outros Campos de edição -->
+
+                            <!-- Select para Zoneamentos -->
+                            <div class="form-group row dual-listbox">
+                                <div class="col">
+                                    <h5>Zoneamentos Disponíveis</h5>
+                                    <input type="text" class="form-control mb-2" placeholder="Filtro"
+                                        id="filterZoneamentos">
+                                    <select class="form-control" id="listaZoneamentos" multiple>
+                                        <!-- Opções carregadas dinamicamente -->
+                                    </select>
+                                </div>
+                                <div class="col d-flex flex-column justify-content-center">
+                                    <button type="button" class="btn btn-primary mb-2"
+                                        id="adicionarZoneamentoBtn">Adicionar →</button>
+                                    <button type="button" class="btn btn-danger" id="removerZoneamentoBtn">←
+                                        Remover</button>
+                                </div>
+                                <div class="col">
+                                    <h5>Zoneamentos Atribuídos <span id="contadorZoneamentos"
+                                            class="badge bg-success">0</span></h5>
+                                    <input type="text" class="form-control mb-2" placeholder="Filtro"
+                                        id="filterAtribuidos">
+                                    <select class="form-control" id="zoneamentosAtribuidos" multiple>
+                                        <!-- Opções carregadas dinamicamente -->
+                                    </select>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label for="editEscolaINEP">INEP:</label>
-                                <input type="text" class="form-control" id="editEscolaINEP" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="editEscolaLatitude">Latitude:</label>
-                                <input type="text" class="form-control" id="editEscolaLatitude" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="editEscolaLongitude">Longitude:</label>
-                                <input type="text" class="form-control" id="editEscolaLongitude" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="editEscolaLogradouro">Logradouro:</label>
-                                <input type="text" class="form-control" id="editEscolaLogradouro" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="editEscolaNumero">Número:</label>
-                                <input type="text" class="form-control" id="editEscolaNumero">
-                            </div>
-                            <div class="form-group">
-                                <label for="editEscolaComplemento">Complemento:</label>
-                                <input type="text" class="form-control" id="editEscolaComplemento">
-                            </div>
-                            <div class="form-group">
-                                <label for="editEscolaBairro">Bairro:</label>
-                                <input type="text" class="form-control" id="editEscolaBairro" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="editEscolaCep">CEP:</label>
-                                <input type="text" class="form-control" id="editEscolaCep" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="editEscolaAreaUrbana">Área Urbana:</label>
-                                <select class="form-control" id="editEscolaAreaUrbana" required>
-                                    <option value="1">Sim</option>
-                                    <option value="0">Não</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="editEscolaZoneamentos">Zoneamentos:</label>
-                                <select class="form-control" id="editEscolaZoneamentos" multiple>
-                                    <!-- Options serão carregadas dinamicamente -->
-                                </select>
-                            </div>
+
+                            <!-- Restante dos campos do formulário -->
                         </form>
                     </div>
                     <div class="modal-footer">
@@ -484,6 +464,7 @@
                 </div>
             </div>
         </div>
+
 
         <section class="section">
             <div class="row">
@@ -645,23 +626,7 @@
                     .catch(error => console.error('Erro ao carregar tabela de escolas:', error));
             }
 
-            function carregarZoneamentos() {
-                return fetch('/api/zoneamentos-editar')
-                    .then(response => response.json())
-                    .then(data => {
-                        const selectZoneamentos = document.getElementById('editEscolaZoneamentos');
-                        selectZoneamentos.innerHTML = ''; // Limpa o conteúdo existente
-
-                        data.forEach(zoneamento => {
-                            const option = document.createElement('option');
-                            option.value = zoneamento.id;
-                            option.textContent = zoneamento.nome;
-                            selectZoneamentos.appendChild(option);
-                        });
-                    })
-                    .catch(error => console.error('Erro ao carregar zoneamentos:', error)); // Verifique erros no console
-            }
-
+            // Função para editar escola
             function editarEscola(id) {
                 fetch(`/api/escolas/${id}`)
                     .then(response => response.json())
@@ -678,24 +643,89 @@
                         document.getElementById('editEscolaCep').value = data.cep;
                         document.getElementById('editEscolaAreaUrbana').value = data.area_urbana ? '1' : '0';
 
-                        // Carrega os zoneamentos e seleciona os atribuídos
-                        carregarZoneamentos().then(() => {
-                            const selectZoneamentos = document.getElementById('editEscolaZoneamentos');
-                            const zoneamentos = JSON.parse(data.zoneamentos || '[]');
+                        carregarZoneamentos(data.zoneamentos);
 
-                            zoneamentos.forEach(zoneamentoId => {
-                                const option = selectZoneamentos.querySelector(`option[value="${zoneamentoId}"]`);
-                                if (option) {
-                                    option.selected = true;
-                                }
-                            });
-                        });
-
-                        $('#editModal').modal('show'); // Use o método correto do Bootstrap para abrir o modal
+                        $('#editModal').modal('show');
                     })
                     .catch(error => console.error('Erro ao buscar dados da escola:', error));
             }
 
+            // Função para carregar zoneamentos
+            function carregarZoneamentos(zoneamentosSelecionados) {
+                fetch('/api/zoneamentos')
+                    .then(response => response.json())
+                    .then(data => {
+                        const listaZoneamentos = document.getElementById('listaZoneamentos');
+                        const zoneamentosAtribuidos = document.getElementById('zoneamentosAtribuidos');
+
+                        listaZoneamentos.innerHTML = '';
+                        zoneamentosAtribuidos.innerHTML = '';
+
+                        data.forEach(zoneamento => {
+                            const option = document.createElement('option');
+                            option.value = zoneamento.id;
+                            option.textContent = zoneamento.nome;
+
+                            if (zoneamentosSelecionados && zoneamentosSelecionados.includes(zoneamento.id)) {
+                                zoneamentosAtribuidos.appendChild(option);
+                            } else {
+                                listaZoneamentos.appendChild(option);
+                            }
+                        });
+
+                        atualizarContadorZoneamentos();
+                    })
+                    .catch(error => console.error('Erro ao carregar zoneamentos:', error));
+            }
+
+            // Funções de filtro para zoneamentos
+            document.getElementById('filterZoneamentos').addEventListener('input', function () {
+                const filter = this.value.toLowerCase();
+                const options = document.getElementById('listaZoneamentos').options;
+                for (let i = 0; i < options.length; i++) {
+                    const option = options[i];
+                    const text = option.text.toLowerCase();
+                    option.style.display = text.includes(filter) ? '' : 'none';
+                }
+            });
+
+            document.getElementById('filterAtribuidos').addEventListener('input', function () {
+                const filter = this.value.toLowerCase();
+                const options = document.getElementById('zoneamentosAtribuidos').options;
+                for (let i = 0; i < options.length; i++) {
+                    const option = options[i];
+                    const text = option.text.toLowerCase();
+                    option.style.display = text.includes(filter) ? '' : 'none';
+                }
+            });
+
+            // Funções de adicionar e remover zoneamentos
+            document.getElementById('adicionarZoneamentoBtn').addEventListener('click', function () {
+                const listaZoneamentos = document.getElementById('listaZoneamentos');
+                const zoneamentosAtribuidos = document.getElementById('zoneamentosAtribuidos');
+                while (listaZoneamentos.selectedOptions.length > 0) {
+                    const option = listaZoneamentos.selectedOptions[0];
+                    zoneamentosAtribuidos.appendChild(option);
+                }
+                atualizarContadorZoneamentos();
+            });
+
+            document.getElementById('removerZoneamentoBtn').addEventListener('click', function () {
+                const zoneamentosAtribuidos = document.getElementById('zoneamentosAtribuidos');
+                const listaZoneamentos = document.getElementById('listaZoneamentos');
+                while (zoneamentosAtribuidos.selectedOptions.length > 0) {
+                    const option = zoneamentosAtribuidos.selectedOptions[0];
+                    listaZoneamentos.appendChild(option);
+                }
+                atualizarContadorZoneamentos();
+            });
+
+            function atualizarContadorZoneamentos() {
+                const contador = document.getElementById('zoneamentosAtribuidos').options.length;
+                document.getElementById('contadorZoneamentos').textContent = contador;
+            }
+
+            // Função para salvar edição da escola
             document.getElementById('salvarEdicaoBtn').addEventListener('click', function () {
                 const id = document.getElementById('editEscolaId').value;
                 const nome = document.getElementById('editEscolaNome').value;
@@ -709,9 +739,7 @@
                 const cep = document.getElementById('editEscolaCep').value;
                 const area_urbana = document.getElementById('editEscolaAreaUrbana').value;
 
-                // Obtém os zoneamentos selecionados
-                const zoneamentos = Array.from(document.getElementById('editEscolaZoneamentos').selectedOptions)
-                    .map(option => option.value);
+                const zoneamentos = Array.from(document.getElementById('zoneamentosAtribuidos').options).map(option => option.value);
 
                 const data = {
                     nome,
@@ -724,7 +752,7 @@
                     bairro,
                     cep,
                     area_urbana,
-                    zoneamentos: JSON.stringify(zoneamentos) // Converte os zoneamentos para JSON antes de enviar
+                    zoneamentos
                 };
 
                 fetch(`/api/editar-escola/${id}`, {
@@ -736,18 +764,16 @@
                 })
                     .then(response => {
                         if (response.ok) {
-                            $('#editModal').modal('hide'); // Fechar o modal após a edição
-                            carregarTabelaEscolas(); // Atualizar a tabela de escolas
+                            $('#editModal').modal('hide');
+                            carregarTabelaEscolas();
                         } else {
-                            return response.json().then(data => {
-                                console.error('Erro ao salvar edição da escola:', data.error);
-                                alert('Erro ao salvar edição da escola: ' + data.error); // Adiciona um alerta para o usuário
-                            });
+                            console.error('Erro ao salvar edição da escola');
                         }
                     })
                     .catch(error => console.error('Erro ao salvar edição da escola:', error));
             });
 
+            // Função para excluir escola
             function excluirEscola(id) {
                 if (confirm('Tem certeza de que deseja excluir esta escola?')) {
                     fetch(`/api/excluir-escola/${id}`, {
