@@ -811,7 +811,7 @@ app.post('/api/cadastrar-bairro', async (req, res) => {
 
 app.get('/api/bairros', async (req, res) => {
     try {
-        const result = await pool.query('SELECT id, nome FROM bairros ORDER BY nome');
+        const result = await pool.query('SELECT id, nome FROM zoneamentos ORDER BY nome');
         res.json(result.rows);
     } catch (error) {
         console.error('Erro ao obter bairros:', error);
