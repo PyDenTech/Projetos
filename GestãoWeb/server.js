@@ -1669,9 +1669,15 @@ app.delete('/api/fornecedores/:id', async (req, res) => {
 app.get('/api/escolas', async (req, res) => {
     try {
         const result = await pool.query(`
-            SELECT e.*, z.nome AS zoneamento_nome
+            SELECT e.*, 
+                ARRAY_AGG(z.nome) AS zoneamentos_nomes
             FROM escolas e
-            LEFT JOIN zoneamentos z ON z.id = ANY(e.zoneamentos::int[])
+            LEFT JOIN LATERAL (
+                SELECT z.nome
+                FROM zoneamentos z
+                WHERE z.id = ANY (SELECT jsonb_array_elements_text(e.zoneamentos)::int)
+            ) z ON TRUE
+            GROUP BY e.id
         `);
 
         res.json(result.rows);
@@ -1680,6 +1686,7 @@ app.get('/api/escolas', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 app.post('/api/zoneamentos', async (req, res) => {
     const zoneamentos = req.body;

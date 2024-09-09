@@ -611,7 +611,7 @@
                         data.forEach(escola => {
                             if (escola.latitude && escola.longitude) {
                                 // Prepare o conteúdo do popup com zoneamentos incluídos
-                                let zoneamentosInfo = escola.zoneamento_nome ? escola.zoneamento_nome.join(", ") : "Nenhum";
+                                let zoneamentosInfo = escola.zoneamentos_nomes ? escola.zoneamentos_nomes.join(", ") : "Nenhum";
 
                                 let popupContent = `
                         <b>${escola.nome}</b><br>
