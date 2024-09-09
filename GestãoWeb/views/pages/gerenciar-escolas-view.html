@@ -673,7 +673,6 @@
                 fetch(`/api/escolas/${id}`)
                     .then(response => response.json())
                     .then(data => {
-                        // Verificar se os elementos existem antes de definir seus valores
                         const escolaIdField = document.getElementById('editEscolaId');
                         if (escolaIdField) escolaIdField.value = data.id || '';
 
@@ -707,7 +706,6 @@
                         const escolaAreaUrbanaField = document.getElementById('editEscolaAreaUrbana');
                         if (escolaAreaUrbanaField) escolaAreaUrbanaField.value = data.area_urbana ? '1' : '0';
 
-                        // Tratamento para dados nulos ou inexistentes na coluna zoneamentos
                         carregarZoneamentos(data.zoneamentos || []);
 
                         $('#editModal').modal('show');
@@ -806,7 +804,10 @@
                 const cep = document.getElementById('editEscolaCep').value;
                 const area_urbana = document.getElementById('editEscolaAreaUrbana').value;
 
-                const zoneamentos = Array.from(document.getElementById('zoneamentosAtribuidos').options).map(option => option.value);
+                // Verificar se os valores são válidos
+                const zoneamentos = Array.from(document.getElementById('zoneamentosAtribuidos').options)
+                    .map(option => option.value)
+                    .filter(value => value !== 'undefined' && value !== null && value !== ''); // Filtrar valores inválidos
 
                 const data = {
                     nome,
