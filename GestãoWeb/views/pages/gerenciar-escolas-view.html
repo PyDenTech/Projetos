@@ -623,14 +623,24 @@
                                 L.marker([escola.latitude, escola.longitude], { icon: schoolIcon }).addTo(map)
                                     .bindPopup(popupContent);
 
-                                // Adicionar os polígonos dos zoneamentos no mapa
-                                if (escola.zoneamentos_coordenadas) {
+                                // Verificar se há coordenadas de zoneamentos antes de tentar processá-las
+                                if (escola.zoneamentos_coordenadas && Array.isArray(escola.zoneamentos_coordenadas)) {
                                     escola.zoneamentos_coordenadas.forEach(coordenadasJSON => {
-                                        const coordenadas = JSON.parse(coordenadasJSON); // Parse JSONB coordenadas
-                                        const polygonCoords = coordenadas.map(coord => [coord.lat, coord.lng]); // Ajustar conforme necessário
+                                        if (coordenadasJSON) {
+                                            try {
+                                                const coordenadas = JSON.parse(coordenadasJSON); // Parse JSONB coordenadas
 
-                                        // Criar o polígono e adicionar ao mapa
-                                        L.polygon(polygonCoords, { color: 'blue' }).addTo(map);
+                                                // Verificar se as coordenadas estão no formato esperado
+                                                if (Array.isArray(coordenadas) && coordenadas.length > 0) {
+                                                    const polygonCoords = coordenadas.map(coord => [coord.lat, coord.lng]); // Ajustar conforme necessário
+
+                                                    // Criar o polígono e adicionar ao mapa
+                                                    L.polygon(polygonCoords, { color: 'blue' }).addTo(map);
+                                                }
+                                            } catch (e) {
+                                                console.error('Erro ao analisar coordenadas de zoneamento:', e);
+                                            }
+                                        }
                                     });
                                 }
                             }
@@ -638,8 +648,6 @@
                     })
                     .catch(error => console.error('Erro ao carregar escolas:', error));
             }
-
-
             carregarEscolas();
 
             // Carregar lista de escolas na tabela
