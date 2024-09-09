@@ -469,6 +469,33 @@
                                     <option value="0">Não</option>
                                 </select>
                             </div>
+
+                            <!-- Campos de edição de bairros atendidos -->
+                            <div class="form-group dual-listbox">
+                                <div class="col">
+                                    <h5>Lista de Bairros</h5>
+                                    <input type="text" class="form-control mb-2" placeholder="Filtro"
+                                        id="filterEditBairros">
+                                    <select class="form-control" id="listaEditBairros" multiple>
+                                        <!-- Opções carregadas dinamicamente -->
+                                    </select>
+                                </div>
+                                <div class="col d-flex flex-column justify-content-center">
+                                    <button type="button" class="btn btn-primary mb-2"
+                                        id="adicionarEditBairroBtn">Adicionar →</button>
+                                    <button type="button" class="btn btn-danger" id="removerEditBairroBtn">←
+                                        Remover</button>
+                                </div>
+                                <div class="col">
+                                    <h5>Bairros Atendidos pela Escola</h5>
+                                    <input type="text" class="form-control mb-2" placeholder="Filtro"
+                                        id="filterEditAtendidos">
+                                    <select class="form-control" id="bairrosEditAtendidos" multiple>
+                                        <!-- Opções carregadas dinamicamente -->
+                                    </select>
+                                </div>
+                            </div>
+
                         </form>
                     </div>
                     <div class="modal-footer">
