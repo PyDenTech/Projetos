@@ -646,7 +646,7 @@
             }
 
             function carregarZoneamentos() {
-                fetch('/api/zoneamentos')
+                return fetch('/api/zoneamentos-editar')
                     .then(response => response.json())
                     .then(data => {
                         const selectZoneamentos = document.getElementById('editEscolaZoneamentos');
