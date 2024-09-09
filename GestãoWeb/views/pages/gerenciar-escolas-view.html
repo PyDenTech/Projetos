@@ -571,7 +571,7 @@
             var satelliteLayer = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
                 maxZoom: 22,
                 id: 'mapbox/satellite-v9',
-                accessToken: 'pk.eyJ1IjoiZGFuaWxvbW9yYWlzIiwiYSI6ImNsdzZocmJ5eDFqenoyanFzenBoMTc4c28ifQ._RiYYX1oIBe7_MBpTyYWxQ' // Substitua pelo seu token de acesso do Mapbox
+                accessToken: 'pk.eyJ1IjoiZGFuaWxvbW9yYWlzIiwiYSI6ImNsdzZocmJ5eDFqenoyanFzenBoMTc4c28ifQ._RiYYX1oIBe7_MBpTyYWxQ'
             });
 
             var streetsLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -609,7 +609,6 @@
                     .then(response => response.json())
                     .then(data => {
                         data.forEach(escola => {
-                            // Adicionar marcador no mapa com ícone personalizado
                             if (escola.latitude && escola.longitude) {
                                 L.marker([escola.latitude, escola.longitude], { icon: schoolIcon }).addTo(map)
                                     .bindPopup(`<b>${escola.nome}</b><br>${escola.logradouro}, ${escola.numero}`);
@@ -727,12 +726,15 @@
                         listaZoneamentos.innerHTML = '';
                         zoneamentosAtribuidos.innerHTML = '';
 
+                        // Garantir que todos os elementos do array estão definidos como strings
+                        const zoneamentosSelecionadosStr = zoneamentosSelecionados.map(z => z ? z.toString() : '');
+
                         data.forEach(zoneamento => {
                             const option = document.createElement('option');
                             option.value = zoneamento.id;
                             option.textContent = zoneamento.nome;
 
-                            if (zoneamentosSelecionados.includes(zoneamento.id.toString())) {
+                            if (zoneamentosSelecionadosStr.includes(zoneamento.id.toString())) {
                                 zoneamentosAtribuidos.appendChild(option);
                             } else {
                                 listaZoneamentos.appendChild(option);
@@ -862,6 +864,7 @@
             carregarTabelaEscolas();
         });
     </script>
+
 </body>
 
 </html>
