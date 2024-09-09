@@ -475,8 +475,6 @@
                                 <div class="row">
                                     <div class="col-md-5">
                                         <h5>Lista de Bairros</h5>
-                                        <input type="text" class="form-control mb-2" placeholder="Filtro"
-                                            id="filterEditBairros">
                                         <select class="form-control" id="editListaBairros" multiple size="10">
                                             <!-- Opções carregadas dinamicamente -->
                                         </select>
@@ -489,15 +487,12 @@
                                     </div>
                                     <div class="col-md-5">
                                         <h5>Bairros Atendidos pela Escola</h5>
-                                        <input type="text" class="form-control mb-2" placeholder="Filtro"
-                                            id="filterEditAtendidos">
                                         <select class="form-control" id="bairrosEditAtendidos" multiple size="10">
                                             <!-- Opções carregadas dinamicamente -->
                                         </select>
                                     </div>
                                 </div>
                             </div>
-
                         </form>
                     </div>
                     <div class="modal-footer">
@@ -667,6 +662,37 @@
                     .catch(error => console.error('Erro ao carregar tabela de escolas:', error));
             }
 
+            // Carregar os bairros relacionados e não relacionados no modal de edição
+            function carregarBairros(idEscola) {
+                fetch(`/api/escolas/${idEscola}/bairros`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const listaBairros = document.getElementById('editListaBairros');
+                        const bairrosAtendidos = document.getElementById('bairrosEditAtendidos');
+
+                        listaBairros.innerHTML = '';
+                        bairrosAtendidos.innerHTML = '';
+
+                        // Preencher bairros atendidos
+                        data.bairrosAtendidos.forEach(bairro => {
+                            const option = document.createElement('option');
+                            option.value = bairro.id;
+                            option.textContent = bairro.nome;
+                            bairrosAtendidos.appendChild(option);
+                        });
+
+                        // Preencher bairros não atendidos
+                        data.bairrosNaoAtendidos.forEach(bairro => {
+                            const option = document.createElement('option');
+                            option.value = bairro.id;
+                            option.textContent = bairro.nome;
+                            listaBairros.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Erro ao carregar bairros:', error));
+            }
+
+            // Função para abrir o modal de edição com os dados da escola
             function editarEscola(id) {
                 fetch(`/api/escolas/${id}`)
                     .then(response => response.json())
@@ -683,11 +709,13 @@
                         document.getElementById('editEscolaCep').value = data.cep;
                         document.getElementById('editEscolaAreaUrbana').value = data.area_urbana ? '1' : '0';
 
+                        carregarBairros(id);
                         $('#editModal').modal('show');
                     })
                     .catch(error => console.error('Erro ao buscar dados da escola:', error));
             }
 
+            // Evento de salvar edição
             document.getElementById('salvarEdicaoBtn').addEventListener('click', function () {
                 const id = document.getElementById('editEscolaId').value;
                 const nome = document.getElementById('editEscolaNome').value;
@@ -701,6 +729,9 @@
                 const cep = document.getElementById('editEscolaCep').value;
                 const area_urbana = document.getElementById('editEscolaAreaUrbana').value;
 
+                const bairrosAtendidos = Array.from(document.getElementById('bairrosEditAtendidos').options)
+                    .map(option => option.value);
+
                 const data = {
                     nome,
                     inep,
@@ -711,10 +742,11 @@
                     complemento,
                     bairro,
                     cep,
-                    area_urbana
+                    area_urbana,
+                    bairros_atendidos: bairrosAtendidos
                 };
 
-                fetch(`/api/editar-escola/${id}`, {
+                fetch(`/api/escolas/${id}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -732,6 +764,7 @@
                     .catch(error => console.error('Erro ao salvar edição da escola:', error));
             });
 
+            // Função para excluir escola
             function excluirEscola(id) {
                 if (confirm('Tem certeza de que deseja excluir esta escola?')) {
                     fetch(`/api/excluir-escola/${id}`, {
@@ -746,6 +779,25 @@
                         })
                         .catch(error => console.error('Erro ao excluir escola:', error));
                 }
+            }
+
+            // Adicionar eventos aos botões de adicionar e remover bairros
+            document.getElementById('adicionarEditBairroBtn').addEventListener('click', function () {
+                moverOpcoes('editListaBairros', 'bairrosEditAtendidos');
+            });
+
+            document.getElementById('removerEditBairroBtn').addEventListener('click', function () {
+                moverOpcoes('bairrosEditAtendidos', 'editListaBairros');
+            });
+
+            // Função para mover opções entre listas
+            function moverOpcoes(origemId, destinoId) {
+                const origem = document.getElementById(origemId);
+                const destino = document.getElementById(destinoId);
+
+                Array.from(origem.selectedOptions).forEach(option => {
+                    destino.appendChild(option);
+                });
             }
 
             carregarTabelaEscolas();
