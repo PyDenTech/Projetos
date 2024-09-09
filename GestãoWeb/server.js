@@ -1670,10 +1670,11 @@ app.get('/api/escolas', async (req, res) => {
     try {
         const result = await pool.query(`
             SELECT e.*, 
-                ARRAY_AGG(z.nome) AS zoneamentos_nomes
+                ARRAY_AGG(z.nome) AS zoneamentos_nomes,
+                ARRAY_AGG(z.coordenadas) AS zoneamentos_coordenadas
             FROM escolas e
             LEFT JOIN LATERAL (
-                SELECT z.nome
+                SELECT z.nome, z.coordenadas
                 FROM zoneamentos z
                 WHERE z.id = ANY (SELECT jsonb_array_elements_text(e.zoneamentos)::int)
             ) z ON TRUE
@@ -1686,7 +1687,6 @@ app.get('/api/escolas', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-
 
 app.post('/api/zoneamentos', async (req, res) => {
     const zoneamentos = req.body;

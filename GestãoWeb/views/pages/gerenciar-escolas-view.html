@@ -622,11 +622,23 @@
                                 // Adicionar marcador no mapa com ícone personalizado e popup com informações da escola e zoneamento
                                 L.marker([escola.latitude, escola.longitude], { icon: schoolIcon }).addTo(map)
                                     .bindPopup(popupContent);
+
+                                // Adicionar os polígonos dos zoneamentos no mapa
+                                if (escola.zoneamentos_coordenadas) {
+                                    escola.zoneamentos_coordenadas.forEach(coordenadasJSON => {
+                                        const coordenadas = JSON.parse(coordenadasJSON); // Parse JSONB coordenadas
+                                        const polygonCoords = coordenadas.map(coord => [coord.lat, coord.lng]); // Ajustar conforme necessário
+
+                                        // Criar o polígono e adicionar ao mapa
+                                        L.polygon(polygonCoords, { color: 'blue' }).addTo(map);
+                                    });
+                                }
                             }
                         });
                     })
                     .catch(error => console.error('Erro ao carregar escolas:', error));
             }
+
 
             carregarEscolas();
 
