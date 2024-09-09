@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
         streetsLayer.addTo(map);
     });
 
-    // Carregar escolas e adicionar marcadores no mapa
+    // Função para carregar escolas e adicionar marcadores no mapa
     function carregarEscolas() {
         fetch('/api/escolas')
             .then(response => response.json())
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     carregarEscolas();
 
-    // Função para carregar bairros relacionados à escola para o modal de edição
+    // Função para carregar bairros relacionados e não relacionados à escola
     function carregarBairrosEscola(escolaId) {
         fetch(`/api/escolas/${escolaId}/bairros`)
             .then(response => response.json())
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 listaAtendidos.innerHTML = '';
 
                 // Carregar bairros atendidos
-                data.atendidos.forEach(bairro => {
+                data.bairrosAtendidos.forEach(bairro => {
                     const option = document.createElement('option');
                     option.value = bairro.id;
                     option.textContent = bairro.nome;
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
 
                 // Carregar bairros não atendidos
-                data.naoAtendidos.forEach(bairro => {
+                data.bairrosNaoAtendidos.forEach(bairro => {
                     const option = document.createElement('option');
                     option.value = bairro.id;
                     option.textContent = bairro.nome;

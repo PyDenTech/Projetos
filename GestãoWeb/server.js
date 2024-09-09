@@ -881,29 +881,32 @@ app.get('/api/escolas/:id', async (req, res) => {
     }
 });
 
-// Endpoint para buscar bairros relacionados à escola
+// Endpoint para buscar bairros relacionados e não relacionados
 app.get('/api/escolas/:id/bairros', async (req, res) => {
     const { id } = req.params;
+
     try {
-        // Busca os bairros atendidos pela escola usando o campo `zoneamentos`
-        const escolaResult = await pool.query('SELECT zoneamentos FROM escolas WHERE id = $1', [id]);
+        // Buscar a escola específica
+        const escolaResult = await pool.query('SELECT * FROM escolas WHERE id = $1', [id]);
         if (escolaResult.rows.length === 0) {
             return res.status(404).json({ error: 'Escola não encontrada' });
         }
 
-        const zoneamentos = escolaResult.rows[0].zoneamentos || [];
-        const zoneamentosIds = zoneamentos.map((z) => z.id);
+        const escola = escolaResult.rows[0];
 
-        // Busca os bairros que não estão na lista de zoneamentos
-        const bairrosNaoAtendidosResult = await pool.query('SELECT * FROM bairros WHERE id NOT IN ($1)', [zoneamentosIds]);
-        
-        // Envia a resposta com bairros atendidos e não atendidos
+        // Obter a lista de bairros atendidos (presentes em zoneamentos)
+        const bairrosAtendidosIds = escola.zoneamentos.map(z => z.id);
+        const bairrosAtendidosResult = await pool.query('SELECT * FROM bairros WHERE id = ANY($1::int[])', [bairrosAtendidosIds]);
+
+        // Obter a lista de bairros não atendidos (não presentes em zoneamentos)
+        const bairrosNaoAtendidosResult = await pool.query('SELECT * FROM bairros WHERE id NOT IN (SELECT unnest($1::int[]))', [bairrosAtendidosIds]);
+
         res.json({
-            atendidos: zoneamentos,
-            naoAtendidos: bairrosNaoAtendidosResult.rows
+            bairrosAtendidos: bairrosAtendidosResult.rows,
+            bairrosNaoAtendidos: bairrosNaoAtendidosResult.rows
         });
     } catch (error) {
-        console.error('Erro ao buscar bairros da escola:', error);
+        console.error('Erro ao buscar bairros:', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -911,57 +914,25 @@ app.get('/api/escolas/:id/bairros', async (req, res) => {
 // Endpoint para atualizar os bairros atendidos pela escola
 app.put('/api/escolas/:id/bairros', async (req, res) => {
     const { id } = req.params;
-    const { bairros_atendidos } = req.body;
+    const { bairros_atendidos } = req.body; // Expecting a list of bairro IDs
 
     try {
-        // Atualiza a lista de bairros atendidos pela escola
-        const result = await pool.query(
-            'UPDATE escolas SET zoneamentos = $1 WHERE id = $2 RETURNING *',
-            [JSON.stringify(bairros_atendidos), id]
-        );
-
-        if (result.rows.length > 0) {
-            res.json(result.rows[0]);
-        } else {
-            res.status(404).json({ error: 'Escola não encontrada' });
+        // Buscar a escola específica
+        const escolaResult = await pool.query('SELECT * FROM escolas WHERE id = $1', [id]);
+        if (escolaResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Escola não encontrada' });
         }
+
+        // Atualizar a lista de zoneamentos da escola
+        const updateQuery = 'UPDATE escolas SET zoneamentos = $1 WHERE id = $2 RETURNING *';
+        const updatedEscolaResult = await pool.query(updateQuery, [JSON.stringify(bairros_atendidos), id]);
+
+        res.json(updatedEscolaResult.rows[0]);
     } catch (error) {
         console.error('Erro ao atualizar bairros atendidos pela escola:', error);
         res.status(500).json({ error: error.message });
     }
 });
-
-
-app.put('/api/editar-escola/:id', async (req, res) => {
-    const { id } = req.params;
-    const {
-        nome, inep, latitude, longitude, logradouro, numero, complemento, bairro, cep, area_urbana, bairros_atendidos
-    } = req.body;
-
-    try {
-        // Converta a lista de bairros atendidos para JSONB
-        const zoneamentos = bairros_atendidos ? JSON.stringify(bairros_atendidos) : '[]';
-
-        // Atualizar os dados da escola, incluindo a lista de bairros atendidos
-        const result = await pool.query(
-            `UPDATE escolas SET nome = $1, inep = $2, latitude = $3, longitude = $4, logradouro = $5,
-            numero = $6, complemento = $7, bairro = $8, cep = $9, area_urbana = $10, zoneamentos = $11 
-            WHERE id = $12 RETURNING *`,
-            [nome, inep, latitude, longitude, logradouro, numero, complemento, bairro, cep, area_urbana, zoneamentos, id]
-        );
-
-        if (result.rows.length > 0) {
-            res.json(result.rows[0]);
-        } else {
-            res.status(404).json({ error: 'Escola não encontrada' });
-        }
-    } catch (error) {
-        console.error('Erro ao editar escola:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-
 
 app.delete('/api/excluir-escola/:id', async (req, res) => {
     const { id } = req.params;
