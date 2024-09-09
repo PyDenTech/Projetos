@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch('/api/bairros')
             .then(response => response.json())
             .then(data => {
-                const listaBairros = document.getElementById('listaEditBairros');
+                const listaBairros = document.getElementById('editListaBairros');
                 listaBairros.innerHTML = ''; // Limpar a lista existente
                 data.forEach(bairro => {
                     const option = document.createElement('option');
@@ -111,23 +111,33 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     function carregarBairrosAtendidos(bairrosAtendidos) {
+        const listaBairros = document.getElementById('editListaBairros');
         const listaAtendidos = document.getElementById('bairrosEditAtendidos');
-        listaAtendidos.innerHTML = ''; // Limpar a lista existente
+        listaAtendidos.innerHTML = ''; // Limpar a lista de bairros atendidos existente
+
+        // Adicionar os bairros à lista apropriada
         bairrosAtendidos.forEach(bairro => {
             const option = document.createElement('option');
             option.value = bairro.id;
             option.textContent = bairro.nome;
             listaAtendidos.appendChild(option);
+
+            // Remover bairro da lista de bairros disponíveis
+            Array.from(listaBairros.options).forEach(opt => {
+                if (opt.value == bairro.id) {
+                    listaBairros.removeChild(opt);
+                }
+            });
         });
     }
 
     // Adicionar e remover bairros no modal de edição
     document.getElementById('adicionarEditBairroBtn').addEventListener('click', function () {
-        moverOpcoes('listaEditBairros', 'bairrosEditAtendidos');
+        moverOpcoes('editListaBairros', 'bairrosEditAtendidos');
     });
 
     document.getElementById('removerEditBairroBtn').addEventListener('click', function () {
-        moverOpcoes('bairrosEditAtendidos', 'listaEditBairros');
+        moverOpcoes('bairrosEditAtendidos', 'editListaBairros');
     });
 
     function moverOpcoes(origemId, destinoId) {
