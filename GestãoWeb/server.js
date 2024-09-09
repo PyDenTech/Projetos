@@ -915,6 +915,17 @@ app.delete('/api/excluir-escola/:id', async (req, res) => {
     }
 });
 
+app.get('/api/zoneamentos-editar', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM zoneamentos');
+        res.status(200).json(result.rows);
+    } catch (err) {
+        console.error('Erro ao buscar zoneamentos:', err);
+        res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+});
+
+
 app.get('/api/lista-escolas', async (req, res) => {
     try {
         const result = await pool.query('SELECT id, nome FROM escolas');

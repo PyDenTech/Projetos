@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS escolas (
     tarde BOOLEAN,
     noite BOOLEAN,
     zoneamentos JSONB NOT NULL,
-    bairro_id INT REFERENCES bairros(id)
+    bairro_id INT REFERENCES zoneamentos(id)
 );
 
 CREATE TABLE IF NOT EXISTS bairros (
