@@ -413,7 +413,6 @@
         </section>
 
         <!-- Modal para Editar Escola -->
-        <!-- Modal para Editar Escola -->
         <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
@@ -425,7 +424,51 @@
                     </div>
                     <div class="modal-body">
                         <form id="editEscolaForm">
-                            <!-- Outros Campos de edição -->
+                            <!-- Campos de edição -->
+                            <input type="hidden" id="editEscolaId">
+                            <div class="form-group">
+                                <label for="editEscolaNome">Nome:</label>
+                                <input type="text" class="form-control" id="editEscolaNome" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editEscolaINEP">INEP:</label>
+                                <input type="text" class="form-control" id="editEscolaINEP" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editEscolaLatitude">Latitude:</label>
+                                <input type="text" class="form-control" id="editEscolaLatitude" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editEscolaLongitude">Longitude:</label>
+                                <input type="text" class="form-control" id="editEscolaLongitude" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editEscolaLogradouro">Logradouro:</label>
+                                <input type="text" class="form-control" id="editEscolaLogradouro" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editEscolaNumero">Número:</label>
+                                <input type="text" class="form-control" id="editEscolaNumero">
+                            </div>
+                            <div class="form-group">
+                                <label for="editEscolaComplemento">Complemento:</label>
+                                <input type="text" class="form-control" id="editEscolaComplemento">
+                            </div>
+                            <div class="form-group">
+                                <label for="editEscolaBairro">Bairro:</label>
+                                <input type="text" class="form-control" id="editEscolaBairro" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editEscolaCep">CEP:</label>
+                                <input type="text" class="form-control" id="editEscolaCep" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editEscolaAreaUrbana">Área Urbana:</label>
+                                <select class="form-control" id="editEscolaAreaUrbana" required>
+                                    <option value="1">Sim</option>
+                                    <option value="0">Não</option>
+                                </select>
+                            </div>
 
                             <!-- Select para Zoneamentos -->
                             <div class="form-group row dual-listbox">
@@ -453,8 +496,6 @@
                                     </select>
                                 </div>
                             </div>
-
-                            <!-- Restante dos campos do formulário -->
                         </form>
                     </div>
                     <div class="modal-footer">
@@ -464,6 +505,7 @@
                 </div>
             </div>
         </div>
+
 
 
         <section class="section">
