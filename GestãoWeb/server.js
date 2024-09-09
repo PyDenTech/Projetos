@@ -863,41 +863,76 @@ app.delete('/api/excluir-bairro/:id', async (req, res) => {
 app.get('/api/escolas/:id', async (req, res) => {
     const { id } = req.params;
     try {
-        const result = await pool.query('SELECT * FROM escolas WHERE id = $1', [id]);
-        if (result.rows.length > 0) {
-            res.json(result.rows[0]);
-        } else {
-            res.status(404).json({ error: 'Escola não encontrada' });
+        // Buscar informações da escola
+        const escolaResult = await pool.query('SELECT * FROM escolas WHERE id = $1', [id]);
+
+        if (escolaResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Escola não encontrada' });
         }
+
+        // Buscar bairros associados à escola
+        const bairrosResult = await pool.query(
+            `SELECT b.id, b.nome FROM bairros b 
+             JOIN escolas_bairros eb ON b.id = eb.bairro_id 
+             WHERE eb.escola_id = $1`,
+            [id]
+        );
+
+        const escola = escolaResult.rows[0];
+        escola.bairros_atendidos = bairrosResult.rows;
+
+        res.json(escola);
     } catch (error) {
         console.error('Erro ao buscar escola:', error);
         res.status(500).json({ error: error.message });
     }
 });
 
+
 app.put('/api/editar-escola/:id', async (req, res) => {
     const { id } = req.params;
     const {
-        nome, inep, latitude, longitude, logradouro, numero, complemento, bairro, cep, area_urbana
+        nome, inep, latitude, longitude, logradouro, numero, complemento, bairro, cep, area_urbana, bairros_atendidos
     } = req.body;
 
+    const client = await pool.connect(); // Obter uma conexão do pool
+
     try {
-        const result = await pool.query(
+        await client.query('BEGIN'); // Iniciar a transação
+
+        // Atualizar os dados principais da escola
+        const result = await client.query(
             `UPDATE escolas SET nome = $1, inep = $2, latitude = $3, longitude = $4, logradouro = $5,
             numero = $6, complemento = $7, bairro = $8, cep = $9, area_urbana = $10 WHERE id = $11 RETURNING *`,
             [nome, inep, latitude, longitude, logradouro, numero, complemento, bairro, cep, area_urbana, id]
         );
 
-        if (result.rows.length > 0) {
-            res.json(result.rows[0]);
-        } else {
-            res.status(404).json({ error: 'Escola não encontrada' });
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Escola não encontrada' });
         }
+
+        // Remover todas as associações de bairros existentes
+        await client.query('DELETE FROM escolas_bairros WHERE escola_id = $1', [id]);
+
+        // Inserir novas associações de bairros
+        if (Array.isArray(bairros_atendidos) && bairros_atendidos.length > 0) {
+            const insertQuery = `
+                INSERT INTO escolas_bairros (escola_id, bairro_id) VALUES ($1, unnest($2::int[]))
+            `;
+            await client.query(insertQuery, [id, bairros_atendidos]);
+        }
+
+        await client.query('COMMIT'); // Confirmar a transação
+        res.json(result.rows[0]);
     } catch (error) {
+        await client.query('ROLLBACK'); // Reverter a transação em caso de erro
         console.error('Erro ao editar escola:', error);
         res.status(500).json({ error: error.message });
+    } finally {
+        client.release(); // Liberar a conexão
     }
 });
+
 
 app.delete('/api/excluir-escola/:id', async (req, res) => {
     const { id } = req.params;
