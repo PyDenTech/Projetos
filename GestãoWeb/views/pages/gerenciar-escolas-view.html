@@ -706,7 +706,8 @@
                         const escolaAreaUrbanaField = document.getElementById('editEscolaAreaUrbana');
                         if (escolaAreaUrbanaField) escolaAreaUrbanaField.value = data.area_urbana ? '1' : '0';
 
-                        carregarZoneamentos(data.zoneamentos || []);
+                        // Carregar zoneamentos e selecionar os atribuídos
+                        carregarZoneamentos(data.zoneamentos ? JSON.parse(data.zoneamentos) : []);
 
                         $('#editModal').modal('show');
                     })
@@ -731,7 +732,7 @@
                             option.value = zoneamento.id;
                             option.textContent = zoneamento.nome;
 
-                            if (zoneamentosSelecionados && zoneamentosSelecionados.includes(zoneamento.id)) {
+                            if (zoneamentosSelecionados.includes(zoneamento.id.toString())) {
                                 zoneamentosAtribuidos.appendChild(option);
                             } else {
                                 listaZoneamentos.appendChild(option);
@@ -804,7 +805,7 @@
                 const cep = document.getElementById('editEscolaCep').value;
                 const area_urbana = document.getElementById('editEscolaAreaUrbana').value;
 
-                // Verificar se os valores são válidos
+                // Coletar zoneamentos válidos
                 const zoneamentos = Array.from(document.getElementById('zoneamentosAtribuidos').options)
                     .map(option => option.value)
                     .filter(value => value !== 'undefined' && value !== null && value !== ''); // Filtrar valores inválidos
@@ -820,7 +821,7 @@
                     bairro,
                     cep,
                     area_urbana,
-                    zoneamentos
+                    zoneamentos: JSON.stringify(zoneamentos) // Enviar como string JSON
                 };
 
                 fetch(`/api/editar-escola/${id}`, {
