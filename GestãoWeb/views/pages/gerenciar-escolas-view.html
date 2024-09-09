@@ -626,7 +626,7 @@
                                 // Verificar se há coordenadas de zoneamentos antes de tentar processá-las
                                 if (escola.zoneamentos_coordenadas && Array.isArray(escola.zoneamentos_coordenadas)) {
                                     escola.zoneamentos_coordenadas.forEach(coordenadasJSON => {
-                                        if (coordenadasJSON) {
+                                        if (coordenadasJSON && typeof coordenadasJSON === 'string') {
                                             try {
                                                 const coordenadas = JSON.parse(coordenadasJSON); // Parse JSONB coordenadas
 
@@ -640,6 +640,16 @@
                                             } catch (e) {
                                                 console.error('Erro ao analisar coordenadas de zoneamento:', e);
                                             }
+                                        } else if (coordenadasJSON && typeof coordenadasJSON === 'object') {
+                                            // Se o coordenadasJSON for um objeto JavaScript, converta diretamente para coordenadas
+                                            const coordenadas = coordenadasJSON;
+
+                                            if (Array.isArray(coordenadas) && coordenadas.length > 0) {
+                                                const polygonCoords = coordenadas.map(coord => [coord.lat, coord.lng]); // Ajustar conforme necessário
+
+                                                // Criar o polígono e adicionar ao mapa
+                                                L.polygon(polygonCoords, { color: 'blue' }).addTo(map);
+                                            }
                                         }
                                     });
                                 }
@@ -648,6 +658,7 @@
                     })
                     .catch(error => console.error('Erro ao carregar escolas:', error));
             }
+
             carregarEscolas();
 
             // Carregar lista de escolas na tabela
