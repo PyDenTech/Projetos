@@ -662,10 +662,14 @@
                     .catch(error => console.error('Erro ao carregar tabela de escolas:', error));
             }
 
-            // Carregar os bairros relacionados e não relacionados no modal de edição
             function carregarBairros(idEscola) {
                 fetch(`/api/escolas/${idEscola}/bairros`)
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erro ao buscar bairros');
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         const listaBairros = document.getElementById('editListaBairros');
                         const bairrosAtendidos = document.getElementById('bairrosEditAtendidos');
@@ -673,24 +677,28 @@
                         listaBairros.innerHTML = '';
                         bairrosAtendidos.innerHTML = '';
 
-                        // Preencher bairros atendidos
-                        data.bairrosAtendidos.forEach(bairro => {
-                            const option = document.createElement('option');
-                            option.value = bairro.id;
-                            option.textContent = bairro.nome;
-                            bairrosAtendidos.appendChild(option);
-                        });
+                        // Verificar se os dados existem e preencher os bairros
+                        if (data.bairrosAtendidos) {
+                            data.bairrosAtendidos.forEach(bairro => {
+                                const option = document.createElement('option');
+                                option.value = bairro.id;
+                                option.textContent = bairro.nome;
+                                bairrosAtendidos.appendChild(option);
+                            });
+                        }
 
-                        // Preencher bairros não atendidos
-                        data.bairrosNaoAtendidos.forEach(bairro => {
-                            const option = document.createElement('option');
-                            option.value = bairro.id;
-                            option.textContent = bairro.nome;
-                            listaBairros.appendChild(option);
-                        });
+                        if (data.bairrosNaoAtendidos) {
+                            data.bairrosNaoAtendidos.forEach(bairro => {
+                                const option = document.createElement('option');
+                                option.value = bairro.id;
+                                option.textContent = bairro.nome;
+                                listaBairros.appendChild(option);
+                            });
+                        }
                     })
                     .catch(error => console.error('Erro ao carregar bairros:', error));
             }
+
 
             // Função para abrir o modal de edição com os dados da escola
             function editarEscola(id) {
