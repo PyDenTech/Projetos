@@ -879,14 +879,14 @@ app.get('/api/escolas/:id', async (req, res) => {
 app.put('/api/editar-escola/:id', async (req, res) => {
     const { id } = req.params;
     const {
-        nome, inep, latitude, longitude, logradouro, numero, complemento, bairro, cep, area_urbana
+        nome, inep, latitude, longitude, logradouro, numero, complemento, bairro, cep, area_urbana, zoneamentos
     } = req.body;
 
     try {
         const result = await pool.query(
             `UPDATE escolas SET nome = $1, inep = $2, latitude = $3, longitude = $4, logradouro = $5,
-            numero = $6, complemento = $7, bairro = $8, cep = $9, area_urbana = $10 WHERE id = $11 RETURNING *`,
-            [nome, inep, latitude, longitude, logradouro, numero, complemento, bairro, cep, area_urbana, id]
+            numero = $6, complemento = $7, bairro = $8, cep = $9, area_urbana = $10, zoneamentos = $11 WHERE id = $12 RETURNING *`,
+            [nome, inep, latitude, longitude, logradouro, numero, complemento, bairro, cep, area_urbana, zoneamentos, id]
         );
 
         if (result.rows.length > 0) {

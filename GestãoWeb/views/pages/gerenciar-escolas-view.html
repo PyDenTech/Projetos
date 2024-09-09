@@ -736,10 +736,13 @@
                 })
                     .then(response => {
                         if (response.ok) {
-                            $('#editModal').modal('hide');
-                            carregarTabelaEscolas();
+                            $('#editModal').modal('hide'); // Fechar o modal após a edição
+                            carregarTabelaEscolas(); // Atualizar a tabela de escolas
                         } else {
-                            console.error('Erro ao salvar edição da escola');
+                            return response.json().then(data => {
+                                console.error('Erro ao salvar edição da escola:', data.error);
+                                alert('Erro ao salvar edição da escola: ' + data.error); // Adiciona um alerta para o usuário
+                            });
                         }
                     })
                     .catch(error => console.error('Erro ao salvar edição da escola:', error));
