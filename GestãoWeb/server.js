@@ -881,6 +881,55 @@ app.get('/api/escolas/:id', async (req, res) => {
     }
 });
 
+// Endpoint para buscar bairros relacionados à escola
+app.get('/api/escolas/:id/bairros', async (req, res) => {
+    const { id } = req.params;
+    try {
+        // Busca os bairros atendidos pela escola usando o campo `zoneamentos`
+        const escolaResult = await pool.query('SELECT zoneamentos FROM escolas WHERE id = $1', [id]);
+        if (escolaResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Escola não encontrada' });
+        }
+
+        const zoneamentos = escolaResult.rows[0].zoneamentos || [];
+        const zoneamentosIds = zoneamentos.map((z) => z.id);
+
+        // Busca os bairros que não estão na lista de zoneamentos
+        const bairrosNaoAtendidosResult = await pool.query('SELECT * FROM bairros WHERE id NOT IN ($1)', [zoneamentosIds]);
+        
+        // Envia a resposta com bairros atendidos e não atendidos
+        res.json({
+            atendidos: zoneamentos,
+            naoAtendidos: bairrosNaoAtendidosResult.rows
+        });
+    } catch (error) {
+        console.error('Erro ao buscar bairros da escola:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Endpoint para atualizar os bairros atendidos pela escola
+app.put('/api/escolas/:id/bairros', async (req, res) => {
+    const { id } = req.params;
+    const { bairros_atendidos } = req.body;
+
+    try {
+        // Atualiza a lista de bairros atendidos pela escola
+        const result = await pool.query(
+            'UPDATE escolas SET zoneamentos = $1 WHERE id = $2 RETURNING *',
+            [JSON.stringify(bairros_atendidos), id]
+        );
+
+        if (result.rows.length > 0) {
+            res.json(result.rows[0]);
+        } else {
+            res.status(404).json({ error: 'Escola não encontrada' });
+        }
+    } catch (error) {
+        console.error('Erro ao atualizar bairros atendidos pela escola:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
 
 
 app.put('/api/editar-escola/:id', async (req, res) => {
