@@ -631,19 +631,42 @@
                 fetch(`/api/escolas/${id}`)
                     .then(response => response.json())
                     .then(data => {
-                        document.getElementById('editEscolaId').value = data.id;
-                        document.getElementById('editEscolaNome').value = data.nome;
-                        document.getElementById('editEscolaINEP').value = data.inep;
-                        document.getElementById('editEscolaLatitude').value = data.latitude;
-                        document.getElementById('editEscolaLongitude').value = data.longitude;
-                        document.getElementById('editEscolaLogradouro').value = data.logradouro;
-                        document.getElementById('editEscolaNumero').value = data.numero;
-                        document.getElementById('editEscolaComplemento').value = data.complemento;
-                        document.getElementById('editEscolaBairro').value = data.bairro;
-                        document.getElementById('editEscolaCep').value = data.cep;
-                        document.getElementById('editEscolaAreaUrbana').value = data.area_urbana ? '1' : '0';
+                        // Verificar se os elementos existem antes de definir seus valores
+                        const escolaIdField = document.getElementById('editEscolaId');
+                        if (escolaIdField) escolaIdField.value = data.id || '';
 
-                        carregarZoneamentos(data.zoneamentos);
+                        const escolaNomeField = document.getElementById('editEscolaNome');
+                        if (escolaNomeField) escolaNomeField.value = data.nome || '';
+
+                        const escolaInepField = document.getElementById('editEscolaINEP');
+                        if (escolaInepField) escolaInepField.value = data.inep || '';
+
+                        const escolaLatitudeField = document.getElementById('editEscolaLatitude');
+                        if (escolaLatitudeField) escolaLatitudeField.value = data.latitude || '';
+
+                        const escolaLongitudeField = document.getElementById('editEscolaLongitude');
+                        if (escolaLongitudeField) escolaLongitudeField.value = data.longitude || '';
+
+                        const escolaLogradouroField = document.getElementById('editEscolaLogradouro');
+                        if (escolaLogradouroField) escolaLogradouroField.value = data.logradouro || '';
+
+                        const escolaNumeroField = document.getElementById('editEscolaNumero');
+                        if (escolaNumeroField) escolaNumeroField.value = data.numero || '';
+
+                        const escolaComplementoField = document.getElementById('editEscolaComplemento');
+                        if (escolaComplementoField) escolaComplementoField.value = data.complemento || '';
+
+                        const escolaBairroField = document.getElementById('editEscolaBairro');
+                        if (escolaBairroField) escolaBairroField.value = data.bairro || '';
+
+                        const escolaCepField = document.getElementById('editEscolaCep');
+                        if (escolaCepField) escolaCepField.value = data.cep || '';
+
+                        const escolaAreaUrbanaField = document.getElementById('editEscolaAreaUrbana');
+                        if (escolaAreaUrbanaField) escolaAreaUrbanaField.value = data.area_urbana ? '1' : '0';
+
+                        // Tratamento para dados nulos ou inexistentes na coluna zoneamentos
+                        carregarZoneamentos(data.zoneamentos || []);
 
                         $('#editModal').modal('show');
                     })
@@ -657,6 +680,8 @@
                     .then(data => {
                         const listaZoneamentos = document.getElementById('listaZoneamentos');
                         const zoneamentosAtribuidos = document.getElementById('zoneamentosAtribuidos');
+
+                        if (!listaZoneamentos || !zoneamentosAtribuidos) return;
 
                         listaZoneamentos.innerHTML = '';
                         zoneamentosAtribuidos.innerHTML = '';
