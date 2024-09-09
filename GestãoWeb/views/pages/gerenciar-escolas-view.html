@@ -610,8 +610,18 @@
                     .then(data => {
                         data.forEach(escola => {
                             if (escola.latitude && escola.longitude) {
+                                // Prepare o conteúdo do popup com zoneamentos incluídos
+                                let zoneamentosInfo = escola.zoneamento_nome ? escola.zoneamento_nome.join(", ") : "Nenhum";
+
+                                let popupContent = `
+                        <b>${escola.nome}</b><br>
+                        ${escola.logradouro}, ${escola.numero}<br>
+                        <b>Zoneamentos:</b> ${zoneamentosInfo}
+                    `;
+
+                                // Adicionar marcador no mapa com ícone personalizado e popup com informações da escola e zoneamento
                                 L.marker([escola.latitude, escola.longitude], { icon: schoolIcon }).addTo(map)
-                                    .bindPopup(`<b>${escola.nome}</b><br>${escola.logradouro}, ${escola.numero}`);
+                                    .bindPopup(popupContent);
                             }
                         });
                     })

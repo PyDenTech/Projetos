@@ -1668,11 +1668,16 @@ app.delete('/api/fornecedores/:id', async (req, res) => {
 
 app.get('/api/escolas', async (req, res) => {
     try {
-        const result = await pool.query('SELECT * FROM escolas');
-        res.status(200).json(result.rows);
-    } catch (err) {
-        console.error('Error fetching schools:', err);
-        res.status(500).json({ error: 'Internal server error' });
+        const result = await pool.query(`
+            SELECT e.*, z.nome AS zoneamento_nome
+            FROM escolas e
+            LEFT JOIN zoneamentos z ON z.id = ANY(e.zoneamentos::int[])
+        `);
+
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Erro ao buscar escolas:', error);
+        res.status(500).json({ error: error.message });
     }
 });
 
