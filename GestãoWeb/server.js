@@ -925,7 +925,6 @@ app.get('/api/zoneamentos-editar', async (req, res) => {
     }
 });
 
-
 app.get('/api/lista-escolas', async (req, res) => {
     try {
         const result = await pool.query('SELECT id, nome FROM escolas');

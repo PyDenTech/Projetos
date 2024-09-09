@@ -659,7 +659,7 @@
                             selectZoneamentos.appendChild(option);
                         });
                     })
-                    .catch(error => console.error('Erro ao carregar zoneamentos:', error));
+                    .catch(error => console.error('Erro ao carregar zoneamentos:', error)); // Verifique erros no console
             }
 
             function editarEscola(id) {
@@ -691,7 +691,7 @@
                             });
                         });
 
-                        $('#editModal').modal('show');
+                        $('#editModal').modal('show'); // Use o método correto do Bootstrap para abrir o modal
                     })
                     .catch(error => console.error('Erro ao buscar dados da escola:', error));
             }
