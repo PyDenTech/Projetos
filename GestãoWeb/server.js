@@ -79,7 +79,6 @@ function ensureLoggedIn(req, res, next) {
         next();
     }
 }
-
 function ensureRole(roles) {
     return function (req, res, next) {
         if (req.session.user && roles.includes(req.session.user.role)) {
