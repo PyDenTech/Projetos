@@ -756,7 +756,9 @@
                         if (escolaAreaUrbanaField) escolaAreaUrbanaField.value = data.area_urbana ? '1' : '0';
 
                         // Carregar zoneamentos e selecionar os atribuídos
-                        const zoneamentos = data.zoneamentos ? JSON.parse(data.zoneamentos) : [];
+                        // Verificar se zoneamentos já é um objeto ou array
+                        const zoneamentos = Array.isArray(data.zoneamentos) ? data.zoneamentos : [];
+
                         carregarZoneamentos(zoneamentos);
 
                         $('#editModal').modal('show');
