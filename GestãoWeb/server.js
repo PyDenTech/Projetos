@@ -3129,79 +3129,64 @@ app.post('/atualizar_status', async (req, res) => {
 const ACCESS_TOKEN = 'EAAUjWN47iroBO0SMKeV0Nt8FI9XT1fIvM0CgYoGq2asPD7eTok1F1A8kaOJutrAZBAzaTCxZBObRZBly2ZB26Tg7nOZAeD5n1ze5oHwzC0oB0eANgibK45CWEBbgiOoT3LV8XKUoBjxBSD1HfMOPEDlipM9X9xgMqlPaT5ZCNmRi8BAe9p7ZANiOZAiASfyJq5dGOKDn20DZBtQMZAbvl5bpPRV3baPpptPcFqSDU1';
 const PHONE_ID = '447260911797954';
 const VERIFY_TOKEN = 'meu_token_secreto'; // Token de verificação personalizado
+const WHATSAPP_API_URL = 'https://graph.facebook.com/v20.0';
 
-const sendMessage = async (phoneNumber, text) => {
-    const url = `https://graph.facebook.com/v17.0/${PHONE_ID}/messages`;
-    const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${ACCESS_TOKEN}`,
-    };
-    const data = {
-        messaging_product: 'whatsapp',
-        to: phoneNumber,
-        type: 'text',
-        text: { body: text },
-    };
-
-    try {
-        const response = await axios.post(url, data, { headers });
-        console.log('Mensagem enviada:', response.data);
-    } catch (error) {
-        console.error('Erro ao enviar mensagem:', error.response ? error.response.data : error.message);
+app.post('/webhook', async (req, res) => {
+    const data = req.body;
+  
+    // Verifica se é uma mensagem
+    if (data.object && data.entry && data.entry[0].changes && data.entry[0].changes[0].value.messages) {
+      const message = data.entry[0].changes[0].value.messages[0];
+  
+      // Verifica se não é mensagem de grupo
+      if (message.type !== 'group') {
+        const senderNumber = message.from;
+  
+        // Envia a mensagem de menu interativo
+        await sendInteractiveMenu(senderNumber);
+      }
     }
-};
-
-// Configurar o Webhook
-app.get('/webhook', (req, res) => {
-    const mode = req.query['hub.mode'];
-    const token = req.query['hub.verify_token'];
-    const challenge = req.query['hub.challenge'];
-
-    if (mode && token === VERIFY_TOKEN) {
-        console.log('WEBHOOK_VERIFICADO');
-        res.status(200).send(challenge);
-    } else {
-        res.sendStatus(403);
-    }
-});
-
-// Processar mensagens recebidas
-app.post('/webhook', (req, res) => {
-    const messageEvent = req.body;
-
-    if (!messageEvent || !messageEvent.entry || messageEvent.entry.length === 0) {
-        return res.sendStatus(400);
-    }
-
-    const changes = messageEvent.entry[0].changes[0];
-    if (changes.field !== 'messages') {
-        return res.sendStatus(400);
-    }
-
-    const messages = changes.value.messages;
-    if (!messages || messages.length === 0) {
-        return res.sendStatus(200);
-    }
-
-    const message = messages[0];
-    const phoneNumber = message.from;
-    const messageType = message.type;
-
-    if (messageType === 'text' && !message.context) {
-        const userText = message.text.body.toLowerCase();
-
-        // Responder de acordo com a entrada do usuário
-        if (userText.includes('rota')) {
-            sendMessage(phoneNumber, 'Você gostaria de saber sobre quais rotas?');
-        } else if (userText.includes('inclusão')) {
-            sendMessage(phoneNumber, 'Por favor, envie o nome do aluno e o endereço completo.');
-        } else {
-            sendMessage(phoneNumber, 'Olá! Este é o bot de transporte escolar. Como posso ajudar?');
-        }
-    }
-
+  
     res.sendStatus(200);
-});
+  });
+  
+  // Função para enviar menu interativo
+  async function sendInteractiveMenu(to) {
+    const menuMessage = {
+      messaging_product: 'whatsapp',
+      recipient_type: 'individual',
+      to: to,
+      type: 'interactive',
+      interactive: {
+        type: 'button',
+        body: {
+          text: '🚍 Bem-vindo ao Sistema de Autoatendimento do Setor de Transporte Municipal! 🚍\n\nAqui você encontra as opções de serviço para facilitar o seu atendimento.\n\nPor favor, selecione o número correspondente à sua opção:'
+        },
+        action: {
+          buttons: [
+            { type: 'reply', reply: { id: 'option_1', title: '1️⃣ Pais Responsáveis e Alunos' } },
+            { type: 'reply', reply: { id: 'option_2', title: '2️⃣ Servidores SEMED' } },
+            { type: 'reply', reply: { id: 'option_3', title: '3️⃣ Servidores Escola' } },
+            { type: 'reply', reply: { id: 'option_4', title: '4️⃣ Fornecedores' } },
+            { type: 'reply', reply: { id: 'option_5', title: '5️⃣ Motoristas' } },
+            { type: 'reply', reply: { id: 'option_6', title: '❌ Encerrar Atendimento' } },
+          ]
+        }
+      }
+    };
+  
+    try {
+      const response = await axios.post(
+        `${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`,
+        menuMessage,
+        { headers: { Authorization: `Bearer ${ACCESS_TOKEN}` } }
+      );
+  
+      console.log('Mensagem enviada:', response.data);
+    } catch (error) {
+      console.error('Erro ao enviar mensagem:', error.response ? error.response.data : error.message);
+    }
+  }
 
 
 app.use((req, res, next) => {
