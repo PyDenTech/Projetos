@@ -3122,52 +3122,16 @@ app.post('/atualizar_status', async (req, res) => {
     }
 });
 
+// ================================================================
+// ===================== BOT DE AUTOATENDIMENTO ====================
+// ================================================================
 
-
-
-
-
-
-
-
-
-
-
-const ACCESS_TOKEN = 'EAAFzdePrfwsBO9GIrjsKOtQDlpflULwCNzZANT2EOYP1mpoZBE33ZCIv2Q2y39j4O2DxOTcOcoo6aJZCr41gZCLTSvWGFuZBrF7kbcZBKwcRZC7WtsZBLyIFmZAASsVOSXPuuBNJZC0u2vTgVlgB2qwdMvo2T3ZCIdXjgo9Lu9zWcVJXWg2Cy01EsqejZCoXx9qeGfMquyCHZAmilyEAexQszTSScfiZAPAQQxy';
-const PHONE_ID = '438514116006700';
+const ACCESS_TOKEN = 'EAAUjWN47iroBO0SMKeV0Nt8FI9XT1fIvM0CgYoGq2asPD7eTok1F1A8kaOJutrAZBAzaTCxZBObRZBly2ZB26Tg7nOZAeD5n1ze5oHwzC0oB0eANgibK45CWEBbgiOoT3LV8XKUoBjxBSD1HfMOPEDlipM9X9xgMqlPaT5ZCNmRi8BAe9p7ZANiOZAiASfyJq5dGOKDn20DZBtQMZAbvl5bpPRV3baPpptPcFqSDU1';
+const PHONE_ID = '447260911797954';
 const VERIFY_TOKEN = 'meu_token_secreto'; // Token de verificação personalizado
 
-// Endpoint de verificação do Webhook
-app.get('/webhook', (req, res) => {
-    const mode = req.query['hub.mode'];
-    const token = req.query['hub.verify_token'];
-    const challenge = req.query['hub.challenge'];
-
-    if (mode && token) {
-        if (mode === 'subscribe' && token === VERIFY_TOKEN) {
-            console.log('WEBHOOK_VERIFICADO');
-            res.status(200).send(challenge);
-        } else {
-            res.sendStatus(403); // Token de verificação inválido
-        }
-    } else {
-        res.sendStatus(400); // Requisição inválida
-    }
-});
-
-// Webhook para receber mensagens
-app.post('/webhook', (req, res) => {
-    const message = req.body;
-    console.log('Mensagem recebida:', message);
-
-    // Adicione lógica de tratamento de mensagens aqui
-
-    res.sendStatus(200);
-});
-
-// Função para enviar mensagem para o WhatsApp
 const sendMessage = async (phoneNumber, text) => {
-    const url = `https://graph.facebook.com/v13.0/${PHONE_ID}/messages`;
+    const url = `https://graph.facebook.com/v17.0/${PHONE_ID}/messages`;
     const headers = {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${ACCESS_TOKEN}`,
@@ -3183,18 +3147,61 @@ const sendMessage = async (phoneNumber, text) => {
         const response = await axios.post(url, data, { headers });
         console.log('Mensagem enviada:', response.data);
     } catch (error) {
-        console.error('Erro ao enviar mensagem:', error.response.data);
+        console.error('Erro ao enviar mensagem:', error.response ? error.response.data : error.message);
     }
 };
 
-// Endpoint para testar o envio de mensagem
-app.get('/send', (req, res) => {
-    const testPhoneNumber = '5594991989803'; // Substitua pelo número de telefone para teste
-    sendMessage(testPhoneNumber, 'Olá! Este é um teste de bot.');
-    res.send('Mensagem de teste enviada!');
+// Configurar o Webhook
+app.get('/webhook', (req, res) => {
+    const mode = req.query['hub.mode'];
+    const token = req.query['hub.verify_token'];
+    const challenge = req.query['hub.challenge'];
+
+    if (mode && token === VERIFY_TOKEN) {
+        console.log('WEBHOOK_VERIFICADO');
+        res.status(200).send(challenge);
+    } else {
+        res.sendStatus(403);
+    }
 });
 
+// Processar mensagens recebidas
+app.post('/webhook', (req, res) => {
+    const messageEvent = req.body;
 
+    if (!messageEvent || !messageEvent.entry || messageEvent.entry.length === 0) {
+        return res.sendStatus(400);
+    }
+
+    const changes = messageEvent.entry[0].changes[0];
+    if (changes.field !== 'messages') {
+        return res.sendStatus(400);
+    }
+
+    const messages = changes.value.messages;
+    if (!messages || messages.length === 0) {
+        return res.sendStatus(200);
+    }
+
+    const message = messages[0];
+    const phoneNumber = message.from;
+    const messageType = message.type;
+
+    if (messageType === 'text' && !message.context) {
+        const userText = message.text.body.toLowerCase();
+
+        // Responder de acordo com a entrada do usuário
+        if (userText.includes('rota')) {
+            sendMessage(phoneNumber, 'Você gostaria de saber sobre quais rotas?');
+        } else if (userText.includes('inclusão')) {
+            sendMessage(phoneNumber, 'Por favor, envie o nome do aluno e o endereço completo.');
+        } else {
+            sendMessage(phoneNumber, 'Olá! Este é o bot de transporte escolar. Como posso ajudar?');
+        }
+    }
+
+    res.sendStatus(200);
+});
 
 
 app.use((req, res, next) => {
