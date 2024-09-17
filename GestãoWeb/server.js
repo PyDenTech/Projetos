@@ -3127,8 +3127,7 @@ app.post('/atualizar_status', async (req, res) => {
 // ================================================================
 
 const ACCESS_TOKEN = 'EAAUjWN47iroBO0SMKeV0Nt8FI9XT1fIvM0CgYoGq2asPD7eTok1F1A8kaOJutrAZBAzaTCxZBObRZBly2ZB26Tg7nOZAeD5n1ze5oHwzC0oB0eANgibK45CWEBbgiOoT3LV8XKUoBjxBSD1HfMOPEDlipM9X9xgMqlPaT5ZCNmRi8BAe9p7ZANiOZAiASfyJq5dGOKDn20DZBtQMZAbvl5bpPRV3baPpptPcFqSDU1';
-const PHONE_ID = '447260911797954';
-const VERIFY_TOKEN = 'meu_token_secreto'; // Token de verificação personalizado
+const PHONE_NUMBER_ID = '447260911797954';
 const WHATSAPP_API_URL = 'https://graph.facebook.com/v20.0';
 
 app.post('/webhook', async (req, res) => {
