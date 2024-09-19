@@ -213,17 +213,52 @@
         }
 
         // Validação do CEP simulada
+        // Validação do CEP usando a API ViaCEP
         function validateCep(cep, numero) {
-            // Simulação de validação de CEP
-            setTimeout(() => {
-                if (cep === 'valid') { // Simule o valor de "valid"
-                    addMessage('Endereço válido! Envie o comprovante de residência.', 'bot');
-                    askQuestion('Por favor, envie o comprovante de residência.', 'comprovanteEndereco');
-                } else {
-                    addMessage('CEP inválido. Por favor, tente novamente.', 'bot');
+            const cleanCep = cep.replace(/\D/g, ''); // Remove caracteres não numéricos
+            if (cleanCep.length !== 8) {
+                addMessage('CEP inválido. Por favor, tente novamente.', 'bot');
+                askQuestion('Por favor, informe o CEP da residência novamente.', 'cep');
+                return;
+            }
+
+            fetch(`https://viacep.com.br/ws/${cleanCep}/json/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.erro) {
+                        addMessage('CEP inválido. Por favor, tente novamente.', 'bot');
+                        askQuestion('Por favor, informe o CEP da residência novamente.', 'cep');
+                    } else {
+                        const enderecoCompleto = `${data.logradouro}, ${numero}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
+                        addMessage(`Endereço encontrado: ${enderecoCompleto}. Está correto?`, 'bot');
+                        confirmAddress(enderecoCompleto); // Função para confirmar o endereço
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar o CEP:', error);
+                    addMessage('Ocorreu um erro ao validar o CEP. Tente novamente.', 'bot');
                     askQuestion('Por favor, informe o CEP da residência novamente.', 'cep');
-                }
-            }, 1000);
+                });
+        }
+        // Confirmação do endereço encontrado
+        function confirmAddress(enderecoCompleto) {
+            startButtons.innerHTML = `
+        <button class="btn btn-success" id="address-yes">Sim</button>
+        <button class="btn btn-danger" id="address-no">Não</button>
+    `;
+            startButtons.style.display = 'flex';
+
+            document.getElementById('address-yes').addEventListener('click', () => {
+                addMessage('Sim', 'user');
+                startButtons.style.display = 'none';
+                askQuestion('Por favor, envie o comprovante de residência.', 'comprovanteEndereco');
+            });
+
+            document.getElementById('address-no').addEventListener('click', () => {
+                addMessage('Não', 'user');
+                startButtons.style.display = 'none';
+                askQuestion('Por favor, informe o CEP da residência novamente.', 'cep');
+            });
         }
 
         // Pergunta sobre compartilhar a localização
