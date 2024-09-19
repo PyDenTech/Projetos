@@ -220,9 +220,9 @@
             if (lastField === 'nomeResponsavel') {
                 askQuestion('Por favor, informe o seu CPF.', 'cpf');
             } else if (lastField === 'cpf') {
-                askQuestion('Por favor, informe o seu contato (telefone).', 'contato');
+                validateCPF(userData.cpf); // Valida e formata o CPF
             } else if (lastField === 'contato') {
-                askQuestion('Qual o ID único de matrícula do aluno ou CPF?', 'idMatricula');
+                formatPhone(userData.contato); // Formata o telefone
             } else if (lastField === 'idMatricula') {
                 askQuestion('Por favor, informe o CEP da residência.', 'cep');
             } else if (lastField === 'cep') {
@@ -233,6 +233,61 @@
                 askLocationPermission();
             } else if (lastField === 'laudoMedico') {
                 askLaudoQuestion();
+            }
+        }
+
+        // Função para validar e formatar CPF
+        function validateCPF(cpf) {
+            cpf = cpf.replace(/\D/g, ''); // Remove tudo que não é dígito
+
+            // Validação de CPF
+            if (cpf.length !== 11 || !isValidCPF(cpf)) {
+                addMessage('CPF inválido. Por favor, tente novamente.', 'bot');
+                askQuestion('Por favor, informe o seu CPF novamente.', 'cpf');
+                return;
+            }
+
+            cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
+            cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
+            cpf = cpf.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+
+            userData.cpf = cpf;
+            addMessage(`CPF válido: ${cpf}`, 'bot');
+            askQuestion('Por favor, informe o seu contato (telefone).', 'contato');
+        }
+
+        // Função para verificar se o CPF é válido
+        function isValidCPF(cpf) {
+            let sum = 0;
+            let rest;
+            if (cpf === "00000000000") return false;
+
+            for (let i = 1; i <= 9; i++) sum += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+            rest = (sum * 10) % 11;
+            if (rest === 10 || rest === 11) rest = 0;
+            if (rest !== parseInt(cpf.substring(9, 10))) return false;
+
+            sum = 0;
+            for (let i = 1; i <= 10; i++) sum += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+            rest = (sum * 10) % 11;
+            if (rest === 10 || rest === 11) rest = 0;
+            if (rest !== parseInt(cpf.substring(10, 11))) return false;
+            return true;
+        }
+
+        // Função para formatar telefone celular
+        function formatPhone(phone) {
+            phone = phone.replace(/\D/g, ''); // Remove tudo que não é dígito
+
+            // Formata para (00) 00000-0000
+            if (phone.length === 11) {
+                phone = phone.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3");
+                userData.contato = phone;
+                addMessage(`Telefone válido: ${phone}`, 'bot');
+                askQuestion('Qual o ID único de matrícula do aluno ou CPF?', 'idMatricula');
+            } else {
+                addMessage('Número de telefone inválido. Por favor, tente novamente.', 'bot');
+                askQuestion('Por favor, informe o seu contato (telefone) novamente.', 'contato');
             }
         }
 
@@ -350,7 +405,17 @@
                 addMessage('Sim', 'user');
                 startButtons.style.display = 'none';
                 addMessage('Por favor, envie o laudo médico.', 'bot');
-                // Inicia o processo de upload do laudo médico
+                fileInput.click(); // Simula o envio do laudo médico
+
+                fileInput.addEventListener('change', function () {
+                    const file = fileInput.files[0];
+                    if (file) {
+                        fileName.textContent = `Laudo médico "${file.name}" foi enviado com sucesso.`;
+                        fileName.style.display = 'block';
+                        addMessage(`Laudo médico "${file.name}" foi enviado com sucesso.`, 'bot');
+                        addMessage('Obrigado! O processo foi concluído com sucesso.', 'bot');
+                    }
+                });
             });
 
             document.getElementById('laudo-no').addEventListener('click', () => {
