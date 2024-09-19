@@ -232,11 +232,11 @@
             } else if (lastField === 'comprovanteEndereco') {
                 askLocationPermission();
             } else if (lastField === 'laudoMedico') {
-                askQuestion('O dependente possui algum laudo médico que comprove deficiência ou síndrome?', 'laudoMedico');
+                askLaudoQuestion();
             }
         }
 
-        // Função para manusear o upload de arquivos
+        // Função para manusear o upload de arquivos e passar para a próxima pergunta
         uploadIcon.addEventListener('click', () => {
             fileInput.click(); // Simula o clique no input de arquivos
         });
@@ -247,6 +247,7 @@
                 fileName.textContent = `Arquivo selecionado: ${file.name}`;
                 fileName.style.display = 'block';
                 addMessage(`Arquivo "${file.name}" foi enviado com sucesso.`, 'bot');
+                nextStep('comprovanteEndereco'); // Passa para a próxima pergunta
             }
         });
 
@@ -317,7 +318,7 @@
             document.getElementById('location-no').addEventListener('click', () => {
                 addMessage('Não', 'user');
                 startButtons.style.display = 'none';
-                askQuestion('O dependente possui algum laudo médico que comprove deficiência ou síndrome?', 'laudoMedico');
+                askLaudoQuestion();
             });
         }
 
@@ -326,14 +327,37 @@
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function (position) {
                     addMessage(`Localização capturada: Latitude: ${position.coords.latitude}, Longitude: ${position.coords.longitude}`, 'bot');
-                    askQuestion('O dependente possui algum laudo médico que comprove deficiência ou síndrome?', 'laudoMedico');
+                    askLaudoQuestion();
                 }, function () {
                     addMessage('Não foi possível acessar a localização. Prosseguindo sem ela.', 'bot');
-                    askQuestion('O dependente possui algum laudo médico que comprove deficiência ou síndrome?', 'laudoMedico');
+                    askLaudoQuestion();
                 });
             } else {
                 addMessage('Geolocalização não é suportada pelo seu navegador.', 'bot');
             }
+        }
+
+        // Pergunta sobre laudo médico com botões Sim/Não
+        function askLaudoQuestion() {
+            addMessage('O dependente possui algum laudo médico que comprove deficiência ou síndrome?', 'bot');
+            startButtons.innerHTML = `
+                <button class="btn btn-success" id="laudo-yes">Sim</button>
+                <button class="btn btn-danger" id="laudo-no">Não</button>
+            `;
+            startButtons.style.display = 'flex';
+
+            document.getElementById('laudo-yes').addEventListener('click', () => {
+                addMessage('Sim', 'user');
+                startButtons.style.display = 'none';
+                addMessage('Por favor, envie o laudo médico.', 'bot');
+                // Inicia o processo de upload do laudo médico
+            });
+
+            document.getElementById('laudo-no').addEventListener('click', () => {
+                addMessage('Não', 'user');
+                startButtons.style.display = 'none';
+                addMessage('Obrigado! O processo foi concluído com sucesso.', 'bot');
+            });
         }
 
         // Inicia o chat ao carregar a página
