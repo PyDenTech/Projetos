@@ -206,6 +206,9 @@ app.get('/termos', (req, res) => {
 app.get('/solicitar-rota', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'solicitar-rota.html'));
 });
+app.get('/solicitar-rota-chat', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'solicitar-rota-chat.html'));
+});
 
 app.get('/faq', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'pages', 'faq.html'));
