@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Chat Interativo - Solicitar Concessão de Rota</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        #chat-container {
+            max-width: 600px;
+            margin: 50px auto;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #chat {
+            height: 400px;
+            overflow-y: auto;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .chat-message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 80%;
+        }
+
+        .chat-message.bot {
+            background-color: #e3e3e3;
+            text-align: left;
+        }
+
+        .chat-message.user {
+            background-color: #007bff;
+            color: #fff;
+            text-align: right;
+            margin-left: auto;
+        }
+
+        .chat-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chat-buttons button {
+            flex: 1;
+            margin: 0 5px;
+        }
+
+        #user-input {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="chat-container">
+        <div id="chat"></div>
+        <div class="chat-buttons" id="start-buttons">
+            <button class="btn btn-success" id="start-yes">Sim</button>
+            <button class="btn btn-danger" id="start-no">Não</button>
+        </div>
+        <input type="text" class="form-control mt-2" id="user-input" placeholder="Digite aqui...">
+        <button class="btn btn-primary mt-2" id="send-btn" style="display: none;">Enviar</button>
+    </div>
+
+    <script>
+        const chat = document.getElementById('chat');
+        const startButtons = document.getElementById('start-buttons');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+
+        // Função para adicionar uma nova mensagem ao chat
+        function addMessage(message, sender = 'bot') {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('chat-message', sender);
+            messageElement.innerText = message;
+            chat.appendChild(messageElement);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        // Saudação inicial
+        function startChat() {
+            addMessage('Olá, bem-vindo ao nosso serviço de solicitação de concessão de rota!');
+            setTimeout(() => {
+                addMessage('Você está pronto para começar o processo?', 'bot');
+                startButtons.style.display = 'flex';
+            }, 1000);
+        }
+
+        // Fluxo ao clicar em "Sim"
+        document.getElementById('start-yes').addEventListener('click', () => {
+            addMessage('Sim', 'user');
+            startButtons.style.display = 'none';
+            nextStep();
+        });
+
+        // Fluxo ao clicar em "Não"
+        document.getElementById('start-no').addEventListener('click', () => {
+            addMessage('Não', 'user');
+            startButtons.style.display = 'none';
+            addMessage('Tudo bem! Se precisar de algo, estamos à disposição. Até breve!', 'bot');
+        });
+
+        // Próximo passo após o usuário clicar "Sim"
+        function nextStep() {
+            setTimeout(() => {
+                addMessage('Ótimo! Vamos começar. Qual é o seu nome completo?', 'bot');
+                userInput.style.display = 'block';
+                sendBtn.style.display = 'inline-block';
+            }, 1000);
+        }
+
+        // Captura a resposta do usuário
+        sendBtn.addEventListener('click', () => {
+            const inputValue = userInput.value.trim();
+            if (inputValue) {
+                addMessage(inputValue, 'user');
+                userInput.value = ''; // Limpa o campo de entrada
+                userInput.style.display = 'none';
+                sendBtn.style.display = 'none';
+
+                // Continuar o fluxo aqui (próximas perguntas ou lógica)
+                // Exemplo: perguntar o CPF
+                setTimeout(() => {
+                    addMessage('Por favor, informe o seu CPF.', 'bot');
+                    userInput.style.display = 'block';
+                    sendBtn.style.display = 'inline-block';
+                }, 1000);
+            }
+        });
+
+        // Inicia o chat ao carregar a página
+        startChat();
+    </script>
+</body>
+
+</html>
