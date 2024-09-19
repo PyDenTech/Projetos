@@ -194,15 +194,16 @@
         // Fluxo de perguntas
         function nextStep(lastField) {
             if (lastField === 'nomeResponsavel') {
-                askQuestion('Por favor, informe o seu CPF e contato.', 'cpfContato');
-            } else if (lastField === 'cpfContato') {
+                askQuestion('Por favor, informe o seu CPF.', 'cpf');
+            } else if (lastField === 'cpf') {
+                askQuestion('Por favor, informe o seu contato (telefone).', 'contato');
+            } else if (lastField === 'contato') {
                 askQuestion('Qual o ID único de matrícula do aluno ou CPF?', 'idMatricula');
             } else if (lastField === 'idMatricula') {
                 askQuestion('Por favor, informe o CEP da residência.', 'cep');
             } else if (lastField === 'cep') {
                 askQuestion('Agora, informe o número da residência.', 'numero');
             } else if (lastField === 'numero') {
-                // Simula uma busca de CEP (exemplo)
                 validateCep(userData.cep, userData.numero);
             } else if (lastField === 'comprovanteEndereco') {
                 askLocationPermission();
@@ -237,7 +238,6 @@
             document.getElementById('location-yes').addEventListener('click', () => {
                 addMessage('Sim', 'user');
                 startButtons.style.display = 'none';
-                // Simulação de solicitação de permissão para localização
                 getLocation();
             });
 
