@@ -74,6 +74,17 @@
         #user-input {
             display: none;
         }
+
+        /* Ícone de clipe */
+        #clip-icon {
+            font-size: 20px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        #file-input {
+            display: none;
+        }
     </style>
 </head>
 
@@ -115,6 +126,10 @@
                                     placeholder="Digite aqui...">
                                 <button class="btn btn-primary mt-2" id="send-btn"
                                     style="display: none;">Enviar</button>
+
+                                <!-- Ícone de clipe para upload -->
+                                <i id="clip-icon" class="bi bi-paperclip"></i>
+                                <input type="file" id="file-input" accept="image/*,application/pdf">
                             </div>
 
                         </div>
@@ -133,6 +148,8 @@
         const startButtons = document.getElementById('start-buttons');
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
+        const clipIcon = document.getElementById('clip-icon');
+        const fileInput = document.getElementById('file-input');
 
         let userData = {};
 
@@ -141,6 +158,15 @@
             const messageElement = document.createElement('div');
             messageElement.classList.add('chat-message', sender);
             messageElement.innerText = message;
+            chat.appendChild(messageElement);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        // Função para exibir o arquivo carregado
+        function addFileMessage(fileName, sender = 'user') {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('chat-message', sender);
+            messageElement.innerText = `Arquivo enviado: ${fileName}`;
             chat.appendChild(messageElement);
             chat.scrollTop = chat.scrollHeight;
         }
@@ -191,6 +217,19 @@
             }, 1000);
         }
 
+        // Função para permitir upload de arquivos ao clicar no ícone de clipe
+        clipIcon.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // Exibe mensagem ao carregar arquivo
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            if (file) {
+                addFileMessage(file.name);
+            }
+        });
+
         // Fluxo de perguntas
         function nextStep(lastField) {
             if (lastField === 'nomeResponsavel') {
@@ -212,7 +251,6 @@
             }
         }
 
-        // Validação do CEP simulada
         // Validação do CEP usando a API ViaCEP
         function validateCep(cep, numero) {
             const cleanCep = cep.replace(/\D/g, ''); // Remove caracteres não numéricos
@@ -231,7 +269,7 @@
                     } else {
                         const enderecoCompleto = `${data.logradouro}, ${numero}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
                         addMessage(`Endereço encontrado: ${enderecoCompleto}. Está correto?`, 'bot');
-                        confirmAddress(enderecoCompleto); // Função para confirmar o endereço
+                        confirmAddress(enderecoCompleto);
                     }
                 })
                 .catch(error => {
@@ -240,6 +278,7 @@
                     askQuestion('Por favor, informe o CEP da residência novamente.', 'cep');
                 });
         }
+
         // Confirmação do endereço encontrado
         function confirmAddress(enderecoCompleto) {
             startButtons.innerHTML = `
