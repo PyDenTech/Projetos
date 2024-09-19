@@ -134,6 +134,8 @@
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
 
+        let userData = {};
+
         // Função para adicionar uma nova mensagem ao chat
         function addMessage(message, sender = 'bot') {
             const messageElement = document.createElement('div');
@@ -156,7 +158,7 @@
         document.getElementById('start-yes').addEventListener('click', () => {
             addMessage('Sim', 'user');
             startButtons.style.display = 'none';
-            nextStep();
+            askQuestion('Qual é o nome do responsável?', 'nomeResponsavel');
         });
 
         // Fluxo ao clicar em "Não"
@@ -166,33 +168,100 @@
             addMessage('Tudo bem! Se precisar de algo, estamos à disposição. Até breve!', 'bot');
         });
 
-        // Próximo passo após o usuário clicar "Sim"
-        function nextStep() {
+        // Perguntas sequenciais
+        function askQuestion(question, field) {
             setTimeout(() => {
-                addMessage('Ótimo! Vamos começar. Qual é o seu nome completo?', 'bot');
+                addMessage(question, 'bot');
                 userInput.style.display = 'block';
                 sendBtn.style.display = 'inline-block';
+
+                sendBtn.onclick = function () {
+                    const inputValue = userInput.value.trim();
+                    if (inputValue) {
+                        addMessage(inputValue, 'user');
+                        userData[field] = inputValue;
+                        userInput.value = ''; // Limpa o campo de entrada
+                        userInput.style.display = 'none';
+                        sendBtn.style.display = 'none';
+
+                        // Chamar próxima pergunta de acordo com o campo
+                        nextStep(field);
+                    }
+                };
             }, 1000);
         }
 
-        // Captura a resposta do usuário
-        sendBtn.addEventListener('click', () => {
-            const inputValue = userInput.value.trim();
-            if (inputValue) {
-                addMessage(inputValue, 'user');
-                userInput.value = ''; // Limpa o campo de entrada
-                userInput.style.display = 'none';
-                sendBtn.style.display = 'none';
-
-                // Continuar o fluxo aqui (próximas perguntas ou lógica)
-                // Exemplo: perguntar o CPF
-                setTimeout(() => {
-                    addMessage('Por favor, informe o seu CPF.', 'bot');
-                    userInput.style.display = 'block';
-                    sendBtn.style.display = 'inline-block';
-                }, 1000);
+        // Fluxo de perguntas
+        function nextStep(lastField) {
+            if (lastField === 'nomeResponsavel') {
+                askQuestion('Por favor, informe o seu CPF e contato.', 'cpfContato');
+            } else if (lastField === 'cpfContato') {
+                askQuestion('Qual o ID único de matrícula do aluno ou CPF?', 'idMatricula');
+            } else if (lastField === 'idMatricula') {
+                askQuestion('Por favor, informe o CEP da residência.', 'cep');
+            } else if (lastField === 'cep') {
+                askQuestion('Agora, informe o número da residência.', 'numero');
+            } else if (lastField === 'numero') {
+                // Simula uma busca de CEP (exemplo)
+                validateCep(userData.cep, userData.numero);
+            } else if (lastField === 'comprovanteEndereco') {
+                askLocationPermission();
+            } else if (lastField === 'laudoMedico') {
+                askQuestion('O dependente possui algum laudo médico que comprove deficiência ou síndrome?', 'laudoMedico');
             }
-        });
+        }
+
+        // Validação do CEP simulada
+        function validateCep(cep, numero) {
+            // Simulação de validação de CEP
+            setTimeout(() => {
+                if (cep === 'valid') { // Simule o valor de "valid"
+                    addMessage('Endereço válido! Envie o comprovante de residência.', 'bot');
+                    askQuestion('Por favor, envie o comprovante de residência.', 'comprovanteEndereco');
+                } else {
+                    addMessage('CEP inválido. Por favor, tente novamente.', 'bot');
+                    askQuestion('Por favor, informe o CEP da residência novamente.', 'cep');
+                }
+            }, 1000);
+        }
+
+        // Pergunta sobre compartilhar a localização
+        function askLocationPermission() {
+            addMessage('Você gostaria de compartilhar a localização da residência para agilizar o processo?', 'bot');
+            startButtons.innerHTML = `
+                <button class="btn btn-success" id="location-yes">Sim</button>
+                <button class="btn btn-danger" id="location-no">Não</button>
+            `;
+            startButtons.style.display = 'flex';
+
+            document.getElementById('location-yes').addEventListener('click', () => {
+                addMessage('Sim', 'user');
+                startButtons.style.display = 'none';
+                // Simulação de solicitação de permissão para localização
+                getLocation();
+            });
+
+            document.getElementById('location-no').addEventListener('click', () => {
+                addMessage('Não', 'user');
+                startButtons.style.display = 'none';
+                askQuestion('O dependente possui algum laudo médico que comprove deficiência ou síndrome?', 'laudoMedico');
+            });
+        }
+
+        // Simulação de captura de localização
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    addMessage(`Localização capturada: Latitude: ${position.coords.latitude}, Longitude: ${position.coords.longitude}`, 'bot');
+                    askQuestion('O dependente possui algum laudo médico que comprove deficiência ou síndrome?', 'laudoMedico');
+                }, function () {
+                    addMessage('Não foi possível acessar a localização. Prosseguindo sem ela.', 'bot');
+                    askQuestion('O dependente possui algum laudo médico que comprove deficiência ou síndrome?', 'laudoMedico');
+                });
+            } else {
+                addMessage('Geolocalização não é suportada pelo seu navegador.', 'bot');
+            }
+        }
 
         // Inicia o chat ao carregar a página
         startChat();
