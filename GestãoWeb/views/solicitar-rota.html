@@ -239,9 +239,18 @@
                 // Inclui o número no endereço
                 const enderecoCompleto = `${data.logradouro}, ${numero}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
                 document.getElementById('endereco').value = enderecoCompleto;
+
+                // Ativa o botão "Buscar Coordenadas" após a busca do endereço
+                document.getElementById('buscar-coordenadas').disabled = false;
             } else {
                 alert('Endereço não encontrado para o CEP informado.');
+                document.getElementById('buscar-coordenadas').disabled = true; // Mantém desabilitado se a busca falhar
             }
+        });
+
+        // Inicializa o formulário com o botão "Buscar Coordenadas" desativado
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('buscar-coordenadas').disabled = true;
         });
 
         // Função para buscar coordenadas e exibir no mapa
@@ -262,6 +271,7 @@
                 }
             });
         });
+
 
         // Carrega escolas via API
         $(document).ready(function () {
