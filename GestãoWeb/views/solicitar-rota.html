@@ -147,7 +147,7 @@
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">O aluno é público do AEE?</label><br>
                                         <input type="radio" id="aeeSim" name="deficiencia" value="sim"
-                                            onclick="mostrarUpload(true)" required> Sim
+                                            onclick="mostrarUpload(false)" required> Sim
                                         <input type="radio" id="aeeNao" name="deficiencia" value="nao"
                                             onclick="mostrarUpload(false)" required> Não
                                     </div>
@@ -224,6 +224,7 @@
         function mostrarUpload(exibir) {
             const uploadDiv = document.getElementById('uploadLaudo');
             uploadDiv.style.display = exibir ? 'block' : 'none';
+            document.getElementById('laudoDeficiencia').required = exibir; // Define como obrigatório ou não
         }
 
         // Habilita o botão "Buscar Coordenadas" apenas após o clique no botão "Buscar Endereço"
