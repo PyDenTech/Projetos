@@ -114,11 +114,12 @@
                                 <input id="longitude" name="longitude" type="hidden">
                                 <input id="latitude" name="latitude" type="hidden">
 
-                                <div class="mb-3">
+                                <div class="mb-3 d-none" id="divComprovanteEndereco">
                                     <label for="comprovanteEndereco" class="form-label">Comprovante de Endereço</label>
                                     <input type="file" class="form-control" id="comprovanteEndereco"
                                         name="comprovante_endereco" accept="image/*">
                                 </div>
+
                                 <div class="mb-3">
                                     <label for="idMatriculaAluno" class="form-label">ID de Matrícula do Aluno</label>
                                     <input type="text" class="form-control" id="idMatriculaAluno"
@@ -289,10 +290,17 @@
         });
 
         // Envia a solicitação
+        // Inicializa o formulário sem o campo comprovante_endereco como obrigatório
         document.getElementById('solicitacao-form').addEventListener('submit', async function (event) {
             event.preventDefault();
 
             const formData = new FormData(this);
+
+            // Remove o campo comprovante_endereco se não houver arquivo selecionado
+            if (!document.getElementById('comprovanteEndereco').files.length) {
+                formData.delete('comprovante_endereco');
+            }
+
             try {
                 const response = await fetch('/api/enviar-solicitacao', {
                     method: 'POST',
@@ -311,6 +319,7 @@
                 alert('Erro ao enviar a solicitação. Tente novamente mais tarde.');
             }
         });
+
         // Máscara de entrada para CPF e Celular
         $('#cpfResponsavel').on('input', function () {
             let cpf = $(this).val().replace(/\D/g, '');

@@ -3053,10 +3053,11 @@ app.post('/api/enviar-solicitacao', upload.fields([
             escola_id
         } = req.body;
 
+        // Verificar se os arquivos foram enviados
         const comprovanteEnderecoPath = req.files['comprovante_endereco'] ? req.files['comprovante_endereco'][0].path : null;
         const laudoDeficienciaPath = req.files['laudo_deficiencia'] ? req.files['laudo_deficiencia'][0].path : null;
 
-        // Inserir os dados no banco de dados
+        // Atualize a consulta SQL para ignorar o comprovante_endereco se ele não for fornecido
         const query = `
             INSERT INTO solicitacoes_rota 
             (nome_responsavel, cpf_responsavel, celular_responsavel, cep, numero, endereco, latitude, longitude, id_matricula_aluno, deficiencia, escola_id, comprovante_endereco, laudo_deficiencia)
@@ -3135,60 +3136,60 @@ const WHATSAPP_API_URL = 'https://graph.facebook.com/v20.0';
 
 app.post('/webhook', async (req, res) => {
     const data = req.body;
-  
+
     // Verifica se é uma mensagem
     if (data.object && data.entry && data.entry[0].changes && data.entry[0].changes[0].value.messages) {
-      const message = data.entry[0].changes[0].value.messages[0];
-  
-      // Verifica se não é mensagem de grupo
-      if (message.type !== 'group') {
-        const senderNumber = message.from;
-  
-        // Envia a mensagem de menu interativo
-        await sendInteractiveMenu(senderNumber);
-      }
-    }
-  
-    res.sendStatus(200);
-  });
-  
-  // Função para enviar menu interativo
-  async function sendInteractiveMenu(to) {
-    const menuMessage = {
-      messaging_product: 'whatsapp',
-      recipient_type: 'individual',
-      to: to,
-      type: 'interactive',
-      interactive: {
-        type: 'button',
-        body: {
-          text: '🚍 Bem-vindo ao Sistema de Autoatendimento do Setor de Transporte Municipal! 🚍\n\nAqui você encontra as opções de serviço para facilitar o seu atendimento.\n\nPor favor, selecione o número correspondente à sua opção:'
-        },
-        action: {
-          buttons: [
-            { type: 'reply', reply: { id: 'option_1', title: '1️⃣ Pais Responsáveis e Alunos' } },
-            { type: 'reply', reply: { id: 'option_2', title: '2️⃣ Servidores SEMED' } },
-            { type: 'reply', reply: { id: 'option_3', title: '3️⃣ Servidores Escola' } },
-            { type: 'reply', reply: { id: 'option_4', title: '4️⃣ Fornecedores' } },
-            { type: 'reply', reply: { id: 'option_5', title: '5️⃣ Motoristas' } },
-            { type: 'reply', reply: { id: 'option_6', title: '❌ Encerrar Atendimento' } },
-          ]
+        const message = data.entry[0].changes[0].value.messages[0];
+
+        // Verifica se não é mensagem de grupo
+        if (message.type !== 'group') {
+            const senderNumber = message.from;
+
+            // Envia a mensagem de menu interativo
+            await sendInteractiveMenu(senderNumber);
         }
-      }
-    };
-  
-    try {
-      const response = await axios.post(
-        `${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`,
-        menuMessage,
-        { headers: { Authorization: `Bearer ${ACCESS_TOKEN}` } }
-      );
-  
-      console.log('Mensagem enviada:', response.data);
-    } catch (error) {
-      console.error('Erro ao enviar mensagem:', error.response ? error.response.data : error.message);
     }
-  }
+
+    res.sendStatus(200);
+});
+
+// Função para enviar menu interativo
+async function sendInteractiveMenu(to) {
+    const menuMessage = {
+        messaging_product: 'whatsapp',
+        recipient_type: 'individual',
+        to: to,
+        type: 'interactive',
+        interactive: {
+            type: 'button',
+            body: {
+                text: '🚍 Bem-vindo ao Sistema de Autoatendimento do Setor de Transporte Municipal! 🚍\n\nAqui você encontra as opções de serviço para facilitar o seu atendimento.\n\nPor favor, selecione o número correspondente à sua opção:'
+            },
+            action: {
+                buttons: [
+                    { type: 'reply', reply: { id: 'option_1', title: '1️⃣ Pais Responsáveis e Alunos' } },
+                    { type: 'reply', reply: { id: 'option_2', title: '2️⃣ Servidores SEMED' } },
+                    { type: 'reply', reply: { id: 'option_3', title: '3️⃣ Servidores Escola' } },
+                    { type: 'reply', reply: { id: 'option_4', title: '4️⃣ Fornecedores' } },
+                    { type: 'reply', reply: { id: 'option_5', title: '5️⃣ Motoristas' } },
+                    { type: 'reply', reply: { id: 'option_6', title: '❌ Encerrar Atendimento' } },
+                ]
+            }
+        }
+    };
+
+    try {
+        const response = await axios.post(
+            `${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`,
+            menuMessage,
+            { headers: { Authorization: `Bearer ${ACCESS_TOKEN}` } }
+        );
+
+        console.log('Mensagem enviada:', response.data);
+    } catch (error) {
+        console.error('Erro ao enviar mensagem:', error.response ? error.response.data : error.message);
+    }
+}
 
 
 app.use((req, res, next) => {
