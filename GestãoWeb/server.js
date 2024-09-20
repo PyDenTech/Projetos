@@ -3051,7 +3051,8 @@ app.post('/api/enviar-solicitacao', upload.fields([
             id_matricula_aluno,
             deficiencia,
             escola_id,
-            zoneamento // Adiciona o novo campo zoneamento
+            zoneamento,
+            observacoes // Novo campo observações
         } = req.body;
 
         const comprovanteEnderecoPath = req.files['comprovante_endereco'] ? req.files['comprovante_endereco'][0].path : null;
@@ -3059,8 +3060,8 @@ app.post('/api/enviar-solicitacao', upload.fields([
 
         const query = `
             INSERT INTO solicitacoes_rota 
-            (nome_responsavel, cpf_responsavel, celular_responsavel, cep, numero, endereco, latitude, longitude, id_matricula_aluno, deficiencia, escola_id, comprovante_endereco, laudo_deficiencia, zoneamento)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+            (nome_responsavel, cpf_responsavel, celular_responsavel, cep, numero, endereco, latitude, longitude, id_matricula_aluno, deficiencia, escola_id, comprovante_endereco, laudo_deficiencia, zoneamento, observacoes)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
             RETURNING id;
         `;
         const values = [
@@ -3077,7 +3078,8 @@ app.post('/api/enviar-solicitacao', upload.fields([
             escola_id,
             comprovanteEnderecoPath,
             laudoDeficienciaPath,
-            zoneamento // Adiciona o novo campo zoneamento
+            zoneamento,
+            observacoes // Inclui o novo campo observações
         ];
 
         const result = await pool.query(query, values);
@@ -3088,6 +3090,7 @@ app.post('/api/enviar-solicitacao', upload.fields([
         res.status(500).json({ message: 'Erro ao enviar a solicitação. Tente novamente mais tarde.' });
     }
 });
+
 
 app.post('/consulta_motorista', async (req, res) => {
     const { cpf } = req.body;
