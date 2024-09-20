@@ -145,15 +145,14 @@
 
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <label class="form-label">O dependente possui algum laudo de alguma deficiência
-                                            que o impeça de caminhar?</label><br>
-                                        <input type="radio" id="deficienciaSim" name="deficiencia" value="sim"
+                                        <label class="form-label">O aluno é público do AEE?</label><br>
+                                        <input type="radio" id="aeeSim" name="aee" value="sim"
                                             onclick="mostrarUpload(true)" required> Sim
-                                        <input type="radio" id="deficienciaNao" name="deficiencia" value="nao"
+                                        <input type="radio" id="aeeNao" name="aee" value="nao"
                                             onclick="mostrarUpload(false)" required> Não
                                     </div>
                                     <div class="col-md-6 mb-3" id="uploadLaudo" style="display: none;">
-                                        <label for="laudoDeficiencia" class="form-label">Upload do Laudo</label>
+                                        <label for="laudoDeficiencia" class="form-label">Upload do Documento</label>
                                         <input type="file" class="form-control" id="laudoDeficiencia"
                                             name="laudo_deficiencia" accept="image/*">
                                     </div>
@@ -278,7 +277,7 @@
             const latitude = document.getElementById('latitude').value;
             const longitude = document.getElementById('longitude').value;
             const escola_id = document.getElementById('escolaSelect').value;
-            const deficiencia = document.querySelector('input[name="deficiencia"]:checked').value;
+            const aee = document.querySelector('input[name="aee"]:checked').value;
 
             if (!latitude || !longitude || !escola_id) {
                 alert('Por favor, preencha todas as informações necessárias.');
@@ -293,11 +292,11 @@
                     document.getElementById('enviar-solicitacao').style.display = 'block';
                     alert(data.mensagem);
                 } else {
-                    document.getElementById('enviar-solicitacao').style.display = deficiencia === 'sim' ? 'block' : 'none';
-                    if (deficiencia === 'nao') {
+                    document.getElementById('enviar-solicitacao').style.display = aee === 'sim' ? 'block' : 'none';
+                    if (aee === 'nao') {
                         alert('Não é possível fazer a solicitação pois a distância é inferior a 2 km.');
                     } else {
-                        alert('A distância é inferior a 2 km, mas devido ao fato do dependente ter um laudo, será solicitado uma avaliação pelo Centro Viver e Conviver para atendimento com o Transporte Escolar Especial.');
+                        alert('A distância é inferior a 2 km, mas será solicitado uma avaliação pelo Centro Viver e Conviver para atendimento com o Transporte Escolar Especial.');
                     }
                 }
             } catch (error) {
