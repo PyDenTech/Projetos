@@ -84,12 +84,12 @@
                                     <div class="col-md-3 mb-3">
                                         <label for="cpfResponsavel" class="form-label">CPF do Responsável</label>
                                         <input type="text" class="form-control" id="cpfResponsavel"
-                                            name="cpf_responsavel" required>
+                                            name="cpf_responsavel" maxlength="11" required>
                                     </div>
                                     <div class="col-md-3 mb-3">
                                         <label for="celularResponsavel" class="form-label">Celular (WhatsApp)</label>
                                         <input type="text" class="form-control" id="celularResponsavel"
-                                            name="celular_responsavel" required>
+                                            name="celular_responsavel" maxlength="11" required>
                                     </div>
                                 </div>
 
@@ -221,14 +221,7 @@
             uploadDiv.style.display = exibir ? 'block' : 'none';
         }
 
-        // Habilita o botão "Buscar Coordenadas" apenas se o campo CEP estiver preenchido
-        document.getElementById('cep').addEventListener('input', function () {
-            const cep = document.getElementById('cep').value.trim();
-            const botaoCoordenadas = document.getElementById('buscar-coordenadas');
-            botaoCoordenadas.disabled = cep === '';
-        });
-
-        // Função para buscar endereço com base no CEP
+        // Habilita o botão "Buscar Coordenadas" apenas após o clique no botão "Buscar Endereço"
         document.getElementById('buscar-endereco').addEventListener('click', async function () {
             const cep = document.getElementById('cep').value;
             const numero = document.getElementById('numero').value; // Obtém o número
@@ -239,9 +232,7 @@
                 // Inclui o número no endereço
                 const enderecoCompleto = `${data.logradouro}, ${numero}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
                 document.getElementById('endereco').value = enderecoCompleto;
-
-                // Ativa o botão "Buscar Coordenadas" após a busca do endereço
-                document.getElementById('buscar-coordenadas').disabled = false;
+                document.getElementById('buscar-coordenadas').disabled = false; // Habilita o botão "Buscar Coordenadas"
             } else {
                 alert('Endereço não encontrado para o CEP informado.');
                 document.getElementById('buscar-coordenadas').disabled = true; // Mantém desabilitado se a busca falhar
@@ -272,10 +263,8 @@
             });
         });
 
-
         // Carrega escolas via API
         $(document).ready(function () {
-            // Substitua a URL abaixo pela URL correta para sua API que retorna as escolas
             $.getJSON("/api/escolas", function (data) {
                 var select = $("#escolaSelect");
                 $.each(data, function (key, entry) {
@@ -318,7 +307,6 @@
         });
 
         // Envia a solicitação
-        // Inicializa o formulário sem o campo comprovante_endereco como obrigatório
         document.getElementById('solicitacao-form').addEventListener('submit', async function (event) {
             event.preventDefault();
 
@@ -351,6 +339,9 @@
         // Máscara de entrada para CPF e Celular
         $('#cpfResponsavel').on('input', function () {
             let cpf = $(this).val().replace(/\D/g, '');
+            if (cpf.length > 11) {
+                cpf = cpf.substring(0, 11);
+            }
             cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
             cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
             cpf = cpf.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
@@ -359,10 +350,14 @@
 
         $('#celularResponsavel').on('input', function () {
             let celular = $(this).val().replace(/\D/g, '');
+            if (celular.length > 11) {
+                celular = celular.substring(0, 11);
+            }
             celular = celular.replace(/(\d{2})(\d)/, "($1) $2");
             celular = celular.replace(/(\d{5})(\d{1,4})$/, "$1-$2");
             $(this).val(celular);
         });
+
         initMap();
     </script>
 </body>
