@@ -3055,11 +3055,8 @@ app.post('/api/enviar-solicitacao', upload.fields([
             observacoes
         } = req.body;
 
-        // Verificação adicional para garantir que "deficiencia" não seja nulo ou vazio
-        if (!deficiencia) {
-            return res.status(400).json({ message: 'Campo "deficiencia" é obrigatório.' });
-        }
-
+        // Verificação opcional de "deficiencia" removida, pois não é mais obrigatória
+        // Não verificar mais esse campo para retorno de erro
         const comprovanteEnderecoPath = req.files['comprovante_endereco'] ? req.files['comprovante_endereco'][0].path : null;
         const laudoDeficienciaPath = req.files['laudo_deficiencia'] ? req.files['laudo_deficiencia'][0].path : null;
 
@@ -3079,7 +3076,7 @@ app.post('/api/enviar-solicitacao', upload.fields([
             latitude,
             longitude,
             id_matricula_aluno,
-            deficiencia,
+            deficiencia || null, // Se deficiencia estiver vazio, define como null
             escola_id,
             comprovanteEnderecoPath,
             laudoDeficienciaPath,
@@ -3095,9 +3092,6 @@ app.post('/api/enviar-solicitacao', upload.fields([
         res.status(500).json({ message: 'Erro ao enviar a solicitação. Tente novamente mais tarde.' });
     }
 });
-
-
-
 
 app.post('/consulta_motorista', async (req, res) => {
     const { cpf } = req.body;
