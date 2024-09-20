@@ -3049,11 +3049,16 @@ app.post('/api/enviar-solicitacao', upload.fields([
             latitude,
             longitude,
             id_matricula_aluno,
-            deficiencia, // Agora recebendo o valor do campo deficiencia (que foi alterado para representar AEE)
+            deficiencia,
             escola_id,
             zoneamento,
             observacoes
         } = req.body;
+
+        // Verificação adicional para garantir que "deficiencia" não seja nulo ou vazio
+        if (!deficiencia) {
+            return res.status(400).json({ message: 'Campo "deficiencia" é obrigatório.' });
+        }
 
         const comprovanteEnderecoPath = req.files['comprovante_endereco'] ? req.files['comprovante_endereco'][0].path : null;
         const laudoDeficienciaPath = req.files['laudo_deficiencia'] ? req.files['laudo_deficiencia'][0].path : null;
@@ -3074,7 +3079,7 @@ app.post('/api/enviar-solicitacao', upload.fields([
             latitude,
             longitude,
             id_matricula_aluno,
-            deficiencia, // Recebe o valor sim/não
+            deficiencia, // Verificado para garantir que não está vazio
             escola_id,
             comprovanteEnderecoPath,
             laudoDeficienciaPath,
@@ -3090,6 +3095,7 @@ app.post('/api/enviar-solicitacao', upload.fields([
         res.status(500).json({ message: 'Erro ao enviar a solicitação. Tente novamente mais tarde.' });
     }
 });
+
 
 
 
