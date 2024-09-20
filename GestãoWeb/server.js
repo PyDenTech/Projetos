@@ -3079,7 +3079,7 @@ app.post('/api/enviar-solicitacao', upload.fields([
             latitude,
             longitude,
             id_matricula_aluno,
-            deficiencia, // Verificado para garantir que não está vazio
+            deficiencia,
             escola_id,
             comprovanteEnderecoPath,
             laudoDeficienciaPath,
