@@ -3050,18 +3050,17 @@ app.post('/api/enviar-solicitacao', upload.fields([
             longitude,
             id_matricula_aluno,
             deficiencia,
-            escola_id
+            escola_id,
+            zoneamento // Adiciona o novo campo zoneamento
         } = req.body;
 
-        // Verificar se os arquivos foram enviados
         const comprovanteEnderecoPath = req.files['comprovante_endereco'] ? req.files['comprovante_endereco'][0].path : null;
         const laudoDeficienciaPath = req.files['laudo_deficiencia'] ? req.files['laudo_deficiencia'][0].path : null;
 
-        // Atualize a consulta SQL para ignorar o comprovante_endereco se ele não for fornecido
         const query = `
             INSERT INTO solicitacoes_rota 
-            (nome_responsavel, cpf_responsavel, celular_responsavel, cep, numero, endereco, latitude, longitude, id_matricula_aluno, deficiencia, escola_id, comprovante_endereco, laudo_deficiencia)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+            (nome_responsavel, cpf_responsavel, celular_responsavel, cep, numero, endereco, latitude, longitude, id_matricula_aluno, deficiencia, escola_id, comprovante_endereco, laudo_deficiencia, zoneamento)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
             RETURNING id;
         `;
         const values = [
@@ -3077,7 +3076,8 @@ app.post('/api/enviar-solicitacao', upload.fields([
             deficiencia,
             escola_id,
             comprovanteEnderecoPath,
-            laudoDeficienciaPath
+            laudoDeficienciaPath,
+            zoneamento // Adiciona o novo campo zoneamento
         ];
 
         const result = await pool.query(query, values);
