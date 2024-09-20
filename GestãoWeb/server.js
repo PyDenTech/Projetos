@@ -3049,10 +3049,10 @@ app.post('/api/enviar-solicitacao', upload.fields([
             latitude,
             longitude,
             id_matricula_aluno,
-            deficiencia,
+            deficiencia, // Agora recebendo o valor do campo deficiencia (que foi alterado para representar AEE)
             escola_id,
             zoneamento,
-            observacoes 
+            observacoes
         } = req.body;
 
         const comprovanteEnderecoPath = req.files['comprovante_endereco'] ? req.files['comprovante_endereco'][0].path : null;
@@ -3074,12 +3074,12 @@ app.post('/api/enviar-solicitacao', upload.fields([
             latitude,
             longitude,
             id_matricula_aluno,
-            deficiencia,
+            deficiencia, // Recebe o valor sim/não
             escola_id,
             comprovanteEnderecoPath,
             laudoDeficienciaPath,
             zoneamento,
-            observacoes 
+            observacoes
         ];
 
         const result = await pool.query(query, values);
@@ -3090,6 +3090,7 @@ app.post('/api/enviar-solicitacao', upload.fields([
         res.status(500).json({ message: 'Erro ao enviar a solicitação. Tente novamente mais tarde.' });
     }
 });
+
 
 
 app.post('/consulta_motorista', async (req, res) => {
