@@ -303,8 +303,20 @@
             const latitude = document.getElementById('latitude').value;
             const longitude = document.getElementById('longitude').value;
             const escolaId = document.getElementById('escolaSelect').value;
-            const zoneamento = document.querySelector('input[name="zoneamento"]:checked').value;
-            const aee = document.querySelector('input[name="deficiencia"]:checked').value;
+
+            // Verificar se o radio button de zoneamento está selecionado corretamente
+            const zoneamento = document.querySelector('input[name="zoneamento"]:checked');
+            if (!zoneamento) {
+                alert('Por favor, selecione se o aluno pertence ao zoneamento da escola.');
+                return;
+            }
+
+            // Verificar se o radio button de deficiência está selecionado corretamente
+            const aee = document.querySelector('input[name="deficiencia"]:checked');
+            if (!aee) {
+                alert('Por favor, selecione se o aluno é público do AEE.');
+                return;
+            }
 
             if (!latitude || !longitude || !escolaId) {
                 alert('Por favor, preencha todas as informações necessárias.');
@@ -329,7 +341,7 @@
                         });
                     }
 
-                    calculateAndDisplayRoute(latitude, longitude, escolaLatLng);
+                    calculateAndDisplayRoute(latitude, longitude, escolaLatLng, zoneamento.value, aee.value);
                 } else {
                     alert('Não foi possível encontrar as coordenadas da escola.');
                 }
@@ -339,7 +351,7 @@
             }
         });
 
-        function calculateAndDisplayRoute(alunoLat, alunoLng, escolaLatLng) {
+        function calculateAndDisplayRoute(alunoLat, alunoLng, escolaLatLng, zoneamento, aee) {
             const alunoLatLng = new google.maps.LatLng(alunoLat, alunoLng);
             const request = {
                 origin: alunoLatLng,
