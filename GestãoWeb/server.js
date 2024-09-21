@@ -3052,18 +3052,17 @@ app.post('/api/enviar-solicitacao', upload.fields([
             deficiencia,
             escola_id,
             zoneamento,
-            observacoes
+            observacoes,
+            direito_transporte = true // Padrão como verdadeiro
         } = req.body;
 
-        // Verificação opcional de "deficiencia" removida, pois não é mais obrigatória
-        // Não verificar mais esse campo para retorno de erro
         const comprovanteEnderecoPath = req.files['comprovante_endereco'] ? req.files['comprovante_endereco'][0].path : null;
         const laudoDeficienciaPath = req.files['laudo_deficiencia'] ? req.files['laudo_deficiencia'][0].path : null;
 
         const query = `
             INSERT INTO solicitacoes_rota 
-            (nome_responsavel, cpf_responsavel, celular_responsavel, cep, numero, endereco, latitude, longitude, id_matricula_aluno, deficiencia, escola_id, comprovante_endereco, laudo_deficiencia, zoneamento, observacoes)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+            (nome_responsavel, cpf_responsavel, celular_responsavel, cep, numero, endereco, latitude, longitude, id_matricula_aluno, deficiencia, escola_id, comprovante_endereco, laudo_deficiencia, zoneamento, observacoes, direito_transporte)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
             RETURNING id;
         `;
         const values = [
@@ -3076,12 +3075,13 @@ app.post('/api/enviar-solicitacao', upload.fields([
             latitude,
             longitude,
             id_matricula_aluno,
-            deficiencia || null, // Se deficiencia estiver vazio, define como null
+            deficiencia || null,
             escola_id,
             comprovanteEnderecoPath,
             laudoDeficienciaPath,
             zoneamento,
-            observacoes
+            observacoes,
+            direito_transporte // Adiciona o campo direito_transporte
         ];
 
         const result = await pool.query(query, values);
@@ -3092,6 +3092,7 @@ app.post('/api/enviar-solicitacao', upload.fields([
         res.status(500).json({ message: 'Erro ao enviar a solicitação. Tente novamente mais tarde.' });
     }
 });
+
 
 app.post('/consulta_motorista', async (req, res) => {
     const { cpf } = req.body;
