@@ -198,7 +198,7 @@
     <script src="/js/main.js"></script>
 
     <script>
-        let map, marker, directionsService, directionsRenderer;
+        let map, marker, escolaMarker, directionsService, directionsRenderer;
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
@@ -210,7 +210,15 @@
             directionsService = new google.maps.DirectionsService();
             directionsRenderer = new google.maps.DirectionsRenderer({
                 map: map,
-                suppressMarkers: true
+                suppressMarkers: true,
+                polylineOptions: {
+                    strokeColor: '#FF0000',
+                    strokeOpacity: 1,
+                    strokeWeight: 4,
+                    strokePattern: [
+                        { offset: '0', repeat: '10px' } // Define um padrão tracejado
+                    ]
+                }
             });
 
             map.addListener('click', function (event) {
@@ -301,6 +309,18 @@
 
                 if (data && data.latitude && data.longitude) {
                     const escolaLatLng = { lat: parseFloat(data.latitude), lng: parseFloat(data.longitude) };
+
+                    // Adiciona o marcador da escola no mapa com ícone personalizado
+                    if (escolaMarker) {
+                        escolaMarker.setPosition(escolaLatLng);
+                    } else {
+                        escolaMarker = new google.maps.Marker({
+                            position: escolaLatLng,
+                            map: map,
+                            icon: '/img/icones/escola-marcador.png' // Caminho do ícone personalizado
+                        });
+                    }
+
                     calculateAndDisplayRoute(latitude, longitude, escolaLatLng);
                 } else {
                     alert('Não foi possível encontrar as coordenadas da escola.');
