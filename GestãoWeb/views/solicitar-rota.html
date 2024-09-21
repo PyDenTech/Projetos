@@ -25,6 +25,10 @@
             height: 400px;
             width: 100%;
         }
+
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 
@@ -135,18 +139,6 @@
                                         <input type="radio" id="aeeSim" name="deficiencia" value="sim" required> Sim
                                         <input type="radio" id="aeeNao" name="deficiencia" value="nao" required> Não
                                     </div>
-                                </div>
-                                <div class="mb-3">
-                                    <button type="button" id="verificar-direito" class="btn btn-secondary">Verificar
-                                        Critérios</button>
-                                </div>
-                                <div id="map" class="mt-3"></div>
-                                <input id="longitude" name="longitude" type="hidden">
-                                <input id="latitude" name="latitude" type="hidden">
-                                <div class="mb-3 d-none" id="divComprovanteEndereco">
-                                    <label for="comprovanteEndereco" class="form-label">Comprovante de Endereço</label>
-                                    <input type="file" class="form-control" id="comprovanteEndereco"
-                                        name="comprovante_endereco" accept="image/*">
                                 </div>
                                 <div class="mb-3 hidden">
                                     <label for="observacoes" class="form-label">Observações</label>
@@ -393,10 +385,6 @@
             event.preventDefault();
 
             const formData = new FormData(this);
-
-            if (!document.getElementById('comprovanteEndereco').files.length) {
-                formData.delete('comprovante_endereco');
-            }
 
             try {
                 const response = await fetch('/api/enviar-solicitacao', {
