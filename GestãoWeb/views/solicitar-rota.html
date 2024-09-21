@@ -94,11 +94,17 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-md-12 mb-3">
+                                    <div class="col-md-6 mb-3">
                                         <label for="idMatriculaAluno" class="form-label">ID de Matrícula do
                                             Aluno</label>
                                         <input type="text" class="form-control" id="idMatriculaAluno"
                                             name="id_matricula_aluno" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="escolaSelect" class="form-label">Selecione a Escola</label>
+                                        <select class="form-select" id="escolaSelect" name="escola_id" required>
+                                            <option value="">Selecione uma Escola</option>
+                                        </select>
                                     </div>
                                 </div>
 
@@ -131,6 +137,18 @@
                                         <input type="radio" id="zoneamentoNao" name="zoneamento" value="nao" required>
                                         Não
                                     </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">O aluno é público do AEE?</label><br>
+                                        <input type="radio" id="aeeSim" name="deficiencia" value="sim"
+                                            onclick="mostrarUpload(false)" required> Sim
+                                        <input type="radio" id="aeeNao" name="deficiencia" value="nao"
+                                            onclick="mostrarUpload(false)" required> Não
+                                    </div>
+                                    <div class="col-md-4 mb-3" id="uploadLaudo" style="display: none;">
+                                        <label for="laudoDeficiencia" class="form-label">Upload do Documento</label>
+                                        <input type="file" class="form-control" id="laudoDeficiencia"
+                                            name="laudo_deficiencia" accept="image/*">
+                                    </div>
                                 </div>
 
                                 <div class="mb-3">
@@ -148,32 +166,10 @@
                                         name="comprovante_endereco" accept="image/*">
                                 </div>
 
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label class="form-label">O aluno é público do AEE?</label><br>
-                                        <input type="radio" id="aeeSim" name="deficiencia" value="sim"
-                                            onclick="mostrarUpload(false)" required> Sim
-                                        <input type="radio" id="aeeNao" name="deficiencia" value="nao"
-                                            onclick="mostrarUpload(false)" required> Não
-                                    </div>
-                                    <div class="col-md-6 mb-3" id="uploadLaudo" style="display: none;">
-                                        <label for="laudoDeficiencia" class="form-label">Upload do Documento</label>
-                                        <input type="file" class="form-control" id="laudoDeficiencia"
-                                            name="laudo_deficiencia" accept="image/*">
-                                    </div>
-                                </div>
-
                                 <div class="mb-3">
                                     <label for="observacoes" class="form-label">Observações</label>
                                     <textarea class="form-control" id="observacoes" name="observacoes" rows="4"
                                         placeholder="Descreva aqui qualquer situação ou necessidade específica relacionada ao transporte escolar..."></textarea>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="escolaSelect" class="form-label">Selecione a Escola</label>
-                                    <select class="form-select" id="escolaSelect" name="escola_id" required>
-                                        <option value="">Selecione uma Escola</option>
-                                    </select>
                                 </div>
 
                                 <button type="submit" class="btn btn-primary mt-3" id="enviar-solicitacao">Enviar
