@@ -3052,19 +3052,21 @@ app.post('/api/enviar-solicitacao', upload.fields([
             deficiencia,
             escola_id,
             zoneamento,
-            observacoes,
+            observacoes, // Inclui o campo observacoes
             direito_transporte = true // Padrão como verdadeiro
         } = req.body;
 
         const comprovanteEnderecoPath = req.files['comprovante_endereco'] ? req.files['comprovante_endereco'][0].path : null;
         const laudoDeficienciaPath = req.files['laudo_deficiencia'] ? req.files['laudo_deficiencia'][0].path : null;
 
+        // Consulta de inserção no banco de dados
         const query = `
             INSERT INTO solicitacoes_rota 
             (nome_responsavel, cpf_responsavel, celular_responsavel, cep, numero, endereco, latitude, longitude, id_matricula_aluno, deficiencia, escola_id, comprovante_endereco, laudo_deficiencia, zoneamento, observacoes, direito_transporte)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
             RETURNING id;
         `;
+
         const values = [
             nome_responsavel,
             cpf_responsavel,
@@ -3080,7 +3082,7 @@ app.post('/api/enviar-solicitacao', upload.fields([
             comprovanteEnderecoPath,
             laudoDeficienciaPath,
             zoneamento,
-            observacoes,
+            observacoes || '', // Inclui observacoes no array de valores
             direito_transporte // Adiciona o campo direito_transporte
         ];
 
@@ -3092,6 +3094,7 @@ app.post('/api/enviar-solicitacao', upload.fields([
         res.status(500).json({ message: 'Erro ao enviar a solicitação. Tente novamente mais tarde.' });
     }
 });
+
 
 app.get('/api/escola-coordenadas', async (req, res) => {
     const { escola_id } = req.query;

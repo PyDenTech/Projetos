@@ -133,7 +133,7 @@
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label">O aluno é público do AEE?</label><br>
                                         <input type="radio" id="aeeSim" name="deficiencia" value="sim"
-                                            onclick="mostrarUpload(false)" required> Sim
+                                            onclick="mostrarUpload(true)" required> Sim
                                         <input type="radio" id="aeeNao" name="deficiencia" value="nao"
                                             onclick="mostrarUpload(false)" required> Não
                                     </div>
@@ -385,14 +385,19 @@
             });
         }
 
-        document.getElementById('confirmarSolicitacao').addEventListener('click', function () {
-            // Inclua aqui a lógica para enviar a solicitação
-            alert('Solicitação enviada com sucesso!');
+        document.getElementById('confirmarSolicitacao').addEventListener('click', async function () {
+            const observacoesModal = document.getElementById('observacoesModal').value;
+
+            // Adiciona a observação do modal ao campo observações do formulário principal
+            document.getElementById('observacoes').value += "\n" + observacoesModal;
+
             $('#modalDireito').modal('hide');
+
+            // Dispara o evento de submissão do formulário principal
+            document.getElementById('solicitacao-form').requestSubmit();
         });
 
         document.getElementById('encerrarSolicitacao').addEventListener('click', function () {
-            // Inclua aqui a lógica para encerrar a solicitação
             alert('Solicitação encerrada.');
             $('#modalDireito').modal('hide');
         });
