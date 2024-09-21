@@ -173,6 +173,12 @@
                 </div>
                 <div class="modal-body">
                     <div id="mensagemModal"></div>
+                    <div class="col-md-4 mb-3" id="uploadLaudo" style="display: none;">
+                        <label for="laudoDeficiencia" class="form-label">Upload do Documento</label>
+                        <input type="file" class="form-control" id="laudoDeficiencia" name="laudo_deficiencia"
+                            accept="image/*">
+                    </div>
+
                     <div class="mb-3">
                         <label for="observacoesModal" class="form-label">Observações</label>
                         <textarea class="form-control" id="observacoesModal" name="observacoes_modal" rows="4"
@@ -338,6 +344,13 @@
             }
         });
 
+        function mostrarUpload(exibir) {
+            const uploadDiv = document.getElementById('uploadLaudo');
+            uploadDiv.style.display = exibir ? 'block' : 'none';
+            document.getElementById('laudoDeficiencia').required = exibir;
+        }
+
+
         function calculateAndDisplayRoute(alunoLat, alunoLng, escolaLatLng, zoneamento, aee) {
             const alunoLatLng = new google.maps.LatLng(alunoLat, alunoLng);
             const request = {
@@ -356,12 +369,21 @@
 
                     if (distance > 2 && zoneamento === 'sim') {
                         mensagem = 'O aluno tem direito ao transporte.';
+                    } else if (distance > 2 && zoneamento === 'nao' && aee === 'sim') {
+                        mensagem = 'O aluno reside em um zoneamento não atendido pela escola e é público AEE. Deseja prosseguir com a solicitação?';
+                        mostrarUpload(true); // Exibe o campo de upload do laudo
                     } else if (distance > 2 && zoneamento === 'nao') {
                         mensagem = 'O aluno reside em um zoneamento não atendido pela escola. Deseja prosseguir com a solicitação?';
+                        mostrarUpload(false); // Esconde o campo de upload do laudo
                     } else if (distance <= 2 && zoneamento === 'sim' && aee === 'sim') {
                         mensagem = 'O aluno é público AEE, mas não mora a mais de 2 km da escola. Por favor, descreva a deficiência ou síndrome do aluno.';
+                        mostrarUpload(true); // Exibe o campo de upload do laudo
+                    } else if (distance <= 2 && zoneamento === 'nao' && aee === 'sim') {
+                        mensagem = 'O aluno é público AEE, mora a menos de 2 km da escola e não pertence ao zoneamento. Deseja prosseguir com a solicitação?';
+                        mostrarUpload(true); // Exibe o campo de upload do laudo
                     } else {
                         mensagem = 'O aluno não atende aos critérios para o transporte escolar.';
+                        mostrarUpload(false); // Esconde o campo de upload do laudo
                     }
 
                     document.getElementById('mensagemModal').textContent = mensagem;
@@ -371,6 +393,7 @@
                 }
             });
         }
+
 
         document.getElementById('confirmarSolicitacao').addEventListener('click', async function () {
             const observacoesModal = document.getElementById('observacoesModal').value;
