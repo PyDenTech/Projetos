@@ -7,13 +7,9 @@
     <title>Solicitar Concessão de Rota</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
-    <!-- Favicons -->
     <link href="/img/favicon.png" rel="icon">
     <link href="/img/apple-touch-icon.png" rel="apple-touch-icon">
-    <!-- Google Fonts -->
-    <link href="https://fonts.gstatic.com" rel="preconnect">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i" rel="stylesheet">
-    <!-- Vendor CSS Files -->
     <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
     <link href="/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
@@ -21,9 +17,7 @@
     <link href="/vendor/quill/quill.bubble.css" rel="stylesheet">
     <link href="/vendor/remixicon/remixicon.css" rel="stylesheet">
     <link href="/vendor/simple-datatables/style.css" rel="stylesheet">
-    <!-- Template Main CSS File -->
     <link href="/css/style.css" rel="stylesheet">
-    <!-- Google Maps API -->
     <script
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&libraries=places"></script>
     <style>
@@ -41,9 +35,8 @@
             <a href="/dashboard-escolar" class="logo d-flex align-items-center">
                 <img src="/img/logo.png" alt="">
             </a>
-        </div><!-- End Logo -->
-    </header><!-- End Header -->
-    <!-- ======= Sidebar ======= -->
+        </div>
+    </header>
     <aside id="sidebar" class="sidebar">
         <ul class="sidebar-nav" id="sidebar-nav">
             <li class="nav-heading">Transporte Escolar</li>
@@ -54,8 +47,7 @@
                 </a>
             </li>
         </ul>
-    </aside><!-- End Sidebar-->
-
+    </aside>
     <main id="main" class="main">
         <div class="pagetitle d-flex justify-content-between align-items-center">
             <h1>Solicitar Concessão de Rota</h1>
@@ -71,7 +63,6 @@
                 <li class="breadcrumb-item active">Solicitar Concessão de Rota</li>
             </ol>
         </nav>
-
         <section class="section">
             <div class="row">
                 <div class="col-lg-12">
@@ -97,7 +88,6 @@
                                             name="celular_responsavel" maxlength="15" required>
                                     </div>
                                 </div>
-
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label for="idMatriculaAluno" class="form-label">ID de Matrícula do
@@ -112,7 +102,6 @@
                                         </select>
                                     </div>
                                 </div>
-
                                 <div class="row">
                                     <div class="col-md-4 mb-3">
                                         <label for="cep" class="form-label">CEP</label>
@@ -133,7 +122,6 @@
                                             disabled>Buscar Coordenadas</button>
                                     </div>
                                 </div>
-
                                 <div class="row">
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label">O aluno pertence ao zoneamento da escola?</label><br>
@@ -155,28 +143,23 @@
                                             name="laudo_deficiencia" accept="image/*">
                                     </div>
                                 </div>
-
                                 <div class="mb-3">
                                     <button type="button" id="verificar-direito" class="btn btn-secondary">Verificar
-                                        Direito ao Transporte</button>
+                                        Critérios</button>
                                 </div>
-
                                 <div id="map" class="mt-3"></div>
                                 <input id="longitude" name="longitude" type="hidden">
                                 <input id="latitude" name="latitude" type="hidden">
-
                                 <div class="mb-3 d-none" id="divComprovanteEndereco">
                                     <label for="comprovanteEndereco" class="form-label">Comprovante de Endereço</label>
                                     <input type="file" class="form-control" id="comprovanteEndereco"
                                         name="comprovante_endereco" accept="image/*">
                                 </div>
-
                                 <div class="mb-3">
                                     <label for="observacoes" class="form-label">Observações</label>
                                     <textarea class="form-control" id="observacoes" name="observacoes" rows="4"
                                         placeholder="Descreva aqui qualquer situação ou necessidade específica relacionada ao transporte escolar..."></textarea>
                                 </div>
-
                                 <button type="submit" class="btn btn-primary mt-3" id="enviar-solicitacao">Enviar
                                     Solicitação</button>
                             </form>
@@ -185,7 +168,32 @@
                 </div>
             </div>
         </section>
-    </main><!-- End #main -->
+    </main>
+
+    <!-- Modals -->
+    <div class="modal fade" id="modalDireito" tabindex="-1" aria-labelledby="modalDireitoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalDireitoLabel">Critério de Direito ao Transporte</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="mensagemModal"></div>
+                    <div class="mb-3">
+                        <label for="observacoesModal" class="form-label">Observações</label>
+                        <textarea class="form-control" id="observacoesModal" name="observacoes_modal" rows="4"
+                            placeholder="Descreva aqui qualquer observação ou detalhe adicional..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" id="confirmarSolicitacao">Enviar Solicitação</button>
+                    <button type="button" class="btn btn-danger" id="encerrarSolicitacao">Encerrar Solicitação</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Vendor JS Files -->
     <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -194,7 +202,6 @@
     <script src="/vendor/simple-datatables/simple-datatables.js"></script>
     <script src="/vendor/tinymce/tinymce.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <!-- Template Main JS File -->
     <script src="/js/main.js"></script>
 
     <script>
@@ -216,7 +223,7 @@
                     strokeOpacity: 1,
                     strokeWeight: 4,
                     strokePattern: [
-                        { offset: '0', repeat: '10px' } // Define um padrão tracejado
+                        { offset: '0', repeat: '10px' }
                     ]
                 }
             });
@@ -296,6 +303,7 @@
             const latitude = document.getElementById('latitude').value;
             const longitude = document.getElementById('longitude').value;
             const escolaId = document.getElementById('escolaSelect').value;
+            const zoneamento = document.querySelector('input[name="zoneamento"]:checked').value;
             const aee = document.querySelector('input[name="deficiencia"]:checked').value;
 
             if (!latitude || !longitude || !escolaId) {
@@ -317,7 +325,7 @@
                         escolaMarker = new google.maps.Marker({
                             position: escolaLatLng,
                             map: map,
-                            icon: '/img/icones/escola-marcador.png' // Caminho do ícone personalizado
+                            icon: '/img/icones/escola-marcador.png'
                         });
                     }
 
@@ -342,11 +350,40 @@
             directionsService.route(request, function (result, status) {
                 if (status === google.maps.DirectionsStatus.OK) {
                     directionsRenderer.setDirections(result);
+
+                    // Calcular a distância e mostrar a mensagem no modal
+                    const distance = result.routes[0].legs[0].distance.value / 1000; // Distância em km
+                    let mensagem = '';
+
+                    if (distance > 2 && zoneamento === 'sim') {
+                        mensagem = 'O aluno tem direito ao transporte.';
+                    } else if (distance > 2 && zoneamento === 'nao') {
+                        mensagem = 'O aluno reside em um zoneamento não atendido pela escola. Deseja prosseguir com a solicitação?';
+                    } else if (distance <= 2 && zoneamento === 'sim' && aee === 'sim') {
+                        mensagem = 'O aluno é público AEE, mas não mora a mais de 2 km da escola. Por favor, descreva a deficiência ou síndrome do aluno.';
+                    } else {
+                        mensagem = 'O aluno não atende aos critérios para o transporte escolar.';
+                    }
+
+                    document.getElementById('mensagemModal').textContent = mensagem;
+                    $('#modalDireito').modal('show');
                 } else {
                     alert('Não foi possível calcular a rota: ' + status);
                 }
             });
         }
+
+        document.getElementById('confirmarSolicitacao').addEventListener('click', function () {
+            // Inclua aqui a lógica para enviar a solicitação
+            alert('Solicitação enviada com sucesso!');
+            $('#modalDireito').modal('hide');
+        });
+
+        document.getElementById('encerrarSolicitacao').addEventListener('click', function () {
+            // Inclua aqui a lógica para encerrar a solicitação
+            alert('Solicitação encerrada.');
+            $('#modalDireito').modal('hide');
+        });
 
         document.getElementById('solicitacao-form').addEventListener('submit', async function (event) {
             event.preventDefault();
