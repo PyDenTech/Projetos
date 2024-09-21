@@ -380,7 +380,8 @@
             });
         }
 
-        document.getElementById('confirmarSolicitacao').addEventListener('click', async function () {
+        document.getElementById('confirmarSolicitacao').addEventListener('click', async function (event) {
+            event.preventDefault();
             const observacoesModal = document.getElementById('observacoesModal').value;
 
             // Adiciona a observação do modal ao campo observações do formulário principal
@@ -389,7 +390,8 @@
             $('#modalDireito').modal('hide');
 
             // Dispara o evento de submissão do formulário principal
-            document.getElementById('solicitacao-form').requestSubmit();
+            document.getElementById('solicitacao-form').submit();
+
         });
 
         document.getElementById('encerrarSolicitacao').addEventListener('click', function () {
