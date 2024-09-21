@@ -3096,7 +3096,7 @@ app.post('/api/enviar-solicitacao', upload.fields([
 app.get('/api/escola-coordenadas', async (req, res) => {
     const { escola_id } = req.query;
     try {
-        const escola = await db.query('SELECT latitude, longitude FROM escolas WHERE id = $1', [escola_id]);
+        const escola = await pool.query('SELECT latitude, longitude FROM escolas WHERE id = $1', [escola_id]);
         if (escola.rows.length > 0) {
             res.json(escola.rows[0]);
         } else {
