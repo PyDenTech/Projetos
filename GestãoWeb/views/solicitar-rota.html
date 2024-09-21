@@ -198,13 +198,19 @@
     <script src="/js/main.js"></script>
 
     <script>
-        // Inicializa o mapa
-        let map, marker;
+        let map, marker, directionsService, directionsRenderer;
+
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
                 center: { lat: -6.530066, lng: -49.851630 },
                 zoom: 15,
                 mapTypeId: 'satellite'
+            });
+
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer({
+                map: map,
+                suppressMarkers: true
             });
 
             map.addListener('click', function (event) {
@@ -228,33 +234,29 @@
         function mostrarUpload(exibir) {
             const uploadDiv = document.getElementById('uploadLaudo');
             uploadDiv.style.display = exibir ? 'block' : 'none';
-            document.getElementById('laudoDeficiencia').required = exibir; // Define como obrigatório ou não
+            document.getElementById('laudoDeficiencia').required = exibir;
         }
 
-        // Habilita o botão "Buscar Coordenadas" apenas após o clique no botão "Buscar Endereço"
         document.getElementById('buscar-endereco').addEventListener('click', async function () {
             const cep = document.getElementById('cep').value;
-            const numero = document.getElementById('numero').value; // Obtém o número
+            const numero = document.getElementById('numero').value;
             const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
             const data = await response.json();
 
             if (data.logradouro) {
-                // Inclui o número no endereço
                 const enderecoCompleto = `${data.logradouro}, ${numero}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
                 document.getElementById('endereco').value = enderecoCompleto;
-                document.getElementById('buscar-coordenadas').disabled = false; // Habilita o botão "Buscar Coordenadas"
+                document.getElementById('buscar-coordenadas').disabled = false;
             } else {
                 alert('Endereço não encontrado para o CEP informado.');
-                document.getElementById('buscar-coordenadas').disabled = true; // Mantém desabilitado se a busca falhar
+                document.getElementById('buscar-coordenadas').disabled = true;
             }
         });
 
-        // Inicializa o formulário com o botão "Buscar Coordenadas" desativado
         document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('buscar-coordenadas').disabled = true;
         });
 
-        // Função para buscar coordenadas e exibir no mapa
         document.getElementById('buscar-coordenadas').addEventListener('click', function () {
             const endereco = document.getElementById('endereco').value;
             const geocoder = new google.maps.Geocoder();
@@ -263,7 +265,7 @@
                 if (status === 'OK') {
                     const location = results[0].geometry.location;
                     map.setCenter(location);
-                    map.setZoom(25); // Aproxima o zoom para 25
+                    map.setZoom(25);
                     placeMarker(location);
                     document.getElementById('latitude').value = location.lat();
                     document.getElementById('longitude').value = location.lng();
@@ -273,7 +275,6 @@
             });
         });
 
-        // Carrega escolas via API
         $(document).ready(function () {
             $.getJSON("/api/escolas", function (data) {
                 var select = $("#escolaSelect");
@@ -283,44 +284,55 @@
             });
         });
 
-        // Verifica o direito ao transporte
         document.getElementById('verificar-direito').addEventListener('click', async function () {
             const latitude = document.getElementById('latitude').value;
             const longitude = document.getElementById('longitude').value;
-            const escola_id = document.getElementById('escolaSelect').value;
+            const escolaId = document.getElementById('escolaSelect').value;
             const aee = document.querySelector('input[name="deficiencia"]:checked').value;
 
-            if (!latitude || !longitude || !escola_id) {
+            if (!latitude || !longitude || !escolaId) {
                 alert('Por favor, preencha todas as informações necessárias.');
                 return;
             }
 
             try {
-                const response = await fetch(`/api/verificar-direito-transporte?endereco=${document.getElementById('endereco').value}&latitude=${latitude}&longitude=${longitude}&escola_id=${escola_id}`);
+                const response = await fetch(`/api/escola-coordenadas?escola_id=${escolaId}`);
                 const data = await response.json();
 
-                if (data.direitoTransporte) {
-                    alert(data.mensagem);
+                if (data && data.latitude && data.longitude) {
+                    const escolaLatLng = { lat: parseFloat(data.latitude), lng: parseFloat(data.longitude) };
+                    calculateAndDisplayRoute(latitude, longitude, escolaLatLng);
                 } else {
-                    if (aee === 'nao') {
-                        alert('Não é possível fazer a solicitação pois a distância é inferior a 2 km.');
-                    } else {
-                        alert('A distância é inferior a 2 km, mas será solicitado uma avaliação pelo Centro Viver e Conviver para atendimento com o Transporte Escolar Especial.');
-                    }
+                    alert('Não foi possível encontrar as coordenadas da escola.');
                 }
             } catch (error) {
-                console.error('Erro ao verificar direito ao transporte:', error);
-                alert('Erro ao verificar direito ao transporte. Tente novamente mais tarde.');
+                console.error('Erro ao buscar coordenadas da escola:', error);
+                alert('Erro ao buscar coordenadas da escola. Tente novamente mais tarde.');
             }
         });
 
-        // Envia a solicitação
+        function calculateAndDisplayRoute(alunoLat, alunoLng, escolaLatLng) {
+            const alunoLatLng = new google.maps.LatLng(alunoLat, alunoLng);
+            const request = {
+                origin: alunoLatLng,
+                destination: escolaLatLng,
+                travelMode: google.maps.TravelMode.WALKING
+            };
+
+            directionsService.route(request, function (result, status) {
+                if (status === google.maps.DirectionsStatus.OK) {
+                    directionsRenderer.setDirections(result);
+                } else {
+                    alert('Não foi possível calcular a rota: ' + status);
+                }
+            });
+        }
+
         document.getElementById('solicitacao-form').addEventListener('submit', async function (event) {
             event.preventDefault();
 
             const formData = new FormData(this);
 
-            // Remove o campo comprovante_endereco se não houver arquivo selecionado
             if (!document.getElementById('comprovanteEndereco').files.length) {
                 formData.delete('comprovante_endereco');
             }
@@ -332,7 +344,7 @@
                 });
                 const data = await response.json();
 
-                if (response.ok) { // Verifica se o status HTTP foi 200-299
+                if (response.ok) {
                     alert('Solicitação enviada com sucesso!');
                     document.getElementById('solicitacao-form').reset();
                 } else {
@@ -344,7 +356,6 @@
             }
         });
 
-        // Máscara de entrada para CPF e Celular
         $('#cpfResponsavel').on('input', function () {
             let cpf = $(this).val().replace(/\D/g, '');
             if (cpf.length > 11) {
