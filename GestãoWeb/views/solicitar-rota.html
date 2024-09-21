@@ -135,6 +135,11 @@
                                         <input type="radio" id="aeeSim" name="deficiencia" value="sim" required> Sim
                                         <input type="radio" id="aeeNao" name="deficiencia" value="nao" required> Não
                                     </div>
+                                    <div class="col-md-4 mb-3" id="uploadLaudo" style="display: none;">
+                                        <label for="laudoDeficiencia" class="form-label">Upload do Documento</label>
+                                        <input type="file" class="form-control" id="laudoDeficiencia"
+                                            name="laudo_deficiencia" accept="image/*">
+                                    </div>
                                 </div>
                                 <div class="mb-3">
                                     <button type="button" id="verificar-direito" class="btn btn-secondary">Verificar
@@ -173,12 +178,6 @@
                 </div>
                 <div class="modal-body">
                     <div id="mensagemModal"></div>
-                    <div class="col-md-4 mb-3" id="uploadLaudo" style="display: none;">
-                        <label for="laudoDeficiencia" class="form-label">Upload do Documento</label>
-                        <input type="file" class="form-control" id="laudoDeficiencia" name="laudo_deficiencia"
-                            accept="image/*">
-                    </div>
-
                     <div class="mb-3">
                         <label for="observacoesModal" class="form-label">Observações</label>
                         <textarea class="form-control" id="observacoesModal" name="observacoes_modal" rows="4"
