@@ -132,15 +132,8 @@
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label">O aluno é público do AEE?</label><br>
-                                        <input type="radio" id="aeeSim" name="deficiencia" value="sim"
-                                            onclick="mostrarUpload(true)" required> Sim
-                                        <input type="radio" id="aeeNao" name="deficiencia" value="nao"
-                                            onclick="mostrarUpload(false)" required> Não
-                                    </div>
-                                    <div class="col-md-4 mb-3" id="uploadLaudo" style="display: none;">
-                                        <label for="laudoDeficiencia" class="form-label">Upload do Documento</label>
-                                        <input type="file" class="form-control" id="laudoDeficiencia"
-                                            name="laudo_deficiencia" accept="image/*">
+                                        <input type="radio" id="aeeSim" name="deficiencia" value="sim" required> Sim
+                                        <input type="radio" id="aeeNao" name="deficiencia" value="nao" required> Não
                                     </div>
                                 </div>
                                 <div class="mb-3">
@@ -244,12 +237,6 @@
                     map: map
                 });
             }
-        }
-
-        function mostrarUpload(exibir) {
-            const uploadDiv = document.getElementById('uploadLaudo');
-            uploadDiv.style.display = exibir ? 'block' : 'none';
-            document.getElementById('laudoDeficiencia').required = exibir;
         }
 
         document.getElementById('buscar-endereco').addEventListener('click', async function () {
