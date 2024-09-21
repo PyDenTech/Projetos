@@ -19,9 +19,7 @@
     <link href="/vendor/simple-datatables/style.css" rel="stylesheet">
     <link href="/css/style.css" rel="stylesheet">
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&libraries=places"
-        async defer>
-        </script>
-
+        async defer></script>
     <style>
         #map {
             height: 400px;
@@ -189,7 +187,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                    <button type="button" class="btn btn-primary" id="confirmarSolicitacao">Enviar Solicitação</button>
+                    <!-- Removido o botão de envio aqui -->
                     <button type="button" class="btn btn-danger" id="encerrarSolicitacao">Encerrar Solicitação</button>
                 </div>
             </div>
@@ -387,9 +385,6 @@
             document.getElementById('observacoes').value += "\n" + observacoesModal;
 
             $('#modalDireito').modal('hide');
-
-            // Dispara o evento de submissão do formulário principal
-            document.getElementById('solicitacao-form').requestSubmit();
         });
 
         document.getElementById('encerrarSolicitacao').addEventListener('click', function () {
