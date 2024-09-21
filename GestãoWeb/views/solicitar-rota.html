@@ -371,6 +371,7 @@
                 }
             });
         }
+
         document.getElementById('confirmarSolicitacao').addEventListener('click', async function () {
             const observacoesModal = document.getElementById('observacoesModal').value;
             const criterioDireito = document.getElementById('mensagemModal').textContent;
@@ -388,63 +389,65 @@
             $('#modalDireito').modal('hide');
 
             // Dispara o evento de submissão do formulário principal
+            document.getElementById('solicitacao-form').requestSubmit();
+        });
 
 
-            document.getElementById('encerrarSolicitacao').addEventListener('click', function () {
-                alert('Solicitação encerrada.');
-                $('#modalDireito').modal('hide');
-            });
+        document.getElementById('encerrarSolicitacao').addEventListener('click', function () {
+            alert('Solicitação encerrada.');
+            $('#modalDireito').modal('hide');
+        });
 
-            document.getElementById('solicitacao-form').addEventListener('submit', async function (event) {
-                event.preventDefault();
+        document.getElementById('solicitacao-form').addEventListener('submit', async function (event) {
+            event.preventDefault();
 
-                const formData = new FormData(this);
+            const formData = new FormData(this);
 
-                if (!document.getElementById('comprovanteEndereco').files.length) {
-                    formData.delete('comprovante_endereco');
+            if (!document.getElementById('comprovanteEndereco').files.length) {
+                formData.delete('comprovante_endereco');
+            }
+
+            try {
+                const response = await fetch('/api/enviar-solicitacao', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('Solicitação enviada com sucesso!');
+                    document.getElementById('solicitacao-form').reset();
+                } else {
+                    alert(`Erro ao enviar a solicitação: ${data.message}`);
                 }
+            } catch (error) {
+                console.error('Erro ao enviar a solicitação:', error);
+                alert('Erro ao enviar a solicitação. Tente novamente mais tarde.');
+            }
+        });
 
-                try {
-                    const response = await fetch('/api/enviar-solicitacao', {
-                        method: 'POST',
-                        body: formData
-                    });
-                    const data = await response.json();
+        $('#cpfResponsavel').on('input', function () {
+            let cpf = $(this).val().replace(/\D/g, '');
+            if (cpf.length > 11) {
+                cpf = cpf.substring(0, 11);
+            }
+            cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
+            cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
+            cpf = cpf.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+            $(this).val(cpf);
+        });
 
-                    if (response.ok) {
-                        alert('Solicitação enviada com sucesso!');
-                        document.getElementById('solicitacao-form').reset();
-                    } else {
-                        alert(`Erro ao enviar a solicitação: ${data.message}`);
-                    }
-                } catch (error) {
-                    console.error('Erro ao enviar a solicitação:', error);
-                    alert('Erro ao enviar a solicitação. Tente novamente mais tarde.');
-                }
-            });
+        $('#celularResponsavel').on('input', function () {
+            let celular = $(this).val().replace(/\D/g, '');
+            if (celular.length > 11) {
+                celular = celular.substring(0, 11);
+            }
+            celular = celular.replace(/(\d{2})(\d)/, "($1) $2");
+            celular = celular.replace(/(\d{5})(\d{1,4})$/, "$1-$2");
+            $(this).val(celular);
+        });
 
-            $('#cpfResponsavel').on('input', function () {
-                let cpf = $(this).val().replace(/\D/g, '');
-                if (cpf.length > 11) {
-                    cpf = cpf.substring(0, 11);
-                }
-                cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
-                cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
-                cpf = cpf.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-                $(this).val(cpf);
-            });
-
-            $('#celularResponsavel').on('input', function () {
-                let celular = $(this).val().replace(/\D/g, '');
-                if (celular.length > 11) {
-                    celular = celular.substring(0, 11);
-                }
-                celular = celular.replace(/(\d{2})(\d)/, "($1) $2");
-                celular = celular.replace(/(\d{5})(\d{1,4})$/, "$1-$2");
-                $(this).val(celular);
-            });
-
-            initMap();
+        initMap();
     </script>
 </body>
 
