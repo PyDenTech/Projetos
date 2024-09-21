@@ -371,74 +371,80 @@
                 }
             });
         }
-
         document.getElementById('confirmarSolicitacao').addEventListener('click', async function () {
             const observacoesModal = document.getElementById('observacoesModal').value;
+            const criterioDireito = document.getElementById('mensagemModal').textContent;
 
-            // Adiciona a observação do modal ao campo observações do formulário principal
+            // Adiciona a observação do modal e o critério de direito ao campo observações do formulário principal
             document.getElementById('observacoes').value += "\n" + observacoesModal;
+
+            // Cria um input oculto para armazenar o critério de direito
+            const inputCriterio = document.createElement('input');
+            inputCriterio.type = 'hidden';
+            inputCriterio.name = 'criterio_direito';
+            inputCriterio.value = criterioDireito;
+            document.getElementById('solicitacao-form').appendChild(inputCriterio);
 
             $('#modalDireito').modal('hide');
 
             // Dispara o evento de submissão do formulário principal
-            document.getElementById('solicitacao-form').requestSubmit();
-        });
 
-        document.getElementById('encerrarSolicitacao').addEventListener('click', function () {
-            alert('Solicitação encerrada.');
-            $('#modalDireito').modal('hide');
-        });
 
-        document.getElementById('solicitacao-form').addEventListener('submit', async function (event) {
-            event.preventDefault();
+            document.getElementById('encerrarSolicitacao').addEventListener('click', function () {
+                alert('Solicitação encerrada.');
+                $('#modalDireito').modal('hide');
+            });
 
-            const formData = new FormData(this);
+            document.getElementById('solicitacao-form').addEventListener('submit', async function (event) {
+                event.preventDefault();
 
-            if (!document.getElementById('comprovanteEndereco').files.length) {
-                formData.delete('comprovante_endereco');
-            }
+                const formData = new FormData(this);
 
-            try {
-                const response = await fetch('/api/enviar-solicitacao', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
-
-                if (response.ok) {
-                    alert('Solicitação enviada com sucesso!');
-                    document.getElementById('solicitacao-form').reset();
-                } else {
-                    alert(`Erro ao enviar a solicitação: ${data.message}`);
+                if (!document.getElementById('comprovanteEndereco').files.length) {
+                    formData.delete('comprovante_endereco');
                 }
-            } catch (error) {
-                console.error('Erro ao enviar a solicitação:', error);
-                alert('Erro ao enviar a solicitação. Tente novamente mais tarde.');
-            }
-        });
 
-        $('#cpfResponsavel').on('input', function () {
-            let cpf = $(this).val().replace(/\D/g, '');
-            if (cpf.length > 11) {
-                cpf = cpf.substring(0, 11);
-            }
-            cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
-            cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
-            cpf = cpf.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-            $(this).val(cpf);
-        });
+                try {
+                    const response = await fetch('/api/enviar-solicitacao', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const data = await response.json();
 
-        $('#celularResponsavel').on('input', function () {
-            let celular = $(this).val().replace(/\D/g, '');
-            if (celular.length > 11) {
-                celular = celular.substring(0, 11);
-            }
-            celular = celular.replace(/(\d{2})(\d)/, "($1) $2");
-            celular = celular.replace(/(\d{5})(\d{1,4})$/, "$1-$2");
-            $(this).val(celular);
-        });
+                    if (response.ok) {
+                        alert('Solicitação enviada com sucesso!');
+                        document.getElementById('solicitacao-form').reset();
+                    } else {
+                        alert(`Erro ao enviar a solicitação: ${data.message}`);
+                    }
+                } catch (error) {
+                    console.error('Erro ao enviar a solicitação:', error);
+                    alert('Erro ao enviar a solicitação. Tente novamente mais tarde.');
+                }
+            });
 
-        initMap();
+            $('#cpfResponsavel').on('input', function () {
+                let cpf = $(this).val().replace(/\D/g, '');
+                if (cpf.length > 11) {
+                    cpf = cpf.substring(0, 11);
+                }
+                cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
+                cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
+                cpf = cpf.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+                $(this).val(cpf);
+            });
+
+            $('#celularResponsavel').on('input', function () {
+                let celular = $(this).val().replace(/\D/g, '');
+                if (celular.length > 11) {
+                    celular = celular.substring(0, 11);
+                }
+                celular = celular.replace(/(\d{2})(\d)/, "($1) $2");
+                celular = celular.replace(/(\d{5})(\d{1,4})$/, "$1-$2");
+                $(this).val(celular);
+            });
+
+            initMap();
     </script>
 </body>
 

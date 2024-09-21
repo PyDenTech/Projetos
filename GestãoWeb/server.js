@@ -3052,8 +3052,9 @@ app.post('/api/enviar-solicitacao', upload.fields([
             deficiencia,
             escola_id,
             zoneamento,
-            observacoes, // Inclui o campo observacoes
-            direito_transporte = true // Padrão como verdadeiro
+            observacoes,
+            direito_transporte = true,
+            criterio_direito // Inclui o campo criterio_direito no body
         } = req.body;
 
         const comprovanteEnderecoPath = req.files['comprovante_endereco'] ? req.files['comprovante_endereco'][0].path : null;
@@ -3062,8 +3063,8 @@ app.post('/api/enviar-solicitacao', upload.fields([
         // Consulta de inserção no banco de dados
         const query = `
             INSERT INTO solicitacoes_rota 
-            (nome_responsavel, cpf_responsavel, celular_responsavel, cep, numero, endereco, latitude, longitude, id_matricula_aluno, deficiencia, escola_id, comprovante_endereco, laudo_deficiencia, zoneamento, observacoes, direito_transporte)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+            (nome_responsavel, cpf_responsavel, celular_responsavel, cep, numero, endereco, latitude, longitude, id_matricula_aluno, deficiencia, escola_id, comprovante_endereco, laudo_deficiencia, zoneamento, observacoes, direito_transporte, criterio_direito)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
             RETURNING id;
         `;
 
@@ -3082,8 +3083,9 @@ app.post('/api/enviar-solicitacao', upload.fields([
             comprovanteEnderecoPath,
             laudoDeficienciaPath,
             zoneamento,
-            observacoes || '', // Inclui observacoes no array de valores
-            direito_transporte // Adiciona o campo direito_transporte
+            observacoes || '',
+            direito_transporte,
+            criterio_direito || '' // Inclui o campo criterio_direito
         ];
 
         const result = await pool.query(query, values);
