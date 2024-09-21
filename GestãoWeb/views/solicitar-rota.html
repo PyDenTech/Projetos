@@ -18,8 +18,8 @@
     <link href="/vendor/remixicon/remixicon.css" rel="stylesheet">
     <link href="/vendor/simple-datatables/style.css" rel="stylesheet">
     <link href="/css/style.css" rel="stylesheet">
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&libraries=places">
+    </script>
     <style>
         #map {
             height: 400px;
@@ -132,8 +132,10 @@
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label">O aluno é público do AEE?</label><br>
-                                        <input type="radio" id="aeeSim" name="deficiencia" value="sim" required> Sim
-                                        <input type="radio" id="aeeNao" name="deficiencia" value="nao" required> Não
+                                        <input type="radio" id="aeeSim" name="deficiencia" value="sim"
+                                            onclick="mostrarUpload(true)" required> Sim
+                                        <input type="radio" id="aeeNao" name="deficiencia" value="nao"
+                                            onclick="mostrarUpload(false)" required> Não
                                     </div>
                                     <div class="col-md-4 mb-3" id="uploadLaudo" style="display: none;">
                                         <label for="laudoDeficiencia" class="form-label">Upload do Documento</label>
@@ -343,13 +345,6 @@
             }
         });
 
-        function mostrarUpload(exibir) {
-            const uploadDiv = document.getElementById('uploadLaudo');
-            uploadDiv.style.display = exibir ? 'block' : 'none';
-            document.getElementById('laudoDeficiencia').required = exibir;
-        }
-
-
         function calculateAndDisplayRoute(alunoLat, alunoLng, escolaLatLng, zoneamento, aee) {
             const alunoLatLng = new google.maps.LatLng(alunoLat, alunoLng);
             const request = {
@@ -378,11 +373,10 @@
                         mensagem = 'O aluno é público AEE, mas não mora a mais de 2 km da escola. Por favor, descreva a deficiência ou síndrome do aluno.';
                         mostrarUpload(true); // Exibe o campo de upload do laudo
                     } else if (distance <= 2 && zoneamento === 'nao' && aee === 'sim') {
-                        mensagem = 'O aluno é público AEE, mora a menos de 2 km da escola e não pertence ao zoneamento. Deseja prosseguir com a solicitação?';
+                        mensagem = 'O aluno é público AEE, reside em um zoneamento não atendido pela escola e mora a menos de 2 km. Por favor, descreva a deficiência ou síndrome do aluno.';
                         mostrarUpload(true); // Exibe o campo de upload do laudo
                     } else {
                         mensagem = 'O aluno não atende aos critérios para o transporte escolar.';
-                        mostrarUpload(false); // Esconde o campo de upload do laudo
                     }
 
                     document.getElementById('mensagemModal').textContent = mensagem;
@@ -392,7 +386,6 @@
                 }
             });
         }
-
 
         document.getElementById('confirmarSolicitacao').addEventListener('click', async function () {
             const observacoesModal = document.getElementById('observacoesModal').value;
@@ -413,7 +406,6 @@
             // Dispara o evento de submissão do formulário principal
             document.getElementById('solicitacao-form').requestSubmit();
         });
-
 
         document.getElementById('encerrarSolicitacao').addEventListener('click', function () {
             alert('Solicitação encerrada.');
@@ -468,6 +460,15 @@
             celular = celular.replace(/(\d{5})(\d{1,4})$/, "$1-$2");
             $(this).val(celular);
         });
+
+        function mostrarUpload(mostrar) {
+            const uploadDiv = document.getElementById('uploadLaudo');
+            if (mostrar) {
+                uploadDiv.style.display = 'block';
+            } else {
+                uploadDiv.style.display = 'none';
+            }
+        }
 
         initMap();
     </script>
