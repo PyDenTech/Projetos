@@ -18,8 +18,10 @@
     <link href="/vendor/remixicon/remixicon.css" rel="stylesheet">
     <link href="/vendor/simple-datatables/style.css" rel="stylesheet">
     <link href="/css/style.css" rel="stylesheet">
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&libraries=places"
+        async defer>
+        </script>
+
     <style>
         #map {
             height: 400px;
@@ -378,7 +380,8 @@
             });
         }
 
-        document.getElementById('confirmarSolicitacao').addEventListener('click', async function () {
+        document.getElementById('confirmarSolicitacao').addEventListener('click', async function (event) {
+            event.preventDefault();
             const observacoesModal = document.getElementById('observacoesModal').value;
 
             // Adiciona a observação do modal ao campo observações do formulário principal
@@ -387,7 +390,8 @@
             $('#modalDireito').modal('hide');
 
             // Dispara o evento de submissão do formulário principal
-            document.getElementById('solicitacao-form').requestSubmit();
+            document.getElementById('solicitacao-form').submit();
+
         });
 
         document.getElementById('encerrarSolicitacao').addEventListener('click', function () {
