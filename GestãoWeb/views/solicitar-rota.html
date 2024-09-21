@@ -312,6 +312,12 @@
                 return;
             }
 
+            // Verificar se o upload do laudo foi feito, caso o aluno seja AEE
+            if (aee.value === 'sim' && !document.getElementById('laudoDeficiencia').files.length) {
+                alert('Por favor, envie o laudo de deficiência antes de verificar os critérios.');
+                return;
+            }
+
             if (!latitude || !longitude || !escolaId) {
                 alert('Por favor, preencha todas as informações necessárias.');
                 return;
@@ -465,8 +471,10 @@
             const uploadDiv = document.getElementById('uploadLaudo');
             if (mostrar) {
                 uploadDiv.style.display = 'block';
+                document.getElementById('laudoDeficiencia').setAttribute('required', 'required'); // Torna obrigatório
             } else {
                 uploadDiv.style.display = 'none';
+                document.getElementById('laudoDeficiencia').removeAttribute('required'); // Remove a obrigatoriedade
             }
         }
 
