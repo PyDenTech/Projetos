@@ -25,6 +25,13 @@
             height: 400px;
             width: 100%;
         }
+
+        /* Estilo para o asterisco vermelho nos campos obrigatórios */
+        .required:after {
+            content: " *";
+            color: red;
+            font-size: small;
+        }
     </style>
 </head>
 
@@ -72,31 +79,33 @@
                             <form id="solicitacao-form">
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <label for="nomeResponsavel" class="form-label">Nome Completo do
+                                        <label for="nomeResponsavel" class="form-label required">Nome Completo do
                                             Responsável</label>
                                         <input type="text" class="form-control" id="nomeResponsavel"
                                             name="nome_responsavel" required>
                                     </div>
                                     <div class="col-md-3 mb-3">
-                                        <label for="cpfResponsavel" class="form-label">CPF do Responsável</label>
+                                        <label for="cpfResponsavel" class="form-label required">CPF do
+                                            Responsável</label>
                                         <input type="text" class="form-control" id="cpfResponsavel"
                                             name="cpf_responsavel" maxlength="14" required>
                                     </div>
                                     <div class="col-md-3 mb-3">
-                                        <label for="celularResponsavel" class="form-label">Celular (WhatsApp)</label>
+                                        <label for="celularResponsavel" class="form-label required">Celular
+                                            (WhatsApp)</label>
                                         <input type="text" class="form-control" id="celularResponsavel"
                                             name="celular_responsavel" maxlength="15" required>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <label for="idMatriculaAluno" class="form-label">ID de Matrícula do
+                                        <label for="idMatriculaAluno" class="form-label required">ID de Matrícula do
                                             Aluno</label>
                                         <input type="text" class="form-control" id="idMatriculaAluno"
                                             name="id_matricula_aluno" required>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <label for="escolaSelect" class="form-label">Selecione a Escola</label>
+                                        <label for="escolaSelect" class="form-label required">Selecione a Escola</label>
                                         <select class="form-select" id="escolaSelect" name="escola_id" required>
                                             <option value="">Selecione uma Escola</option>
                                         </select>
@@ -104,19 +113,19 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-4 mb-3">
-                                        <label for="cep" class="form-label">CEP</label>
+                                        <label for="cep" class="form-label required">CEP</label>
                                         <input type="text" class="form-control" id="cep" name="cep" required>
                                         <a href="https://portalcanaa.com.br/ceps/ceps-do-centro-canaa-dos-carajas/"
                                             target="_blank" class="d-block mt-2">Não sei meu CEP</a>
                                     </div>
                                     <div class="col-md-4 mb-3">
-                                        <label for="numero" class="form-label">Número</label>
+                                        <label for="numero" class="form-label required">Número</label>
                                         <input type="text" class="form-control" id="numero" name="numero" required>
                                         <button type="button" id="buscar-endereco" class="btn btn-secondary mt-2">Buscar
                                             Endereço</button>
                                     </div>
                                     <div class="col-md-4 mb-3">
-                                        <label for="endereco" class="form-label">Endereço</label>
+                                        <label for="endereco" class="form-label required">Endereço</label>
                                         <input type="text" class="form-control" id="endereco" name="endereco" readonly>
                                         <button type="button" id="buscar-coordenadas" class="btn btn-secondary mt-2"
                                             disabled>Buscar Coordenadas</button>
@@ -124,14 +133,15 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-md-4 mb-3">
-                                        <label class="form-label">O aluno pertence ao zoneamento da escola?</label><br>
+                                        <label class="form-label required">O aluno pertence ao zoneamento da
+                                            escola?</label><br>
                                         <input type="radio" id="zoneamentoSim" name="zoneamento" value="sim" required>
                                         Sim
                                         <input type="radio" id="zoneamentoNao" name="zoneamento" value="nao" required>
                                         Não
                                     </div>
                                     <div class="col-md-4 mb-3">
-                                        <label class="form-label">O aluno é público do AEE?</label><br>
+                                        <label class="form-label required">O aluno é público do AEE?</label><br>
                                         <input type="radio" id="aeeSim" name="deficiencia" value="sim" required> Sim
                                         <input type="radio" id="aeeNao" name="deficiencia" value="nao" required> Não
                                     </div>
@@ -144,14 +154,10 @@
                                 <input id="longitude" name="longitude" type="hidden">
                                 <input id="latitude" name="latitude" type="hidden">
                                 <div class="mb-3 d-none" id="divComprovanteEndereco">
-                                    <label for="comprovanteEndereco" class="form-label">Comprovante de Endereço</label>
+                                    <label for="comprovanteEndereco" class="form-label required">Comprovante de
+                                        Endereço</label>
                                     <input type="file" class="form-control" id="comprovanteEndereco"
                                         name="comprovante_endereco" accept="image/*">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="observacoes" class="form-label">Observações</label>
-                                    <textarea class="form-control" id="observacoes" name="observacoes" rows="4"
-                                        placeholder="Descreva aqui qualquer situação ou necessidade específica relacionada ao transporte escolar..."></textarea>
                                 </div>
                                 <button type="submit" class="btn btn-primary mt-3" id="enviar-solicitacao">Enviar
                                     Solicitação</button>
