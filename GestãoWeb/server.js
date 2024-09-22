@@ -3097,6 +3097,42 @@ app.post('/api/enviar-solicitacao', upload.fields([
     }
 });
 
+app.get('/api/solicitacoes', async (req, res) => {
+    try {
+        const query = `
+            SELECT 
+                id,
+                nome_responsavel,
+                cpf_responsavel,
+                cep,
+                numero,
+                endereco,
+                latitude,
+                longitude,
+                comprovante_endereco,
+                id_matricula_aluno,
+                deficiencia,
+                laudo_deficiencia,
+                escola_id,
+                data_solicitacao,
+                celular_responsavel,
+                zoneamento,
+                observacoes,
+                direito_transporte,
+                criterio_direito
+            FROM 
+                public.solicitacoes_rota
+            LIMIT 1000;
+        `;
+
+        const result = await pool.query(query);
+        res.json(result.rows); // Envia o resultado como JSON
+    } catch (error) {
+        console.error('Erro ao buscar as solicitações:', error);
+        res.status(500).json({ message: 'Erro ao buscar as solicitações.' });
+    }
+});
+
 
 app.get('/api/escola-coordenadas', async (req, res) => {
     const { escola_id } = req.query;
