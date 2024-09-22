@@ -3134,6 +3134,7 @@ app.get('/api/solicitacoes', async (req, res) => {
 });
 
 
+
 app.get('/api/escola-coordenadas', async (req, res) => {
     const { escola_id } = req.query;
     try {
