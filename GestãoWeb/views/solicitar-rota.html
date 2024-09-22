@@ -41,174 +41,128 @@
         <ul class="sidebar-nav" id="sidebar-nav">
             <li class="nav-heading">Transporte Escolar</li>
             <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#solicitar-rota">
+                <a class="nav-link" href="#">
                     <i class="bi bi-truck"></i>
                     <span>Solicitar Concessão de Rota</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#solicitacoes">
-                    <i class="bi bi-list"></i>
-                    <span>Solicitações</span>
                 </a>
             </li>
         </ul>
     </aside>
     <main id="main" class="main">
         <div class="pagetitle d-flex justify-content-between align-items-center">
-            <h1>Solicitações de Transporte</h1>
+            <h1>Solicitar Concessão de Rota</h1>
+            <div>
+                <button type="button" class="btn btn-outline-primary me-2">Carregar dados Filiação 1</button>
+                <button type="button" class="btn btn-outline-primary me-2">Carregar dados Filiação 2</button>
+                <button type="button" class="btn btn-outline-primary">Carregar dados Responsável Legal</button>
+            </div>
         </div>
         <nav>
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="/dashboard-escolar"><i class="bi bi-house"></i></a></li>
-                <li class="breadcrumb-item active">Solicitações de Transporte</li>
+                <li class="breadcrumb-item active">Solicitar Concessão de Rota</li>
             </ol>
         </nav>
         <section class="section">
             <div class="row">
                 <div class="col-lg-12">
-                    <!-- Tabs -->
-                    <div class="tab-content">
-                        <!-- Aba Solicitar Concessão de Rota -->
-                        <div class="tab-pane fade show active" id="solicitar-rota">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Formulário de Solicitação</h5>
-                                    <!-- Formulário de Solicitação -->
-                                    <form id="solicitacao-form">
-                                        <!-- Conteúdo do Formulário Anterior -->
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="nomeResponsavel" class="form-label">Nome Completo do
-                                                    Responsável</label>
-                                                <input type="text" class="form-control" id="nomeResponsavel"
-                                                    name="nome_responsavel" required>
-                                            </div>
-                                            <div class="col-md-3 mb-3">
-                                                <label for="cpfResponsavel" class="form-label">CPF do
-                                                    Responsável</label>
-                                                <input type="text" class="form-control" id="cpfResponsavel"
-                                                    name="cpf_responsavel" maxlength="14" required>
-                                            </div>
-                                            <div class="col-md-3 mb-3">
-                                                <label for="celularResponsavel" class="form-label">Celular
-                                                    (WhatsApp)</label>
-                                                <input type="text" class="form-control" id="celularResponsavel"
-                                                    name="celular_responsavel" maxlength="15" required>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="idMatriculaAluno" class="form-label">ID de Matrícula do
-                                                    Aluno</label>
-                                                <input type="text" class="form-control" id="idMatriculaAluno"
-                                                    name="id_matricula_aluno" required>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="escolaSelect" class="form-label">Selecione a Escola</label>
-                                                <select class="form-select" id="escolaSelect" name="escola_id" required>
-                                                    <option value="">Selecione uma Escola</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-4 mb-3">
-                                                <label for="cep" class="form-label">CEP</label>
-                                                <input type="text" class="form-control" id="cep" name="cep" required>
-                                                <a href="https://portalcanaa.com.br/ceps/ceps-do-centro-canaa-dos-carajas/"
-                                                    target="_blank" class="d-block mt-2">Não sei meu CEP</a>
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="numero" class="form-label">Número</label>
-                                                <input type="text" class="form-control" id="numero" name="numero"
-                                                    required>
-                                                <button type="button" id="buscar-endereco"
-                                                    class="btn btn-secondary mt-2">Buscar
-                                                    Endereço</button>
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="endereco" class="form-label">Endereço</label>
-                                                <input type="text" class="form-control" id="endereco" name="endereco"
-                                                    readonly>
-                                                <button type="button" id="buscar-coordenadas"
-                                                    class="btn btn-secondary mt-2" disabled>Buscar Coordenadas</button>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-md-4 mb-3">
-                                                <label class="form-label">O aluno pertence ao zoneamento da
-                                                    escola?</label><br>
-                                                <input type="radio" id="zoneamentoSim" name="zoneamento" value="sim"
-                                                    required>
-                                                Sim
-                                                <input type="radio" id="zoneamentoNao" name="zoneamento" value="nao"
-                                                    required>
-                                                Não
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label class="form-label">O aluno é público do AEE?</label><br>
-                                                <input type="radio" id="aeeSim" name="deficiencia" value="sim"
-                                                    onclick="mostrarUpload(true)" required> Sim
-                                                <input type="radio" id="aeeNao" name="deficiencia" value="nao"
-                                                    onclick="mostrarUpload(false)" required> Não
-                                            </div>
-                                            <div class="col-md-4 mb-3" id="uploadLaudo" style="display: none;">
-                                                <label for="laudoDeficiencia" class="form-label">Upload do
-                                                    Documento</label>
-                                                <input type="file" class="form-control" id="laudoDeficiencia"
-                                                    name="laudo_deficiencia" accept="image/*">
-                                            </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <button type="button" id="verificar-direito"
-                                                class="btn btn-secondary">Verificar
-                                                Critérios</button>
-                                        </div>
-                                        <div id="map" class="mt-3"></div>
-                                        <input id="longitude" name="longitude" type="hidden">
-                                        <input id="latitude" name="latitude" type="hidden">
-                                        <div class="mb-3 d-none" id="divComprovanteEndereco">
-                                            <label for="comprovanteEndereco" class="form-label">Comprovante de
-                                                Endereço</label>
-                                            <input type="file" class="form-control" id="comprovanteEndereco"
-                                                name="comprovante_endereco" accept="image/*">
-                                        </div>
-                                        <div class="mb-3 d-none">
-                                            <label for="observacoes" class="form-label">Observações</label>
-                                            <textarea class="form-control" id="observacoes" name="observacoes" rows="4"
-                                                placeholder="Descreva aqui qualquer situação ou necessidade específica relacionada ao transporte escolar..."></textarea>
-                                        </div>
-                                        <button type="submit" class="btn btn-primary mt-3 d-none"
-                                            id="enviar-solicitacao">Enviar
-                                            Solicitação</button>
-                                    </form>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Formulário de Solicitação</h5>
+                            <form id="solicitacao-form">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="nomeResponsavel" class="form-label">Nome Completo do
+                                            Responsável</label>
+                                        <input type="text" class="form-control" id="nomeResponsavel"
+                                            name="nome_responsavel" required>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="cpfResponsavel" class="form-label">CPF do Responsável</label>
+                                        <input type="text" class="form-control" id="cpfResponsavel"
+                                            name="cpf_responsavel" maxlength="14" required>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="celularResponsavel" class="form-label">Celular (WhatsApp)</label>
+                                        <input type="text" class="form-control" id="celularResponsavel"
+                                            name="celular_responsavel" maxlength="15" required>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-
-                        <!-- Aba Solicitações -->
-                        <div class="tab-pane fade" id="solicitacoes">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Solicitações Realizadas</h5>
-                                    <table class="table table-striped" id="tabela-solicitacoes">
-                                        <thead>
-                                            <tr>
-                                                <th>ID</th>
-                                                <th>Nome do Responsável</th>
-                                                <th>CPF</th>
-                                                <th>Escola</th>
-                                                <th>Data da Solicitação</th>
-                                                <th>Status</th>
-                                                <th>Ações</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <!-- Dados preenchidos via JavaScript -->
-                                        </tbody>
-                                    </table>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="idMatriculaAluno" class="form-label">ID de Matrícula do
+                                            Aluno</label>
+                                        <input type="text" class="form-control" id="idMatriculaAluno"
+                                            name="id_matricula_aluno" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="escolaSelect" class="form-label">Selecione a Escola</label>
+                                        <select class="form-select" id="escolaSelect" name="escola_id" required>
+                                            <option value="">Selecione uma Escola</option>
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="cep" class="form-label">CEP</label>
+                                        <input type="text" class="form-control" id="cep" name="cep" required>
+                                        <a href="https://portalcanaa.com.br/ceps/ceps-do-centro-canaa-dos-carajas/"
+                                            target="_blank" class="d-block mt-2">Não sei meu CEP</a>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="numero" class="form-label">Número</label>
+                                        <input type="text" class="form-control" id="numero" name="numero" required>
+                                        <button type="button" id="buscar-endereco" class="btn btn-secondary mt-2">Buscar
+                                            Endereço</button>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="endereco" class="form-label">Endereço</label>
+                                        <input type="text" class="form-control" id="endereco" name="endereco" readonly>
+                                        <button type="button" id="buscar-coordenadas" class="btn btn-secondary mt-2"
+                                            disabled>Buscar Coordenadas</button>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">O aluno pertence ao zoneamento da escola?</label><br>
+                                        <input type="radio" id="zoneamentoSim" name="zoneamento" value="sim" required>
+                                        Sim
+                                        <input type="radio" id="zoneamentoNao" name="zoneamento" value="nao" required>
+                                        Não
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label">O aluno é público do AEE?</label><br>
+                                        <input type="radio" id="aeeSim" name="deficiencia" value="sim"
+                                            onclick="mostrarUpload(true)" required> Sim
+                                        <input type="radio" id="aeeNao" name="deficiencia" value="nao"
+                                            onclick="mostrarUpload(false)" required> Não
+                                    </div>
+                                    <div class="col-md-4 mb-3" id="uploadLaudo" style="display: none;">
+                                        <label for="laudoDeficiencia" class="form-label">Upload do Documento</label>
+                                        <input type="file" class="form-control" id="laudoDeficiencia"
+                                            name="laudo_deficiencia" accept="image/*">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <button type="button" id="verificar-direito" class="btn btn-secondary">Verificar
+                                        Critérios</button>
+                                </div>
+                                <div id="map" class="mt-3"></div>
+                                <input id="longitude" name="longitude" type="hidden">
+                                <input id="latitude" name="latitude" type="hidden">
+                                <div class="mb-3 d-none" id="divComprovanteEndereco">
+                                    <label for="comprovanteEndereco" class="form-label">Comprovante de Endereço</label>
+                                    <input type="file" class="form-control" id="comprovanteEndereco"
+                                        name="comprovante_endereco" accept="image/*">
+                                </div>
+                                <div class="mb-3 d-none">
+                                    <label for="observacoes" class="form-label">Observações</label>
+                                    <textarea class="form-control" id="observacoes" name="observacoes" rows="4"
+                                        placeholder="Descreva aqui qualquer situação ou necessidade específica relacionada ao transporte escolar..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary mt-3 d-none" id="enviar-solicitacao">Enviar
+                                    Solicitação</button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -310,7 +264,6 @@
 
         document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('buscar-coordenadas').disabled = true;
-            carregarSolicitacoes();
         });
 
         document.getElementById('buscar-coordenadas').addEventListener('click', function () {
@@ -345,18 +298,21 @@
             const longitude = document.getElementById('longitude').value;
             const escolaId = document.getElementById('escolaSelect').value;
 
+            // Verificar se o radio button de zoneamento está selecionado corretamente
             const zoneamento = document.querySelector('input[name="zoneamento"]:checked');
             if (!zoneamento) {
                 alert('Por favor, selecione se o aluno pertence ao zoneamento da escola.');
                 return;
             }
 
+            // Verificar se o radio button de deficiência está selecionado corretamente
             const aee = document.querySelector('input[name="deficiencia"]:checked');
             if (!aee) {
                 alert('Por favor, selecione se o aluno é público do AEE.');
                 return;
             }
 
+            // Verificar se o upload do laudo foi feito, caso o aluno seja AEE
             if (aee.value === 'sim' && !document.getElementById('laudoDeficiencia').files.length) {
                 alert('Por favor, envie o laudo de deficiência antes de verificar os critérios.');
                 return;
@@ -374,6 +330,7 @@
                 if (data && data.latitude && data.longitude) {
                     const escolaLatLng = { lat: parseFloat(data.latitude), lng: parseFloat(data.longitude) };
 
+                    // Adiciona o marcador da escola no mapa com ícone personalizado
                     if (escolaMarker) {
                         escolaMarker.setPosition(escolaLatLng);
                     } else {
@@ -406,6 +363,7 @@
                 if (status === google.maps.DirectionsStatus.OK) {
                     directionsRenderer.setDirections(result);
 
+                    // Calcular a distância e mostrar a mensagem no modal
                     const distance = result.routes[0].legs[0].distance.value / 1000; // Distância em km
                     let mensagem = '';
 
@@ -413,16 +371,16 @@
                         mensagem = 'O aluno tem direito ao transporte.';
                     } else if (distance > 2 && zoneamento === 'nao' && aee === 'sim') {
                         mensagem = 'O aluno reside em um zoneamento não atendido pela escola e é público AEE. Deseja prosseguir com a solicitação?';
-                        mostrarUpload(true);
+                        mostrarUpload(true); // Exibe o campo de upload do laudo
                     } else if (distance > 2 && zoneamento === 'nao') {
                         mensagem = 'O aluno reside em um zoneamento não atendido pela escola. Deseja prosseguir com a solicitação?';
-                        mostrarUpload(false);
+                        mostrarUpload(false); // Esconde o campo de upload do laudo
                     } else if (distance <= 2 && zoneamento === 'sim' && aee === 'sim') {
                         mensagem = 'O aluno é público AEE, mas não mora a mais de 2 km da escola. Por favor, descreva a deficiência ou síndrome do aluno.';
-                        mostrarUpload(true);
+                        mostrarUpload(true); // Exibe o campo de upload do laudo
                     } else if (distance <= 2 && zoneamento === 'nao' && aee === 'sim') {
                         mensagem = 'O aluno é público AEE, reside em um zoneamento não atendido pela escola e mora a menos de 2 km. Por favor, descreva a deficiência ou síndrome do aluno.';
-                        mostrarUpload(true);
+                        mostrarUpload(true); // Exibe o campo de upload do laudo
                     } else {
                         mensagem = 'O aluno não atende aos critérios para o transporte escolar.';
                     }
@@ -439,8 +397,10 @@
             const observacoesModal = document.getElementById('observacoesModal').value;
             const criterioDireito = document.getElementById('mensagemModal').textContent;
 
+            // Adiciona a observação do modal e o critério de direito ao campo observações do formulário principal
             document.getElementById('observacoes').value += "\n" + observacoesModal;
 
+            // Cria um input oculto para armazenar o critério de direito
             const inputCriterio = document.createElement('input');
             inputCriterio.type = 'hidden';
             inputCriterio.name = 'criterio_direito';
@@ -448,6 +408,8 @@
             document.getElementById('solicitacao-form').appendChild(inputCriterio);
 
             $('#modalDireito').modal('hide');
+
+            // Dispara o evento de submissão do formulário principal
             document.getElementById('solicitacao-form').requestSubmit();
         });
 
@@ -509,39 +471,10 @@
             const uploadDiv = document.getElementById('uploadLaudo');
             if (mostrar) {
                 uploadDiv.style.display = 'block';
-                document.getElementById('laudoDeficiencia').setAttribute('required', 'required');
+                document.getElementById('laudoDeficiencia').setAttribute('required', 'required'); // Torna obrigatório
             } else {
                 uploadDiv.style.display = 'none';
-                document.getElementById('laudoDeficiencia').removeAttribute('required');
-            }
-        }
-
-        async function carregarSolicitacoes() {
-            try {
-                const response = await fetch('/api/listar-solicitacoes');
-                const solicitacoes = await response.json();
-                const tabelaSolicitacoes = document.querySelector('#tabela-solicitacoes tbody');
-
-                tabelaSolicitacoes.innerHTML = '';
-
-                solicitacoes.forEach((solicitacao) => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${solicitacao.id}</td>
-                        <td>${solicitacao.nome_responsavel}</td>
-                        <td>${solicitacao.cpf_responsavel}</td>
-                        <td>${solicitacao.escola}</td>
-                        <td>${solicitacao.data_solicitacao}</td>
-                        <td>${solicitacao.status}</td>
-                        <td>
-                            <button class="btn btn-sm btn-primary">Visualizar</button>
-                            <button class="btn btn-sm btn-danger">Excluir</button>
-                        </td>
-                    `;
-                    tabelaSolicitacoes.appendChild(tr);
-                });
-            } catch (error) {
-                console.error('Erro ao carregar as solicitações:', error);
+                document.getElementById('laudoDeficiencia').removeAttribute('required'); // Remove a obrigatoriedade
             }
         }
 
