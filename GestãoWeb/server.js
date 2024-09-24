@@ -3183,14 +3183,10 @@ app.post('/webhook', async (req, res) => {
 
     if (data.object && data.entry && data.entry[0].changes && data.entry[0].changes[0].value.messages) {
         const message = data.entry[0].changes[0].value.messages[0];
+        const senderNumber = message.from;
 
-        // Verifica se não é mensagem de grupo
-        if (message.type !== 'group') {
-            const senderNumber = message.from;
-
-            // Envia a mensagem de menu interativo
-            await sendInteractiveMenu(senderNumber);
-        }
+        // Inicia a sessão de conversa enviando o menu interativo
+        await sendInteractiveMenu(senderNumber);
     }
 
     res.sendStatus(200);
