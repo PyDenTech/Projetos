@@ -3207,8 +3207,7 @@ async function sendInteractiveMenu(to) {
                 buttons: [
                     { type: 'reply', reply: { id: 'option_1', title: 'Pais e Alunos' } }, // Menos de 20 caracteres
                     { type: 'reply', reply: { id: 'option_2', title: 'Servidores SEMED' } }, // Menos de 20 caracteres
-                    { type: 'reply', reply: { id: 'option_3', title: 'Servidores Escola' } }, // Menos de 20 caracteres
-                    { type: 'reply', reply: { id: 'option_4', title: 'Fornecedores ' } } // Menos de 20 caracteres
+                    { type: 'reply', reply: { id: 'option_3', title: 'Servidores Escola' } } // Menos de 20 caracteres
                 ]
             }
         }
