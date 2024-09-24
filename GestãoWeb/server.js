@@ -3186,11 +3186,37 @@ app.post('/webhook', async (req, res) => {
         const senderNumber = message.from;
 
         // Inicia a sessão de conversa enviando o menu interativo
+        await sendMenuTextMessage(senderNumber);
         await sendInteractiveListMessage(senderNumber);
     }
 
     res.sendStatus(200);
 });
+
+async function sendMenuTextMessage(to) {
+    const textMessage = {
+        messaging_product: 'whatsapp',
+        recipient_type: 'individual',
+        to: to,
+        type: 'text',
+        text: {
+            body: '🚍 Bem-vindo ao Sistema de Autoatendimento do Setor de Transporte Municipal! 🚍\n\nAqui você encontra as opções de serviço para facilitar o seu atendimento. \n\nPor favor, selecione o número correspondente à sua opção:\n\n1️⃣ - 👨‍👩‍👧‍👦 Pais Responsáveis e Alunos\n2️⃣ - 👩‍🏫 Servidores SEMED\n3️⃣ - 🏫 Servidores Escola\n4️⃣ - 📦 Fornecedores\n5️⃣ - 🚌 Motoristas\n\n❌ 6 - Encerrar Atendimento'
+        }
+    };
+
+    try {
+        const response = await axios.post(
+            `${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`,
+            textMessage,
+            { headers: { Authorization: `Bearer ${ACCESS_TOKEN}` } }
+        );
+
+        console.log('Mensagem de texto enviada:', response.data);
+    } catch (error) {
+        console.error('Erro ao enviar mensagem de texto:', error.response ? error.response.data : error.message);
+    }
+}
+
 
 async function sendInteractiveListMessage(to) {
     const listMessage = {
