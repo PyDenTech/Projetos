@@ -3186,37 +3186,11 @@ app.post('/webhook', async (req, res) => {
         const senderNumber = message.from;
 
         // Inicia a sessão de conversa enviando o menu interativo
-        await sendMenuTextMessage(senderNumber);
         await sendInteractiveListMessage(senderNumber);
     }
 
     res.sendStatus(200);
 });
-
-async function sendMenuTextMessage(to) {
-    const textMessage = {
-        messaging_product: 'whatsapp',
-        recipient_type: 'individual',
-        to: to,
-        type: 'text',
-        text: {
-            body: '🚍 Bem-vindo ao Sistema de Autoatendimento do Setor de Transporte Municipal! 🚍\n\nAqui você encontra as opções de serviço para facilitar o seu atendimento. \n\nPor favor, selecione o número correspondente à sua opção:\n\n1️⃣ - 👨‍👩‍👧‍👦 Pais Responsáveis e Alunos\n2️⃣ - 👩‍🏫 Servidores SEMED\n3️⃣ - 🏫 Servidores Escola\n4️⃣ - 📦 Fornecedores\n5️⃣ - 🚌 Motoristas\n\n❌ 6 - Encerrar Atendimento'
-        }
-    };
-
-    try {
-        const response = await axios.post(
-            `${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`,
-            textMessage,
-            { headers: { Authorization: `Bearer ${ACCESS_TOKEN}` } }
-        );
-
-        console.log('Mensagem de texto enviada:', response.data);
-    } catch (error) {
-        console.error('Erro ao enviar mensagem de texto:', error.response ? error.response.data : error.message);
-    }
-}
-
 
 async function sendInteractiveListMessage(to) {
     const listMessage = {
@@ -3227,50 +3201,50 @@ async function sendInteractiveListMessage(to) {
         interactive: {
             type: 'list',
             header: {
-                type: 'text',
-                text: 'Escolha uma Opção'
+                type: 'text', // Tipo de cabeçalho: 'text' ou 'none'
+                text: '🚍 Bem-vindo ao Sistema de Autoatendimento! 🚍' // Cabeçalho da mensagem
             },
             body: {
-                text: 'Selecione uma opção abaixo para continuar:'
+                text: 'Aqui você encontra as opções de serviço para facilitar o seu atendimento.\n\nPor favor, selecione uma das opções abaixo para continuar:'
             },
             footer: {
                 text: 'Atendimento Automatizado'
             },
             action: {
-                button: 'Ver Opções',
+                button: 'Ver Opções', // Texto do botão que abre a lista
                 sections: [
                     {
                         title: 'Opções de Atendimento',
                         rows: [
                             {
                                 id: 'option_1',
-                                title: 'Pais e Alunos',
-                                description: '👨‍👩‍👧‍👦'
+                                title: '1️⃣ Pais e Alunos',
+                                description: '👨‍👩‍👧‍👦 Informações para Pais e Alunos'
                             },
                             {
                                 id: 'option_2',
-                                title: 'Servidores SEMED',
-                                description: '👩‍🏫'
+                                title: '2️⃣ Servidores SEMED',
+                                description: '👩‍🏫 Informações para Servidores SEMED'
                             },
                             {
                                 id: 'option_3',
-                                title: 'Servidores Escola',
-                                description: '🏫'
+                                title: '3️⃣ Servidores Escola',
+                                description: '🏫 Informações para Servidores da Escola'
                             },
                             {
                                 id: 'option_4',
-                                title: 'Fornecedores',
-                                description: '📦'
+                                title: '4️⃣ Fornecedores',
+                                description: '📦 Informações para Fornecedores'
                             },
                             {
                                 id: 'option_5',
-                                title: 'Motoristas',
-                                description: '🚌'
+                                title: '5️⃣ Motoristas',
+                                description: '🚌 Informações para Motoristas'
                             },
                             {
                                 id: 'option_6',
-                                title: 'Encerrar Atendimento',
-                                description: '❌'
+                                title: '6️⃣ Encerrar Atendimento',
+                                description: '❌ Finalizar o atendimento'
                             }
                         ]
                     }
@@ -3291,6 +3265,22 @@ async function sendInteractiveListMessage(to) {
         console.error('Erro ao enviar mensagem de lista:', error.response ? error.response.data : error.message);
     }
 }
+
+// Função para lidar com o webhook e enviar a mensagem interativa
+app.post('/webhook', async (req, res) => {
+    const data = req.body;
+
+    if (data.object && data.entry && data.entry[0].changes && data.entry[0].changes[0].value.messages) {
+        const message = data.entry[0].changes[0].value.messages[0];
+        const senderNumber = message.from;
+
+        // Envia a mensagem interativa com lista e texto no corpo
+        await sendInteractiveListMessage(senderNumber);
+    }
+
+    res.sendStatus(200);
+});
+
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
