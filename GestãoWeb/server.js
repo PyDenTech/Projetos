@@ -3168,13 +3168,14 @@ app.get('/webhook', (req, res) => {
     const challenge = req.query['hub.challenge'];
 
     // Verificar se o token corresponde
-    if (mode === 'subscribe' && token === 'DeD-140619') {
+    if (mode === 'subscribe' && token === 'DeD-140619') {  // Certifique-se de que o token corresponde exatamente
         console.log('Webhook verificado com sucesso!');
-        res.status(200).send(challenge);
+        res.status(200).send(challenge);  // Responde com o 'challenge' para validação
     } else {
-        res.sendStatus(403); // Token incorreto
+        res.sendStatus(403);  // Token incorreto
     }
 });
+
 
 // Rota para lidar com mensagens recebidas
 app.post('/webhook', async (req, res) => {
