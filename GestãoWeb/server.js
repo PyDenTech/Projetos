@@ -3201,35 +3201,50 @@ async function sendInteractiveListMessage(to) {
         interactive: {
             type: 'list',
             header: {
-                type: 'text', // Tipo do cabeçalho
-                text: 'Escolha uma Opção' // Texto do cabeçalho
+                type: 'text',
+                text: 'Escolha uma Opção'
             },
             body: {
-                text: 'Por favor, selecione a opção desejada:'
+                text: 'Selecione uma opção abaixo para continuar:'
             },
             footer: {
-                text: 'Atendimento Automatizado' // Opcional
+                text: 'Atendimento Automatizado'
             },
             action: {
-                button: 'Opções', // Texto do botão que abre a lista
+                button: 'Ver Opções',
                 sections: [
                     {
-                        title: 'Opções de Atendimento', // Título da seção
+                        title: 'Opções de Atendimento',
                         rows: [
                             {
                                 id: 'option_1',
                                 title: 'Pais e Alunos',
-                                description: 'Informações para Pais e Alunos'
+                                description: '👨‍👩‍👧‍👦'
                             },
                             {
                                 id: 'option_2',
                                 title: 'Servidores SEMED',
-                                description: 'Informações para Servidores SEMED'
+                                description: '👩‍🏫'
                             },
                             {
                                 id: 'option_3',
                                 title: 'Servidores Escola',
-                                description: 'Informações para Servidores da Escola'
+                                description: '🏫'
+                            },
+                            {
+                                id: 'option_4',
+                                title: 'Fornecedores',
+                                description: '📦'
+                            },
+                            {
+                                id: 'option_5',
+                                title: 'Motoristas',
+                                description: '🚌'
+                            },
+                            {
+                                id: 'option_6',
+                                title: 'Encerrar Atendimento',
+                                description: '❌'
                             }
                         ]
                     }
