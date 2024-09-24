@@ -3192,7 +3192,6 @@ app.post('/webhook', async (req, res) => {
     res.sendStatus(200);
 });
 
-// Função para enviar menu interativo
 async function sendInteractiveMenu(to) {
     const menuMessage = {
         messaging_product: 'whatsapp',
@@ -3208,10 +3207,7 @@ async function sendInteractiveMenu(to) {
                 buttons: [
                     { type: 'reply', reply: { id: 'option_1', title: '1️⃣ Pais Responsáveis e Alunos' } },
                     { type: 'reply', reply: { id: 'option_2', title: '2️⃣ Servidores SEMED' } },
-                    { type: 'reply', reply: { id: 'option_3', title: '3️⃣ Servidores Escola' } },
-                    { type: 'reply', reply: { id: 'option_4', title: '4️⃣ Fornecedores' } },
-                    { type: 'reply', reply: { id: 'option_5', title: '5️⃣ Motoristas' } },
-                    { type: 'reply', reply: { id: 'option_6', title: '❌ Encerrar Atendimento' } },
+                    { type: 'reply', reply: { id: 'option_3', title: '3️⃣ Servidores Escola' } }
                 ]
             }
         }
@@ -3229,6 +3225,7 @@ async function sendInteractiveMenu(to) {
         console.error('Erro ao enviar mensagem:', error.response ? error.response.data : error.message);
     }
 }
+
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
 });
