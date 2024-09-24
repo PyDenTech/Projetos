@@ -3186,28 +3186,53 @@ app.post('/webhook', async (req, res) => {
         const senderNumber = message.from;
 
         // Inicia a sessão de conversa enviando o menu interativo
-        await sendInteractiveMenu(senderNumber);
+        await sendInteractiveListMessage(senderNumber);
     }
 
     res.sendStatus(200);
 });
 
-async function sendInteractiveMenu(to) {
-    const menuMessage = {
+async function sendInteractiveListMessage(to) {
+    const listMessage = {
         messaging_product: 'whatsapp',
         recipient_type: 'individual',
         to: to,
         type: 'interactive',
         interactive: {
-            type: 'button',
+            type: 'list',
+            header: {
+                type: 'text', // Tipo do cabeçalho
+                text: 'Escolha uma Opção' // Texto do cabeçalho
+            },
             body: {
-                text: '🚍 Bem-vindo ao Sistema de Autoatendimento do Setor de Transporte Municipal! 🚍\n\nAqui você encontra as opções de serviço para facilitar o seu atendimento.\n\nPor favor, selecione o número correspondente à sua opção:'
+                text: 'Por favor, selecione a opção desejada:'
+            },
+            footer: {
+                text: 'Atendimento Automatizado' // Opcional
             },
             action: {
-                buttons: [
-                    { type: 'reply', reply: { id: 'option_1', title: 'Pais e Alunos' } }, // Menos de 20 caracteres
-                    { type: 'reply', reply: { id: 'option_2', title: 'Servidores SEMED' } }, // Menos de 20 caracteres
-                    { type: 'reply', reply: { id: 'option_3', title: 'Servidores Escola' } } // Menos de 20 caracteres
+                button: 'Opções', // Texto do botão que abre a lista
+                sections: [
+                    {
+                        title: 'Opções de Atendimento', // Título da seção
+                        rows: [
+                            {
+                                id: 'option_1',
+                                title: 'Pais e Alunos',
+                                description: 'Informações para Pais e Alunos'
+                            },
+                            {
+                                id: 'option_2',
+                                title: 'Servidores SEMED',
+                                description: 'Informações para Servidores SEMED'
+                            },
+                            {
+                                id: 'option_3',
+                                title: 'Servidores Escola',
+                                description: 'Informações para Servidores da Escola'
+                            }
+                        ]
+                    }
                 ]
             }
         }
@@ -3216,13 +3241,13 @@ async function sendInteractiveMenu(to) {
     try {
         const response = await axios.post(
             `${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`,
-            menuMessage,
+            listMessage,
             { headers: { Authorization: `Bearer ${ACCESS_TOKEN}` } }
         );
 
-        console.log('Mensagem enviada:', response.data);
+        console.log('Mensagem de lista enviada:', response.data);
     } catch (error) {
-        console.error('Erro ao enviar mensagem:', error.response ? error.response.data : error.message);
+        console.error('Erro ao enviar mensagem de lista:', error.response ? error.response.data : error.message);
     }
 }
 
