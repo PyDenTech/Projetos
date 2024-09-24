@@ -3205,9 +3205,9 @@ async function sendInteractiveMenu(to) {
             },
             action: {
                 buttons: [
-                    { type: 'reply', reply: { id: 'option_1', title: '1️⃣ Pais Responsáveis e Alunos' } },
-                    { type: 'reply', reply: { id: 'option_2', title: '2️⃣ Servidores SEMED' } },
-                    { type: 'reply', reply: { id: 'option_3', title: '3️⃣ Servidores Escola' } }
+                    { type: 'reply', reply: { id: 'option_1', title: 'Pais e Alunos' } }, // Menos de 20 caracteres
+                    { type: 'reply', reply: { id: 'option_2', title: 'Servidores SEMED' } }, // Menos de 20 caracteres
+                    { type: 'reply', reply: { id: 'option_3', title: 'Servidores Escola' } } // Menos de 20 caracteres
                 ]
             }
         }
