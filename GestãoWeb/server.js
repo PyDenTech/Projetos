@@ -26,11 +26,6 @@ app.use(session({
 
 console.log('DATABASE_URL:', process.env.DATABASE_URL);
 
-const ACCESS_TOKEN = 'EAAEwLRVWeeYBO1EWUZBuBA4IXdxmI3XYKgbFDzdeVvM3cZBSmpo7yFU5rrO3Vikn3oo3fGhR9RZCsUaJIBQmB9aevvZBvFo1AUGNbbRA0lEOjCY0w8il0M5JgUs1sxmGvxyxwiyl7XmmAUCF1FoZCPajjJNkXMZAOlVBlPw97aVhRFLtYQI06YavVZCRJyXzgZCgTDyduyeVDB4unw7MNOBZCzyZBmSGTjNUmVL2zBmsNF2n7h7ltGOawZD';
-const PHONE_NUMBER_ID = '447260911797954';
-const WHATSAPP_API_URL = 'https://graph.facebook.com/v20.0';
-
-
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -3160,25 +3155,14 @@ app.post('/atualizar_status', async (req, res) => {
 // ===================== BOT DE AUTOATENDIMENTO ====================
 // ================================================================
 
-// Rota para verificar o webhook
-app.get('/webhook', (req, res) => {
-    const mode = req.query['hub.mode'];
-    const token = req.query['hub.verify_token'];
-    const challenge = req.query['hub.challenge'];
+const ACCESS_TOKEN = 'EAAUjWN47iroBO0SMKeV0Nt8FI9XT1fIvM0CgYoGq2asPD7eTok1F1A8kaOJutrAZBAzaTCxZBObRZBly2ZB26Tg7nOZAeD5n1ze5oHwzC0oB0eANgibK45CWEBbgiOoT3LV8XKUoBjxBSD1HfMOPEDlipM9X9xgMqlPaT5ZCNmRi8BAe9p7ZANiOZAiASfyJq5dGOKDn20DZBtQMZAbvl5bpPRV3baPpptPcFqSDU1';
+const PHONE_NUMBER_ID = '447260911797954';
+const WHATSAPP_API_URL = 'https://graph.facebook.com/v20.0';
 
-    // Verificar se o token corresponde
-    if (mode === 'subscribe' && token === 'YOUR_VERIFY_TOKEN') {
-        console.log('Webhook verificado com sucesso!');
-        res.status(200).send(challenge);
-    } else {
-        res.sendStatus(403); // Token incorreto
-    }
-});
-
-// Rota para lidar com mensagens recebidas
 app.post('/webhook', async (req, res) => {
     const data = req.body;
 
+    // Verifica se é uma mensagem
     if (data.object && data.entry && data.entry[0].changes && data.entry[0].changes[0].value.messages) {
         const message = data.entry[0].changes[0].value.messages[0];
 
