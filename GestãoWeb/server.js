@@ -26,8 +26,8 @@ app.use(session({
 
 console.log('DATABASE_URL:', process.env.DATABASE_URL);
 
-const ACCESS_TOKEN = 'EAAEwLRVWeeYBO24B5wVdOj6RDFohBllmrRcglHFp1RnVE0Qb0WXx2OBKm1JFPZAMtoRlMmTAmPyYE5B41zN7ceInt6Qa1CGSMZATsbTKp7JZANdrgpYXOZBQtPttFChPc2GWNZBVIq1r0oUPuSgZABN5Ro6hHo1O6cixZBOpLuktCRSIeZAHFhLSv5cpbsuQO7TqXZB5OfnyeaZAJ60eZB6uDDzpQHCdcjl1YQazAMMocZBmDE1ZCsGacZCUQZD';
-const PHONE_NUMBER_ID = '367092649831930';
+const ACCESS_TOKEN = process.env.ACCESS_TOKEN;
+const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 const WHATSAPP_API_URL = 'https://graph.facebook.com/v20.0';
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -3159,23 +3159,19 @@ app.post('/atualizar_status', async (req, res) => {
 // ===================== BOT DE AUTOATENDIMENTO ====================
 // ================================================================
 
-
-
 // Rota para verificar o webhook
 app.get('/webhook', (req, res) => {
     const mode = req.query['hub.mode'];
     const token = req.query['hub.verify_token'];
     const challenge = req.query['hub.challenge'];
 
-    // Verificar se o token corresponde
-    if (mode === 'subscribe' && token === 'DeD-140619') {  // Certifique-se de que o token corresponde exatamente
+    if (mode === 'subscribe' && token === process.env.VERIFY_TOKEN) {
         console.log('Webhook verificado com sucesso!');
-        res.status(200).send(challenge);  // Responde com o 'challenge' para validação
+        res.status(200).send(challenge); // Responde com o 'challenge' para validação
     } else {
-        res.sendStatus(403);  // Token incorreto
+        res.sendStatus(403); // Token incorreto
     }
 });
-
 
 // Rota para lidar com mensagens recebidas
 app.post('/webhook', async (req, res) => {
@@ -3185,13 +3181,42 @@ app.post('/webhook', async (req, res) => {
         const message = data.entry[0].changes[0].value.messages[0];
         const senderNumber = message.from;
 
-        // Inicia a sessão de conversa enviando o menu interativo
-        await sendInteractiveListMessage(senderNumber);
+        if (message.interactive && message.interactive.list_reply) {
+            const selectedOption = message.interactive.list_reply.id;
+
+            // Chama a função com base na opção selecionada
+            switch (selectedOption) {
+                case 'option_1':
+                    await sendParentsStudentsMenu(senderNumber);
+                    break;
+                case 'option_2':
+                    await sendTextMessage(senderNumber, 'Informações para Servidores SEMED...');
+                    break;
+                case 'option_3':
+                    await sendTextMessage(senderNumber, 'Informações para Servidores da Escola...');
+                    break;
+                case 'option_4':
+                    await sendTextMessage(senderNumber, 'Informações para Fornecedores...');
+                    break;
+                case 'option_5':
+                    await sendTextMessage(senderNumber, 'Informações para Motoristas...');
+                    break;
+                case 'option_6':
+                    await sendTextMessage(senderNumber, 'Atendimento encerrado. Se precisar de mais ajuda, envie uma mensagem a qualquer momento.');
+                    break;
+                default:
+                    await sendInteractiveListMessage(senderNumber); // Envia o menu principal caso não haja opção válida
+            }
+        } else {
+            // Se não for uma resposta interativa, envia o menu principal
+            await sendInteractiveListMessage(senderNumber);
+        }
     }
 
     res.sendStatus(200);
 });
 
+// Função para enviar o menu interativo principal
 async function sendInteractiveListMessage(to) {
     const listMessage = {
         messaging_product: 'whatsapp',
@@ -3201,8 +3226,8 @@ async function sendInteractiveListMessage(to) {
         interactive: {
             type: 'list',
             header: {
-                type: 'text', // Tipo de cabeçalho: 'text' ou 'none'
-                text: '🚍 Bem-vindo ao Sistema de Autoatendimento! 🚍' // Cabeçalho da mensagem
+                type: 'text',
+                text: '🚍 Bem-vindo ao Sistema de Autoatendimento! 🚍'
             },
             body: {
                 text: 'Aqui você encontra as opções de serviço para facilitar o seu atendimento.\n\nPor favor, selecione uma das opções abaixo para continuar:'
@@ -3211,14 +3236,14 @@ async function sendInteractiveListMessage(to) {
                 text: 'Atendimento Automatizado'
             },
             action: {
-                button: 'Ver Opções', // Texto do botão que abre a lista
+                button: 'Ver Opções',
                 sections: [
                     {
                         title: 'Opções de Atendimento',
                         rows: [
                             {
                                 id: 'option_1',
-                                title: '1️⃣ Pais e Alunos',
+                                title: '1️⃣ Pais, Responsáveis e Alunos',
                                 description: '👨‍👩‍👧‍👦 Informações para Pais e Alunos'
                             },
                             {
@@ -3266,21 +3291,103 @@ async function sendInteractiveListMessage(to) {
     }
 }
 
-// Função para lidar com o webhook e enviar a mensagem interativa
-app.post('/webhook', async (req, res) => {
-    const data = req.body;
+// Função para enviar o submenu específico para Pais e Alunos
+async function sendParentsStudentsMenu(to) {
+    const submenuMessage = {
+        messaging_product: 'whatsapp',
+        recipient_type: 'individual',
+        to: to,
+        type: 'interactive',
+        interactive: {
+            type: 'list',
+            header: {
+                type: 'text',
+                text: '🚍 Você selecionou a opção Pais Responsáveis e Alunos.'
+            },
+            body: {
+                text: 'Por favor, selecione o número correspondente à sua necessidade:'
+            },
+            footer: {
+                text: 'Como podemos ajudar?'
+            },
+            action: {
+                button: 'Ver Opções',
+                sections: [
+                    {
+                        title: 'Necessidades',
+                        rows: [
+                            {
+                                id: 'check_stop',
+                                title: '1️⃣ Consultar Ponto de Parada',
+                                description: '📍 Encontrar o ponto de parada mais próximo'
+                            },
+                            {
+                                id: 'request_route',
+                                title: '2️⃣ Solicitar Concessão de Rota',
+                                description: '🛣️ Solicitar uma nova rota ou ajuste de rota'
+                            },
+                            {
+                                id: 'transport_questions',
+                                title: '3️⃣ Dúvidas sobre Transporte',
+                                description: '❓ Perguntas frequentes sobre transporte escolar'
+                            },
+                            {
+                                id: 'feedback',
+                                title: '4️⃣ Fazer Reclamação, Elogio ou Sugestão',
+                                description: '📝 Enviar feedback'
+                            },
+                            {
+                                id: 'speak_to_agent',
+                                title: '5️⃣ Falar com Atendente',
+                                description: '📞 Conversar com um atendente humano'
+                            },
+                            {
+                                id: 'end_service',
+                                title: '6️⃣ Encerrar Atendimento',
+                                description: '❌ Finalizar o atendimento'
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    };
 
-    if (data.object && data.entry && data.entry[0].changes && data.entry[0].changes[0].value.messages) {
-        const message = data.entry[0].changes[0].value.messages[0];
-        const senderNumber = message.from;
+    try {
+        const response = await axios.post(
+            `${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`,
+            submenuMessage,
+            { headers: { Authorization: `Bearer ${ACCESS_TOKEN}` } }
+        );
 
-        // Envia a mensagem interativa com lista e texto no corpo
-        await sendInteractiveListMessage(senderNumber);
+        console.log('Submenu Pais e Alunos enviado:', response.data);
+    } catch (error) {
+        console.error('Erro ao enviar submenu Pais e Alunos:', error.response ? error.response.data : error.message);
     }
+}
 
-    res.sendStatus(200);
-});
+// Função genérica para enviar mensagem de texto
+async function sendTextMessage(to, text) {
+    const message = {
+        messaging_product: 'whatsapp',
+        recipient_type: 'individual',
+        to: to,
+        type: 'text',
+        text: { body: text }
+    };
 
+    try {
+        const response = await axios.post(
+            `${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`,
+            message,
+            { headers: { Authorization: `Bearer ${ACCESS_TOKEN}` } }
+        );
+
+        console.log('Mensagem enviada:', response.data);
+    } catch (error) {
+        console.error('Erro ao enviar mensagem:', error.response ? error.response.data : error.message);
+    }
+}
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
