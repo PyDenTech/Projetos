@@ -1732,6 +1732,19 @@ app.post('/api/zoneamentos', async (req, res) => {
     }
 });
 
+app.post('/api/pontos_parada', async (req, res) => {
+    const { nome, endereco, lat, lng, zoneamento_id } = req.body;
+    try {
+        await pool.query(
+            'INSERT INTO pontos_parada (nome, endereco, lat, lng, zoneamento_id) VALUES ($1, $2, $3, $4, $5)',
+            [nome, endereco, lat, lng, zoneamento_id]
+        );
+        res.status(200).send('Ponto de parada salvo com sucesso');
+    } catch (error) {
+        console.error('Erro ao salvar ponto de parada:', error);
+        res.status(500).send('Erro ao salvar ponto de parada');
+    }
+});
 
 // Rota para obter todos os zoneamentos
 app.get('/api/zoneamentos', async (req, res) => {

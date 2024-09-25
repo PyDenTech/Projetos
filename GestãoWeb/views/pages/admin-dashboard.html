@@ -119,14 +119,37 @@
                         </form>
                         <div id="map" class="mt-4" style="height: 500px;"></div>
                     </div>
-                </div>
-                <div class="tab-pane fade" id="relatorios" role="tabpanel" aria-labelledby="relatorios-tab">
-                    <h3>Relatórios</h3>
-                    <p>Conteúdo da aba de Relatórios.</p>
-                </div>
-                <div class="tab-pane fade" id="graficos" role="tabpanel" aria-labelledby="graficos-tab">
-                    <h3>Gráficos</h3>
-                    <p>Conteúdo da aba de Gráficos.</p>
+                    <hr>
+                    <h3>Cadastro de Pontos de Parada</h3>
+                    <div class="container mt-5">
+                        <form id="ponto-parada-form">
+                            <div class="form-group">
+                                <label for="zoneamento-select">Selecionar Zoneamento</label>
+                                <select id="zoneamento-select" class="form-control" required>
+                                    <!-- Opções carregadas dinamicamente -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="nome-ponto">Nome do Ponto de Parada</label>
+                                <input type="text" id="nome-ponto" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="endereco-ponto">Endereço do Ponto de Parada</label>
+                                <input type="text" id="endereco-ponto" class="form-control" required>
+                            </div>
+                            <button type="button" id="geocode-button" class="btn btn-secondary mb-2">Obter
+                                Coordenadas</button>
+                            <div class="form-group">
+                                <label for="lat-ponto">Latitude</label>
+                                <input type="text" id="lat-ponto" class="form-control" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="lng-ponto">Longitude</label>
+                                <input type="text" id="lng-ponto" class="form-control" readonly>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Salvar Ponto de Parada</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -142,9 +165,11 @@
         const zoneamentoForm = document.getElementById('zoneamento-form');
         const zoneamentosList = document.getElementById('zoneamentos-list');
         const addZoneamentoBtn = document.getElementById('add-zoneamento');
-        let infoWindow = new google.maps.InfoWindow({
-            disableAutoPan: true // Impede o infowindow de reposicionar o mapa automaticamente
-        });
+        const pontoParadaForm = document.getElementById('ponto-parada-form');
+        const zoneamentoSelect = document.getElementById('zoneamento-select');
+        const geocodeButton = document.getElementById('geocode-button');
+        const latPonto = document.getElementById('lat-ponto');
+        const lngPonto = document.getElementById('lng-ponto');
 
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
@@ -153,6 +178,7 @@
                 mapTypeId: 'terrain'
             });
 
+            // Inicializa o gerenciador de desenho para desenhar polígonos de zoneamento
             drawingManager = new google.maps.drawing.DrawingManager({
                 drawingMode: google.maps.drawing.OverlayType.POLYGON,
                 drawingControl: true,
@@ -185,144 +211,95 @@
             });
 
             zoneamentoForm.addEventListener('submit', saveAllZoneamentos);
+            pontoParadaForm.addEventListener('submit', savePontoParada);
+            geocodeButton.addEventListener('click', geocodeAddress);
 
-            // Carrega zoneamentos existentes
+            // Carrega zoneamentos existentes e pontos de parada
             loadExistingZoneamentos();
+            loadZoneamentosForPontosParada();
         }
 
-        function loadExistingZoneamentos() {
+        function loadZoneamentosForPontosParada() {
             fetch('/api/zoneamentos')
                 .then(response => response.json())
                 .then(data => {
+                    zoneamentoSelect.innerHTML = '<option value="">Selecione um Zoneamento</option>';
                     data.forEach(zoneamento => {
-                        const coordinates = zoneamento.coordenadas.map(coord => new google.maps.LatLng(coord.lat, coord.lng));
-                        const polygon = new google.maps.Polygon({
-                            paths: coordinates,
-                            strokeColor: zoneamento.cor,
-                            fillColor: zoneamento.cor,
-                            editable: false,
-                            fillOpacity: 0.35,
-                            map: map
-                        });
-                        shapes.push(polygon);
-
-                        // Evento de hover para exibir o nome
-                        google.maps.event.addListener(polygon, 'mouseover', function (event) {
-                            const content = `
-                                <div class="info-window">
-                                    <div class="info-window-content" style="color: ${zoneamento.cor};">
-                                        ${zoneamento.nome}
-                                    </div>
-                                </div>`;
-                            infoWindow.setContent(content);
-                            infoWindow.setPosition(event.latLng);
-                            infoWindow.open(map);
-                            polygon.setOptions({ strokeWeight: 3 }); // Aumenta a espessura da borda no hover
-                        });
-
-                        // Evento para esconder o nome quando o mouse sai de cima
-                        google.maps.event.addListener(polygon, 'mouseout', function () {
-                            infoWindow.close();
-                            polygon.setOptions({ strokeWeight: 1 }); // Reduz a espessura da borda quando o mouse sai
-                        });
+                        const option = document.createElement('option');
+                        option.value = zoneamento.id;
+                        option.textContent = zoneamento.nome;
+                        zoneamentoSelect.appendChild(option);
                     });
                 })
                 .catch(error => console.error('Erro ao carregar zoneamentos:', error));
         }
 
-        function setSelection(shape) {
-            if (selectedShape) {
-                selectedShape.setEditable(false);
-            }
-            selectedShape = shape;
-            selectedShape.setEditable(true);
-
-            const index = zoneamentos.findIndex(z => z.shape === null);
-            if (index !== -1) {
-                zoneamentos[index].shape = shape;
-            }
-        }
-
-        function addZoneamentoFields() {
-            const index = zoneamentos.length;
-            const zoneamentoDiv = document.createElement('div');
-            zoneamentoDiv.className = 'zoneamento-item mb-3';
-            zoneamentoDiv.innerHTML = `
-                <div class="form-group">
-                    <label for="zoneamento-name-${index}">Nome do Zoneamento</label>
-                    <input type="text" class="form-control zoneamento-name" id="zoneamento-name-${index}" required>
-                </div>
-                <div class="form-group">
-                    <label for="color-picker-${index}">Escolha a Cor</label>
-                    <input type="color" class="form-control color-picker" id="color-picker-${index}" value="#ff0000">
-                </div>
-            `;
-            zoneamentosList.appendChild(zoneamentoDiv);
-
-            const colorPicker = document.getElementById(`color-picker-${index}`);
-            colorPicker.addEventListener('input', function () {
-                if (zoneamentos[index].shape) {
-                    zoneamentos[index].shape.setOptions({
-                        strokeColor: colorPicker.value,
-                        fillColor: colorPicker.value
-                    });
-                }
-            });
-
-            zoneamentos.push({ id: index, shape: null });
-        }
-
-        function saveAllZoneamentos(event) {
-            event.preventDefault();
-            const zoneamentoData = [];
-
-            zoneamentos.forEach((zoneamento, index) => {
-                const name = document.getElementById(`zoneamento-name-${index}`).value;
-                const color = document.getElementById(`color-picker-${index}`).value;
-
-                if (zoneamento.shape) {
-                    const coordinates = zoneamento.shape.getPath().getArray().map(latLng => ({
-                        lat: latLng.lat(),
-                        lng: latLng.lng()
-                    }));
-
-                    if (!name) {
-                        alert(`Por favor, preencha o nome do zoneamento ${index + 1}.`);
-                        return;
-                    }
-
-                    zoneamentoData.push({ name, color, coordinates });
-                }
-            });
-
-            if (zoneamentoData.length === 0) {
-                alert('Nenhum zoneamento para salvar.');
+        function geocodeAddress() {
+            const address = document.getElementById('endereco-ponto').value;
+            if (!address) {
+                alert('Por favor, preencha o endereço do ponto de parada.');
                 return;
             }
 
-            fetch('/api/zoneamentos', {
+            fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${GOOGLE_MAPS_API_KEY}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'OK') {
+                        const location = data.results[0].geometry.location;
+                        latPonto.value = location.lat;
+                        lngPonto.value = location.lng;
+                        alert('Coordenadas obtidas com sucesso!');
+                    } else {
+                        alert('Não foi possível obter as coordenadas. Verifique o endereço informado.');
+                    }
+                })
+                .catch(error => console.error('Erro ao acessar API de geocodificação:', error));
+        }
+
+        function savePontoParada(event) {
+            event.preventDefault();
+
+            const zoneamentoId = zoneamentoSelect.value;
+            const nomePonto = document.getElementById('nome-ponto').value;
+            const endereco = document.getElementById('endereco-ponto').value;
+            const lat = parseFloat(latPonto.value);
+            const lng = parseFloat(lngPonto.value);
+
+            if (!zoneamentoId || !nomePonto || !endereco || !lat || !lng) {
+                alert('Por favor, preencha todos os campos e obtenha as coordenadas antes de salvar.');
+                return;
+            }
+
+            const pontoParadaData = {
+                nome: nomePonto,
+                endereco: endereco,
+                lat: lat,
+                lng: lng,
+                zoneamento_id: parseInt(zoneamentoId)
+            };
+
+            fetch('/api/pontos_parada', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(zoneamentoData)
+                body: JSON.stringify(pontoParadaData)
             })
                 .then(response => response.json())
                 .then(data => {
-                    alert('Todos os zoneamentos foram salvos com sucesso!');
-                    shapes.forEach(shape => shape.setMap(null));
-                    shapes.length = 0;
-                    zoneamentoForm.reset();
-                    zoneamentosList.innerHTML = '';
-                    zoneamentos.length = 0;
+                    alert('Ponto de parada salvo com sucesso!');
+                    pontoParadaForm.reset();
+                    latPonto.value = '';
+                    lngPonto.value = '';
                 })
                 .catch(error => {
-                    console.error('Erro ao salvar zoneamentos:', error);
+                    console.error('Erro ao salvar ponto de parada:', error);
                 });
         }
 
         window.onload = initMap;
     </script>
+
     <script src="/js/admin.js"></script>
 </body>
 
