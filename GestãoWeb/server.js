@@ -3230,11 +3230,16 @@ app.post('/webhook', async (req, res) => {
 
             // Verifica a resposta ao botão de confirmação
             if (buttonResponse === 'confirm_yes') {
-                await sendTextMessage(senderNumber, 'Ótimo! Informações confirmadas. O ponto de parada mais próximo é: Rua Exemplo, 123.');
-                delete userState[senderNumber]; // Reseta o estado do usuário
+                await checkStudentTransport(senderNumber); // Verifica o status de transporte escolar
             } else if (buttonResponse === 'confirm_no') {
                 await sendTextMessage(senderNumber, 'Por favor, verifique o ID de matrícula ou CPF e tente novamente.');
                 userState[senderNumber] = 'awaiting_id'; // Volta ao estado aguardando ID
+            } else if (buttonResponse === 'request_transport_yes') {
+                await sendTextMessage(senderNumber, 'Por favor, preencha o formulário para solicitar concessão de transporte: https://exemplo.com/solicitar-transporte');
+                delete userState[senderNumber]; // Reseta o estado do usuário
+            } else if (buttonResponse === 'request_transport_no') {
+                await sendTextMessage(senderNumber, 'Tudo bem! Se precisar de mais ajuda, envie uma mensagem a qualquer momento.');
+                delete userState[senderNumber]; // Reseta o estado do usuário
             }
         } else {
             // Se não for uma resposta interativa, envia o menu principal
@@ -3414,6 +3419,9 @@ Endereço: ${aluno.endereco}
 ID de Matrícula: ${aluno.id_matricula}
 Usa Transporte Escolar: ${aluno.usa_transporte_escolar ? 'Sim' : 'Não'}
             `;
+            // Armazena o aluno encontrado no estado do usuário
+            userState[to] = { aluno };
+
             // Envia mensagem com os dados do aluno e botões de confirmação
             await sendInteractiveMessageWithButtons(
                 to,
@@ -3432,6 +3440,63 @@ Usa Transporte Escolar: ${aluno.usa_transporte_escolar ? 'Sim' : 'Não'}
     } catch (error) {
         console.error('Erro ao consultar o banco de dados:', error);
         await sendTextMessage(to, 'Desculpe, ocorreu um erro ao consultar as informações. Por favor, tente novamente mais tarde.');
+    }
+}
+
+// Função para verificar se o aluno usa transporte escolar e responder adequadamente
+async function checkStudentTransport(to) {
+    const aluno = userState[to] ? userState[to].aluno : null;
+
+    if (aluno) {
+        if (aluno.usa_transporte_escolar) {
+            // Converte o endereço do aluno em coordenadas usando a API do Google Maps
+            const coordinates = await getCoordinatesFromAddress(aluno.endereco);
+
+            if (coordinates) {
+                await sendTextMessage(to, `O aluno usa o transporte escolar. O ponto de parada mais próximo ao endereço (${aluno.endereco}) é na Rua Exemplo, 123. Coordenadas: ${coordinates.lat}, ${coordinates.lng}.`);
+            } else {
+                await sendTextMessage(to, 'Não foi possível encontrar um ponto de parada próximo ao endereço informado.');
+            }
+        } else {
+            // Pergunta se o pai deseja solicitar concessão de transporte escolar
+            await sendInteractiveMessageWithButtons(
+                to,
+                'O aluno está matriculado, mas não é usuário do transporte escolar. Deseja solicitar uma avaliação para concessão de transporte escolar?',
+                '',
+                'Sim',
+                'request_transport_yes',
+                'Não',
+                'request_transport_no'
+            );
+        }
+    } else {
+        await sendTextMessage(to, 'Desculpe, ocorreu um erro ao verificar as informações do aluno. Por favor, tente novamente.');
+    }
+}
+
+// Função para obter as coordenadas de um endereço usando a API do Google Maps
+async function getCoordinatesFromAddress(address) {
+    try {
+        const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json`, {
+            params: {
+                address: address,
+                key: GOOGLE_MAPS_API_KEY
+            }
+        });
+
+        if (response.data.status === 'OK') {
+            const location = response.data.results[0].geometry.location;
+            return {
+                lat: location.lat,
+                lng: location.lng
+            };
+        } else {
+            console.error('Erro ao obter coordenadas:', response.data.status);
+            return null;
+        }
+    } catch (error) {
+        console.error('Erro ao acessar API do Google Maps:', error);
+        return null;
     }
 }
 
