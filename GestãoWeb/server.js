@@ -3541,7 +3541,16 @@ async function getCoordinatesFromAddress(address) {
 async function getNearestStop(studentCoordinates) {
     try {
         const client = await pool.connect();
-        const query = 'SELECT * FROM pontos_parada';
+
+        // Ajuste na consulta para retornar coordenadas no formato GeoJSON
+        const query = `
+            SELECT 
+                id, 
+                nome, 
+                ST_AsGeoJSON(coordenadas) AS coordenadas_geojson, 
+                descricao 
+            FROM pontos_parada
+        `;
         const result = await client.query(query);
 
         if (result.rows.length > 0) {
@@ -3549,22 +3558,19 @@ async function getNearestStop(studentCoordinates) {
             let minDistance = Number.MAX_VALUE;
 
             result.rows.forEach(stop => {
-                // Verificar se as coordenadas estão definidas e no formato correto
-                if (stop.coordenadas && stop.coordenadas.coordinates && stop.coordenadas.coordinates.length === 2) {
-                    const stopCoordinates = stop.coordenadas.coordinates;
-                    const distance = calculateDistance(
-                        studentCoordinates.lat,
-                        studentCoordinates.lng,
-                        stopCoordinates[1], // Latitude do ponto de parada
-                        stopCoordinates[0]  // Longitude do ponto de parada
-                    );
+                // Converte o GeoJSON das coordenadas em um objeto JavaScript
+                const stopCoordinates = JSON.parse(stop.coordenadas_geojson).coordinates;
 
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        nearestStop = stop;
-                    }
-                } else {
-                    console.warn(`Coordenadas inválidas para o ponto de parada com ID: ${stop.id}`);
+                const distance = calculateDistance(
+                    studentCoordinates.lat,
+                    studentCoordinates.lng,
+                    stopCoordinates[1], // Latitude do ponto de parada
+                    stopCoordinates[0]  // Longitude do ponto de parada
+                );
+
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearestStop = stop;
                 }
             });
 
@@ -3579,6 +3585,7 @@ async function getNearestStop(studentCoordinates) {
         return null;
     }
 }
+
 
 
 // Função para calcular a distância entre duas coordenadas
