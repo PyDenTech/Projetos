@@ -3558,19 +3558,34 @@ async function getNearestStop(studentCoordinates) {
             let minDistance = Number.MAX_VALUE;
 
             result.rows.forEach(stop => {
-                // Converte o GeoJSON das coordenadas em um objeto JavaScript
-                const stopCoordinates = JSON.parse(stop.coordenadas_geojson).coordinates;
+                if (stop.coordenadas_geojson) {
+                    try {
+                        // Converte o GeoJSON das coordenadas em um objeto JavaScript
+                        const stopGeoJSON = JSON.parse(stop.coordenadas_geojson);
 
-                const distance = calculateDistance(
-                    studentCoordinates.lat,
-                    studentCoordinates.lng,
-                    stopCoordinates[1], // Latitude do ponto de parada
-                    stopCoordinates[0]  // Longitude do ponto de parada
-                );
+                        // Verifica se o GeoJSON contém a propriedade coordinates
+                        if (stopGeoJSON && stopGeoJSON.coordinates) {
+                            const stopCoordinates = stopGeoJSON.coordinates;
 
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    nearestStop = stop;
+                            const distance = calculateDistance(
+                                studentCoordinates.lat,
+                                studentCoordinates.lng,
+                                stopCoordinates[1], // Latitude do ponto de parada
+                                stopCoordinates[0]  // Longitude do ponto de parada
+                            );
+
+                            if (distance < minDistance) {
+                                minDistance = distance;
+                                nearestStop = stop;
+                            }
+                        } else {
+                            console.warn(`Coordenadas inválidas para o ponto de parada com ID: ${stop.id}. GeoJSON: ${stop.coordenadas_geojson}`);
+                        }
+                    } catch (parseError) {
+                        console.error(`Erro ao parsear GeoJSON para o ponto de parada com ID: ${stop.id}. Erro: ${parseError.message}`);
+                    }
+                } else {
+                    console.warn(`Ponto de parada com ID: ${stop.id} não possui coordenadas GeoJSON.`);
                 }
             });
 
@@ -3585,6 +3600,7 @@ async function getNearestStop(studentCoordinates) {
         return null;
     }
 }
+
 
 
 
