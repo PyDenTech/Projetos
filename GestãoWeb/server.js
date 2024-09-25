@@ -3549,17 +3549,22 @@ async function getNearestStop(studentCoordinates) {
             let minDistance = Number.MAX_VALUE;
 
             result.rows.forEach(stop => {
-                const stopCoordinates = stop.coordenadas.coordinates;
-                const distance = calculateDistance(
-                    studentCoordinates.lat,
-                    studentCoordinates.lng,
-                    stopCoordinates[1],
-                    stopCoordinates[0]
-                );
+                // Verificar se as coordenadas estão definidas e no formato correto
+                if (stop.coordenadas && stop.coordenadas.coordinates && stop.coordenadas.coordinates.length === 2) {
+                    const stopCoordinates = stop.coordenadas.coordinates;
+                    const distance = calculateDistance(
+                        studentCoordinates.lat,
+                        studentCoordinates.lng,
+                        stopCoordinates[1], // Latitude do ponto de parada
+                        stopCoordinates[0]  // Longitude do ponto de parada
+                    );
 
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    nearestStop = stop;
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        nearestStop = stop;
+                    }
+                } else {
+                    console.warn(`Coordenadas inválidas para o ponto de parada com ID: ${stop.id}`);
                 }
             });
 
@@ -3574,6 +3579,7 @@ async function getNearestStop(studentCoordinates) {
         return null;
     }
 }
+
 
 // Função para calcular a distância entre duas coordenadas
 function calculateDistance(lat1, lng1, lat2, lng2) {
