@@ -280,7 +280,7 @@
         }
 
         function loadZoneamentosForPontoParada() {
-            fetch('/api/zoneamentos')
+            fetch('/api/zoneamentosConsulta')
                 .then(response => response.json())
                 .then(data => {
                     const zoneamentoSelect = document.getElementById('zoneamento-select');
@@ -366,7 +366,7 @@
                 return;
             }
 
-            fetch('/api/zoneamentosConsulta', {
+            fetch('/api/zoneamentos', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
