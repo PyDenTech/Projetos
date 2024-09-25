@@ -3261,8 +3261,8 @@ async function sendInteractiveListMessage(to) {
                         rows: [
                             {
                                 id: 'option_1',
-                                title: '1️⃣ Pais, Responsáveis e Alunos',
-                                description: '👨‍👩‍👧‍👦 Informações para Pais e Alunos'
+                                title: '1️⃣ Pais e Alunos',
+                                description: '👨‍👩‍👧‍👦 Informações para Pais e Alunos ou Responsáveis'
                             },
                             {
                                 id: 'option_2',
@@ -3336,23 +3336,23 @@ async function sendParentsStudentsMenu(to) {
                         rows: [
                             {
                                 id: 'check_stop',
-                                title: '1️⃣ Consultar Ponto de Parada',
+                                title: '1️⃣ Ponto de Parada',
                                 description: '📍 Encontrar o ponto de parada mais próximo'
                             },
                             {
                                 id: 'request_route',
-                                title: '2️⃣ Solicitar Concessão de Rota',
+                                title: '2️⃣ Concessão de Rota',
                                 description: '🛣️ Solicitar uma nova rota ou ajuste de rota'
                             },
                             {
                                 id: 'transport_questions',
-                                title: '3️⃣ Dúvidas sobre Transporte',
+                                title: '3️⃣ Dúvidas',
                                 description: '❓ Perguntas frequentes sobre transporte escolar'
                             },
                             {
                                 id: 'feedback',
-                                title: '4️⃣ Fazer Reclamação, Elogio ou Sugestão',
-                                description: '📝 Enviar feedback'
+                                title: '4️⃣ Feedback',
+                                description: '📝 Fazer Reclamação, Elogio ou Sugestão'
                             },
                             {
                                 id: 'speak_to_agent',
