@@ -3480,7 +3480,7 @@ async function getCoordinatesFromAddress(address) {
         const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json`, {
             params: {
                 address: address,
-                key: AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M
+                key: process.env.GOOGLE_MAPS_API_KEY
             }
         });
 
