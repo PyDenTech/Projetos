@@ -3225,6 +3225,17 @@ app.post('/webhook', async (req, res) => {
             } else {
                 await sendTextMessage(senderNumber, 'Por favor, forneça um ID de matrícula ou CPF válido, usando apenas números.');
             }
+        } else if (message.interactive && message.interactive.button_reply) {
+            const buttonResponse = message.interactive.button_reply.id;
+
+            // Verifica a resposta ao botão de confirmação
+            if (buttonResponse === 'confirm_yes') {
+                await sendTextMessage(senderNumber, 'Ótimo! Informações confirmadas. O ponto de parada mais próximo é: Rua Exemplo, 123.');
+                delete userState[senderNumber]; // Reseta o estado do usuário
+            } else if (buttonResponse === 'confirm_no') {
+                await sendTextMessage(senderNumber, 'Por favor, verifique o ID de matrícula ou CPF e tente novamente.');
+                userState[senderNumber] = 'awaiting_id'; // Volta ao estado aguardando ID
+            }
         } else {
             // Se não for uma resposta interativa, envia o menu principal
             await sendInteractiveListMessage(senderNumber);
@@ -3384,7 +3395,7 @@ async function sendParentsStudentsMenu(to) {
     }
 }
 
-// Função para verificar a matrícula do aluno no banco de dados
+// Função para verificar a matrícula do aluno no banco de dados e enviar mensagem de confirmação
 async function checkStudentEnrollment(to, studentId) {
     try {
         const client = await pool.connect();
@@ -3392,7 +3403,27 @@ async function checkStudentEnrollment(to, studentId) {
         const result = await client.query(query, [studentId]);
 
         if (result.rows.length > 0) {
-            await sendTextMessage(to, 'Aluno encontrado! O ponto de parada mais próximo é: Rua Exemplo, 123.');
+            const aluno = result.rows[0];
+            const alunoInfo = `
+📚 *Dados do Aluno Encontrado* 📚
+Nome: ${aluno.nome}
+Data de Nascimento: ${aluno.dt_nascimento}
+Série: ${aluno.serie}
+Turma: ${aluno.turma}
+Endereço: ${aluno.endereco}
+ID de Matrícula: ${aluno.id_matricula}
+Usa Transporte Escolar: ${aluno.usa_transporte_escolar ? 'Sim' : 'Não'}
+            `;
+            // Envia mensagem com os dados do aluno e botões de confirmação
+            await sendInteractiveMessageWithButtons(
+                to,
+                alunoInfo,
+                'Essas informações estão corretas?',
+                'Sim',
+                'confirm_yes',
+                'Não',
+                'confirm_no'
+            );
         } else {
             await sendTextMessage(to, 'ID de matrícula ou CPF não encontrado. Por favor, verifique as informações e tente novamente.');
         }
@@ -3401,6 +3432,55 @@ async function checkStudentEnrollment(to, studentId) {
     } catch (error) {
         console.error('Erro ao consultar o banco de dados:', error);
         await sendTextMessage(to, 'Desculpe, ocorreu um erro ao consultar as informações. Por favor, tente novamente mais tarde.');
+    }
+}
+
+// Função para enviar uma mensagem interativa com botões
+async function sendInteractiveMessageWithButtons(to, bodyText, footerText, button1Title, button1Id, button2Title, button2Id) {
+    const buttonMessage = {
+        messaging_product: 'whatsapp',
+        recipient_type: 'individual',
+        to: to,
+        type: 'interactive',
+        interactive: {
+            type: 'button',
+            body: {
+                text: bodyText
+            },
+            footer: {
+                text: footerText
+            },
+            action: {
+                buttons: [
+                    {
+                        type: 'reply',
+                        reply: {
+                            id: button1Id,
+                            title: button1Title
+                        }
+                    },
+                    {
+                        type: 'reply',
+                        reply: {
+                            id: button2Id,
+                            title: button2Title
+                        }
+                    }
+                ]
+            }
+        }
+    };
+
+    try {
+        const response = await axios.post(
+            `${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`,
+            buttonMessage,
+            { headers: { Authorization: `Bearer ${ACCESS_TOKEN}` } }
+        );
+
+        console.log('Mensagem interativa com botões enviada:', response.data);
+    } catch (error) {
+        console.error('Erro ao enviar mensagem interativa com botões:', error.response ? error.response.data : error.message);
     }
 }
 
