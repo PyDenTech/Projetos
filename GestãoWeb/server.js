@@ -1732,19 +1732,6 @@ app.post('/api/zoneamentos', async (req, res) => {
     }
 });
 
-app.post('/api/pontos_parada', async (req, res) => {
-    const { nome, endereco, lat, lng, zoneamento_id } = req.body;
-    try {
-        await pool.query(
-            'INSERT INTO pontos_parada (nome, endereco, lat, lng, zoneamento_id) VALUES ($1, $2, $3, $4, $5)',
-            [nome, endereco, lat, lng, zoneamento_id]
-        );
-        res.status(200).send('Ponto de parada salvo com sucesso');
-    } catch (error) {
-        console.error('Erro ao salvar ponto de parada:', error);
-        res.status(500).send('Erro ao salvar ponto de parada');
-    }
-});
 
 // Rota para obter todos os zoneamentos
 app.get('/api/zoneamentos', async (req, res) => {
@@ -1757,6 +1744,20 @@ app.get('/api/zoneamentos', async (req, res) => {
     }
 });
 
+// Rota para cadastrar um novo ponto de parada
+app.post('/api/pontos-parada', async (req, res) => {
+    const { nome, coordenadas, zoneamento_id, descricao } = req.body;
+    try {
+        const result = await pool.query(
+            'INSERT INTO pontos_parada (nome, coordenadas, zoneamento_id, descricao) VALUES ($1, ST_GeomFromGeoJSON($2), $3, $4) RETURNING *',
+            [nome, JSON.stringify(coordenadas), zoneamento_id, descricao]
+        );
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Erro ao cadastrar ponto de parada.');
+    }
+});
 
 app.get('/api/motoristas', async (req, res) => {
     try {
