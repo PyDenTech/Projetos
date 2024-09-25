@@ -3173,6 +3173,9 @@ app.get('/webhook', (req, res) => {
     }
 });
 
+// Variável global para armazenar o estado do usuário
+let userState = {};
+
 // Rota para lidar com mensagens recebidas
 app.post('/webhook', async (req, res) => {
     const data = req.body;
@@ -3180,6 +3183,7 @@ app.post('/webhook', async (req, res) => {
     if (data.object && data.entry && data.entry[0].changes && data.entry[0].changes[0].value.messages) {
         const message = data.entry[0].changes[0].value.messages[0];
         const senderNumber = message.from;
+        const text = message.text ? message.text.body : '';
 
         if (message.interactive && message.interactive.list_reply) {
             const selectedOption = message.interactive.list_reply.id;
@@ -3189,23 +3193,37 @@ app.post('/webhook', async (req, res) => {
                 case 'option_1':
                     await sendParentsStudentsMenu(senderNumber);
                     break;
-                case 'option_2':
-                    await sendTextMessage(senderNumber, 'Informações para Servidores SEMED...');
+                case 'check_stop':
+                    userState[senderNumber] = 'awaiting_id'; // Define o estado como esperando o ID
+                    await sendTextMessage(senderNumber, 'Para consultar o ponto de parada mais próximo, por favor, forneça o ID de matrícula ou CPF do aluno. Este ID pode ser encontrado na carteirinha do aluno ou no comprovante de matrícula emitido pela escola e entregue ao pai ou responsável.\n\nDigite o ID de matrícula do aluno para continuarmos:');
                     break;
-                case 'option_3':
-                    await sendTextMessage(senderNumber, 'Informações para Servidores da Escola...');
+                case 'request_route':
+                    await sendTextMessage(senderNumber, 'Para solicitar uma nova concessão de rota, por favor, preencha o formulário em: https://exemplo.com/solicitar-rota');
                     break;
-                case 'option_4':
-                    await sendTextMessage(senderNumber, 'Informações para Fornecedores...');
+                case 'transport_questions':
+                    await sendTextMessage(senderNumber, 'Perguntas frequentes sobre transporte escolar: https://exemplo.com/faq-transporte');
                     break;
-                case 'option_5':
-                    await sendTextMessage(senderNumber, 'Informações para Motoristas...');
+                case 'feedback':
+                    await sendTextMessage(senderNumber, 'Para enviar reclamações, elogios ou sugestões, acesse: https://exemplo.com/feedback');
                     break;
-                case 'option_6':
+                case 'speak_to_agent':
+                    await sendTextMessage(senderNumber, 'Por favor, aguarde enquanto conectamos você a um atendente. Um momento, por favor.');
+                    break;
+                case 'end_service':
                     await sendTextMessage(senderNumber, 'Atendimento encerrado. Se precisar de mais ajuda, envie uma mensagem a qualquer momento.');
+                    delete userState[senderNumber]; // Reseta o estado do usuário
                     break;
                 default:
                     await sendInteractiveListMessage(senderNumber); // Envia o menu principal caso não haja opção válida
+            }
+        } else if (userState[senderNumber] === 'awaiting_id') {
+            // Se o estado do usuário for 'awaiting_id', processa o ID fornecido
+            const isNumeric = /^[0-9]+$/.test(text); // Verifica se a resposta é numérica
+
+            if (isNumeric) {
+                await checkStudentEnrollment(senderNumber, text); // Verifica a matrícula do aluno
+            } else {
+                await sendTextMessage(senderNumber, 'Por favor, forneça um ID de matrícula ou CPF válido, usando apenas números.');
             }
         } else {
             // Se não for uma resposta interativa, envia o menu principal
@@ -3243,7 +3261,7 @@ async function sendInteractiveListMessage(to) {
                         rows: [
                             {
                                 id: 'option_1',
-                                title: '1️⃣ Pais e Alunos',
+                                title: '1️⃣ Pais, Responsáveis e Alunos',
                                 description: '👨‍👩‍👧‍👦 Informações para Pais e Alunos'
                             },
                             {
@@ -3318,22 +3336,22 @@ async function sendParentsStudentsMenu(to) {
                         rows: [
                             {
                                 id: 'check_stop',
-                                title: '1️⃣ Ponto de Parada',
+                                title: '1️⃣ Consultar Ponto de Parada',
                                 description: '📍 Encontrar o ponto de parada mais próximo'
                             },
                             {
                                 id: 'request_route',
-                                title: '2️⃣ Concessão de Rota',
+                                title: '2️⃣ Solicitar Concessão de Rota',
                                 description: '🛣️ Solicitar uma nova rota ou ajuste de rota'
                             },
                             {
                                 id: 'transport_questions',
-                                title: '3️⃣ Dúvidas',
+                                title: '3️⃣ Dúvidas sobre Transporte',
                                 description: '❓ Perguntas frequentes sobre transporte escolar'
                             },
                             {
                                 id: 'feedback',
-                                title: '4️⃣ Reclamação ou Elogio',
+                                title: '4️⃣ Fazer Reclamação, Elogio ou Sugestão',
                                 description: '📝 Enviar feedback'
                             },
                             {
@@ -3363,6 +3381,26 @@ async function sendParentsStudentsMenu(to) {
         console.log('Submenu Pais e Alunos enviado:', response.data);
     } catch (error) {
         console.error('Erro ao enviar submenu Pais e Alunos:', error.response ? error.response.data : error.message);
+    }
+}
+
+// Função para verificar a matrícula do aluno no banco de dados
+async function checkStudentEnrollment(to, studentId) {
+    try {
+        const client = await pool.connect();
+        const query = 'SELECT * FROM alunos WHERE id_matricula = $1 OR cpf = $1';
+        const result = await client.query(query, [studentId]);
+
+        if (result.rows.length > 0) {
+            await sendTextMessage(to, 'Aluno encontrado! O ponto de parada mais próximo é: Rua Exemplo, 123.');
+        } else {
+            await sendTextMessage(to, 'ID de matrícula ou CPF não encontrado. Por favor, verifique as informações e tente novamente.');
+        }
+
+        client.release();
+    } catch (error) {
+        console.error('Erro ao consultar o banco de dados:', error);
+        await sendTextMessage(to, 'Desculpe, ocorreu um erro ao consultar as informações. Por favor, tente novamente mais tarde.');
     }
 }
 
