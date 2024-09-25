@@ -1744,6 +1744,16 @@ app.get('/api/zoneamentos', async (req, res) => {
     }
 });
 
+app.get('/api/zoneamentosConsulta', async (req, res) => {
+    try {
+        const result = await pool.query('SELECT * FROM zoneamentos');
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Erro ao buscar zoneamentos.');
+    }
+});
+
 // Rota para cadastrar um novo ponto de parada
 app.post('/api/pontos-parada', async (req, res) => {
     const { nome, coordenadas, zoneamento_id, descricao } = req.body;
