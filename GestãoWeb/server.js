@@ -3511,30 +3511,61 @@ async function checkStudentTransport(to) {
     }
 }
 
-// Função para obter as coordenadas de um endereço usando a API do Google Maps
-async function getCoordinatesFromAddress(address) {
+// Função para obter o ponto de parada mais próximo com base nas coordenadas
+async function getNearestStop(studentCoordinates) {
     try {
-        const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json`, {
-            params: {
-                address: address,
-                key: process.env.GOOGLE_MAPS_API_KEY
-            }
-        });
+        const client = await pool.connect();
+        const query = 'SELECT * FROM pontos_parada';
+        const result = await client.query(query);
 
-        if (response.data.status === 'OK') {
-            const location = response.data.results[0].geometry.location;
-            return {
-                lat: location.lat,
-                lng: location.lng
-            };
+        if (result.rows.length > 0) {
+            let nearestStop = null;
+            let minDistance = Number.MAX_VALUE;
+
+            result.rows.forEach(stop => {
+                const stopCoordinates = stop.coordenadas.coordinates;
+                const distance = calculateDistance(
+                    studentCoordinates.lat,
+                    studentCoordinates.lng,
+                    stopCoordinates[1],
+                    stopCoordinates[0]
+                );
+
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearestStop = stop;
+                }
+            });
+
+            client.release();
+            return nearestStop;
         } else {
-            console.error('Erro ao obter coordenadas:', response.data.status);
+            client.release();
             return null;
         }
     } catch (error) {
-        console.error('Erro ao acessar API do Google Maps:', error);
+        console.error('Erro ao consultar os pontos de parada:', error);
         return null;
     }
+}
+
+// Função para calcular a distância entre duas coordenadas
+function calculateDistance(lat1, lng1, lat2, lng2) {
+    const R = 6371; // Raio da Terra em quilômetros
+    const dLat = toRad(lat2 - lat1);
+    const dLng = toRad(lng2 - lng1);
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+        Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
+    return distance;
+}
+
+// Função para converter graus para radianos
+function toRad(value) {
+    return value * Math.PI / 180;
 }
 
 // Função para enviar uma mensagem interativa com botões
