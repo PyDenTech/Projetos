@@ -3481,12 +3481,12 @@ async function checkStudentTransport(to) {
                 const nearestStop = await getNearestStop(coordinates);
                 if (nearestStop) {
                     // Gera o link do Google Maps para direções a pé
-                    const directionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${coordinates.lat},${coordinates.lng}&destination=${nearestStop.coordenadas.coordinates[1]},${nearestStop.coordenadas.coordinates[0]}&travelmode=walking`;
+                    const directionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${coordinates.lat},${coordinates.lng}&destination=${nearestStop.latitude},${nearestStop.longitude}&travelmode=walking`;
 
                     // Envia mensagem com o link de direções
                     await sendTextMessage(
                         to,
-                        `O aluno usa o transporte escolar. O ponto de parada mais próximo ao endereço (${aluno.endereco}) é o ${nearestStop.nome}, localizado em: ${nearestStop.descricao}. Coordenadas: ${nearestStop.coordenadas.coordinates[1]}, ${nearestStop.coordenadas.coordinates[0]}.\n\nClique no link para ver a rota a pé até o ponto de parada: [Traçar Rota no Google Maps](${directionsUrl})`
+                        `O aluno usa o transporte escolar. O ponto de parada mais próximo ao endereço (${aluno.endereco}) é o ${nearestStop.nome}, localizado em: ${nearestStop.descricao}. Coordenadas: ${nearestStop.latitude}, ${nearestStop.longitude}.\n\nClique no link para ver a rota a pé até o ponto de parada: [Traçar Rota no Google Maps](${directionsUrl})`
                     );
                 } else {
                     await sendTextMessage(to, 'Não foi possível encontrar um ponto de parada próximo ao endereço informado.');
