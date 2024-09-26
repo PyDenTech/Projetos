@@ -3742,7 +3742,7 @@ async function sendSemedServersMenu(to) {
                             },
                             {
                                 id: 'back_to_menu',
-                                title: '5️⃣ Voltar ao Menu Anterior',
+                                title: '5️⃣ Menu Anterior',
                                 description: '↩️ Retornar ao menu principal'
                             }
                         ]
