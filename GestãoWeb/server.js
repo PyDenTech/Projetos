@@ -3191,9 +3191,9 @@ app.get('/webhook', (req, res) => {
 
     if (mode === 'subscribe' && token === process.env.VERIFY_TOKEN) {
         console.log('Webhook verificado com sucesso!');
-        res.status(200).send(challenge);
+        res.status(200).send(challenge); // Responde com o 'challenge' para validação
     } else {
-        res.sendStatus(403);
+        res.sendStatus(403); // Token incorreto
     }
 });
 
@@ -3212,14 +3212,17 @@ app.post('/webhook', async (req, res) => {
         if (message.interactive && message.interactive.list_reply) {
             const selectedOption = message.interactive.list_reply.id;
 
+            // Chama a função com base na opção selecionada
             switch (selectedOption) {
-                case 'request_route':
-                    userState[senderNumber] = { stage: 'responsavel_nome' };
-                    await sendTextMessage(senderNumber, 'Para solicitar uma concessão de transporte, por favor, forneça seu nome completo:');
+                case 'option_1':
+                    await sendParentsStudentsMenu(senderNumber);
                     break;
                 case 'check_stop':
-                    userState[senderNumber] = 'awaiting_id';
+                    userState[senderNumber] = 'awaiting_id'; // Define o estado como esperando o ID
                     await sendTextMessage(senderNumber, 'Para consultar o ponto de parada mais próximo, por favor, forneça o ID de matrícula ou CPF do aluno. Este ID pode ser encontrado na carteirinha do aluno ou no comprovante de matrícula emitido pela escola e entregue ao pai ou responsável.\n\nDigite o ID de matrícula do aluno para continuarmos:');
+                    break;
+                case 'request_route':
+                    await sendTextMessage(senderNumber, 'Para solicitar uma nova concessão de rota, por favor, preencha o formulário em: https://exemplo.com/solicitar-rota');
                     break;
                 case 'transport_questions':
                     await sendTextMessage(senderNumber, 'Perguntas frequentes sobre transporte escolar: https://exemplo.com/faq-transporte');
@@ -3232,248 +3235,44 @@ app.post('/webhook', async (req, res) => {
                     break;
                 case 'end_service':
                     await sendTextMessage(senderNumber, 'Atendimento encerrado. Se precisar de mais ajuda, envie uma mensagem a qualquer momento.');
-                    delete userState[senderNumber];
+                    delete userState[senderNumber]; // Reseta o estado do usuário
                     break;
                 default:
-                    await sendInteractiveListMessage(senderNumber);
+                    await sendInteractiveListMessage(senderNumber); // Envia o menu principal caso não haja opção válida
             }
-        } else if (userState[senderNumber] && userState[senderNumber].stage) {
-            await handleConcessionRequest(senderNumber, text);
         } else if (userState[senderNumber] === 'awaiting_id') {
-            const isNumeric = /^[0-9]+$/.test(text);
+            // Se o estado do usuário for 'awaiting_id', processa o ID fornecido
+            const isNumeric = /^[0-9]+$/.test(text); // Verifica se a resposta é numérica
 
             if (isNumeric) {
-                await checkStudentEnrollment(senderNumber, text);
+                await checkStudentEnrollment(senderNumber, text); // Verifica a matrícula do aluno
             } else {
                 await sendTextMessage(senderNumber, 'Por favor, forneça um ID de matrícula ou CPF válido, usando apenas números.');
             }
         } else if (message.interactive && message.interactive.button_reply) {
             const buttonResponse = message.interactive.button_reply.id;
 
+            // Verifica a resposta ao botão de confirmação
             if (buttonResponse === 'confirm_yes') {
-                await checkStudentTransport(senderNumber);
+                await checkStudentTransport(senderNumber); // Verifica o status de transporte escolar
             } else if (buttonResponse === 'confirm_no') {
                 await sendTextMessage(senderNumber, 'Por favor, verifique o ID de matrícula ou CPF e tente novamente.');
-                userState[senderNumber] = 'awaiting_id';
+                userState[senderNumber] = 'awaiting_id'; // Volta ao estado aguardando ID
             } else if (buttonResponse === 'request_transport_yes') {
                 await sendTextMessage(senderNumber, 'Por favor, preencha o formulário para solicitar concessão de transporte: https://exemplo.com/solicitar-transporte');
-                delete userState[senderNumber];
+                delete userState[senderNumber]; // Reseta o estado do usuário
             } else if (buttonResponse === 'request_transport_no') {
                 await sendTextMessage(senderNumber, 'Tudo bem! Se precisar de mais ajuda, envie uma mensagem a qualquer momento.');
-                delete userState[senderNumber];
+                delete userState[senderNumber]; // Reseta o estado do usuário
             }
         } else {
+            // Se não for uma resposta interativa, envia o menu principal
             await sendInteractiveListMessage(senderNumber);
         }
     }
 
     res.sendStatus(200);
 });
-
-// Função para lidar com o fluxo de solicitação de concessão de transporte
-async function handleConcessionRequest(senderNumber, text) {
-    const state = userState[senderNumber];
-
-    switch (state.stage) {
-        case 'responsavel_nome':
-            state.responsavel_nome = text;
-            state.stage = 'responsavel_cpf';
-            await sendTextMessage(senderNumber, 'Por favor, forneça seu CPF:');
-            break;
-
-        case 'responsavel_cpf':
-            state.responsavel_cpf = text;
-            state.stage = 'zona_residencia';
-            await sendInteractiveMessageWithButtons(senderNumber, 'Sua residência está em zona urbana ou rural?', '', 'Urbana', 'zona_urbana', 'Rural', 'zona_rural');
-            break;
-
-        case 'zona_residencia':
-            if (text.toLowerCase() === 'urbana') {
-                state.stage = 'responsavel_cep';
-                await sendTextMessage(senderNumber, 'Por favor, informe o CEP da sua residência:');
-            } else if (text.toLowerCase() === 'rural') {
-                state.stage = 'responsavel_localizacao';
-                await sendTextMessage(senderNumber, 'Por favor, envie a localização atual para identificarmos o ponto de partida.');
-            }
-            break;
-
-        case 'responsavel_cep':
-            state.responsavel_cep = text;
-            state.stage = 'responsavel_numero';
-            await sendTextMessage(senderNumber, 'Por favor, informe o número da sua casa:');
-            break;
-
-        case 'responsavel_numero':
-            state.responsavel_numero = text;
-            state.stage = 'responsavel_confirmar_endereco';
-            const enderecoCompleto = await getEnderecoCompleto(state.responsavel_cep, state.responsavel_numero);
-            await sendInteractiveMessageWithButtons(senderNumber, `O endereço é: ${enderecoCompleto}. Está correto?`, '', 'Sim', 'endereco_confirmado', 'Não', 'endereco_incorreto');
-            break;
-
-        case 'responsavel_confirmar_endereco':
-            if (text.toLowerCase() === 'sim') {
-                state.endereco_confirmado = true;
-                state.stage = 'responsavel_localizacao';
-                await sendTextMessage(senderNumber, 'Por favor, envie a localização atual para identificarmos o ponto de partida.');
-            } else if (text.toLowerCase() === 'não') {
-                state.stage = 'responsavel_cep';
-                await sendTextMessage(senderNumber, 'Por favor, informe novamente o CEP correto:');
-            }
-            break;
-
-        case 'responsavel_localizacao':
-            state.responsavel_localizacao = text;
-            state.stage = 'aluno_id';
-            await sendTextMessage(senderNumber, 'Por favor, informe o CPF ou ID de matrícula do aluno:');
-            break;
-
-        case 'aluno_id':
-            state.aluno_id = text;
-            const aluno = await getAlunoByIdOrCPF(text);
-            if (aluno) {
-                state.aluno = aluno;
-                state.stage = 'aluno_deficiencia';
-                await sendInteractiveMessageWithButtons(senderNumber, `Dados do aluno encontrados: Nome: ${aluno.nome}. Confirmar?`, '', 'Sim', 'confirm_aluno', 'Não', 'confirm_aluno_errado');
-            } else {
-                await sendTextMessage(senderNumber, 'ID ou CPF não encontrado. Por favor, verifique e tente novamente.');
-            }
-            break;
-
-        case 'aluno_deficiencia':
-            state.aluno_deficiencia = text;
-            if (text.toLowerCase() === 'sim') {
-                state.stage = 'aluno_laudo';
-                await sendTextMessage(senderNumber, 'Por favor, envie o laudo médico.');
-            } else {
-                state.stage = 'aluno_escola';
-                await sendEscolasMenu(senderNumber);
-            }
-            break;
-
-        case 'aluno_laudo':
-            state.aluno_laudo = text;
-            state.stage = 'aluno_escola';
-            await sendEscolasMenu(senderNumber);
-            break;
-
-        case 'aluno_escola':
-            state.aluno_escola = text;
-            state.stage = 'aluno_observacoes';
-            await sendTextMessage(senderNumber, 'Há alguma observação ou detalhe específico que gostaria de mencionar sobre a concessão do transporte?');
-            break;
-
-        case 'aluno_observacoes':
-            state.aluno_observacoes = text;
-            state.stage = 'confirmacao_final';
-            await sendConcessionSummary(senderNumber, state);
-            break;
-
-        case 'confirmacao_final':
-            if (text.toLowerCase() === 'confirmar') {
-                await saveConcessionRequest(state);
-                await sendTextMessage(senderNumber, 'Sua solicitação foi registrada com sucesso. Entraremos em contato em breve. Obrigado!');
-                delete userState[senderNumber];
-            } else {
-                await sendTextMessage(senderNumber, 'Por favor, verifique as informações e faça as correções necessárias.');
-            }
-            break;
-
-        default:
-            await sendTextMessage(senderNumber, 'Desculpe, não entendi. Vamos recomeçar.');
-            userState[senderNumber] = { stage: 'responsavel_nome' };
-            await sendTextMessage(senderNumber, 'Por favor, forneça seu nome completo:');
-    }
-}
-
-// Função para salvar os dados da solicitação de concessão no banco de dados
-async function saveConcessionRequest(state) {
-    try {
-        const client = await pool.connect();
-        const query = 'INSERT INTO solicitacoes_concessao (responsavel_nome, responsavel_cpf, endereco, localizacao, aluno_id, aluno_deficiencia, aluno_laudo, aluno_escola, aluno_observacoes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)';
-        const values = [
-            state.responsavel_nome,
-            state.responsavel_cpf,
-            state.endereco_confirmado ? `${state.responsavel_cep}, ${state.responsavel_numero}` : null,
-            state.responsavel_localizacao,
-            state.aluno_id,
-            state.aluno_deficiencia,
-            state.aluno_laudo,
-            state.aluno_escola,
-            state.aluno_observacoes
-        ];
-        await client.query(query, values);
-        client.release();
-    } catch (error) {
-        console.error('Erro ao salvar a solicitação de concessão:', error);
-    }
-}
-
-// Função para buscar dados de aluno no banco
-async function getAlunoByIdOrCPF(idOrCpf) {
-    try {
-        const client = await pool.connect();
-        const query = 'SELECT * FROM alunos WHERE id_matricula = $1 OR cpf = $1';
-        const result = await client.query(query, [idOrCpf]);
-        client.release();
-        return result.rows[0] || null;
-    } catch (error) {
-        console.error('Erro ao consultar aluno no banco de dados:', error);
-        return null;
-    }
-}
-
-// Função para enviar menu de escolas
-async function sendEscolasMenu(to) {
-    try {
-        const client = await pool.connect();
-        const query = 'SELECT id, nome FROM escolas';
-        const result = await client.query(query);
-        client.release();
-
-        const rows = result.rows.map(escola => ({
-            id: escola.id.toString(),
-            title: escola.nome,
-            description: ''
-        }));
-
-        const menuMessage = {
-            messaging_product: 'whatsapp',
-            recipient_type: 'individual',
-            to: to,
-            type: 'interactive',
-            interactive: {
-                type: 'list',
-                header: { type: 'text', text: 'Selecione a escola em que o aluno estudará:' },
-                body: { text: 'Escolha uma das opções abaixo:' },
-                action: { button: 'Ver Escolas', sections: [{ title: 'Escolas Disponíveis', rows: rows }] }
-            }
-        };
-
-        await axios.post(`${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`, menuMessage, { headers: { Authorization: `Bearer ${ACCESS_TOKEN}` } });
-    } catch (error) {
-        console.error('Erro ao enviar menu de escolas:', error);
-    }
-}
-
-// Função para enviar resumo dos dados coletados para confirmação
-async function sendConcessionSummary(to, state) {
-    const summary = `
-*Dados do Responsável:*
-Nome: ${state.responsavel_nome}
-CPF: ${state.responsavel_cpf}
-Endereço: ${state.endereco_confirmado ? `${state.responsavel_cep}, ${state.responsavel_numero}` : 'N/A'}
-Localização: ${state.responsavel_localizacao}
-
-*Dados do Aluno:*
-CPF ou ID: ${state.aluno_id}
-Deficiência: ${state.aluno_deficiencia ? 'Sim' : 'Não'}
-Escola: ${state.aluno_escola}
-Observações: ${state.aluno_observacoes || 'N/A'}
-
-Confirma todos os dados? Digite 'Confirmar' para enviar a solicitação ou 'Editar' para corrigir alguma informação.`;
-
-    await sendTextMessage(to, summary);
-}
 
 // Função para enviar o menu interativo principal
 async function sendInteractiveListMessage(to) {
@@ -3644,8 +3443,10 @@ Endereço: ${aluno.endereco}
 ID de Matrícula: ${aluno.id_matricula}
 Usa Transporte Escolar: ${aluno.usa_transporte_escolar ? 'Sim' : 'Não'}
             `;
+            // Armazena o aluno encontrado no estado do usuário
             userState[to] = { aluno };
 
+            // Envia mensagem com os dados do aluno e botões de confirmação
             await sendInteractiveMessageWithButtons(
                 to,
                 alunoInfo,
@@ -3671,15 +3472,23 @@ async function checkStudentTransport(to) {
 
     if (aluno) {
         if (aluno.usa_transporte_escolar) {
+            // Converte o endereço do aluno em coordenadas usando a API do Google Maps
             const coordinates = await getCoordinatesFromAddress(aluno.endereco);
 
             if (coordinates) {
+                // Busca o ponto de parada mais próximo
                 const nearestStop = await getNearestStop(coordinates);
 
                 if (nearestStop) {
+                    // Verificar se todos os valores estão presentes
+                    console.log('Coordenadas do aluno:', coordinates);
+                    console.log('Ponto de parada mais próximo:', nearestStop);
+
                     if (coordinates.lat && coordinates.lng && nearestStop.latitude && nearestStop.longitude) {
+                        // Gera o link do Google Maps para direções a pé
                         const directionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${coordinates.lat},${coordinates.lng}&destination=${nearestStop.latitude},${nearestStop.longitude}&travelmode=walking`;
 
+                        // Envia mensagem com o link de direções
                         await sendTextMessage(
                             to,
                             `O aluno usa o transporte escolar. O ponto de parada mais próximo ao endereço (${aluno.endereco}) é o ${nearestStop.nome}, localizado em: ${nearestStop.descricao}. Coordenadas: ${nearestStop.latitude}, ${nearestStop.longitude}.\n\nClique no link para ver a rota a pé até o ponto de parada: [Traçar Rota no Google Maps](${directionsUrl})`
@@ -3695,6 +3504,7 @@ async function checkStudentTransport(to) {
                 await sendTextMessage(to, 'Não foi possível converter o endereço para coordenadas. Verifique o endereço informado.');
             }
         } else {
+            // Pergunta se o pai deseja solicitar concessão de transporte escolar
             await sendInteractiveMessageWithButtons(
                 to,
                 'O aluno está matriculado, mas não é usuário do transporte escolar. Deseja solicitar uma avaliação para concessão de transporte escolar?',
@@ -3748,9 +3558,11 @@ async function getNearestStop(studentCoordinates) {
             let minDistance = Number.MAX_VALUE;
 
             result.rows.forEach(stop => {
+                // Usar diretamente as colunas latitude e longitude como números
                 const stopLat = parseFloat(stop.latitude);
                 const stopLng = parseFloat(stop.longitude);
 
+                // Verifica se as coordenadas são válidas
                 if (!isNaN(stopLat) && !isNaN(stopLng)) {
                     const distance = calculateDistance(
                         studentCoordinates.lat,
@@ -3782,7 +3594,7 @@ async function getNearestStop(studentCoordinates) {
 
 // Função para calcular a distância entre duas coordenadas
 function calculateDistance(lat1, lng1, lat2, lng2) {
-    const R = 6371;
+    const R = 6371; // Raio da Terra em quilômetros
     const dLat = toRad(lat2 - lat1);
     const dLng = toRad(lng2 - lng1);
     const a =
