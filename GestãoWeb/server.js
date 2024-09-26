@@ -3217,6 +3217,9 @@ app.post('/webhook', async (req, res) => {
                 case 'option_1':
                     await sendParentsStudentsMenu(senderNumber);
                     break;
+                case 'option_2':
+                    await sendSemedServersMenu(senderNumber);
+                    break;
                 case 'check_stop':
                     userState[senderNumber] = 'awaiting_id'; // Define o estado como esperando o ID
                     await sendTextMessage(senderNumber, 'Para consultar o ponto de parada mais próximo, por favor, forneça o ID de matrícula ou CPF do aluno. Este ID pode ser encontrado na carteirinha do aluno ou no comprovante de matrícula emitido pela escola e entregue ao pai ou responsável.\n\nDigite o ID de matrícula do aluno para continuarmos:');
@@ -3237,8 +3240,14 @@ app.post('/webhook', async (req, res) => {
                     await sendTextMessage(senderNumber, 'Atendimento encerrado. Se precisar de mais ajuda, envie uma mensagem a qualquer momento.');
                     delete userState[senderNumber]; // Reseta o estado do usuário
                     break;
-                case 'option_2':
-                    await sendSemedServersMenu(senderNumber);
+                case 'request_driver':
+                    await sendTextMessage(senderNumber, 'Para solicitar um motorista, por favor, preencha o formulário em: https://example.com/solicitar-motorista');
+                    break;
+                case 'schedule_driver':
+                    await sendTextMessage(senderNumber, 'Para agendar um motorista, por favor, preencha o formulário em: https://example.com/agendar-motorista');
+                    break;
+                case 'back_to_menu':
+                    await sendInteractiveListMessage(senderNumber); // Envia o menu principal
                     break;
                 default:
                     await sendInteractiveListMessage(senderNumber); // Envia o menu principal caso não haja opção válida
@@ -3756,27 +3765,6 @@ async function sendSemedServersMenu(to) {
     }
 }
 
-// Modificar o switch para lidar com as opções do submenu "Servidores SEMED"
-switch (selectedOption) {
-    case 'request_driver':
-        await sendTextMessage(senderNumber, 'Para solicitar um motorista, por favor, preencha o formulário em: https://example.com/solicitar-motorista');
-        break;
-    case 'schedule_driver':
-        await sendTextMessage(senderNumber, 'Para agendar um motorista, por favor, preencha o formulário em: https://example.com/agendar-motorista');
-        break;
-    case 'speak_to_agent':
-        await sendTextMessage(senderNumber, 'Por favor, aguarde enquanto conectamos você a um atendente. Um momento, por favor.');
-        break;
-    case 'end_service':
-        await sendTextMessage(senderNumber, 'Atendimento encerrado. Se precisar de mais ajuda, envie uma mensagem a qualquer momento.');
-        delete userState[senderNumber]; // Reseta o estado do usuário
-        break;
-    case 'back_to_menu':
-        await sendInteractiveListMessage(senderNumber); // Envia o menu principal
-        break;
-    default:
-        await sendInteractiveListMessage(senderNumber); // Envia o menu principal caso não haja opção válida
-}
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
