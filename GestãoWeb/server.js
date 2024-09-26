@@ -3179,7 +3179,7 @@ app.post('/atualizar_status', async (req, res) => {
     }
 });
 
-// ================================================================
+// ================================================================ 
 // ===================== BOT DE AUTOATENDIMENTO ====================
 // ================================================================
 
@@ -3199,6 +3199,7 @@ app.get('/webhook', (req, res) => {
 
 // Variável global para armazenar o estado do usuário
 let userState = {};
+let feedbackState = {}; // Variável global para estados de feedback
 
 // Rota para lidar com mensagens recebidas
 app.post('/webhook', async (req, res) => {
@@ -3208,8 +3209,17 @@ app.post('/webhook', async (req, res) => {
         const message = data.entry[0].changes[0].value.messages[0];
         const senderNumber = message.from;
         const text = message.text ? message.text.body : '';
+        const messageType = message.type;
 
-        if (message.interactive && message.interactive.list_reply) {
+        if (feedbackState[senderNumber]) {
+            // Se o usuário está no fluxo de feedback
+            if (feedbackState[senderNumber] === 'awaiting_feedback_text') {
+                await storeFeedback(senderNumber, text);
+            } else if (feedbackState[senderNumber] === 'awaiting_feedback_audio' && messageType === 'audio') {
+                const audioUrl = message.audio.id;
+                await storeFeedback(senderNumber, audioUrl, true);
+            }
+        } else if (message.interactive && message.interactive.list_reply) {
             const selectedOption = message.interactive.list_reply.id;
 
             // Chama a função com base na opção selecionada
@@ -3222,13 +3232,13 @@ app.post('/webhook', async (req, res) => {
                     await sendTextMessage(senderNumber, 'Para consultar o ponto de parada mais próximo, por favor, forneça o ID de matrícula ou CPF do aluno. Este ID pode ser encontrado na carteirinha do aluno ou no comprovante de matrícula emitido pela escola e entregue ao pai ou responsável.\n\nDigite o ID de matrícula do aluno para continuarmos:');
                     break;
                 case 'request_route':
-                    await sendTextMessage(senderNumber, 'Para solicitar uma nova concessão de rota, por favor, preencha o formulário em: https://exemplo.com/solicitar-rota');
+                    await sendTextMessage(senderNumber, 'Para solicitar uma nova concessão de rota, por favor, preencha o formulário em: https://semedcanaadoscarajas.pydenexpress.com/solicitar-rota-chat');
                     break;
                 case 'transport_questions':
-                    await sendTextMessage(senderNumber, 'Perguntas frequentes sobre transporte escolar: https://exemplo.com/faq-transporte');
+                    await sendTextMessage(senderNumber, 'Perguntas frequentes sobre transporte escolar: https://semedcanaadoscarajas.pydenexpress.com/faq');
                     break;
                 case 'feedback':
-                    await sendTextMessage(senderNumber, 'Para enviar reclamações, elogios ou sugestões, acesse: https://exemplo.com/feedback');
+                    await askFeedbackType(senderNumber);
                     break;
                 case 'speak_to_agent':
                     await sendTextMessage(senderNumber, 'Por favor, aguarde enquanto conectamos você a um atendente. Um momento, por favor.');
@@ -3259,7 +3269,7 @@ app.post('/webhook', async (req, res) => {
                 await sendTextMessage(senderNumber, 'Por favor, verifique o ID de matrícula ou CPF e tente novamente.');
                 userState[senderNumber] = 'awaiting_id'; // Volta ao estado aguardando ID
             } else if (buttonResponse === 'request_transport_yes') {
-                await sendTextMessage(senderNumber, 'Por favor, preencha o formulário para solicitar concessão de transporte: https://exemplo.com/solicitar-transporte');
+                await sendTextMessage(senderNumber, 'Por favor, preencha o formulário para solicitar concessão de transporte: https://semedcanaadoscarajas.pydenexpress.com/solicitar-rota-chat');
                 delete userState[senderNumber]; // Reseta o estado do usuário
             } else if (buttonResponse === 'request_transport_no') {
                 await sendTextMessage(senderNumber, 'Tudo bem! Se precisar de mais ajuda, envie uma mensagem a qualquer momento.');
@@ -3467,6 +3477,7 @@ Usa Transporte Escolar: ${aluno.usa_transporte_escolar ? 'Sim' : 'Não'}
     }
 }
 
+// Função para verificar o status do transporte escolar do aluno
 async function checkStudentTransport(to) {
     const aluno = userState[to] ? userState[to].aluno : null;
 
@@ -3480,15 +3491,12 @@ async function checkStudentTransport(to) {
                 const nearestStop = await getNearestStop(coordinates);
 
                 if (nearestStop) {
-                    // Verificar se todos os valores estão presentes
                     console.log('Coordenadas do aluno:', coordinates);
                     console.log('Ponto de parada mais próximo:', nearestStop);
 
                     if (coordinates.lat && coordinates.lng && nearestStop.latitude && nearestStop.longitude) {
-                        // Gera o link do Google Maps para direções a pé
                         const directionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${coordinates.lat},${coordinates.lng}&destination=${nearestStop.latitude},${nearestStop.longitude}&travelmode=walking`;
 
-                        // Envia mensagem com o link de direções
                         await sendTextMessage(
                             to,
                             `O aluno usa o transporte escolar. O ponto de parada mais próximo ao endereço (${aluno.endereco}) é o ${nearestStop.nome}, localizado em: ${nearestStop.descricao}. Coordenadas: ${nearestStop.latitude}, ${nearestStop.longitude}.\n\nClique no link para ver a rota a pé até o ponto de parada: [Traçar Rota no Google Maps](${directionsUrl})`
@@ -3504,7 +3512,6 @@ async function checkStudentTransport(to) {
                 await sendTextMessage(to, 'Não foi possível converter o endereço para coordenadas. Verifique o endereço informado.');
             }
         } else {
-            // Pergunta se o pai deseja solicitar concessão de transporte escolar
             await sendInteractiveMessageWithButtons(
                 to,
                 'O aluno está matriculado, mas não é usuário do transporte escolar. Deseja solicitar uma avaliação para concessão de transporte escolar?',
@@ -3558,11 +3565,9 @@ async function getNearestStop(studentCoordinates) {
             let minDistance = Number.MAX_VALUE;
 
             result.rows.forEach(stop => {
-                // Usar diretamente as colunas latitude e longitude como números
                 const stopLat = parseFloat(stop.latitude);
                 const stopLng = parseFloat(stop.longitude);
 
-                // Verifica se as coordenadas são válidas
                 if (!isNaN(stopLat) && !isNaN(stopLng)) {
                     const distance = calculateDistance(
                         studentCoordinates.lat,
@@ -3660,7 +3665,7 @@ async function sendInteractiveMessageWithButtons(to, bodyText, footerText, butto
     }
 }
 
-// Função genérica para enviar mensagem de texto
+// Função para enviar uma mensagem de texto
 async function sendTextMessage(to, text) {
     const message = {
         messaging_product: 'whatsapp',
@@ -3680,6 +3685,74 @@ async function sendTextMessage(to, text) {
         console.log('Mensagem enviada:', response.data);
     } catch (error) {
         console.error('Erro ao enviar mensagem:', error.response ? error.response.data : error.message);
+    }
+}
+
+// Função para perguntar o tipo de feedback
+async function askFeedbackType(to) {
+    const message = {
+        messaging_product: 'whatsapp',
+        recipient_type: 'individual',
+        to: to,
+        type: 'interactive',
+        interactive: {
+            type: 'button',
+            body: {
+                text: 'Qual tipo de feedback você deseja enviar?'
+            },
+            footer: {
+                text: 'Escolha uma opção'
+            },
+            action: {
+                buttons: [
+                    {
+                        type: 'reply',
+                        reply: {
+                            id: 'feedback_text',
+                            title: 'Texto'
+                        }
+                    },
+                    {
+                        type: 'reply',
+                        reply: {
+                            id: 'feedback_audio',
+                            title: 'Áudio'
+                        }
+                    }
+                ]
+            }
+        }
+    };
+
+    try {
+        const response = await axios.post(
+            `${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`,
+            message,
+            { headers: { Authorization: `Bearer ${ACCESS_TOKEN}` } }
+        );
+        console.log('Pergunta de tipo de feedback enviada:', response.data);
+    } catch (error) {
+        console.error('Erro ao enviar pergunta de tipo de feedback:', error.response ? error.response.data : error.message);
+    }
+}
+
+// Função para armazenar o feedback no banco de dados
+async function storeFeedback(to, feedback, isAudio = false) {
+    try {
+        const client = await pool.connect();
+        const query = 'INSERT INTO public.feedback (nome, mensagem, data_criacao) VALUES ($1, $2, $3)';
+        const values = [to, feedback, new Date()];
+        await client.query(query, values);
+        client.release();
+
+        await sendTextMessage(to, 'Obrigado pelo seu feedback! Ele foi armazenado com sucesso.');
+        console.log('Feedback armazenado:', feedback);
+
+        // Reseta o estado de feedback
+        delete feedbackState[to];
+    } catch (error) {
+        console.error('Erro ao armazenar feedback:', error);
+        await sendTextMessage(to, 'Desculpe, ocorreu um erro ao armazenar seu feedback. Por favor, tente novamente mais tarde.');
     }
 }
 
