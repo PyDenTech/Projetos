@@ -3467,7 +3467,6 @@ Usa Transporte Escolar: ${aluno.usa_transporte_escolar ? 'Sim' : 'Não'}
     }
 }
 
-// Função para verificar se o aluno usa transporte escolar e responder adequadamente
 async function checkStudentTransport(to) {
     const aluno = userState[to] ? userState[to].aluno : null;
 
@@ -3479,15 +3478,25 @@ async function checkStudentTransport(to) {
             if (coordinates) {
                 // Busca o ponto de parada mais próximo
                 const nearestStop = await getNearestStop(coordinates);
-                if (nearestStop) {
-                    // Gera o link do Google Maps para direções a pé
-                    const directionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${coordinates.lat},${coordinates.lng}&destination=${nearestStop.latitude},${nearestStop.longitude}&travelmode=walking`;
 
-                    // Envia mensagem com o link de direções
-                    await sendTextMessage(
-                        to,
-                        `O aluno usa o transporte escolar. O ponto de parada mais próximo ao endereço (${aluno.endereco}) é o ${nearestStop.nome}, localizado em: ${nearestStop.descricao}. Coordenadas: ${nearestStop.latitude}, ${nearestStop.longitude}.\n\nClique no link para ver a rota a pé até o ponto de parada: [Traçar Rota no Google Maps](${directionsUrl})`
-                    );
+                if (nearestStop) {
+                    // Verificar se todos os valores estão presentes
+                    console.log('Coordenadas do aluno:', coordinates);
+                    console.log('Ponto de parada mais próximo:', nearestStop);
+
+                    if (coordinates.lat && coordinates.lng && nearestStop.latitude && nearestStop.longitude) {
+                        // Gera o link do Google Maps para direções a pé
+                        const directionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${coordinates.lat},${coordinates.lng}&destination=${nearestStop.latitude},${nearestStop.longitude}&travelmode=walking`;
+
+                        // Envia mensagem com o link de direções
+                        await sendTextMessage(
+                            to,
+                            `O aluno usa o transporte escolar. O ponto de parada mais próximo ao endereço (${aluno.endereco}) é o ${nearestStop.nome}, localizado em: ${nearestStop.descricao}. Coordenadas: ${nearestStop.latitude}, ${nearestStop.longitude}.\n\nClique no link para ver a rota a pé até o ponto de parada: [Traçar Rota no Google Maps](${directionsUrl})`
+                        );
+                    } else {
+                        console.error('Coordenadas inválidas ou incompletas.');
+                        await sendTextMessage(to, 'Não foi possível gerar a rota devido a coordenadas inválidas ou incompletas.');
+                    }
                 } else {
                     await sendTextMessage(to, 'Não foi possível encontrar um ponto de parada próximo ao endereço informado.');
                 }
