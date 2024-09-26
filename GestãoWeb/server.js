@@ -3541,17 +3541,7 @@ async function getCoordinatesFromAddress(address) {
 async function getNearestStop(studentCoordinates) {
     try {
         const client = await pool.connect();
-        
-        // Atualiza a consulta para selecionar latitude e longitude diretamente
-        const query = `
-            SELECT 
-                id, 
-                nome, 
-                latitude, 
-                longitude, 
-                descricao 
-            FROM pontos_parada
-        `;
+        const query = 'SELECT * FROM pontos_parada';
         const result = await client.query(query);
 
         if (result.rows.length > 0) {
@@ -3559,20 +3549,23 @@ async function getNearestStop(studentCoordinates) {
             let minDistance = Number.MAX_VALUE;
 
             result.rows.forEach(stop => {
-                if (stop.latitude !== null && stop.longitude !== null) {
+                // Usar diretamente as colunas latitude e longitude
+                const stopLat = parseFloat(stop.latitude);
+                const stopLng = parseFloat(stop.longitude);
+
+                // Verifica se as coordenadas são válidas
+                if (!isNaN(stopLat) && !isNaN(stopLng)) {
                     const distance = calculateDistance(
                         studentCoordinates.lat,
                         studentCoordinates.lng,
-                        stop.latitude, // Latitude do ponto de parada
-                        stop.longitude  // Longitude do ponto de parada
+                        stopLat,
+                        stopLng
                     );
 
                     if (distance < minDistance) {
                         minDistance = distance;
                         nearestStop = stop;
                     }
-                } else {
-                    console.warn(`Coordenadas inválidas para o ponto de parada com ID: ${stop.id}`);
                 }
             });
 
@@ -3587,6 +3580,7 @@ async function getNearestStop(studentCoordinates) {
         return null;
     }
 }
+
 
 // Função para calcular a distância entre duas coordenadas
 function calculateDistance(lat1, lng1, lat2, lng2) {
