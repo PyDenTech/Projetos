@@ -3222,13 +3222,13 @@ app.post('/webhook', async (req, res) => {
                     await sendTextMessage(senderNumber, 'Para consultar o ponto de parada mais próximo, por favor, forneça o ID de matrícula ou CPF do aluno. Este ID pode ser encontrado na carteirinha do aluno ou no comprovante de matrícula emitido pela escola e entregue ao pai ou responsável.\n\nDigite o ID de matrícula do aluno para continuarmos:');
                     break;
                 case 'request_route':
-                    await sendTextMessage(senderNumber, 'Para solicitar uma nova concessão de rota, por favor, preencha o formulário em: https://exemplo.com/solicitar-rota');
+                    await sendTextMessage(senderNumber, 'Para solicitar uma nova concessão de rota, por favor, preencha o formulário em: https://semedcanaadoscarajas.pydenexpress.com/solicitar-rota-chat');
                     break;
                 case 'transport_questions':
-                    await sendTextMessage(senderNumber, 'Perguntas frequentes sobre transporte escolar: https://exemplo.com/faq-transporte');
+                    await sendTextMessage(senderNumber, 'Perguntas frequentes sobre transporte escolar: https://semedcanaadoscarajas.pydenexpress.com/faq');
                     break;
                 case 'feedback':
-                    await sendTextMessage(senderNumber, 'Para enviar reclamações, elogios ou sugestões, acesse: https://exemplo.com/feedback');
+                    await sendTextMessage(senderNumber, 'Para enviar reclamações, elogios ou sugestões, acesse: https://semedcanaadoscarajas.pydenexpress.com/feedback');
                     break;
                 case 'speak_to_agent':
                     await sendTextMessage(senderNumber, 'Por favor, aguarde enquanto conectamos você a um atendente. Um momento, por favor.');
@@ -3236,6 +3236,9 @@ app.post('/webhook', async (req, res) => {
                 case 'end_service':
                     await sendTextMessage(senderNumber, 'Atendimento encerrado. Se precisar de mais ajuda, envie uma mensagem a qualquer momento.');
                     delete userState[senderNumber]; // Reseta o estado do usuário
+                    break;
+                case 'option_2':
+                    await sendSemedServersMenu(senderNumber);
                     break;
                 default:
                     await sendInteractiveListMessage(senderNumber); // Envia o menu principal caso não haja opção válida
@@ -3681,6 +3684,98 @@ async function sendTextMessage(to, text) {
     } catch (error) {
         console.error('Erro ao enviar mensagem:', error.response ? error.response.data : error.message);
     }
+}
+
+// Função para enviar o submenu específico para Servidores SEMED
+async function sendSemedServersMenu(to) {
+    const submenuMessage = {
+        messaging_product: 'whatsapp',
+        recipient_type: 'individual',
+        to: to,
+        type: 'interactive',
+        interactive: {
+            type: 'list',
+            header: {
+                type: 'text',
+                text: '👩‍🏫 Você selecionou a opção Servidores SEMED.'
+            },
+            body: {
+                text: 'Por favor, selecione o número correspondente à sua necessidade:'
+            },
+            footer: {
+                text: 'Como podemos ajudar?'
+            },
+            action: {
+                button: 'Ver Opções',
+                sections: [
+                    {
+                        title: 'Necessidades',
+                        rows: [
+                            {
+                                id: 'request_driver',
+                                title: '1️⃣ Solicitar Motorista',
+                                description: '🚗 Solicitar um motorista para transporte'
+                            },
+                            {
+                                id: 'schedule_driver',
+                                title: '2️⃣ Agendar Motorista',
+                                description: '🗓️ Agendar um motorista para transporte futuro'
+                            },
+                            {
+                                id: 'speak_to_agent',
+                                title: '3️⃣ Falar com Atendente',
+                                description: '📞 Conversar com um atendente humano'
+                            },
+                            {
+                                id: 'end_service',
+                                title: '4️⃣ Encerrar Chamado',
+                                description: '❌ Finalizar o atendimento'
+                            },
+                            {
+                                id: 'back_to_menu',
+                                title: '5️⃣ Voltar ao Menu Anterior',
+                                description: '↩️ Retornar ao menu principal'
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    };
+
+    try {
+        const response = await axios.post(
+            `${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`,
+            submenuMessage,
+            { headers: { Authorization: `Bearer ${ACCESS_TOKEN}` } }
+        );
+
+        console.log('Submenu Servidores SEMED enviado:', response.data);
+    } catch (error) {
+        console.error('Erro ao enviar submenu Servidores SEMED:', error.response ? error.response.data : error.message);
+    }
+}
+
+// Modificar o switch para lidar com as opções do submenu "Servidores SEMED"
+switch (selectedOption) {
+    case 'request_driver':
+        await sendTextMessage(senderNumber, 'Para solicitar um motorista, por favor, preencha o formulário em: https://example.com/solicitar-motorista');
+        break;
+    case 'schedule_driver':
+        await sendTextMessage(senderNumber, 'Para agendar um motorista, por favor, preencha o formulário em: https://example.com/agendar-motorista');
+        break;
+    case 'speak_to_agent':
+        await sendTextMessage(senderNumber, 'Por favor, aguarde enquanto conectamos você a um atendente. Um momento, por favor.');
+        break;
+    case 'end_service':
+        await sendTextMessage(senderNumber, 'Atendimento encerrado. Se precisar de mais ajuda, envie uma mensagem a qualquer momento.');
+        delete userState[senderNumber]; // Reseta o estado do usuário
+        break;
+    case 'back_to_menu':
+        await sendInteractiveListMessage(senderNumber); // Envia o menu principal
+        break;
+    default:
+        await sendInteractiveListMessage(senderNumber); // Envia o menu principal caso não haja opção válida
 }
 
 app.use((req, res, next) => {
