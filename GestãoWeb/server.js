@@ -1756,11 +1756,11 @@ app.get('/api/zoneamentosConsulta', async (req, res) => {
 
 // Rota para cadastrar um novo ponto de parada
 app.post('/api/pontos-parada', async (req, res) => {
-    const { nome, coordenadas, zoneamento_id, descricao } = req.body;
+    const { nome, latitude, longitude, zoneamento_id, descricao } = req.body;
     try {
         const result = await pool.query(
-            'INSERT INTO pontos_parada (nome, coordenadas, zoneamento_id, descricao) VALUES ($1, ST_GeomFromGeoJSON($2), $3, $4) RETURNING *',
-            [nome, JSON.stringify(coordenadas), zoneamento_id, descricao]
+            'INSERT INTO pontos_parada (nome, latitude, longitude, zoneamento_id, descricao) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+            [nome, latitude, longitude, zoneamento_id, descricao]
         );
         res.json(result.rows[0]);
     } catch (err) {
@@ -3541,13 +3541,14 @@ async function getCoordinatesFromAddress(address) {
 async function getNearestStop(studentCoordinates) {
     try {
         const client = await pool.connect();
-
-        // Ajuste na consulta para retornar coordenadas no formato GeoJSON
+        
+        // Atualiza a consulta para selecionar latitude e longitude diretamente
         const query = `
             SELECT 
                 id, 
                 nome, 
-                ST_AsGeoJSON(coordenadas) AS coordenadas_geojson, 
+                latitude, 
+                longitude, 
                 descricao 
             FROM pontos_parada
         `;
@@ -3558,34 +3559,20 @@ async function getNearestStop(studentCoordinates) {
             let minDistance = Number.MAX_VALUE;
 
             result.rows.forEach(stop => {
-                if (stop.coordenadas_geojson) {
-                    try {
-                        // Converte o GeoJSON das coordenadas em um objeto JavaScript
-                        const stopGeoJSON = JSON.parse(stop.coordenadas_geojson);
+                if (stop.latitude !== null && stop.longitude !== null) {
+                    const distance = calculateDistance(
+                        studentCoordinates.lat,
+                        studentCoordinates.lng,
+                        stop.latitude, // Latitude do ponto de parada
+                        stop.longitude  // Longitude do ponto de parada
+                    );
 
-                        // Verifica se o GeoJSON contém a propriedade coordinates
-                        if (stopGeoJSON && stopGeoJSON.coordinates) {
-                            const stopCoordinates = stopGeoJSON.coordinates;
-
-                            const distance = calculateDistance(
-                                studentCoordinates.lat,
-                                studentCoordinates.lng,
-                                stopCoordinates[1], // Latitude do ponto de parada
-                                stopCoordinates[0]  // Longitude do ponto de parada
-                            );
-
-                            if (distance < minDistance) {
-                                minDistance = distance;
-                                nearestStop = stop;
-                            }
-                        } else {
-                            console.warn(`Coordenadas inválidas para o ponto de parada com ID: ${stop.id}. GeoJSON: ${stop.coordenadas_geojson}`);
-                        }
-                    } catch (parseError) {
-                        console.error(`Erro ao parsear GeoJSON para o ponto de parada com ID: ${stop.id}. Erro: ${parseError.message}`);
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        nearestStop = stop;
                     }
                 } else {
-                    console.warn(`Ponto de parada com ID: ${stop.id} não possui coordenadas GeoJSON.`);
+                    console.warn(`Coordenadas inválidas para o ponto de parada com ID: ${stop.id}`);
                 }
             });
 
@@ -3600,9 +3587,6 @@ async function getNearestStop(studentCoordinates) {
         return null;
     }
 }
-
-
-
 
 // Função para calcular a distância entre duas coordenadas
 function calculateDistance(lat1, lng1, lat2, lng2) {

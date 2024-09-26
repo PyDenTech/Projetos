@@ -10,7 +10,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="/css/admin-dashboard.css">
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&libraries=drawing,places"></script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&libraries=drawing,places"></script>
     <style>
         /* Animação para o efeito de fade-in */
         .info-window {
@@ -252,6 +253,12 @@
             }
             document.getElementById('latitude').value = location.lat();
             document.getElementById('longitude').value = location.lng();
+
+            // Atualiza latitude e longitude ao arrastar o marcador
+            google.maps.event.addListener(pontoMarker, 'dragend', function (event) {
+                document.getElementById('latitude').value = event.latLng.lat();
+                document.getElementById('longitude').value = event.latLng.lng();
+            });
         }
 
         // Função para carregar os zoneamentos existentes
@@ -430,10 +437,8 @@
 
             const pontoData = {
                 nome: nomePonto,
-                coordenadas: {
-                    type: "Point",
-                    coordinates: [longitude, latitude]
-                },
+                latitude: parseFloat(latitude),
+                longitude: parseFloat(longitude),
                 zoneamento_id: zoneamentoId,
                 descricao: descricao
             };
