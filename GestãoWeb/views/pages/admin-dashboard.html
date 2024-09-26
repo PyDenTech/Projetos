@@ -10,7 +10,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="/css/admin-dashboard.css">
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&libraries=drawing,places"></script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&libraries=drawing"></script>
     <style>
         /* Animação para o efeito de fade-in */
         .info-window {
@@ -33,6 +34,7 @@
         /* Estilo do conteúdo da janela de informação */
         .info-window-content {
             font-size: 14px;
+            /* Tamanho de fonte ajustado */
             font-weight: bold;
             padding: 8px;
             border-radius: 8px;
@@ -117,36 +119,6 @@
                         </form>
                         <div id="map" class="mt-4" style="height: 500px;"></div>
                     </div>
-                    <!-- Cadastro de Pontos de Parada -->
-                    <h3 class="mt-5">Cadastro de Pontos de Parada</h3>
-                    <div class="container mt-4">
-                        <form id="ponto-parada-form">
-                            <div class="form-group">
-                                <label for="nome-ponto">Nome do Ponto de Parada</label>
-                                <input type="text" class="form-control" id="nome-ponto" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="zoneamento-select">Selecione o Zoneamento</label>
-                                <select class="form-control" id="zoneamento-select" required>
-                                    <!-- Zoneamentos serão carregados dinamicamente -->
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="descricao-ponto">Descrição do Ponto de Parada</label>
-                                <textarea class="form-control" id="descricao-ponto" rows="3"></textarea>
-                            </div>
-                            <div id="map-ponto" class="mt-4" style="height: 400px;"></div>
-                            <div class="form-group">
-                                <label for="latitude">Latitude</label>
-                                <input type="text" class="form-control" id="latitude" readonly required>
-                            </div>
-                            <div class="form-group">
-                                <label for="longitude">Longitude</label>
-                                <input type="text" class="form-control" id="longitude" readonly required>
-                            </div>
-                            <button type="submit" class="btn btn-success">Cadastrar Ponto de Parada</button>
-                        </form>
-                    </div>
                 </div>
                 <div class="tab-pane fade" id="relatorios" role="tabpanel" aria-labelledby="relatorios-tab">
                     <h3>Relatórios</h3>
@@ -160,18 +132,20 @@
         </div>
     </main>
 
-    <!-- JavaScript para gerenciamento dos pontos de parada e mapa -->
+    <!-- JavaScript necessário para o funcionamento do mapa -->
     <script>
         let map;
         let drawingManager;
         let selectedShape;
-        let mapPonto;
-        let pontoMarker;
         const shapes = [];
         const zoneamentos = [];
-        const infoWindow = new google.maps.InfoWindow({ disableAutoPan: true });
+        const zoneamentoForm = document.getElementById('zoneamento-form');
+        const zoneamentosList = document.getElementById('zoneamentos-list');
+        const addZoneamentoBtn = document.getElementById('add-zoneamento');
+        let infoWindow = new google.maps.InfoWindow({
+            disableAutoPan: true // Impede o infowindow de reposicionar o mapa automaticamente
+        });
 
-        // Função para inicializar o mapa
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
                 center: { lat: -6.530080, lng: -49.851571 },
@@ -179,13 +153,6 @@
                 mapTypeId: 'terrain'
             });
 
-            mapPonto = new google.maps.Map(document.getElementById('map-ponto'), {
-                center: { lat: -6.530080, lng: -49.851571 },
-                zoom: 15,
-                mapTypeId: 'roadmap'
-            });
-
-            // Configuração inicial do gerenciador de desenhos
             drawingManager = new google.maps.drawing.DrawingManager({
                 drawingMode: google.maps.drawing.OverlayType.POLYGON,
                 drawingControl: true,
@@ -213,48 +180,16 @@
                 }
             });
 
-            // Configuração do clique no mapa de ponto de parada
-            google.maps.event.addListener(mapPonto, 'click', function (event) {
-                placePontoMarker(event.latLng);
+            addZoneamentoBtn.addEventListener('click', function () {
+                addZoneamentoFields();
             });
 
-            // Referência correta ao botão de adicionar zoneamento
-            const addZoneamentoBtn = document.getElementById('add-zoneamento');
-            if (addZoneamentoBtn) {
-                addZoneamentoBtn.addEventListener('click', function () {
-                    addZoneamentoFields();
-                });
-            }
-
-            // Adiciona o evento de submissão ao formulário de zoneamento
-            const zoneamentoForm = document.getElementById('zoneamento-form');
-            if (zoneamentoForm) {
-                zoneamentoForm.addEventListener('submit', saveAllZoneamentos);
-            }
+            zoneamentoForm.addEventListener('submit', saveAllZoneamentos);
 
             // Carrega zoneamentos existentes
             loadExistingZoneamentos();
-
-            // Carrega lista de zoneamentos para pontos de parada
-            loadZoneamentosForPontoParada();
         }
 
-        // Função para adicionar o marcador do ponto de parada
-        function placePontoMarker(location) {
-            if (pontoMarker) {
-                pontoMarker.setPosition(location);
-            } else {
-                pontoMarker = new google.maps.Marker({
-                    position: location,
-                    map: mapPonto,
-                    draggable: true
-                });
-            }
-            document.getElementById('latitude').value = location.lat();
-            document.getElementById('longitude').value = location.lng();
-        }
-
-        // Função para carregar os zoneamentos existentes
         function loadExistingZoneamentos() {
             fetch('/api/zoneamentos')
                 .then(response => response.json())
@@ -295,26 +230,6 @@
                 .catch(error => console.error('Erro ao carregar zoneamentos:', error));
         }
 
-        // Função para carregar a lista de zoneamentos para selecionar ao cadastrar ponto de parada
-        function loadZoneamentosForPontoParada() {
-            fetch('/api/zoneamentosConsulta')
-                .then(response => response.json())
-                .then(data => {
-                    const zoneamentoSelect = document.getElementById('zoneamento-select');
-                    if (zoneamentoSelect) {
-                        zoneamentoSelect.innerHTML = '<option value="">Selecione um Zoneamento</option>';
-                        data.forEach(zoneamento => {
-                            const option = document.createElement('option');
-                            option.value = zoneamento.id;
-                            option.text = zoneamento.nome;
-                            zoneamentoSelect.appendChild(option);
-                        });
-                    }
-                })
-                .catch(error => console.error('Erro ao carregar zoneamentos para pontos de parada:', error));
-        }
-
-        // Função para definir a seleção de um shape no mapa de zoneamento
         function setSelection(shape) {
             if (selectedShape) {
                 selectedShape.setEditable(false);
@@ -328,7 +243,6 @@
             }
         }
 
-        // Função para adicionar campos para novo zoneamento
         function addZoneamentoFields() {
             const index = zoneamentos.length;
             const zoneamentoDiv = document.createElement('div');
@@ -343,27 +257,21 @@
                     <input type="color" class="form-control color-picker" id="color-picker-${index}" value="#ff0000">
                 </div>
             `;
-            const zoneamentosList = document.getElementById('zoneamentos-list');
-            if (zoneamentosList) {
-                zoneamentosList.appendChild(zoneamentoDiv);
-            }
+            zoneamentosList.appendChild(zoneamentoDiv);
 
             const colorPicker = document.getElementById(`color-picker-${index}`);
-            if (colorPicker) {
-                colorPicker.addEventListener('input', function () {
-                    if (zoneamentos[index].shape) {
-                        zoneamentos[index].shape.setOptions({
-                            strokeColor: colorPicker.value,
-                            fillColor: colorPicker.value
-                        });
-                    }
-                });
-            }
+            colorPicker.addEventListener('input', function () {
+                if (zoneamentos[index].shape) {
+                    zoneamentos[index].shape.setOptions({
+                        strokeColor: colorPicker.value,
+                        fillColor: colorPicker.value
+                    });
+                }
+            });
 
             zoneamentos.push({ id: index, shape: null });
         }
 
-        // Função para salvar todos os zoneamentos
         function saveAllZoneamentos(event) {
             event.preventDefault();
             const zoneamentoData = [];
@@ -413,54 +321,9 @@
                 });
         }
 
-        // Função para salvar ponto de parada
-        document.getElementById('ponto-parada-form').addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            const nomePonto = document.getElementById('nome-ponto').value;
-            const zoneamentoId = document.getElementById('zoneamento-select').value;
-            const descricao = document.getElementById('descricao-ponto').value;
-            const latitude = document.getElementById('latitude').value;
-            const longitude = document.getElementById('longitude').value;
-
-            if (!latitude || !longitude) {
-                alert('Por favor, selecione a localização do ponto no mapa.');
-                return;
-            }
-
-            const pontoData = {
-                nome: nomePonto,
-                coordenadas: {
-                    type: "Point",
-                    coordinates: [longitude, latitude]
-                },
-                zoneamento_id: zoneamentoId,
-                descricao: descricao
-            };
-
-            fetch('/api/pontos-parada', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(pontoData)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    alert('Ponto de parada cadastrado com sucesso!');
-                    document.getElementById('ponto-parada-form').reset();
-                    if (pontoMarker) {
-                        pontoMarker.setMap(null);
-                        pontoMarker = null;
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro ao cadastrar ponto de parada:', error);
-                });
-        });
-
         window.onload = initMap;
     </script>
+    <script src="/js/admin.js"></script>
 </body>
 
 </html>
