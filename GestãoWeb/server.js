@@ -3208,6 +3208,7 @@ app.post('/webhook', async (req, res) => {
         const message = data.entry[0].changes[0].value.messages[0];
         const senderNumber = message.from;
         const text = message.text ? message.text.body : '';
+        const location = message.location ? message.location : null; // Verifica se há uma localização enviada
 
         if (!senderNumber) {
             console.error('Número do remetente não encontrado!');
@@ -3239,13 +3240,18 @@ app.post('/webhook', async (req, res) => {
                     break;
                 case 'endereco':
                     userState[senderNumber].endereco = text;
-                    userState[senderNumber].step = 'comprovante_endereco';
-                    await sendTextMessage(senderNumber, 'Por favor, envie o comprovante de endereço:');
+                    userState[senderNumber].step = 'localizacao_atual';
+                    await sendTextMessage(senderNumber, 'Por favor, compartilhe a sua localização atual para capturarmos os dados de latitude e longitude:');
                     break;
-                case 'comprovante_endereco':
-                    userState[senderNumber].comprovante_endereco = text;
-                    userState[senderNumber].step = 'id_matricula_aluno';
-                    await sendTextMessage(senderNumber, 'Por favor, insira o ID de matrícula ou CPF do aluno (use apenas números):');
+                case 'localizacao_atual':
+                    if (location) {
+                        userState[senderNumber].latitude = location.latitude;
+                        userState[senderNumber].longitude = location.longitude;
+                        userState[senderNumber].step = 'id_matricula_aluno';
+                        await sendTextMessage(senderNumber, 'Por favor, insira o ID de matrícula ou CPF do aluno (use apenas números):');
+                    } else {
+                        await sendTextMessage(senderNumber, 'Você não enviou uma localização válida. Por favor, compartilhe sua localização atual:');
+                    }
                     break;
                 case 'id_matricula_aluno':
                     userState[senderNumber].id_matricula_aluno = text;
@@ -3264,7 +3270,7 @@ app.post('/webhook', async (req, res) => {
                 case 'celular_responsavel':
                     userState[senderNumber].celular_responsavel = text;
                     userState[senderNumber].step = 'zoneamento';
-                    await sendTextMessage(senderNumber, 'Por favor, insira o zoneamento:');
+                    await sendTextMessage(senderNumber, 'Por favor, insira o bairro em que o aluno reside:');
                     break;
                 case 'zoneamento':
                     userState[senderNumber].zoneamento = text;
@@ -3391,7 +3397,8 @@ async function saveRouteRequest(senderNumber) {
         cep,
         numero,
         endereco,
-        comprovante_endereco,
+        latitude,
+        longitude,
         id_matricula_aluno,
         deficiencia,
         laudo_deficiencia,
@@ -3410,7 +3417,8 @@ async function saveRouteRequest(senderNumber) {
                 cep,
                 numero,
                 endereco,
-                comprovante_endereco,
+                latitude,
+                longitude,
                 id_matricula_aluno,
                 deficiencia,
                 laudo_deficiencia,
@@ -3418,7 +3426,7 @@ async function saveRouteRequest(senderNumber) {
                 celular_responsavel,
                 zoneamento,
                 observacoes
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
         `;
         const values = [
             nome_responsavel,
@@ -3426,7 +3434,8 @@ async function saveRouteRequest(senderNumber) {
             cep,
             numero,
             endereco,
-            comprovante_endereco,
+            latitude,
+            longitude,
             id_matricula_aluno,
             deficiencia,
             laudo_deficiencia,
@@ -3443,7 +3452,6 @@ async function saveRouteRequest(senderNumber) {
         await sendTextMessage(senderNumber, 'Desculpe, ocorreu um erro ao processar sua solicitação. Tente novamente mais tarde.');
     }
 }
-
 
 // Função para enviar o menu interativo principal
 async function sendInteractiveListMessage(to) {
