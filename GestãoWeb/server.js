@@ -3282,7 +3282,7 @@ app.post('/webhook', async (req, res) => {
             // Se não for uma resposta interativa, envia o menu principal
             await sendInteractiveListMessage(senderNumber);
         }
-    } else if (userState[senderNumber] && userState[senderNumber].step) {
+    } else if (senderNumber && userState[senderNumber] && userState[senderNumber].step) {
         switch (userState[senderNumber].step) {
             case 'nome_responsavel':
                 userState[senderNumber].nome_responsavel = text;
@@ -3425,6 +3425,7 @@ async function saveRouteRequest(to) {
         await sendTextMessage(to, 'Desculpe, ocorreu um erro ao processar sua solicitação. Tente novamente mais tarde.');
     }
 }
+
 
 // Função para enviar o menu interativo principal
 async function sendInteractiveListMessage(to) {
