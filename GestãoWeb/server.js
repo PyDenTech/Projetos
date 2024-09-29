@@ -3373,8 +3373,9 @@ app.post('/webhook', async (req, res) => {
                 await sendTextMessage(senderNumber, 'Por favor, verifique o ID de matrícula ou CPF e tente novamente.');
                 userState[senderNumber] = 'awaiting_id'; // Volta ao estado aguardando ID
             } else if (buttonResponse === 'request_transport_yes') {
-                await sendTextMessage(senderNumber, 'Por favor, preencha o formulário para solicitar concessão de transporte: https://exemplo.com/solicitar-transporte');
-                delete userState[senderNumber]; // Reseta o estado do usuário
+                // Muda para o fluxo de solicitação de rota
+                userState[senderNumber] = { step: 'nome_responsavel' }; // Define que a próxima resposta será o nome do responsável
+                await sendTextMessage(senderNumber, 'Por favor, insira o nome completo do responsável pela solicitação:');
             } else if (buttonResponse === 'request_transport_no') {
                 await sendTextMessage(senderNumber, 'Tudo bem! Se precisar de mais ajuda, envie uma mensagem a qualquer momento.');
                 delete userState[senderNumber]; // Reseta o estado do usuário
