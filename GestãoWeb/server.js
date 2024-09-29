@@ -3707,9 +3707,15 @@ async function checkStudentTransport(to) {
                 const nearestStop = await getNearestStop(coordinates);
 
                 if (nearestStop) {
+                    // Verificar se todos os valores estão presentes
+                    console.log('Coordenadas do aluno:', coordinates);
+                    console.log('Ponto de parada mais próximo:', nearestStop);
+
                     if (coordinates.lat && coordinates.lng && nearestStop.latitude && nearestStop.longitude) {
+                        // Gera o link do Google Maps para direções a pé
                         const directionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${coordinates.lat},${coordinates.lng}&destination=${nearestStop.latitude},${nearestStop.longitude}&travelmode=walking`;
 
+                        // Envia mensagem com o link de direções
                         await sendTextMessage(
                             to,
                             `O aluno usa o transporte escolar. O ponto de parada mais próximo ao endereço (${aluno.endereco}) é o ${nearestStop.nome}, localizado em: ${nearestStop.descricao}. Coordenadas: ${nearestStop.latitude}, ${nearestStop.longitude}.\n\nClique no link para ver a rota a pé até o ponto de parada: [Traçar Rota no Google Maps](${directionsUrl})`
@@ -3722,11 +3728,10 @@ async function checkStudentTransport(to) {
                     await sendTextMessage(to, 'Não foi possível encontrar um ponto de parada próximo ao endereço informado.');
                 }
             } else {
-                // Se não conseguir converter o endereço para coordenadas, solicita a localização
-                await sendTextMessage(to, 'Não foi possível converter o endereço para coordenadas. Por favor, envie sua localização atual, certificando-se de que está em sua residência, para que possamos processar sua solicitação corretamente.');
-                userState[to].step = 'localizacao_atual';
+                await sendTextMessage(to, 'Não foi possível converter o endereço para coordenadas. Verifique o endereço informado.');
             }
         } else {
+            // Pergunta se o pai deseja solicitar concessão de transporte escolar
             await sendInteractiveMessageWithButtons(
                 to,
                 'O aluno está matriculado, mas não é usuário do transporte escolar. Deseja solicitar uma avaliação para concessão de transporte escolar?',
@@ -3741,7 +3746,6 @@ async function checkStudentTransport(to) {
         await sendTextMessage(to, 'Desculpe, ocorreu um erro ao verificar as informações do aluno. Por favor, tente novamente.');
     }
 }
-
 
 // Função para obter as coordenadas de um endereço usando a API do Google Maps
 async function getCoordinatesFromAddress(address) {
