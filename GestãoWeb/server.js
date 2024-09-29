@@ -3197,6 +3197,8 @@ app.get('/webhook', (req, res) => {
     }
 });
 
+let userState = {};
+
 const TIMEOUT_DURATION = 10 * 60 * 1000; // 10 minutos em milissegundos
 
 // Variável global para armazenar o tempo da última interação
