@@ -3381,7 +3381,7 @@ async function saveRouteRequest(to) {
         celular_responsavel,
         zoneamento,
         observacoes
-    } = userState[senderNumber];
+    } = userState[to];
 
     try {
         const client = await pool.connect();
