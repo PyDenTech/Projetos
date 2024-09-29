@@ -3365,11 +3365,8 @@ app.post('/webhook', async (req, res) => {
     res.sendStatus(200);
 });
 
-const message = data.entry[0].changes[0].value.messages[0];
-const senderNumber = message.from;
-
 // Função para salvar a solicitação no banco de dados
-async function saveRouteRequest(senderNumber) {
+async function saveRouteRequest(to) {
     const {
         nome_responsavel,
         cpf_responsavel,
