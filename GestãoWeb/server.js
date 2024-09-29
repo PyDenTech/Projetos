@@ -3282,80 +3282,80 @@ app.post('/webhook', async (req, res) => {
             // Se não for uma resposta interativa, envia o menu principal
             await sendInteractiveListMessage(senderNumber);
         }
-    } else if (senderNumber && userState[senderNumber] && userState[senderNumber].step) {
-        switch (userState[senderNumber].step) {
+    } else if (userState[to] && userState[to].step) {
+        switch (userState[to].step) {
             case 'nome_responsavel':
-                userState[senderNumber].nome_responsavel = text;
-                userState[senderNumber].step = 'cpf_responsavel';
-                await sendTextMessage(senderNumber, 'Por favor, insira o CPF do responsável:');
+                userState[to].nome_responsavel = text;
+                userState[to].step = 'cpf_responsavel';
+                await sendTextMessage(to, 'Por favor, insira o CPF do responsável:');
                 break;
             case 'cpf_responsavel':
-                userState[senderNumber].cpf_responsavel = text;
-                userState[senderNumber].step = 'cep';
-                await sendTextMessage(senderNumber, 'Por favor, insira o CEP do endereço:');
+                userState[to].cpf_responsavel = text;
+                userState[to].step = 'cep';
+                await sendTextMessage(to, 'Por favor, insira o CEP do endereço:');
                 break;
             case 'cep':
-                userState[senderNumber].cep = text;
-                userState[senderNumber].step = 'numero';
-                await sendTextMessage(senderNumber, 'Por favor, insira o número da residência:');
+                userState[to].cep = text;
+                userState[to].step = 'numero';
+                await sendTextMessage(to, 'Por favor, insira o número da residência:');
                 break;
             case 'numero':
-                userState[senderNumber].numero = text;
-                userState[senderNumber].step = 'endereco';
-                await sendTextMessage(senderNumber, 'Por favor, insira o endereço completo:');
+                userState[to].numero = text;
+                userState[to].step = 'endereco';
+                await sendTextMessage(to, 'Por favor, insira o endereço completo:');
                 break;
             case 'endereco':
-                userState[senderNumber].endereco = text;
-                userState[senderNumber].step = 'comprovante_endereco';
-                await sendTextMessage(senderNumber, 'Por favor, envie o comprovante de endereço:');
+                userState[to].endereco = text;
+                userState[to].step = 'comprovante_endereco';
+                await sendTextMessage(to, 'Por favor, envie o comprovante de endereço:');
                 break;
             case 'comprovante_endereco':
-                userState[senderNumber].comprovante_endereco = text;
-                userState[senderNumber].step = 'id_matricula_aluno';
-                await sendTextMessage(senderNumber, 'Por favor, insira o ID de matrícula do aluno:');
+                userState[to].comprovante_endereco = text;
+                userState[to].step = 'id_matricula_aluno';
+                await sendTextMessage(to, 'Por favor, insira o ID de matrícula do aluno:');
                 break;
             case 'id_matricula_aluno':
-                userState[senderNumber].id_matricula_aluno = text;
-                userState[senderNumber].step = 'deficiencia';
-                await sendTextMessage(senderNumber, 'O aluno possui alguma deficiência? Responda "Sim" ou "Não":');
+                userState[to].id_matricula_aluno = text;
+                userState[to].step = 'deficiencia';
+                await sendTextMessage(to, 'O aluno possui alguma deficiência? Responda "Sim" ou "Não":');
                 break;
             case 'deficiencia':
-                userState[senderNumber].deficiencia = text.toLowerCase() === 'sim' ? 'Sim' : 'Não';
-                if (userState[senderNumber].deficiencia === 'Sim') {
-                    userState[senderNumber].step = 'laudo_deficiencia';
-                    await sendTextMessage(senderNumber, 'Por favor, envie o laudo da deficiência:');
+                userState[to].deficiencia = text.toLowerCase() === 'sim' ? 'Sim' : 'Não';
+                if (userState[to].deficiencia === 'Sim') {
+                    userState[to].step = 'laudo_deficiencia';
+                    await sendTextMessage(to, 'Por favor, envie o laudo da deficiência:');
                 } else {
-                    userState[senderNumber].step = 'escola_id';
-                    await sendTextMessage(senderNumber, 'Por favor, insira o ID da escola:');
+                    userState[to].step = 'escola_id';
+                    await sendTextMessage(to, 'Por favor, insira o ID da escola:');
                 }
                 break;
             case 'laudo_deficiencia':
-                userState[senderNumber].laudo_deficiencia = text;
-                userState[senderNumber].step = 'escola_id';
-                await sendTextMessage(senderNumber, 'Por favor, insira o ID da escola:');
+                userState[to].laudo_deficiencia = text;
+                userState[to].step = 'escola_id';
+                await sendTextMessage(to, 'Por favor, insira o ID da escola:');
                 break;
             case 'escola_id':
-                userState[senderNumber].escola_id = text;
-                userState[senderNumber].step = 'celular_responsavel';
-                await sendTextMessage(senderNumber, 'Por favor, insira o número de telefone do responsável:');
+                userState[to].escola_id = text;
+                userState[to].step = 'celular_responsavel';
+                await sendTextMessage(to, 'Por favor, insira o número de telefone do responsável:');
                 break;
             case 'celular_responsavel':
-                userState[senderNumber].celular_responsavel = text;
-                userState[senderNumber].step = 'zoneamento';
-                await sendTextMessage(senderNumber, 'Por favor, insira o zoneamento:');
+                userState[to].celular_responsavel = text;
+                userState[to].step = 'zoneamento';
+                await sendTextMessage(to, 'Por favor, insira o zoneamento:');
                 break;
             case 'zoneamento':
-                userState[senderNumber].zoneamento = text;
-                userState[senderNumber].step = 'observacoes';
-                await sendTextMessage(senderNumber, 'Por favor, insira qualquer observação adicional (ou digite "nenhuma" se não houver):');
+                userState[to].zoneamento = text;
+                userState[to].step = 'observacoes';
+                await sendTextMessage(to, 'Por favor, insira qualquer observação adicional (ou digite "nenhuma" se não houver):');
                 break;
             case 'observacoes':
-                userState[senderNumber].observacoes = text === 'nenhuma' ? '' : text;
+                userState[to].observacoes = text === 'nenhuma' ? '' : text;
 
                 // Agora que todos os dados foram coletados, vamos inserir no banco de dados
-                await saveRouteRequest(senderNumber);
-                await sendTextMessage(senderNumber, 'Sua solicitação de rota foi enviada com sucesso! Em breve entraremos em contato.');
-                delete userState[senderNumber]; // Limpa o estado do usuário após a conclusão
+                await saveRouteRequest(to);
+                await sendTextMessage(to, 'Sua solicitação de rota foi enviada com sucesso! Em breve entraremos em contato.');
+                delete userState[to]; // Limpa o estado do usuário após a conclusão
                 break;
             default:
                 await sendInteractiveListMessage(senderNumber); // Caso não haja um estado conhecido, volta ao menu principal
