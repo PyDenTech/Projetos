@@ -3197,10 +3197,11 @@ app.get('/webhook', (req, res) => {
     }
 });
 
-// Variável global para armazenar o estado do usuário
-let userState = {};
+const TIMEOUT_DURATION = 10 * 60 * 1000; // 10 minutos em milissegundos
 
-// Rota para lidar com mensagens recebidas
+// Variável global para armazenar o tempo da última interação
+let userTimers = {};
+
 app.post('/webhook', async (req, res) => {
     const data = req.body;
 
@@ -3215,6 +3216,20 @@ app.post('/webhook', async (req, res) => {
             console.error('Número do remetente não encontrado!');
             return res.sendStatus(400);  // Retorna um erro se senderNumber não for definido
         }
+
+        // Verifica se há um timer ativo para o usuário
+        if (userTimers[senderNumber]) {
+            clearTimeout(userTimers[senderNumber]); // Reseta o temporizador se o usuário respondeu
+        }
+
+        // Função para encerrar a conversa após 10 minutos de inatividade
+        const setInactivityTimeout = () => {
+            userTimers[senderNumber] = setTimeout(async () => {
+                await sendTextMessage(senderNumber, 'Percebemos que você está ocupado(a). Se precisar de mais ajuda, estamos à disposição. Pode nos chamar a qualquer momento.');
+                delete userState[senderNumber]; // Limpa o estado do usuário após o tempo limite
+                delete userTimers[senderNumber]; // Remove o temporizador
+            }, TIMEOUT_DURATION);
+        };
 
         // Verifique primeiro se o usuário está no meio de uma solicitação
         if (userState[senderNumber] && userState[senderNumber].step) {
@@ -3310,6 +3325,8 @@ app.post('/webhook', async (req, res) => {
                 default:
                     await sendInteractiveListMessage(senderNumber); // Caso não haja um estado conhecido, volta ao menu principal
             }
+            // Inicia o temporizador para encerrar a conversa após 10 minutos de inatividade
+            setInactivityTimeout();
         } else if (message.interactive && message.interactive.list_reply) {
             const selectedOption = message.interactive.list_reply.id;
 
@@ -3354,6 +3371,8 @@ app.post('/webhook', async (req, res) => {
                 default:
                     await sendInteractiveListMessage(senderNumber); // Envia o menu principal caso não haja opção válida
             }
+            // Inicia o temporizador para encerrar a conversa após 10 minutos de inatividade
+            setInactivityTimeout();
         } else if (userState[senderNumber] === 'awaiting_id') {
             // Se o estado do usuário for 'awaiting_id', processa o ID fornecido
             const isNumeric = /^[0-9]+$/.test(text); // Verifica se a resposta é numérica
@@ -3363,6 +3382,8 @@ app.post('/webhook', async (req, res) => {
             } else {
                 await sendTextMessage(senderNumber, 'Por favor, forneça um ID de matrícula ou CPF válido, usando apenas números.');
             }
+            // Inicia o temporizador para encerrar a conversa após 10 minutos de inatividade
+            setInactivityTimeout();
         } else if (message.interactive && message.interactive.button_reply) {
             const buttonResponse = message.interactive.button_reply.id;
 
@@ -3373,16 +3394,19 @@ app.post('/webhook', async (req, res) => {
                 await sendTextMessage(senderNumber, 'Por favor, verifique o ID de matrícula ou CPF e tente novamente.');
                 userState[senderNumber] = 'awaiting_id'; // Volta ao estado aguardando ID
             } else if (buttonResponse === 'request_transport_yes') {
-                // Muda para o fluxo de solicitação de rota
-                userState[senderNumber] = { step: 'nome_responsavel' }; // Define que a próxima resposta será o nome do responsável
+                userState[senderNumber] = { step: 'nome_responsavel' }; // Começa o fluxo de solicitação de rota
                 await sendTextMessage(senderNumber, 'Por favor, insira o nome completo do responsável pela solicitação:');
             } else if (buttonResponse === 'request_transport_no') {
                 await sendTextMessage(senderNumber, 'Tudo bem! Se precisar de mais ajuda, envie uma mensagem a qualquer momento.');
                 delete userState[senderNumber]; // Reseta o estado do usuário
             }
+            // Inicia o temporizador para encerrar a conversa após 10 minutos de inatividade
+            setInactivityTimeout();
         } else {
             // Se não for uma resposta interativa, envia o menu principal
             await sendInteractiveListMessage(senderNumber);
+            // Inicia o temporizador para encerrar a conversa após 10 minutos de inatividade
+            setInactivityTimeout();
         }
     }
 
