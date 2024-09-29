@@ -3225,7 +3225,8 @@ app.post('/webhook', async (req, res) => {
                     await sendTextMessage(senderNumber, 'Para consultar o ponto de parada mais próximo, por favor, forneça o ID de matrícula ou CPF do aluno. Este ID pode ser encontrado na carteirinha do aluno ou no comprovante de matrícula emitido pela escola e entregue ao pai ou responsável.\n\nDigite o ID de matrícula do aluno para continuarmos:');
                     break;
                 case 'request_route':
-                    await sendTextMessage(senderNumber, 'Para solicitar uma nova concessão de rota, por favor, preencha o formulário em: https://semedcanaadoscarajas.pydenexpress.com/solicitar-rota-chat');
+                    userState[senderNumber] = { step: 'nome_responsavel' }; // Define que a próxima resposta será o nome do responsável
+                    await sendTextMessage(senderNumber, 'Por favor, insira o nome completo do responsável pela solicitação:');
                     break;
                 case 'transport_questions':
                     await sendTextMessage(senderNumber, 'Perguntas frequentes sobre transporte escolar: https://semedcanaadoscarajas.pydenexpress.com/faq');
@@ -3281,10 +3282,149 @@ app.post('/webhook', async (req, res) => {
             // Se não for uma resposta interativa, envia o menu principal
             await sendInteractiveListMessage(senderNumber);
         }
+    } else if (userState[senderNumber] && userState[senderNumber].step) {
+        switch (userState[senderNumber].step) {
+            case 'nome_responsavel':
+                userState[senderNumber].nome_responsavel = text;
+                userState[senderNumber].step = 'cpf_responsavel';
+                await sendTextMessage(senderNumber, 'Por favor, insira o CPF do responsável:');
+                break;
+            case 'cpf_responsavel':
+                userState[senderNumber].cpf_responsavel = text;
+                userState[senderNumber].step = 'cep';
+                await sendTextMessage(senderNumber, 'Por favor, insira o CEP do endereço:');
+                break;
+            case 'cep':
+                userState[senderNumber].cep = text;
+                userState[senderNumber].step = 'numero';
+                await sendTextMessage(senderNumber, 'Por favor, insira o número da residência:');
+                break;
+            case 'numero':
+                userState[senderNumber].numero = text;
+                userState[senderNumber].step = 'endereco';
+                await sendTextMessage(senderNumber, 'Por favor, insira o endereço completo:');
+                break;
+            case 'endereco':
+                userState[senderNumber].endereco = text;
+                userState[senderNumber].step = 'comprovante_endereco';
+                await sendTextMessage(senderNumber, 'Por favor, envie o comprovante de endereço:');
+                break;
+            case 'comprovante_endereco':
+                userState[senderNumber].comprovante_endereco = text;
+                userState[senderNumber].step = 'id_matricula_aluno';
+                await sendTextMessage(senderNumber, 'Por favor, insira o ID de matrícula do aluno:');
+                break;
+            case 'id_matricula_aluno':
+                userState[senderNumber].id_matricula_aluno = text;
+                userState[senderNumber].step = 'deficiencia';
+                await sendTextMessage(senderNumber, 'O aluno possui alguma deficiência? Responda "Sim" ou "Não":');
+                break;
+            case 'deficiencia':
+                userState[senderNumber].deficiencia = text.toLowerCase() === 'sim' ? 'Sim' : 'Não';
+                if (userState[senderNumber].deficiencia === 'Sim') {
+                    userState[senderNumber].step = 'laudo_deficiencia';
+                    await sendTextMessage(senderNumber, 'Por favor, envie o laudo da deficiência:');
+                } else {
+                    userState[senderNumber].step = 'escola_id';
+                    await sendTextMessage(senderNumber, 'Por favor, insira o ID da escola:');
+                }
+                break;
+            case 'laudo_deficiencia':
+                userState[senderNumber].laudo_deficiencia = text;
+                userState[senderNumber].step = 'escola_id';
+                await sendTextMessage(senderNumber, 'Por favor, insira o ID da escola:');
+                break;
+            case 'escola_id':
+                userState[senderNumber].escola_id = text;
+                userState[senderNumber].step = 'celular_responsavel';
+                await sendTextMessage(senderNumber, 'Por favor, insira o número de telefone do responsável:');
+                break;
+            case 'celular_responsavel':
+                userState[senderNumber].celular_responsavel = text;
+                userState[senderNumber].step = 'zoneamento';
+                await sendTextMessage(senderNumber, 'Por favor, insira o zoneamento:');
+                break;
+            case 'zoneamento':
+                userState[senderNumber].zoneamento = text;
+                userState[senderNumber].step = 'observacoes';
+                await sendTextMessage(senderNumber, 'Por favor, insira qualquer observação adicional (ou digite "nenhuma" se não houver):');
+                break;
+            case 'observacoes':
+                userState[senderNumber].observacoes = text === 'nenhuma' ? '' : text;
+
+                // Agora que todos os dados foram coletados, vamos inserir no banco de dados
+                await saveRouteRequest(senderNumber);
+                await sendTextMessage(senderNumber, 'Sua solicitação de rota foi enviada com sucesso! Em breve entraremos em contato.');
+                delete userState[senderNumber]; // Limpa o estado do usuário após a conclusão
+                break;
+            default:
+                await sendInteractiveListMessage(senderNumber); // Caso não haja um estado conhecido, volta ao menu principal
+        }
     }
 
     res.sendStatus(200);
 });
+
+// Função para salvar a solicitação no banco de dados
+async function saveRouteRequest(senderNumber) {
+    const {
+        nome_responsavel,
+        cpf_responsavel,
+        cep,
+        numero,
+        endereco,
+        comprovante_endereco,
+        id_matricula_aluno,
+        deficiencia,
+        laudo_deficiencia,
+        escola_id,
+        celular_responsavel,
+        zoneamento,
+        observacoes
+    } = userState[senderNumber];
+
+    try {
+        const client = await pool.connect();
+        const query = `
+            INSERT INTO solicitacoes_rota (
+                nome_responsavel,
+                cpf_responsavel,
+                cep,
+                numero,
+                endereco,
+                comprovante_endereco,
+                id_matricula_aluno,
+                deficiencia,
+                laudo_deficiencia,
+                escola_id,
+                celular_responsavel,
+                zoneamento,
+                observacoes
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+        `;
+        const values = [
+            nome_responsavel,
+            cpf_responsavel,
+            cep,
+            numero,
+            endereco,
+            comprovante_endereco,
+            id_matricula_aluno,
+            deficiencia,
+            laudo_deficiencia,
+            escola_id,
+            celular_responsavel,
+            zoneamento,
+            observacoes
+        ];
+        await client.query(query, values);
+        client.release();
+        console.log('Solicitação de rota salva com sucesso');
+    } catch (error) {
+        console.error('Erro ao salvar solicitação de rota:', error);
+        await sendTextMessage(senderNumber, 'Desculpe, ocorreu um erro ao processar sua solicitação. Tente novamente mais tarde.');
+    }
+}
 
 // Função para enviar o menu interativo principal
 async function sendInteractiveListMessage(to) {
