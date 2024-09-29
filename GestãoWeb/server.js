@@ -3422,7 +3422,7 @@ async function saveRouteRequest(to) {
         console.log('Solicitação de rota salva com sucesso');
     } catch (error) {
         console.error('Erro ao salvar solicitação de rota:', error);
-        await sendTextMessage(senderNumber, 'Desculpe, ocorreu um erro ao processar sua solicitação. Tente novamente mais tarde.');
+        await sendTextMessage(to, 'Desculpe, ocorreu um erro ao processar sua solicitação. Tente novamente mais tarde.');
     }
 }
 
