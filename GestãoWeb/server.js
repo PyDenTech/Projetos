@@ -3209,6 +3209,7 @@ app.post('/webhook', async (req, res) => {
         const senderNumber = message.from;
         const text = message.text ? message.text.body : '';
         const location = message.location ? message.location : null; // Verifica se há uma localização enviada
+        const media = message.image || message.document; // Verifica se há um documento enviado (ex: laudo médico)
 
         if (!senderNumber) {
             console.error('Número do remetente não encontrado!');
@@ -3260,11 +3261,32 @@ app.post('/webhook', async (req, res) => {
                     const alunoData = await findStudentByIdOrCpf(userState[senderNumber].id_matricula_aluno);
                     if (alunoData) {
                         userState[senderNumber].escola_id = alunoData.id_escola;
-                        await sendTextMessage(senderNumber, `Aluno encontrado! Matriculado na escola: ${alunoData.nome_escola}. Agora insira o telefone do responsável.`);
-                        userState[senderNumber].step = 'celular_responsavel';
+                        await sendTextMessage(senderNumber, `Aluno encontrado! Matriculado na escola: ${alunoData.nome_escola}. O aluno possui alguma deficiência? Responda "Sim" ou "Não".`);
+                        userState[senderNumber].step = 'deficiencia';
                     } else {
                         await sendTextMessage(senderNumber, 'ID de matrícula ou CPF do aluno não encontrado. Verifique os dados e tente novamente.');
                         delete userState[senderNumber]; // Reseta o estado do usuário
+                    }
+                    break;
+                case 'deficiencia':
+                    if (text.toLowerCase() === 'sim') {
+                        userState[senderNumber].deficiencia = true;
+                        userState[senderNumber].step = 'laudo_deficiencia';
+                        await sendTextMessage(senderNumber, 'Por favor, envie o laudo médico que comprove a deficiência (pode ser uma imagem ou documento).');
+                    } else {
+                        userState[senderNumber].deficiencia = false;
+                        userState[senderNumber].laudo_deficiencia = null;
+                        userState[senderNumber].step = 'celular_responsavel';
+                        await sendTextMessage(senderNumber, 'Por favor, insira o telefone do responsável:');
+                    }
+                    break;
+                case 'laudo_deficiencia':
+                    if (media) {
+                        userState[senderNumber].laudo_deficiencia = media.id; // Salva o ID do documento/laudo
+                        userState[senderNumber].step = 'celular_responsavel';
+                        await sendTextMessage(senderNumber, 'Laudo médico recebido! Agora insira o telefone do responsável:');
+                    } else {
+                        await sendTextMessage(senderNumber, 'Por favor, envie um documento ou imagem válido do laudo médico.');
                     }
                     break;
                 case 'celular_responsavel':
@@ -3365,6 +3387,7 @@ app.post('/webhook', async (req, res) => {
 
     res.sendStatus(200);
 });
+
 
 // Função para buscar os dados do aluno pelo CPF ou ID de matrícula
 async function findStudentByIdOrCpf(idOrCpf) {
