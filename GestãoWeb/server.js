@@ -3220,7 +3220,7 @@ app.post('/webhook', async (req, res) => {
                 case 'nome_responsavel':
                     userState[senderNumber].nome_responsavel = text;
                     userState[senderNumber].step = 'cpf_responsavel';
-                    await sendTextMessage(senderNumber, 'Por favor, insira o CPF (até 15 dígitos) ou o ID de matrícula do aluno:');
+                    await sendTextMessage(senderNumber, 'Por favor, insira o CPF do responsável:');
                     break;
                 case 'cpf_responsavel':
                     userState[senderNumber].cpf_responsavel = text;
@@ -3245,33 +3245,21 @@ app.post('/webhook', async (req, res) => {
                 case 'comprovante_endereco':
                     userState[senderNumber].comprovante_endereco = text;
                     userState[senderNumber].step = 'id_matricula_aluno';
-                    await sendTextMessage(senderNumber, 'Por favor, insira o CPF (até 15 dígitos) ou o ID de matrícula do aluno:');
+                    await sendTextMessage(senderNumber, 'Por favor, insira o ID de matrícula ou CPF do aluno (use apenas números):');
                     break;
                 case 'id_matricula_aluno':
                     userState[senderNumber].id_matricula_aluno = text;
-                    userState[senderNumber].step = 'deficiencia';
-                    await sendTextMessage(senderNumber, 'O aluno possui alguma deficiência? Responda "Sim" ou "Não":');
-                    break;
-                case 'deficiencia':
-                    userState[senderNumber].deficiencia = text.toLowerCase() === 'sim' ? 'Sim' : 'Não';
-                    if (userState[senderNumber].deficiencia === 'Sim') {
-                        userState[senderNumber].step = 'laudo_deficiencia';
-                        await sendTextMessage(senderNumber, 'Por favor, envie o laudo da deficiência:');
+
+                    // Consulta o banco de dados para encontrar a escola do aluno
+                    const alunoData = await findStudentByIdOrCpf(userState[senderNumber].id_matricula_aluno);
+                    if (alunoData) {
+                        userState[senderNumber].escola_id = alunoData.id_escola;
+                        await sendTextMessage(senderNumber, `Aluno encontrado! Matriculado na escola: ${alunoData.nome_escola}. Agora insira o telefone do responsável.`);
+                        userState[senderNumber].step = 'celular_responsavel';
                     } else {
-                        userState[senderNumber].step = 'escola_id';
-                        await sendSchoolsList(senderNumber); // Envia a lista de escolas
+                        await sendTextMessage(senderNumber, 'ID de matrícula ou CPF do aluno não encontrado. Verifique os dados e tente novamente.');
+                        delete userState[senderNumber]; // Reseta o estado do usuário
                     }
-                    break;
-                case 'laudo_deficiencia':
-                    userState[senderNumber].laudo_deficiencia = text;
-                    userState[senderNumber].step = 'escola_id';
-                    await sendSchoolsList(senderNumber); // Envia a lista de escolas
-                    break;
-                case 'escola_id':
-                    // Captura a escola escolhida e continua o fluxo
-                    userState[senderNumber].escola_id = text; // Aqui, o 'text' será o ID da escola selecionada
-                    userState[senderNumber].step = 'celular_responsavel';
-                    await sendTextMessage(senderNumber, 'Por favor, insira o número de telefone do responsável:');
                     break;
                 case 'celular_responsavel':
                     userState[senderNumber].celular_responsavel = text;
@@ -3372,58 +3360,26 @@ app.post('/webhook', async (req, res) => {
     res.sendStatus(200);
 });
 
-// Função para enviar a lista de escolas
-async function sendSchoolsList(to) {
+// Função para buscar os dados do aluno pelo CPF ou ID de matrícula
+async function findStudentByIdOrCpf(idOrCpf) {
     try {
         const client = await pool.connect();
-        const result = await client.query('SELECT id, nome FROM escolas'); // Supondo que você queira listar apenas ID e nome
-        const escolas = result.rows;
-
-        const sections = escolas.map(escola => ({
-            id: escola.id.toString(),  // Usamos o ID como identificador
-            title: escola.nome,        // Nome da escola para exibição
-            description: `ID: ${escola.id}`  // Exibe o ID na descrição (opcional)
-        }));
-
-        const listMessage = {
-            messaging_product: 'whatsapp',
-            recipient_type: 'individual',
-            to: to,
-            type: 'interactive',
-            interactive: {
-                type: 'list',
-                header: {
-                    type: 'text',
-                    text: 'Escolha a escola onde o aluno está matriculado:'
-                },
-                body: {
-                    text: 'Selecione uma das escolas listadas abaixo:'
-                },
-                footer: {
-                    text: 'Escolha a escola correspondente ao aluno.'
-                },
-                action: {
-                    button: 'Ver Escolas',
-                    sections: [
-                        {
-                            title: 'Lista de Escolas',
-                            rows: sections
-                        }
-                    ]
-                }
-            }
-        };
-
-        await axios.post(
-            `${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`,
-            listMessage,
-            { headers: { Authorization: `Bearer ${ACCESS_TOKEN}` } }
-        );
+        const query = `SELECT a.*, e.nome AS nome_escola
+                       FROM alunos a
+                       JOIN escolas e ON a.id_escola = e.id
+                       WHERE a.id_matricula = $1 OR a.cpf = $1`;
+        const result = await client.query(query, [idOrCpf]);
 
         client.release();
+
+        if (result.rows.length > 0) {
+            return result.rows[0];
+        } else {
+            return null;
+        }
     } catch (error) {
-        console.error('Erro ao enviar a lista de escolas:', error);
-        await sendTextMessage(to, 'Desculpe, ocorreu um erro ao recuperar as escolas. Tente novamente mais tarde.');
+        console.error('Erro ao buscar aluno no banco de dados:', error);
+        return null;
     }
 }
 
@@ -3487,6 +3443,7 @@ async function saveRouteRequest(senderNumber) {
         await sendTextMessage(senderNumber, 'Desculpe, ocorreu um erro ao processar sua solicitação. Tente novamente mais tarde.');
     }
 }
+
 
 // Função para enviar o menu interativo principal
 async function sendInteractiveListMessage(to) {
