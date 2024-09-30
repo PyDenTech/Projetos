@@ -222,6 +222,10 @@ app.get('/cadastrar-bairro', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'teste_perimetro.html'));
 });
 
+app.get('/localizar', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'desenhar-rota.html'));
+});
+
 app.post('/api/upload-foto-perfil', ensureLoggedIn, uploadDisk.single('foto_perfil'), async (req, res) => {
     if (!req.file) {
         return res.status(400).send('Nenhum arquivo foi enviado.');
@@ -3243,198 +3247,198 @@ app.post('/webhook', async (req, res) => {
             }
         }
 
-    // Verifica se há um timer ativo para o usuário
-    if (userTimers[senderNumber]) {
-        clearTimeout(userTimers[senderNumber]); // Reseta o temporizador se o usuário respondeu
-    }
+        // Verifica se há um timer ativo para o usuário
+        if (userTimers[senderNumber]) {
+            clearTimeout(userTimers[senderNumber]); // Reseta o temporizador se o usuário respondeu
+        }
 
-    // Função para encerrar a conversa após 10 minutos de inatividade
-    const setInactivityTimeout = () => {
-        userTimers[senderNumber] = setTimeout(async () => {
-            await sendTextMessage(senderNumber, 'Percebemos que você está ocupado(a). Se precisar de mais ajuda, estamos à disposição. Pode nos chamar a qualquer momento.');
-            delete userState[senderNumber]; // Limpa o estado do usuário após o tempo limite
-            delete userTimers[senderNumber]; // Remove o temporizador
-        }, TIMEOUT_DURATION);
-    };
+        // Função para encerrar a conversa após 10 minutos de inatividade
+        const setInactivityTimeout = () => {
+            userTimers[senderNumber] = setTimeout(async () => {
+                await sendTextMessage(senderNumber, 'Percebemos que você está ocupado(a). Se precisar de mais ajuda, estamos à disposição. Pode nos chamar a qualquer momento.');
+                delete userState[senderNumber]; // Limpa o estado do usuário após o tempo limite
+                delete userTimers[senderNumber]; // Remove o temporizador
+            }, TIMEOUT_DURATION);
+        };
 
-    // Verifique primeiro se o usuário está no meio de uma solicitação
-    if (userState[senderNumber] && userState[senderNumber].step) {
-        switch (userState[senderNumber].step) {
-            case 'nome_responsavel':
-                userState[senderNumber].nome_responsavel = text;
-                userState[senderNumber].step = 'cpf_responsavel';
-                await sendTextMessage(senderNumber, 'Por favor, insira o CPF do responsável:');
-                break;
-            case 'cpf_responsavel':
-                userState[senderNumber].cpf_responsavel = text;
-                userState[senderNumber].step = 'cep';
-                await sendTextMessage(senderNumber, 'Por favor, insira o CEP do endereço:');
-                break;
-            case 'cep':
-                userState[senderNumber].cep = text;
-                userState[senderNumber].step = 'numero';
-                await sendTextMessage(senderNumber, 'Por favor, insira o número da residência:');
-                break;
-            case 'numero':
-                userState[senderNumber].numero = text;
-                userState[senderNumber].step = 'endereco';
-                await sendTextMessage(senderNumber, 'Por favor, insira o endereço completo:');
-                break;
-            case 'endereco':
-                userState[senderNumber].endereco = text;
-                userState[senderNumber].step = 'localizacao_atual';
-                await sendTextMessage(senderNumber, 'Por favor, compartilhe a sua localização atual para capturarmos os dados de latitude e longitude:');
-                break;
-            case 'localizacao_atual':
-                if (location) {
-                    userState[senderNumber].latitude = location.latitude;
-                    userState[senderNumber].longitude = location.longitude;
-                    userState[senderNumber].step = 'id_matricula_aluno';
-                    await sendTextMessage(senderNumber, 'Por favor, insira o ID de matrícula ou CPF do aluno (use apenas números):');
-                } else {
-                    await sendTextMessage(senderNumber, 'Você não enviou uma localização válida. Por favor, compartilhe sua localização atual:');
-                }
-                break;
-            case 'id_matricula_aluno':
-                userState[senderNumber].id_matricula_aluno = text;
+        // Verifique primeiro se o usuário está no meio de uma solicitação
+        if (userState[senderNumber] && userState[senderNumber].step) {
+            switch (userState[senderNumber].step) {
+                case 'nome_responsavel':
+                    userState[senderNumber].nome_responsavel = text;
+                    userState[senderNumber].step = 'cpf_responsavel';
+                    await sendTextMessage(senderNumber, 'Por favor, insira o CPF do responsável:');
+                    break;
+                case 'cpf_responsavel':
+                    userState[senderNumber].cpf_responsavel = text;
+                    userState[senderNumber].step = 'cep';
+                    await sendTextMessage(senderNumber, 'Por favor, insira o CEP do endereço:');
+                    break;
+                case 'cep':
+                    userState[senderNumber].cep = text;
+                    userState[senderNumber].step = 'numero';
+                    await sendTextMessage(senderNumber, 'Por favor, insira o número da residência:');
+                    break;
+                case 'numero':
+                    userState[senderNumber].numero = text;
+                    userState[senderNumber].step = 'endereco';
+                    await sendTextMessage(senderNumber, 'Por favor, insira o endereço completo:');
+                    break;
+                case 'endereco':
+                    userState[senderNumber].endereco = text;
+                    userState[senderNumber].step = 'localizacao_atual';
+                    await sendTextMessage(senderNumber, 'Por favor, compartilhe a sua localização atual para capturarmos os dados de latitude e longitude:');
+                    break;
+                case 'localizacao_atual':
+                    if (location) {
+                        userState[senderNumber].latitude = location.latitude;
+                        userState[senderNumber].longitude = location.longitude;
+                        userState[senderNumber].step = 'id_matricula_aluno';
+                        await sendTextMessage(senderNumber, 'Por favor, insira o ID de matrícula ou CPF do aluno (use apenas números):');
+                    } else {
+                        await sendTextMessage(senderNumber, 'Você não enviou uma localização válida. Por favor, compartilhe sua localização atual:');
+                    }
+                    break;
+                case 'id_matricula_aluno':
+                    userState[senderNumber].id_matricula_aluno = text;
 
-                // Consulta o banco de dados para encontrar a escola do aluno
-                const alunoData = await findStudentByIdOrCpf(userState[senderNumber].id_matricula_aluno);
-                if (alunoData) {
-                    userState[senderNumber].escola_id = alunoData.id_escola;
-                    await sendTextMessage(senderNumber, `Aluno encontrado! Matriculado na escola: ${alunoData.nome_escola}. O aluno possui alguma deficiência? Responda "Sim" ou "Não".`);
-                    userState[senderNumber].step = 'deficiencia';
-                } else {
-                    await sendTextMessage(senderNumber, 'ID de matrícula ou CPF do aluno não encontrado. Verifique os dados e tente novamente.');
+                    // Consulta o banco de dados para encontrar a escola do aluno
+                    const alunoData = await findStudentByIdOrCpf(userState[senderNumber].id_matricula_aluno);
+                    if (alunoData) {
+                        userState[senderNumber].escola_id = alunoData.id_escola;
+                        await sendTextMessage(senderNumber, `Aluno encontrado! Matriculado na escola: ${alunoData.nome_escola}. O aluno possui alguma deficiência? Responda "Sim" ou "Não".`);
+                        userState[senderNumber].step = 'deficiencia';
+                    } else {
+                        await sendTextMessage(senderNumber, 'ID de matrícula ou CPF do aluno não encontrado. Verifique os dados e tente novamente.');
+                        delete userState[senderNumber]; // Reseta o estado do usuário
+                    }
+                    break;
+                case 'deficiencia':
+                    if (text.toLowerCase() === 'sim') {
+                        userState[senderNumber].deficiencia = true;
+                        userState[senderNumber].step = 'laudo_deficiencia';
+                        await sendTextMessage(senderNumber, 'Por favor, envie o laudo médico que comprove a deficiência (pode ser uma imagem ou documento).');
+                    } else {
+                        userState[senderNumber].deficiencia = false;
+                        userState[senderNumber].laudo_deficiencia = null;
+                        userState[senderNumber].step = 'celular_responsavel';
+                        await sendTextMessage(senderNumber, 'Por favor, insira o telefone do responsável:');
+                    }
+                    break;
+                case 'laudo_deficiencia':
+                    if (media) {
+                        userState[senderNumber].laudo_deficiencia = media.id; // Salva o ID do documento/laudo
+                        userState[senderNumber].step = 'celular_responsavel';
+                        await sendTextMessage(senderNumber, 'Laudo médico recebido! Agora insira o telefone do responsável:');
+                    } else {
+                        await sendTextMessage(senderNumber, 'Por favor, envie um documento ou imagem válido do laudo médico.');
+                    }
+                    break;
+                case 'celular_responsavel':
+                    userState[senderNumber].celular_responsavel = text;
+                    userState[senderNumber].step = 'zoneamento';
+                    await sendTextMessage(senderNumber, 'Por favor, insira o bairro em que o aluno reside:');
+                    break;
+                case 'zoneamento':
+                    userState[senderNumber].zoneamento = text;
+                    userState[senderNumber].step = 'observacoes';
+                    await sendTextMessage(senderNumber, 'Por favor, insira qualquer observação adicional (ou digite "nenhuma" se não houver):');
+                    break;
+                case 'observacoes':
+                    userState[senderNumber].observacoes = text === 'nenhuma' ? '' : text;
+
+                    // Agora que todos os dados foram coletados, vamos inserir no banco de dados
+                    await saveRouteRequest(senderNumber);
+                    await sendTextMessage(senderNumber, 'Sua solicitação de rota foi enviada com sucesso! Em breve entraremos em contato.');
+                    delete userState[senderNumber]; // Limpa o estado do usuário após a conclusão
+                    break;
+                default:
+                    await sendInteractiveListMessage(senderNumber); // Caso não haja um estado conhecido, volta ao menu principal
+            }
+            // Inicia o temporizador para encerrar a conversa após 10 minutos de inatividade
+            setInactivityTimeout();
+        } else if (message.interactive && message.interactive.list_reply) {
+            const selectedOption = message.interactive.list_reply.id;
+
+            // Chama a função com base na opção selecionada
+            switch (selectedOption) {
+                case 'option_1':
+                    await sendParentsStudentsMenu(senderNumber);
+                    break;
+                case 'option_2':
+                    await sendSemedServersMenu(senderNumber);
+                    break;
+                case 'check_stop':
+                    userState[senderNumber] = 'awaiting_id'; // Define o estado como esperando o ID
+                    await sendTextMessage(senderNumber, 'Para consultar o ponto de parada mais próximo, por favor, forneça o ID de matrícula ou CPF do aluno. Este ID pode ser encontrado na carteirinha do aluno ou no comprovante de matrícula emitido pela escola e entregue ao pai ou responsável.\n\nDigite o ID de matrícula ou CPF do aluno para continuarmos:');
+                    break;
+                case 'request_route':
+                    userState[senderNumber] = { step: 'nome_responsavel' }; // Define que a próxima resposta será o nome do responsável
+                    await sendTextMessage(senderNumber, 'Por favor, insira o nome completo do responsável pela solicitação:');
+                    break;
+                case 'transport_questions':
+                    await sendTextMessage(senderNumber, 'Perguntas frequentes sobre transporte escolar: https://semedcanaadoscarajas.pydenexpress.com/faq');
+                    break;
+                case 'feedback':
+                    await sendTextMessage(senderNumber, 'Para enviar reclamações, elogios ou sugestões, acesse: https://semedcanaadoscarajas.pydenexpress.com/feedback');
+                    break;
+                case 'speak_to_agent':
+                    await sendTextMessage(senderNumber, 'Por favor, aguarde enquanto conectamos você a um atendente. Um momento, por favor.');
+                    break;
+                case 'end_service':
+                    await sendTextMessage(senderNumber, 'Atendimento encerrado. Se precisar de mais ajuda, envie uma mensagem a qualquer momento.');
                     delete userState[senderNumber]; // Reseta o estado do usuário
-                }
-                break;
-            case 'deficiencia':
-                if (text.toLowerCase() === 'sim') {
-                    userState[senderNumber].deficiencia = true;
-                    userState[senderNumber].step = 'laudo_deficiencia';
-                    await sendTextMessage(senderNumber, 'Por favor, envie o laudo médico que comprove a deficiência (pode ser uma imagem ou documento).');
-                } else {
-                    userState[senderNumber].deficiencia = false;
-                    userState[senderNumber].laudo_deficiencia = null;
-                    userState[senderNumber].step = 'celular_responsavel';
-                    await sendTextMessage(senderNumber, 'Por favor, insira o telefone do responsável:');
-                }
-                break;
-            case 'laudo_deficiencia':
-                if (media) {
-                    userState[senderNumber].laudo_deficiencia = media.id; // Salva o ID do documento/laudo
-                    userState[senderNumber].step = 'celular_responsavel';
-                    await sendTextMessage(senderNumber, 'Laudo médico recebido! Agora insira o telefone do responsável:');
-                } else {
-                    await sendTextMessage(senderNumber, 'Por favor, envie um documento ou imagem válido do laudo médico.');
-                }
-                break;
-            case 'celular_responsavel':
-                userState[senderNumber].celular_responsavel = text;
-                userState[senderNumber].step = 'zoneamento';
-                await sendTextMessage(senderNumber, 'Por favor, insira o bairro em que o aluno reside:');
-                break;
-            case 'zoneamento':
-                userState[senderNumber].zoneamento = text;
-                userState[senderNumber].step = 'observacoes';
-                await sendTextMessage(senderNumber, 'Por favor, insira qualquer observação adicional (ou digite "nenhuma" se não houver):');
-                break;
-            case 'observacoes':
-                userState[senderNumber].observacoes = text === 'nenhuma' ? '' : text;
+                    break;
+                case 'request_driver':
+                    await sendTextMessage(senderNumber, 'Para solicitar um motorista, por favor, preencha o formulário em: https://example.com/solicitar-motorista');
+                    break;
+                case 'schedule_driver':
+                    await sendTextMessage(senderNumber, 'Para agendar um motorista, por favor, preencha o formulário em: https://example.com/agendar-motorista');
+                    break;
+                case 'back_to_menu':
+                    await sendInteractiveListMessage(senderNumber); // Envia o menu principal
+                    break;
+                default:
+                    await sendInteractiveListMessage(senderNumber); // Envia o menu principal caso não haja opção válida
+            }
+            // Inicia o temporizador para encerrar a conversa após 10 minutos de inatividade
+            setInactivityTimeout();
+        } else if (userState[senderNumber] === 'awaiting_id') {
+            // Se o estado do usuário for 'awaiting_id', processa o ID fornecido
+            const isNumeric = /^[0-9]+$/.test(text); // Verifica se a resposta é numérica
 
-                // Agora que todos os dados foram coletados, vamos inserir no banco de dados
-                await saveRouteRequest(senderNumber);
-                await sendTextMessage(senderNumber, 'Sua solicitação de rota foi enviada com sucesso! Em breve entraremos em contato.');
-                delete userState[senderNumber]; // Limpa o estado do usuário após a conclusão
-                break;
-            default:
-                await sendInteractiveListMessage(senderNumber); // Caso não haja um estado conhecido, volta ao menu principal
-        }
-        // Inicia o temporizador para encerrar a conversa após 10 minutos de inatividade
-        setInactivityTimeout();
-    } else if (message.interactive && message.interactive.list_reply) {
-        const selectedOption = message.interactive.list_reply.id;
+            if (isNumeric) {
+                await checkStudentEnrollment(senderNumber, text); // Verifica a matrícula do aluno
+            } else {
+                await sendTextMessage(senderNumber, 'Por favor, forneça um ID de matrícula ou CPF válido, usando apenas números.');
+            }
+            // Inicia o temporizador para encerrar a conversa após 10 minutos de inatividade
+            setInactivityTimeout();
+        } else if (message.interactive && message.interactive.button_reply) {
+            const buttonResponse = message.interactive.button_reply.id;
 
-        // Chama a função com base na opção selecionada
-        switch (selectedOption) {
-            case 'option_1':
-                await sendParentsStudentsMenu(senderNumber);
-                break;
-            case 'option_2':
-                await sendSemedServersMenu(senderNumber);
-                break;
-            case 'check_stop':
-                userState[senderNumber] = 'awaiting_id'; // Define o estado como esperando o ID
-                await sendTextMessage(senderNumber, 'Para consultar o ponto de parada mais próximo, por favor, forneça o ID de matrícula ou CPF do aluno. Este ID pode ser encontrado na carteirinha do aluno ou no comprovante de matrícula emitido pela escola e entregue ao pai ou responsável.\n\nDigite o ID de matrícula ou CPF do aluno para continuarmos:');
-                break;
-            case 'request_route':
-                userState[senderNumber] = { step: 'nome_responsavel' }; // Define que a próxima resposta será o nome do responsável
+            // Verifica a resposta ao botão de confirmação
+            if (buttonResponse === 'confirm_yes') {
+                await checkStudentTransport(senderNumber); // Verifica o status de transporte escolar
+            } else if (buttonResponse === 'confirm_no') {
+                await sendTextMessage(senderNumber, 'Por favor, verifique o ID de matrícula ou CPF e tente novamente.');
+                userState[senderNumber] = 'awaiting_id'; // Volta ao estado aguardando ID
+            } else if (buttonResponse === 'request_transport_yes') {
+                userState[senderNumber] = { step: 'nome_responsavel' }; // Começa o fluxo de solicitação de rota
                 await sendTextMessage(senderNumber, 'Por favor, insira o nome completo do responsável pela solicitação:');
-                break;
-            case 'transport_questions':
-                await sendTextMessage(senderNumber, 'Perguntas frequentes sobre transporte escolar: https://semedcanaadoscarajas.pydenexpress.com/faq');
-                break;
-            case 'feedback':
-                await sendTextMessage(senderNumber, 'Para enviar reclamações, elogios ou sugestões, acesse: https://semedcanaadoscarajas.pydenexpress.com/feedback');
-                break;
-            case 'speak_to_agent':
-                await sendTextMessage(senderNumber, 'Por favor, aguarde enquanto conectamos você a um atendente. Um momento, por favor.');
-                break;
-            case 'end_service':
-                await sendTextMessage(senderNumber, 'Atendimento encerrado. Se precisar de mais ajuda, envie uma mensagem a qualquer momento.');
+            } else if (buttonResponse === 'request_transport_no') {
+                await sendTextMessage(senderNumber, 'Tudo bem! Se precisar de mais ajuda, envie uma mensagem a qualquer momento.');
                 delete userState[senderNumber]; // Reseta o estado do usuário
-                break;
-            case 'request_driver':
-                await sendTextMessage(senderNumber, 'Para solicitar um motorista, por favor, preencha o formulário em: https://example.com/solicitar-motorista');
-                break;
-            case 'schedule_driver':
-                await sendTextMessage(senderNumber, 'Para agendar um motorista, por favor, preencha o formulário em: https://example.com/agendar-motorista');
-                break;
-            case 'back_to_menu':
-                await sendInteractiveListMessage(senderNumber); // Envia o menu principal
-                break;
-            default:
-                await sendInteractiveListMessage(senderNumber); // Envia o menu principal caso não haja opção válida
-        }
-        // Inicia o temporizador para encerrar a conversa após 10 minutos de inatividade
-        setInactivityTimeout();
-    } else if (userState[senderNumber] === 'awaiting_id') {
-        // Se o estado do usuário for 'awaiting_id', processa o ID fornecido
-        const isNumeric = /^[0-9]+$/.test(text); // Verifica se a resposta é numérica
-
-        if (isNumeric) {
-            await checkStudentEnrollment(senderNumber, text); // Verifica a matrícula do aluno
+            }
+            // Inicia o temporizador para encerrar a conversa após 10 minutos de inatividade
+            setInactivityTimeout();
         } else {
-            await sendTextMessage(senderNumber, 'Por favor, forneça um ID de matrícula ou CPF válido, usando apenas números.');
+            // Se não for uma resposta interativa, envia o menu principal
+            await sendInteractiveListMessage(senderNumber);
+            // Inicia o temporizador para encerrar a conversa após 10 minutos de inatividade
+            setInactivityTimeout();
         }
-        // Inicia o temporizador para encerrar a conversa após 10 minutos de inatividade
-        setInactivityTimeout();
-    } else if (message.interactive && message.interactive.button_reply) {
-        const buttonResponse = message.interactive.button_reply.id;
-
-        // Verifica a resposta ao botão de confirmação
-        if (buttonResponse === 'confirm_yes') {
-            await checkStudentTransport(senderNumber); // Verifica o status de transporte escolar
-        } else if (buttonResponse === 'confirm_no') {
-            await sendTextMessage(senderNumber, 'Por favor, verifique o ID de matrícula ou CPF e tente novamente.');
-            userState[senderNumber] = 'awaiting_id'; // Volta ao estado aguardando ID
-        } else if (buttonResponse === 'request_transport_yes') {
-            userState[senderNumber] = { step: 'nome_responsavel' }; // Começa o fluxo de solicitação de rota
-            await sendTextMessage(senderNumber, 'Por favor, insira o nome completo do responsável pela solicitação:');
-        } else if (buttonResponse === 'request_transport_no') {
-            await sendTextMessage(senderNumber, 'Tudo bem! Se precisar de mais ajuda, envie uma mensagem a qualquer momento.');
-            delete userState[senderNumber]; // Reseta o estado do usuário
-        }
-        // Inicia o temporizador para encerrar a conversa após 10 minutos de inatividade
-        setInactivityTimeout();
-    } else {
-        // Se não for uma resposta interativa, envia o menu principal
-        await sendInteractiveListMessage(senderNumber);
-        // Inicia o temporizador para encerrar a conversa após 10 minutos de inatividade
-        setInactivityTimeout();
     }
-}
 
     res.sendStatus(200);
 });
@@ -3776,7 +3780,7 @@ async function checkStudentTransport(to) {
 
 // Função para obter as coordenadas de um endereço usando a API do Google Maps
 async function getCoordinatesFromAddress(address) {
-    try {        
+    try {
         const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json`, {
             params: {
                 address: address,
@@ -4007,29 +4011,40 @@ async function sendSemedServersMenu(to) {
     }
 }
 
-app.post('/traccar-data', async (req, res) => {
+app.post('/traccar', async (req, res) => {
     try {
-      const { latitude, longitude, speed, bearing, timestamp, battery } = req.body;
-  
-      // Verifica se os dados estão completos
-      if (!latitude || !longitude || !timestamp) {
-        return res.status(400).send('Dados incompletos');
-      }
-  
-      // Insere os dados no PostgreSQL
-      const query = `
-        INSERT INTO localizacao (latitude, longitude, velocidade, direcao, timestamp, bateria)
-        VALUES ($1, $2, $3, $4, $5, $6)
+        const { latitude, longitude, speed, bearing, timestamp } = req.body;
+
+        // Validações
+        if (!latitude || !longitude) {
+            return res.status(400).json({ message: 'Dados inválidos!' });
+        }
+
+        // Inserir os dados no banco de dados PostgreSQL
+        const query = `
+        INSERT INTO localizacao (latitude, longitude, velocidade, direcao, timestamp)
+        VALUES ($1, $2, $3, $4, $5)
       `;
-      await pool.query(query, [latitude, longitude, speed || 0, bearing || 0, timestamp, battery || 0]);
-  
-      res.status(200).send('Dados recebidos e armazenados com sucesso.');
+        await pool.query(query, [latitude, longitude, speed, bearing, timestamp]);
+
+        res.status(200).json({ message: 'Dados recebidos com sucesso!' });
     } catch (error) {
-      console.error('Erro ao armazenar os dados:', error);
-      res.status(500).send('Erro no servidor.');
+        console.error('Erro ao salvar dados: ', error);
+        res.status(500).json({ message: 'Erro no servidor' });
+    }
+});
+
+// Rota para fornecer dados ao front-end
+app.get('/localizacoes', async (req, res) => {
+    try {
+      const result = await pool.query('SELECT latitude, longitude FROM localizacao');
+      res.status(200).json(result.rows);
+    } catch (error) {
+      console.error('Erro ao obter dados: ', error);
+      res.status(500).json({ message: 'Erro no servidor' });
     }
   });
-
+  
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));

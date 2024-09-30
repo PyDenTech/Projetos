@@ -1,212 +1,50 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Desenhar Traçado e Exportar GPX</title>
-    <style>
-        /* CSS básico embutido para a página */
-        #map {
-            height: 85vh;
-            width: 100%;
-        }
-
-        #controls {
-            margin: 10px;
-            display: flex;
-            align-items: center;
-        }
-
-        #distance {
-            margin-left: 20px;
-            font-weight: bold;
-        }
-
-        button {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mapa de Localização</title>
+  <style>
+    #map {
+      height: 500px;
+      width: 100%;
+    }
+  </style>
 </head>
-
 <body>
-    <div id="controls">
-        <button id="export">Exportar para GPX</button>
-        <button id="viewMap">Visualizar no Google Maps</button>
-        <div id="distance">Distância: 0.00 km</div>
-    </div>
-    <div id="map"></div>
+  <h1>Mapa de Localização em Tempo Real</h1>
+  <div id="map"></div>
 
-    <!-- API do Google Maps -->
-    <script async
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&callback=initMap">
-        </script>
+  <script>
+    // Carregar o mapa
+    function initMap() {
+      // Coordenadas iniciais (pode ser uma posição padrão)
+      const initialLocation = { lat: -15.7801, lng: -47.9292 };
 
-    <!-- Script principal -->
-    <script>
-        let map;
-        let polyline;
-        let path = [];
-        let markers = [];
-        let totalDistance = 0;
+      // Criar o mapa
+      const map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 14,
+        center: initialLocation,
+      });
 
-        function initMap() {
-            // Inicializa o mapa centrado em Canaã dos Carajás
-            map = new google.maps.Map(document.getElementById('map'), {
-                center: { lat: -6.530080, lng: -49.851571 },
-                zoom: 15
-            });
-
-            polyline = new google.maps.Polyline({
-                map: map,
-                path: path,
-                strokeColor: '#FF0000',
-                strokeOpacity: 1.0,
-                strokeWeight: 2
-            });
-
-            // Adiciona ponto ao traçado ao clicar no mapa
-            map.addListener('click', function (event) {
-                addPoint(event.latLng);
-            });
-        }
-
-        function addPoint(location) {
-            if (path.length > 0) {
-                const lastPoint = path[path.length - 1];
-                totalDistance += google.maps.geometry.spherical.computeDistanceBetween(lastPoint, location) / 1000;
-                updateDistanceDisplay();
-            }
-            path.push(location);
-            polyline.setPath(path);
-
-            // Cria um marcador para o novo ponto
+      // Carregar as coordenadas do servidor
+      fetch('/localizacoes')
+        .then(response => response.json())
+        .then(data => {
+          data.forEach(location => {
             const marker = new google.maps.Marker({
-                position: location,
-                map: map,
-                draggable: true
+              position: { lat: location.latitude, lng: location.longitude },
+              map: map,
             });
+          });
+        })
+        .catch(error => console.error('Erro ao carregar dados: ', error));
+    }
+  </script>
 
-            markers.push(marker);
-
-            // Atualiza o traçado ao arrastar o marcador
-            marker.addListener('dragend', function (event) {
-                updatePoint(marker, event.latLng);
-            });
-
-            // Remove o marcador e o ponto ao clicar com o botão direito
-            marker.addListener('rightclick', function () {
-                removePoint(marker);
-            });
-
-            // Insere um ponto intermediário ao clicar com o botão esquerdo
-            marker.addListener('click', function () {
-                addIntermediatePoint(marker);
-            });
-        }
-
-        function addIntermediatePoint(marker) {
-            const index = markers.indexOf(marker);
-            if (index < markers.length - 1) {
-                const nextPoint = path[index + 1];
-                const midPoint = google.maps.geometry.spherical.interpolate(marker.getPosition(), nextPoint, 0.5);
-                path.splice(index + 1, 0, midPoint);
-
-                // Atualiza o traçado e marcadores
-                polyline.setPath(path);
-                const newMarker = new google.maps.Marker({
-                    position: midPoint,
-                    map: map,
-                    draggable: true
-                });
-
-                markers.splice(index + 1, 0, newMarker);
-                updateTotalDistance();
-
-                // Adiciona eventos ao novo marcador
-                newMarker.addListener('dragend', function (event) {
-                    updatePoint(newMarker, event.latLng);
-                });
-                newMarker.addListener('rightclick', function () {
-                    removePoint(newMarker);
-                });
-                newMarker.addListener('click', function () {
-                    addIntermediatePoint(newMarker);
-                });
-            }
-        }
-
-        function updatePoint(marker, location) {
-            const index = markers.indexOf(marker);
-            path[index] = location;
-            polyline.setPath(path);
-            updateTotalDistance();
-        }
-
-        function removePoint(marker) {
-            const index = markers.indexOf(marker);
-            if (index > -1) {
-                markers.splice(index, 1);
-                path.splice(index, 1);
-                marker.setMap(null);
-                updateTotalDistance();
-                polyline.setPath(path);
-            }
-        }
-
-        function updateTotalDistance() {
-            totalDistance = 0;
-            for (let i = 1; i < path.length; i++) {
-                totalDistance += google.maps.geometry.spherical.computeDistanceBetween(path[i - 1], path[i]) / 1000;
-            }
-            updateDistanceDisplay();
-        }
-
-        function updateDistanceDisplay() {
-            document.getElementById('distance').textContent = `Distância: ${totalDistance.toFixed(2)} km`;
-        }
-
-        function exportGPX() {
-            let gpx = `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="Mapa - Gerador de GPX">
-  <trk>
-    <name>Traçado Mapa</name>
-    <trkseg>`;
-
-            path.forEach((point) => {
-                gpx += `
-      <trkpt lat="${point.lat()}" lon="${point.lng()}"></trkpt>`;
-            });
-
-            gpx += `
-    </trkseg>
-  </trk>
-</gpx>`;
-
-            const blob = new Blob([gpx], { type: 'application/gpx+xml' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'tracado.gpx';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        function viewOnGoogleMaps() {
-            const coordinates = path.map(point => `${point.lat()},${point.lng()}`).join('|');
-            const url = `https://www.google.com/maps/dir/?api=1&origin=${path[0].lat()},${path[0].lng()}&destination=${path[path.length - 1].lat()},${path[path.length - 1].lng()}&waypoints=${coordinates}`;
-            window.open(url, '_blank');
-        }
-
-        document.getElementById('export').addEventListener('click', exportGPX);
-        document.getElementById('viewMap').addEventListener('click', viewOnGoogleMaps);
-    </script>
+  <!-- Google Maps API -->
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&callback=initMap">
+  </script>
 </body>
-
 </html>
