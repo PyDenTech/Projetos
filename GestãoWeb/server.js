@@ -4007,6 +4007,29 @@ async function sendSemedServersMenu(to) {
     }
 }
 
+app.post('/traccar-data', async (req, res) => {
+    try {
+      const { latitude, longitude, speed, bearing, timestamp, battery } = req.body;
+  
+      // Verifica se os dados estão completos
+      if (!latitude || !longitude || !timestamp) {
+        return res.status(400).send('Dados incompletos');
+      }
+  
+      // Insere os dados no PostgreSQL
+      const query = `
+        INSERT INTO localizacao (latitude, longitude, velocidade, direcao, timestamp, bateria)
+        VALUES ($1, $2, $3, $4, $5, $6)
+      `;
+      await pool.query(query, [latitude, longitude, speed || 0, bearing || 0, timestamp, battery || 0]);
+  
+      res.status(200).send('Dados recebidos e armazenados com sucesso.');
+    } catch (error) {
+      console.error('Erro ao armazenar os dados:', error);
+      res.status(500).send('Erro no servidor.');
+    }
+  });
+
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
