@@ -25,6 +25,7 @@
     <label for="date">Data:</label>
     <input type="date" id="date">
     <button onclick="fetchData()">Buscar Dados</button>
+    <button onclick="downloadGPX()">Baixar Arquivo GPX</button>
   </div>
 
   <div id="map"></div>
@@ -41,7 +42,7 @@
       });
     }
 
-    // Função para buscar os dados do backend
+    // Função para buscar os dados de GPS do backend
     async function fetchData() {
       const busPlate = document.getElementById('busPlate').value;
       const routeId = document.getElementById('routeId').value;
@@ -76,6 +77,34 @@
         }
       } catch (err) {
         console.error('Erro ao buscar dados:', err);
+      }
+    }
+
+    // Função para baixar o arquivo GPX
+    async function downloadGPX() {
+      const busPlate = document.getElementById('busPlate').value;
+      const routeId = document.getElementById('routeId').value;
+      const date = document.getElementById('date').value;
+
+      try {
+        const response = await fetch(`/api/get-gpx-file?busPlate=${busPlate}&routeId=${routeId}&date=${date}`);
+        
+        if (!response.ok) {
+          alert('Erro ao buscar arquivo GPX');
+          return;
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'rota.gpx';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+      } catch (err) {
+        console.error('Erro ao baixar arquivo GPX:', err);
       }
     }
 
