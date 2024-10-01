@@ -4044,6 +4044,43 @@ app.get('/localizacoes', async (req, res) => {
       res.status(500).json({ message: 'Erro no servidor' });
     }
   });
+
+  // Endpoint para consultar rotas
+app.get('/api/consultar-rota-app', async (req, res) => {
+    try {
+      const result = await pool.query('SELECT id, nome_rota FROM rotas');
+      res.json(result.rows);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Erro ao consultar rotas');
+    }
+  });
+  
+  // Endpoint para salvar dados de GPS
+  app.post('/api/salvar-dados', async (req, res) => {
+    const { routeId, busPlate, gpsData } = req.body;
+  
+    if (!routeId || !busPlate || !gpsData || !Array.isArray(gpsData)) {
+      return res.status(400).send('Dados inválidos');
+    }
+  
+    try {
+      const client = await pool.connect();
+  
+      for (const data of gpsData) {
+        await client.query(
+          'INSERT INTO gps_data (route_id, bus_plate, latitude, longitude, time) VALUES ($1, $2, $3, $4, $5)',
+          [routeId, busPlate, data.latitude, data.longitude, data.time]
+        );
+      }
+  
+      client.release();
+      res.status(200).send('Dados salvos com sucesso');
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Erro ao salvar dados de GPS');
+    }
+  });
   
 
 app.use((req, res, next) => {
