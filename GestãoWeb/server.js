@@ -4137,7 +4137,6 @@ app.post('/api/salvar-gpx', upload.single('gpxFile'), async (req, res) => {
     }
 });
 
-// Endpoint para buscar dados de GPS e GPX pelo ID da rota e data
 app.get('/api/get-location-and-gpx', async (req, res) => {
     const { routeId, date } = req.query;
 
@@ -4146,7 +4145,7 @@ app.get('/api/get-location-and-gpx', async (req, res) => {
     }
 
     try {
-        // Buscar dados de localização (GPS)
+        // Buscando dados GPS
         const gpsQuery = `
         SELECT latitude, longitude, time 
         FROM gps_data 
@@ -4156,7 +4155,7 @@ app.get('/api/get-location-and-gpx', async (req, res) => {
         const gpsValues = [routeId, date];
         const gpsResult = await pool.query(gpsQuery, gpsValues);
 
-        // Buscar arquivo GPX
+        // Buscando arquivo GPX
         const gpxQuery = `
         SELECT file_path 
         FROM gpx_files 
@@ -4170,12 +4169,10 @@ app.get('/api/get-location-and-gpx', async (req, res) => {
         const gpxFilePath = gpxResult.rows.length > 0 ? gpxResult.rows[0].file_path : null;
 
         if (gpxFilePath) {
-            // Use path.join para garantir que o caminho seja resolvido corretamente
             const absolutePath = path.join(__dirname, '../public/uploads/', path.basename(gpxFilePath));
 
-            // Verifique se o arquivo existe antes de tentar lê-lo
             if (fs.existsSync(absolutePath)) {
-                const gpxFileContent = fs.readFileSync(absolutePath, 'utf-8'); // Lê o arquivo GPX
+                const gpxFileContent = fs.readFileSync(absolutePath, 'utf-8');
                 res.json({ gpsData, gpxFile: gpxFileContent });
             } else {
                 res.status(404).send('Arquivo GPX não encontrado.');
@@ -4188,6 +4185,7 @@ app.get('/api/get-location-and-gpx', async (req, res) => {
         res.status(500).send('Erro ao buscar dados de GPS e GPX.');
     }
 });
+
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));

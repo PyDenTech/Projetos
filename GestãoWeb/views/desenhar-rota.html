@@ -11,11 +11,13 @@
       height: 600px;
       width: 100%;
     }
+
     .filters {
       margin-bottom: 20px;
     }
   </style>
 </head>
+
 <body>
   <h1>Visualização de Dados de GPS e Arquivos GPX</h1>
   <div class="filters">
@@ -54,23 +56,28 @@
       fetchDataAndGPX(routeId, date);
     }
 
-    // Função para buscar os dados de GPS e o arquivo GPX do backend
     async function fetchDataAndGPX(routeId, date) {
       try {
         const response = await fetch(`/api/get-location-and-gpx?routeId=${routeId}&date=${date}`);
-        const data = await response.json();
 
-        // Exibir os dados de GPS no mapa
-        displayGPSData(data.gpsData);
-
-        // Exibir o traçado GPX no mapa, se disponível
-        if (data.gpxFile) {
-          parseAndDrawGPX(data.gpxFile);
-        } else {
-          alert('Nenhum arquivo GPX encontrado.');
+        if (!response.ok) {
+          throw new Error(`Erro ao buscar dados: ${response.statusText}`);
         }
-      } catch (err) {
-        console.error('Erro ao buscar dados de GPS e GPX:', err);
+
+        const data = await response.json();
+        console.log('Dados de GPS e GPX:', data);
+
+        if (data.gpsData && data.gpsData.length > 0) {
+          // Exibir marcadores de GPS no mapa
+          displayMarkersOnMap(data.gpsData);
+        }
+
+        if (data.gpxFile) {
+          // Exibir o traçado GPX
+          parseAndDrawGPX(data.gpxFile);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar dados de GPS e GPX:', error);
       }
     }
 
@@ -141,4 +148,5 @@
     window.onload = initMap;
   </script>
 </body>
+
 </html>
