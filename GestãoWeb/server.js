@@ -4037,53 +4037,81 @@ app.post('/traccar', async (req, res) => {
 // Rota para fornecer dados ao front-end
 app.get('/localizacoes', async (req, res) => {
     try {
-      const result = await pool.query('SELECT latitude, longitude FROM localizacao');
-      res.status(200).json(result.rows);
+        const result = await pool.query('SELECT latitude, longitude FROM localizacao');
+        res.status(200).json(result.rows);
     } catch (error) {
-      console.error('Erro ao obter dados: ', error);
-      res.status(500).json({ message: 'Erro no servidor' });
+        console.error('Erro ao obter dados: ', error);
+        res.status(500).json({ message: 'Erro no servidor' });
     }
-  });
+});
 
 // Endpoint para consultar rotas
 app.get('/api/consultar-rota-app', async (req, res) => {
     try {
-      // Ajusta a consulta para retornar apenas o campo identificador_unico
-      const result = await pool.query('SELECT identificador_unico FROM rotas');
-      res.json(result.rows);
+        // Ajusta a consulta para retornar apenas o campo identificador_unico
+        const result = await pool.query('SELECT identificador_unico FROM rotas');
+        res.json(result.rows);
     } catch (err) {
-      console.error(err);
-      res.status(500).send('Erro ao consultar rotas');
+        console.error(err);
+        res.status(500).send('Erro ao consultar rotas');
     }
-  });
-  
-  
-  // Endpoint para salvar dados de GPS
-  app.post('/api/salvar-dados', async (req, res) => {
+});
+
+
+// Endpoint para salvar dados de GPS
+app.post('/api/salvar-dados', async (req, res) => {
     const { routeId, busPlate, gpsData } = req.body;
-  
+
     if (!routeId || !busPlate || !gpsData || !Array.isArray(gpsData)) {
-      return res.status(400).send('Dados inválidos');
+        return res.status(400).send('Dados inválidos');
     }
-  
+
     try {
-      const client = await pool.connect();
-  
-      for (const data of gpsData) {
-        await client.query(
-          'INSERT INTO gps_data (route_id, bus_plate, latitude, longitude, time) VALUES ($1, $2, $3, $4, $5)',
-          [routeId, busPlate, data.latitude, data.longitude, data.time]
-        );
-      }
-  
-      client.release();
-      res.status(200).send('Dados salvos com sucesso');
+        const client = await pool.connect();
+
+        for (const data of gpsData) {
+            await client.query(
+                'INSERT INTO gps_data (route_id, bus_plate, latitude, longitude, time) VALUES ($1, $2, $3, $4, $5)',
+                [routeId, busPlate, data.latitude, data.longitude, data.time]
+            );
+        }
+
+        client.release();
+        res.status(200).send('Dados salvos com sucesso');
     } catch (err) {
-      console.error(err);
-      res.status(500).send('Erro ao salvar dados de GPS');
+        console.error(err);
+        res.status(500).send('Erro ao salvar dados de GPS');
     }
-  });
-  
+});
+
+// Endpoint para salvar o arquivo GPX
+app.post('/api/salvar-gpx', async (req, res) => {
+    try {
+        const { routeId, date } = req.body;
+        const gpxFile = req.files.gpxFile;
+
+        if (!routeId || !gpxFile) {
+            return res.status(400).send('Dados inválidos');
+        }
+
+        // Salvar o arquivo GPX e associar ao ID da rota
+        const filePath = `/path/to/save/${gpxFile.name}`;
+        await gpxFile.mv(filePath);
+
+        // Salvar no banco de dados
+        await pool.query(
+            'INSERT INTO gpx_files (route_id, file_path, created_at) VALUES ($1, $2, $3)',
+            [routeId, filePath, date]
+        );
+
+        res.status(200).send('Arquivo GPX salvo com sucesso');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Erro ao salvar arquivo GPX');
+    }
+});
+
+
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
