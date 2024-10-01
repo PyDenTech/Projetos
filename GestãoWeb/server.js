@@ -4087,31 +4087,33 @@ app.post('/api/salvar-dados', async (req, res) => {
 // Endpoint para salvar o arquivo GPX
 app.post('/api/salvar-gpx', async (req, res) => {
     try {
-        const { routeId, date } = req.body;
-        const gpxFile = req.files.gpxFile;
-
-        if (!routeId || !gpxFile) {
-            return res.status(400).send('Dados inválidos');
-        }
-
-        // Salvar o arquivo GPX e associar ao ID da rota
-        const filePath = `/path/to/save/${gpxFile.name}`;
-        await gpxFile.mv(filePath);
-
-        // Salvar no banco de dados
-        await pool.query(
-            'INSERT INTO gpx_files (route_id, file_path, created_at) VALUES ($1, $2, $3)',
-            [routeId, filePath, date]
-        );
-
-        res.status(200).send('Arquivo GPX salvo com sucesso');
+      const { routeId, busPlate, date } = req.body;
+      const gpxFile = req.files.gpxFile;
+  
+      if (!routeId || !gpxFile || !busPlate) {
+        return res.status(400).send('Dados inválidos');
+      }
+  
+      // Defina o caminho para salvar o arquivo GPX na pasta public
+      const filePath = `${__dirname}/../public/gpx/${gpxFile.name}`;
+      await gpxFile.mv(filePath);
+  
+      // Inserir no banco de dados
+      const query = `
+        INSERT INTO gpx_files (route_id, bus_plate, file_path, created_at) 
+        VALUES ($1, $2, $3, $4)
+      `;
+      const values = [routeId, busPlate, filePath, date];
+  
+      await pool.query(query, values);
+  
+      res.status(200).send('Arquivo GPX salvo com sucesso');
     } catch (err) {
-        console.error(err);
-        res.status(500).send('Erro ao salvar arquivo GPX');
+      console.error(err);
+      res.status(500).send('Erro ao salvar arquivo GPX');
     }
-});
-
-
+  });  
+  
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
