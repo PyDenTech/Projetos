@@ -3,48 +3,83 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mapa de Localização</title>
+  <title>Visualização de GPS</title>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M"></script>
   <style>
     #map {
-      height: 500px;
+      height: 600px;
       width: 100%;
+    }
+    .filters {
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>Mapa de Localização em Tempo Real</h1>
+  <h1>Visualização de Dados de GPS</h1>
+  <div class="filters">
+    <label for="busPlate">Placa do Ônibus:</label>
+    <input type="text" id="busPlate" placeholder="Digite a placa do ônibus">
+    <label for="routeId">ID da Rota:</label>
+    <input type="text" id="routeId" placeholder="Digite o ID da rota">
+    <label for="date">Data:</label>
+    <input type="date" id="date">
+    <button onclick="fetchData()">Buscar Dados</button>
+  </div>
+
   <div id="map"></div>
 
   <script>
-    // Carregar o mapa
+    let map;
+    let markers = [];
+
+    // Inicializar o Google Maps
     function initMap() {
-      // Coordenadas iniciais (pode ser uma posição padrão)
-      const initialLocation = { lat: -15.7801, lng: -47.9292 };
-
-      // Criar o mapa
-      const map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 14,
-        center: initialLocation,
+      map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: -23.5505, lng: -46.6333 }, // Centraliza no Brasil
+        zoom: 12,
       });
-
-      // Carregar as coordenadas do servidor
-      fetch('/localizacoes')
-        .then(response => response.json())
-        .then(data => {
-          data.forEach(location => {
-            const marker = new google.maps.Marker({
-              position: { lat: location.latitude, lng: location.longitude },
-              map: map,
-            });
-          });
-        })
-        .catch(error => console.error('Erro ao carregar dados: ', error));
     }
-  </script>
 
-  <!-- Google Maps API -->
-  <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M&callback=initMap">
+    // Função para buscar os dados do backend
+    async function fetchData() {
+      const busPlate = document.getElementById('busPlate').value;
+      const routeId = document.getElementById('routeId').value;
+      const date = document.getElementById('date').value;
+
+      try {
+        const response = await fetch(`/api/get-location-data?busPlate=${busPlate}&routeId=${routeId}&date=${date}`);
+        const data = await response.json();
+
+        if (data.length === 0) {
+          alert('Nenhum dado encontrado');
+          return;
+        }
+
+        // Limpar os marcadores anteriores
+        markers.forEach(marker => marker.setMap(null));
+        markers = [];
+
+        // Exibir os dados no mapa
+        data.forEach(point => {
+          const marker = new google.maps.Marker({
+            position: { lat: point.latitude, lng: point.longitude },
+            map: map,
+            title: `Data: ${point.time}`
+          });
+          markers.push(marker);
+        });
+        
+        // Centralizar o mapa no primeiro ponto
+        if (data.length > 0) {
+          map.setCenter({ lat: data[0].latitude, lng: data[0].longitude });
+        }
+      } catch (err) {
+        console.error('Erro ao buscar dados:', err);
+      }
+    }
+
+    window.onload = initMap;
   </script>
 </body>
 </html>

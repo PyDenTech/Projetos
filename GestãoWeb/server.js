@@ -4137,6 +4137,40 @@ app.post('/api/salvar-gpx', upload.single('gpxFile'), async (req, res) => {
     }
 });
 
+// Endpoint para buscar dados de localização filtrados
+app.get('/api/get-location-data', async (req, res) => {
+    const { busPlate, routeId, date } = req.query;
+  
+    try {
+      // Montar a query com base nos filtros recebidos
+      let query = `SELECT latitude, longitude, time FROM gps_data WHERE 1=1`;
+      const values = [];
+  
+      if (busPlate) {
+        query += ` AND bus_plate = $${values.length + 1}`;
+        values.push(busPlate);
+      }
+  
+      if (routeId) {
+        query += ` AND route_id = $${values.length + 1}`;
+        values.push(routeId);
+      }
+  
+      if (date) {
+        query += ` AND DATE(time) = $${values.length + 1}`;
+        values.push(date);
+      }
+  
+      const result = await pool.query(query, values);
+  
+      res.json(result.rows);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Erro ao buscar dados de GPS');
+    }
+  });
+  
+
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
