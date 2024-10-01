@@ -4142,37 +4142,37 @@ app.post('/api/salvar-gpx', upload.single('gpxFile'), async (req, res) => {
 // Endpoint para recuperar arquivos GPX e dados de GPS por rota e data
 app.get('/api/recuperar-dados', async (req, res) => {
     try {
-      const { routeId, date } = req.query;
-  
-      if (!routeId || !date) {
-        return res.status(400).send('Faltando dados: routeId ou date');
-      }
-  
-      // Consultar arquivos GPX na tabela gpx_files
-      const gpxQuery = `
+        const { routeId, date } = req.query;
+
+        if (!routeId || !date) {
+            return res.status(400).send('Faltando dados: routeId ou date');
+        }
+
+        // Consultar arquivos GPX na tabela gpx_files
+        const gpxQuery = `
         SELECT file_path FROM gpx_files
         WHERE route_id = $1 AND created_at::date = $2
       `;
-      const gpxResult = await pool.query(gpxQuery, [routeId, date]);
-  
-      // Consultar dados GPS na tabela gps_data
-      const gpsQuery = `
+        const gpxResult = await pool.query(gpxQuery, [routeId, date]);
+
+        // Consultar dados GPS na tabela gps_data
+        const gpsQuery = `
         SELECT latitude, longitude, time FROM gps_data
         WHERE route_id = $1 AND time::date = $2
         ORDER BY time ASC
       `;
-      const gpsResult = await pool.query(gpsQuery, [routeId, date]);
-  
-      res.status(200).json({
-        gpxFiles: gpxResult.rows,
-        gpsData: gpsResult.rows,
-      });
+        const gpsResult = await pool.query(gpsQuery, [routeId, date]);
+
+        res.status(200).json({
+            gpxFiles: gpxResult.rows,
+            gpsData: gpsResult.rows,
+        });
     } catch (err) {
-      console.error(err);
-      res.status(500).send('Erro ao recuperar dados');
+        console.error(err);
+        res.status(500).send('Erro ao recuperar dados');
     }
-  });
-  
+});
+
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
 });
