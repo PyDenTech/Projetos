@@ -4171,10 +4171,16 @@ app.get('/api/get-location-and-gpx', async (req, res) => {
         const gpxFilePath = gpxResult.rows.length > 0 ? gpxResult.rows[0].file_path : null;
 
         if (gpxFilePath) {
-            const absolutePath = path.resolve(gpxFilePath);
-            const gpxFileContent = fs.readFileSync(absolutePath, 'utf-8'); // Lê o arquivo GPX
+            // Use path.join para garantir que o caminho seja resolvido corretamente
+            const absolutePath = path.join(__dirname, '../public/uploads/', path.basename(gpxFilePath));
 
-            res.json({ gpsData, gpxFile: gpxFileContent });
+            // Verifique se o arquivo existe antes de tentar lê-lo
+            if (fs.existsSync(absolutePath)) {
+                const gpxFileContent = fs.readFileSync(absolutePath, 'utf-8'); // Lê o arquivo GPX
+                res.json({ gpsData, gpxFile: gpxFileContent });
+            } else {
+                res.status(404).send('Arquivo GPX não encontrado.');
+            }
         } else {
             res.json({ gpsData, gpxFile: null });
         }
@@ -4183,7 +4189,6 @@ app.get('/api/get-location-and-gpx', async (req, res) => {
         res.status(500).send('Erro ao buscar dados de GPS e GPX.');
     }
 });
-
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
