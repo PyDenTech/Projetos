@@ -4094,7 +4094,6 @@ app.post('/api/salvar-dados', async (req, res) => {
     }
 });
 
-
 // Rota para salvar o arquivo GPX usando multer
 app.post('/api/salvar-gpx', upload.single('gpxFile'), async (req, res) => {
     try {
