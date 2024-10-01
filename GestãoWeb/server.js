@@ -4045,16 +4045,18 @@ app.get('/localizacoes', async (req, res) => {
     }
   });
 
-  // Endpoint para consultar rotas
+// Endpoint para consultar rotas
 app.get('/api/consultar-rota-app', async (req, res) => {
     try {
-      const result = await pool.query('SELECT id, nome_rota FROM rotas');
+      // Ajusta a consulta para retornar apenas o campo identificador_unico
+      const result = await pool.query('SELECT identificador_unico FROM rotas');
       res.json(result.rows);
     } catch (err) {
       console.error(err);
       res.status(500).send('Erro ao consultar rotas');
     }
   });
+  
   
   // Endpoint para salvar dados de GPS
   app.post('/api/salvar-dados', async (req, res) => {
