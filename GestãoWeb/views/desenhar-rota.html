@@ -11,18 +11,14 @@
       height: 600px;
       width: 100%;
     }
-
     .filters {
       margin-bottom: 20px;
     }
   </style>
 </head>
-
 <body>
   <h1>Visualização de Dados de GPS e Arquivos GPX</h1>
   <div class="filters">
-    <label for="busPlate">Placa do Ônibus:</label>
-    <input type="text" id="busPlate" placeholder="Digite a placa do ônibus">
     <label for="routeId">ID da Rota:</label>
     <input type="text" id="routeId" placeholder="Digite o ID da rota">
     <label for="date">Data:</label>
@@ -35,80 +31,68 @@
   <script>
     let map;
     let markers = [];
-    let gpxPolyline; // Polilinha do GPX
+    let gpxPolyline;
 
     // Inicializar o Google Maps
     function initMap() {
       map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: -23.5505, lng: -46.6333 }, // Centraliza no Brasil
+        center: { lat: -23.5505, lng: -46.6333 },
         zoom: 12,
       });
     }
 
     // Validação dos campos antes de buscar dados
     function validateAndFetchData() {
-      const busPlate = document.getElementById('busPlate').value;
       const routeId = document.getElementById('routeId').value;
       const date = document.getElementById('date').value;
 
-      if (!busPlate || !routeId || !date) {
-        alert('Preencha todos os campos: Placa, ID da Rota e Data.');
+      if (!routeId || !date) {
+        alert('Preencha todos os campos: ID da Rota e Data.');
         return;
       }
 
-      fetchData(busPlate, routeId, date);
-      fetchGPXFile(busPlate, routeId, date);
+      fetchDataAndGPX(routeId, date);
     }
 
-    // Função para buscar os dados de GPS do backend
-    async function fetchData(busPlate, routeId, date) {
+    // Função para buscar os dados de GPS e o arquivo GPX do backend
+    async function fetchDataAndGPX(routeId, date) {
       try {
-        const response = await fetch(`/api/get-location-data?busPlate=${busPlate}&routeId=${routeId}&date=${date}`);
+        const response = await fetch(`/api/get-location-and-gpx?routeId=${routeId}&date=${date}`);
         const data = await response.json();
 
-        if (data.length === 0) {
-          alert('Nenhum dado de GPS encontrado.');
-          return;
-        }
-
-        // Limpar os marcadores anteriores
-        markers.forEach(marker => marker.setMap(null));
-        markers = [];
-
         // Exibir os dados de GPS no mapa
-        data.forEach(point => {
-          const marker = new google.maps.Marker({
-            position: { lat: point.latitude, lng: point.longitude },
-            map: map,
-            title: `Data: ${point.time}`
-          });
-          markers.push(marker);
-        });
+        displayGPSData(data.gpsData);
 
-        // Centralizar o mapa no primeiro ponto
-        if (data.length > 0) {
-          map.setCenter({ lat: data[0].latitude, lng: data[0].longitude });
+        // Exibir o traçado GPX no mapa, se disponível
+        if (data.gpxFile) {
+          parseAndDrawGPX(data.gpxFile);
+        } else {
+          alert('Nenhum arquivo GPX encontrado.');
         }
       } catch (err) {
-        console.error('Erro ao buscar dados de GPS:', err);
+        console.error('Erro ao buscar dados de GPS e GPX:', err);
       }
     }
 
-    // Função para buscar e desenhar o arquivo GPX no mapa
-    async function fetchGPXFile(busPlate, routeId, date) {
-      try {
-        const response = await fetch(`/api/get-gpx-file?busPlate=${busPlate}&routeId=${routeId}&date=${date}`);
+    // Função para exibir os dados de GPS no mapa
+    function displayGPSData(gpsData) {
+      // Limpar marcadores antigos
+      markers.forEach(marker => marker.setMap(null));
+      markers = [];
 
-        if (!response.ok) {
-          alert('Erro ao buscar arquivo GPX.');
-          return;
-        }
+      // Exibir marcadores no mapa
+      gpsData.forEach(point => {
+        const marker = new google.maps.Marker({
+          position: { lat: point.latitude, lng: point.longitude },
+          map: map,
+          title: `Data: ${point.time}`
+        });
+        markers.push(marker);
+      });
 
-        const gpxText = await response.text();
-        console.log("GPX file content:", gpxText); // Log para verificar o conteúdo do GPX
-        parseAndDrawGPX(gpxText);
-      } catch (err) {
-        console.error('Erro ao buscar arquivo GPX:', err);
+      // Centralizar o mapa no primeiro ponto
+      if (gpsData.length > 0) {
+        map.setCenter({ lat: gpsData[0].latitude, lng: gpsData[0].longitude });
       }
     }
 
@@ -122,15 +106,12 @@
       for (let i = 0; i < trkpts.length; i++) {
         const lat = parseFloat(trkpts[i].getAttribute("lat"));
         const lon = parseFloat(trkpts[i].getAttribute("lon"));
-
-        // Verificar se os valores de latitude e longitude são válidos
         if (!isNaN(lat) && !isNaN(lon)) {
           path.push({ lat, lng: lon });
         }
       }
 
       if (path.length === 0) {
-        console.log('Nenhum ponto GPX válido encontrado.');
         alert('Erro: Nenhum traçado encontrado no arquivo GPX.');
         return;
       }
@@ -151,7 +132,7 @@
 
       gpxPolyline.setMap(map);
 
-      // Ajustar o zoom e centralizar o mapa para cobrir toda a área do traçado GPX
+      // Ajustar o zoom para cobrir toda a área do traçado GPX
       const bounds = new google.maps.LatLngBounds();
       path.forEach(point => bounds.extend(point));
       map.fitBounds(bounds);
@@ -160,5 +141,4 @@
     window.onload = initMap;
   </script>
 </body>
-
 </html>
