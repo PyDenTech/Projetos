@@ -4175,7 +4175,6 @@ app.get('/api/get-gpx-file', async (req, res) => {
     const { busPlate, routeId, date } = req.query;
 
     try {
-        // Montar a query com base nos filtros recebidos
         let query = `SELECT file_path FROM gpx_files WHERE 1=1`;
         const values = [];
 
@@ -4202,8 +4201,8 @@ app.get('/api/get-gpx-file', async (req, res) => {
 
         const gpxFilePath = result.rows[0].file_path;
 
-        // Enviar o arquivo GPX encontrado
-        res.download(gpxFilePath, (err) => {
+        // Enviar o arquivo GPX como texto
+        res.sendFile(gpxFilePath, (err) => {
             if (err) {
                 console.error('Erro ao enviar o arquivo GPX:', err);
                 res.status(500).send('Erro ao enviar o arquivo GPX');
