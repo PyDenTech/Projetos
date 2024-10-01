@@ -36,6 +36,7 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 app.use('/docs', express.static(path.join(__dirname, 'public', 'uploads')));
+app.use('/gpx', express.static(path.join(__dirname, 'public/gpx')));
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
