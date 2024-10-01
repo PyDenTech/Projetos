@@ -4074,9 +4074,18 @@ app.post('/api/salvar-dados', async (req, res) => {
         const client = await pool.connect();
 
         for (const data of gpsData) {
+            // Adicionar log dentro do loop para registrar cada entrada de GPS
+            console.log('Valores sendo inseridos:', {
+                routeId: String(routeId),
+                busPlate: busPlate,
+                latitude: data.latitude,
+                longitude: data.longitude,
+                time: data.time
+            });
+
             await client.query(
                 'INSERT INTO gps_data (route_id, bus_plate, latitude, longitude, time) VALUES ($1, $2, $3, $4, $5)',
-                [routeId, busPlate, data.latitude, data.longitude, data.time]
+                [String(routeId), busPlate, data.latitude, data.longitude, data.time] // Convertendo routeId para string
             );
         }
 
@@ -4087,6 +4096,7 @@ app.post('/api/salvar-dados', async (req, res) => {
         res.status(500).send('Erro ao salvar dados de GPS');
     }
 });
+
 
 // Endpoint para salvar o arquivo GPX
 app.post('/api/salvar-gpx', async (req, res) => {
