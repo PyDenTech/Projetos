@@ -4201,8 +4201,11 @@ app.get('/api/get-gpx-file', async (req, res) => {
 
         const gpxFilePath = result.rows[0].file_path;
 
-        // Enviar o arquivo GPX como texto
-        res.sendFile(gpxFilePath, (err) => {
+        // Transformar o caminho relativo em um caminho absoluto
+        const absolutePath = path.resolve(gpxFilePath);
+
+        // Enviar o arquivo GPX como resposta
+        res.sendFile(absolutePath, (err) => {
             if (err) {
                 console.error('Erro ao enviar o arquivo GPX:', err);
                 res.status(500).send('Erro ao enviar o arquivo GPX');
