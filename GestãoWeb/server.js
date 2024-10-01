@@ -4138,6 +4138,7 @@ app.post('/api/salvar-gpx', upload.single('gpxFile'), async (req, res) => {
     }
 });
 
+
 // Endpoint para recuperar arquivos GPX e dados de GPS por rota e data
 app.get('/api/recuperar-dados', async (req, res) => {
     try {
