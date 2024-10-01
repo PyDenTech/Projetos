@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,11 +11,13 @@
       height: 600px;
       width: 100%;
     }
+
     .filters {
       margin-bottom: 20px;
     }
   </style>
 </head>
+
 <body>
   <h1>Visualização de Dados de GPS e Arquivos GPX</h1>
   <div class="filters">
@@ -95,13 +98,14 @@
     async function fetchGPXFile(busPlate, routeId, date) {
       try {
         const response = await fetch(`/api/get-gpx-file?busPlate=${busPlate}&routeId=${routeId}&date=${date}`);
-        
+
         if (!response.ok) {
           alert('Erro ao buscar arquivo GPX.');
           return;
         }
 
         const gpxText = await response.text();
+        console.log("GPX file content:", gpxText); // Log para verificar o conteúdo do GPX
         parseAndDrawGPX(gpxText);
       } catch (err) {
         console.error('Erro ao buscar arquivo GPX:', err);
@@ -118,7 +122,17 @@
       for (let i = 0; i < trkpts.length; i++) {
         const lat = parseFloat(trkpts[i].getAttribute("lat"));
         const lon = parseFloat(trkpts[i].getAttribute("lon"));
-        path.push({ lat, lng: lon });
+
+        // Verificar se os valores de latitude e longitude são válidos
+        if (!isNaN(lat) && !isNaN(lon)) {
+          path.push({ lat, lng: lon });
+        }
+      }
+
+      if (path.length === 0) {
+        console.log('Nenhum ponto GPX válido encontrado.');
+        alert('Erro: Nenhum traçado encontrado no arquivo GPX.');
+        return;
       }
 
       // Remover polilinha antiga, se existir
@@ -137,13 +151,14 @@
 
       gpxPolyline.setMap(map);
 
-      // Centralizar o mapa na primeira coordenada do GPX
-      if (path.length > 0) {
-        map.setCenter(path[0]);
-      }
+      // Ajustar o zoom e centralizar o mapa para cobrir toda a área do traçado GPX
+      const bounds = new google.maps.LatLngBounds();
+      path.forEach(point => bounds.extend(point));
+      map.fitBounds(bounds);
     }
 
     window.onload = initMap;
   </script>
 </body>
+
 </html>
