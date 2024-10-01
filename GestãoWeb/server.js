@@ -4137,56 +4137,40 @@ app.post('/api/salvar-gpx', upload.single('gpxFile'), async (req, res) => {
     }
 });
 
-app.get('/api/get-location-and-gpx', async (req, res) => {
-    const { routeId, date } = req.query;
-
-    if (!routeId || !date) {
-        return res.status(400).send('Preencha o ID da rota e a data.');
-    }
-
+// Endpoint para recuperar arquivos GPX e dados de GPS por rota e data
+app.get('/api/recuperar-dados', async (req, res) => {
     try {
-        // Buscando dados GPS
-        const gpsQuery = `
-        SELECT latitude, longitude, time 
-        FROM gps_data 
-        WHERE route_id = $1 
-        AND DATE(time) = $2
+      const { routeId, date } = req.query;
+  
+      if (!routeId || !date) {
+        return res.status(400).send('Faltando dados: routeId ou date');
+      }
+  
+      // Consultar arquivos GPX na tabela gpx_files
+      const gpxQuery = `
+        SELECT file_path FROM gpx_files
+        WHERE route_id = $1 AND created_at::date = $2
       `;
-        const gpsValues = [routeId, date];
-        const gpsResult = await pool.query(gpsQuery, gpsValues);
-
-        // Buscando arquivo GPX
-        const gpxQuery = `
-        SELECT file_path 
-        FROM gpx_files 
-        WHERE route_id = $1 
-        AND DATE(created_at) = $2
+      const gpxResult = await pool.query(gpxQuery, [routeId, date]);
+  
+      // Consultar dados GPS na tabela gps_data
+      const gpsQuery = `
+        SELECT latitude, longitude, time FROM gps_data
+        WHERE route_id = $1 AND time::date = $2
+        ORDER BY time ASC
       `;
-        const gpxValues = [routeId, date];
-        const gpxResult = await pool.query(gpxQuery, gpxValues);
-
-        const gpsData = gpsResult.rows;
-        const gpxFilePath = gpxResult.rows.length > 0 ? gpxResult.rows[0].file_path : null;
-
-        if (gpxFilePath) {
-            const absolutePath = path.join(__dirname, '../public/uploads/', path.basename(gpxFilePath));
-
-            if (fs.existsSync(absolutePath)) {
-                const gpxFileContent = fs.readFileSync(absolutePath, 'utf-8');
-                res.json({ gpsData, gpxFile: gpxFileContent });
-            } else {
-                res.status(404).send('Arquivo GPX não encontrado.');
-            }
-        } else {
-            res.json({ gpsData, gpxFile: null });
-        }
+      const gpsResult = await pool.query(gpsQuery, [routeId, date]);
+  
+      res.status(200).json({
+        gpxFiles: gpxResult.rows,
+        gpsData: gpsResult.rows,
+      });
     } catch (err) {
-        console.error('Erro ao buscar dados de GPS e GPX:', err);
-        res.status(500).send('Erro ao buscar dados de GPS e GPX.');
+      console.error(err);
+      res.status(500).send('Erro ao recuperar dados');
     }
-});
-
-
+  });
+  
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
 });

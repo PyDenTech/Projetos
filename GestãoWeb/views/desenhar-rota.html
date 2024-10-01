@@ -1,135 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Visualização de GPS</title>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M"></script>
+  <title>Mapa de Rotas</title>
   <style>
     #map {
-      height: 600px;
+      height: 500px;
       width: 100%;
     }
-
-    .filters {
+    #form {
       margin-bottom: 20px;
     }
   </style>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAwvAt4l0Pkb1c52FLUE-ttVxm4YZ9J8M"></script>
 </head>
-
 <body>
-  <h1>Visualização de Dados de GPS e Arquivos GPX</h1>
-  <div class="filters">
+
+  <div id="form">
     <label for="routeId">ID da Rota:</label>
-    <input type="text" id="routeId" placeholder="Digite o ID da rota">
-    <label for="date">Data:</label>
+    <input type="text" id="routeId">
+    
+    <label for="date">Data (YYYY-MM-DD):</label>
     <input type="date" id="date">
-    <button onclick="validateAndFetchData()">Buscar Dados e Traçado GPX</button>
+    
+    <button onclick="fetchData()">Buscar Trajeto</button>
   </div>
 
   <div id="map"></div>
 
   <script>
     let map;
-    let markers = [];
-    let gpxPolyline;
 
-    // Inicializar o Google Maps
+    // Inicializar o mapa
     function initMap() {
       map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: -23.5505, lng: -46.6333 },
         zoom: 12,
+        center: { lat: -23.5505, lng: -46.6333 },  // Posição inicial (São Paulo)
       });
     }
 
-    // Validação dos campos antes de buscar dados
-    function validateAndFetchData() {
+    // Função para buscar os dados de localização
+    async function fetchData() {
       const routeId = document.getElementById('routeId').value;
       const date = document.getElementById('date').value;
 
       if (!routeId || !date) {
-        alert('Preencha todos os campos: ID da Rota e Data.');
+        alert('Por favor, preencha o ID da rota e a data');
         return;
       }
 
-      fetchDataAndGPX(routeId, date);
-    }
-
-    async function fetchDataAndGPX(routeId, date) {
       try {
-        const response = await fetch(`/api/get-location-and-gpx?routeId=${routeId}&date=${date}`);
-
-        if (!response.ok) {
-          throw new Error(`Erro ao buscar dados: ${response.statusText}`);
-        }
-
+        const response = await fetch(`/api/recuperar-dados?routeId=${routeId}&date=${date}`);
         const data = await response.json();
-        console.log('Dados de GPS e GPX:', data);
 
-        if (data.gpsData && data.gpsData.length > 0) {
-          // Exibir marcadores de GPS no mapa
-          displayMarkersOnMap(data.gpsData);
+        if (data.gpxFiles.length > 0) {
+          // Carregar e exibir arquivos GPX no mapa
+          data.gpxFiles.forEach(file => loadGPX(file.file_path));
         }
 
-        if (data.gpxFile) {
-          // Exibir o traçado GPX
-          parseAndDrawGPX(data.gpxFile);
+        if (data.gpsData.length > 0) {
+          // Exibir dados GPS no mapa
+          const gpsPath = data.gpsData.map(point => ({
+            lat: parseFloat(point.latitude),
+            lng: parseFloat(point.longitude),
+          }));
+          drawPathOnMap(gpsPath);
         }
+
       } catch (error) {
-        console.error('Erro ao buscar dados de GPS e GPX:', error);
+        console.error('Erro ao buscar dados:', error);
       }
     }
 
-    // Função para exibir os dados de GPS no mapa
-    function displayGPSData(gpsData) {
-      // Limpar marcadores antigos
-      markers.forEach(marker => marker.setMap(null));
-      markers = [];
-
-      // Exibir marcadores no mapa
-      gpsData.forEach(point => {
-        const marker = new google.maps.Marker({
-          position: { lat: point.latitude, lng: point.longitude },
-          map: map,
-          title: `Data: ${point.time}`
-        });
-        markers.push(marker);
-      });
-
-      // Centralizar o mapa no primeiro ponto
-      if (gpsData.length > 0) {
-        map.setCenter({ lat: gpsData[0].latitude, lng: gpsData[0].longitude });
-      }
-    }
-
-    // Função para parsear o arquivo GPX e desenhar a polilinha no mapa
-    function parseAndDrawGPX(gpxText) {
+    // Função para carregar o arquivo GPX e desenhar o trajeto
+    function loadGPX(gpxPath) {
       const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(gpxText, "application/xml");
-      const trkpts = xmlDoc.getElementsByTagName("trkpt");
+      fetch(gpxPath)
+        .then(response => response.text())
+        .then(gpxData => {
+          const gpxDoc = parser.parseFromString(gpxData, 'application/xml');
+          const points = gpxDoc.getElementsByTagName('trkpt');
 
-      const path = [];
-      for (let i = 0; i < trkpts.length; i++) {
-        const lat = parseFloat(trkpts[i].getAttribute("lat"));
-        const lon = parseFloat(trkpts[i].getAttribute("lon"));
-        if (!isNaN(lat) && !isNaN(lon)) {
-          path.push({ lat, lng: lon });
-        }
-      }
+          const path = [];
+          for (let i = 0; i < points.length; i++) {
+            const lat = parseFloat(points[i].getAttribute('lat'));
+            const lon = parseFloat(points[i].getAttribute('lon'));
+            path.push({ lat: lat, lng: lon });
+          }
 
-      if (path.length === 0) {
-        alert('Erro: Nenhum traçado encontrado no arquivo GPX.');
-        return;
-      }
+          drawPathOnMap(path);
+        });
+    }
 
-      // Remover polilinha antiga, se existir
-      if (gpxPolyline) {
-        gpxPolyline.setMap(null);
-      }
-
-      // Desenhar nova polilinha
-      gpxPolyline = new google.maps.Polyline({
+    // Função para desenhar o caminho no mapa
+    function drawPathOnMap(path) {
+      const polyline = new google.maps.Polyline({
         path: path,
         geodesic: true,
         strokeColor: '#FF0000',
@@ -137,16 +103,12 @@
         strokeWeight: 2,
       });
 
-      gpxPolyline.setMap(map);
-
-      // Ajustar o zoom para cobrir toda a área do traçado GPX
-      const bounds = new google.maps.LatLngBounds();
-      path.forEach(point => bounds.extend(point));
-      map.fitBounds(bounds);
+      polyline.setMap(map);
+      map.setCenter(path[0]);
     }
 
     window.onload = initMap;
   </script>
-</body>
 
+</body>
 </html>
