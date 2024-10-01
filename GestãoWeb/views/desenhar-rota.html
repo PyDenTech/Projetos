@@ -16,7 +16,7 @@
   </style>
 </head>
 <body>
-  <h1>Visualização de Dados de GPS</h1>
+  <h1>Visualização de Dados de GPS e Arquivos GPX</h1>
   <div class="filters">
     <label for="busPlate">Placa do Ônibus:</label>
     <input type="text" id="busPlate" placeholder="Digite a placa do ônibus">
@@ -24,8 +24,7 @@
     <input type="text" id="routeId" placeholder="Digite o ID da rota">
     <label for="date">Data:</label>
     <input type="date" id="date">
-    <button onclick="fetchData()">Buscar Dados</button>
-    <button onclick="downloadGPX()">Baixar Arquivo GPX</button>
+    <button onclick="validateAndFetchData()">Buscar Dados e Traçado GPX</button>
   </div>
 
   <div id="map"></div>
@@ -33,6 +32,7 @@
   <script>
     let map;
     let markers = [];
+    let gpxPolyline; // Polilinha do GPX
 
     // Inicializar o Google Maps
     function initMap() {
@@ -42,18 +42,29 @@
       });
     }
 
-    // Função para buscar os dados de GPS do backend
-    async function fetchData() {
+    // Validação dos campos antes de buscar dados
+    function validateAndFetchData() {
       const busPlate = document.getElementById('busPlate').value;
       const routeId = document.getElementById('routeId').value;
       const date = document.getElementById('date').value;
 
+      if (!busPlate || !routeId || !date) {
+        alert('Preencha todos os campos: Placa, ID da Rota e Data.');
+        return;
+      }
+
+      fetchData(busPlate, routeId, date);
+      fetchGPXFile(busPlate, routeId, date);
+    }
+
+    // Função para buscar os dados de GPS do backend
+    async function fetchData(busPlate, routeId, date) {
       try {
         const response = await fetch(`/api/get-location-data?busPlate=${busPlate}&routeId=${routeId}&date=${date}`);
         const data = await response.json();
 
         if (data.length === 0) {
-          alert('Nenhum dado encontrado');
+          alert('Nenhum dado de GPS encontrado.');
           return;
         }
 
@@ -61,7 +72,7 @@
         markers.forEach(marker => marker.setMap(null));
         markers = [];
 
-        // Exibir os dados no mapa
+        // Exibir os dados de GPS no mapa
         data.forEach(point => {
           const marker = new google.maps.Marker({
             position: { lat: point.latitude, lng: point.longitude },
@@ -70,41 +81,65 @@
           });
           markers.push(marker);
         });
-        
+
         // Centralizar o mapa no primeiro ponto
         if (data.length > 0) {
           map.setCenter({ lat: data[0].latitude, lng: data[0].longitude });
         }
       } catch (err) {
-        console.error('Erro ao buscar dados:', err);
+        console.error('Erro ao buscar dados de GPS:', err);
       }
     }
 
-    // Função para baixar o arquivo GPX
-    async function downloadGPX() {
-      const busPlate = document.getElementById('busPlate').value;
-      const routeId = document.getElementById('routeId').value;
-      const date = document.getElementById('date').value;
-
+    // Função para buscar e desenhar o arquivo GPX no mapa
+    async function fetchGPXFile(busPlate, routeId, date) {
       try {
         const response = await fetch(`/api/get-gpx-file?busPlate=${busPlate}&routeId=${routeId}&date=${date}`);
         
         if (!response.ok) {
-          alert('Erro ao buscar arquivo GPX');
+          alert('Erro ao buscar arquivo GPX.');
           return;
         }
 
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = url;
-        a.download = 'rota.gpx';
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
+        const gpxText = await response.text();
+        parseAndDrawGPX(gpxText);
       } catch (err) {
-        console.error('Erro ao baixar arquivo GPX:', err);
+        console.error('Erro ao buscar arquivo GPX:', err);
+      }
+    }
+
+    // Função para parsear o arquivo GPX e desenhar a polilinha no mapa
+    function parseAndDrawGPX(gpxText) {
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(gpxText, "application/xml");
+      const trkpts = xmlDoc.getElementsByTagName("trkpt");
+
+      const path = [];
+      for (let i = 0; i < trkpts.length; i++) {
+        const lat = parseFloat(trkpts[i].getAttribute("lat"));
+        const lon = parseFloat(trkpts[i].getAttribute("lon"));
+        path.push({ lat, lng: lon });
+      }
+
+      // Remover polilinha antiga, se existir
+      if (gpxPolyline) {
+        gpxPolyline.setMap(null);
+      }
+
+      // Desenhar nova polilinha
+      gpxPolyline = new google.maps.Polyline({
+        path: path,
+        geodesic: true,
+        strokeColor: '#FF0000',
+        strokeOpacity: 1.0,
+        strokeWeight: 2,
+      });
+
+      gpxPolyline.setMap(map);
+
+      // Centralizar o mapa na primeira coordenada do GPX
+      if (path.length > 0) {
+        map.setCenter(path[0]);
       }
     }
 
