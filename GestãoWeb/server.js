@@ -39,10 +39,6 @@ app.use('/docs', express.static(path.join(__dirname, 'public', 'uploads')));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-const fileUpload = require('express-fileupload');
-app.use(fileUpload());
-
-
 const saltRounds = 10;
 
 const pool = new Pool({
@@ -4098,36 +4094,35 @@ app.post('/api/salvar-dados', async (req, res) => {
 });
 
 
-// Endpoint para salvar o arquivo GPX
-app.post('/api/salvar-gpx', async (req, res) => {
+// Rota para salvar o arquivo GPX usando multer
+app.post('/api/salvar-gpx', upload.single('gpxFile'), async (req, res) => {
     try {
-        const { routeId, busPlate, date } = req.body;
-        const gpxFile = req.files.gpxFile;
-
-        if (!routeId || !gpxFile || !busPlate) {
-            return res.status(400).send('Dados inválidos');
-        }
-
-        // Defina o caminho para salvar o arquivo GPX na pasta public
-        const filePath = `${__dirname}/../public/gpx/${gpxFile.name}`;
-        await gpxFile.mv(filePath);
-
-        // Inserir no banco de dados
-        const query = `
+      const { routeId, busPlate, date } = req.body;
+      const gpxFile = req.file;
+  
+      if (!routeId || !gpxFile || !busPlate) {
+        return res.status(400).send('Dados inválidos');
+      }
+  
+      // Defina o caminho para salvar o arquivo GPX
+      const filePath = `public/uploads/${gpxFile.filename}`;
+  
+      // Inserir no banco de dados
+      const query = `
         INSERT INTO gpx_files (route_id, bus_plate, file_path, created_at) 
         VALUES ($1, $2, $3, $4)
       `;
-        const values = [routeId, busPlate, filePath, date];
-
-        await pool.query(query, values);
-
-        res.status(200).send('Arquivo GPX salvo com sucesso');
+      const values = [routeId, busPlate, filePath, date];
+  
+      await pool.query(query, values);
+  
+      res.status(200).send('Arquivo GPX salvo com sucesso');
     } catch (err) {
-        console.error(err);
-        res.status(500).send('Erro ao salvar arquivo GPX');
+      console.error(err);
+      res.status(500).send('Erro ao salvar arquivo GPX');
     }
-});
-
+  });
+  
 
 app.use((req, res, next) => {
     res.status(404).sendFile(path.join(__dirname, 'views', 'pages', '404.html'));
