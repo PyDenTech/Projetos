@@ -31,8 +31,8 @@ const ACCESS_TOKEN = process.env.ACCESS_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 const WHATSAPP_API_URL = 'https://graph.facebook.com/v20.0';
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true })); 
+app.use(bodyParser.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 app.use('/docs', express.static(path.join(__dirname, 'public', 'uploads')));
@@ -156,6 +156,9 @@ const diskStorage = multer.diskStorage({
 });
 
 
+
+
+
 // Função para formatar a data no formato dd/mm/aaaa
 function formatDate(date) {
     const d = new Date(date);
@@ -165,7 +168,10 @@ function formatDate(date) {
     return `${day}/${month}/${year}`;
 }
 
-const uploadDisk = multer({ storage: diskStorage });
+const uploadDisk = multer({
+    storage: diskStorage,
+    limits: { fileSize: 50 * 1024 * 1024 } // Limite de tamanho de arquivo de 50MB
+});
 
 const memoryStorage = multer.memoryStorage();
 const uploadMemory = multer({ storage: memoryStorage });
